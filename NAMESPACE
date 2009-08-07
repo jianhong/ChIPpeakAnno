@@ -1,0 +1,8 @@
+importFrom(biomaRt, useMart, getBM, getSequence)
+importFrom(multtest, mt.rawp2adjp)
+importFrom(stats, phyper)
+import(IRanges)
+import(Biostrings)
+import(BSgenome)
+import(GO.db)
+export(getAnnotation, annotatePeakInBatch, getAllPeakSequence, write2FASTA, getEnrichedGO, getUniqueGOidCount, hyperGtest,convert2EntrezID, addAncestors)

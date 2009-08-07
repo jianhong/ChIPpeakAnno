@@ -1,0 +1,45 @@
+\name{annotatePeakInBatch}
+\alias{annotatePeakInBatch}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{ obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak intervals}
+\description{
+  obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
+}
+\usage{
+annotatePeakInBatch(myPeakList, mart, featureType = "TSS", AnnotationData)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{myPeakList}{RangedData: See example below}
+  \item{mart}{used if AnnotationData not supplied, a mart object, see useMart of bioMaRt package for details }
+   \item{featureType}{ used if AnnotationData not supplied, TSS, miRNA or exon }
+  \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 for plus strand and -1 for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType}
+}
+\details{
+  }
+\value{
+ RangedData with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
+    \item{\code{feature}}{id of the feature such as ensembl gene ID}
+    \item{\code{insideFeature}}{TRUE for inside the feature and FALSE for between features}
+    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site}
+    \item{\code{start_position}}{start position of the feature such as gene}
+    \item{\code{end_position}}{end position of the feature such as the gene}
+    \item{\code{strand}}{1 for positive strand and -1 for negative strand where the feature is located}
+}
+\references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful link between biological biomarts and microarray data analysis. Bioinformatics, 21, 3439-3440.  }
+\author{ Lihua Julie Zhu }
+\note{ 
+}
+\seealso{  }
+\examples{
+
+if (interactive())
+{
+	data(myPeakList)
+	data(TSS.human.NCBI36)
+	annotatedPeak = annotatePeakInBatch(myPeakList[1:6,], AnnotationData=TSS.human.NCBI36)
+}
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ misc }
