@@ -6,7 +6,7 @@
   obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
 }
 \usage{
-annotatePeakInBatch(myPeakList, mart, featureType = "TSS", AnnotationData)
+annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,7 +21,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = "TSS", AnnotationData)
  RangedData with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
     \item{\code{feature}}{id of the feature such as ensembl gene ID}
     \item{\code{insideFeature}}{TRUE for inside the feature and FALSE for between features}
-    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site}
+    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site. The distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand}
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
     \item{\code{strand}}{1 for positive strand and -1 for negative strand where the feature is located}
@@ -35,9 +35,22 @@ annotatePeakInBatch(myPeakList, mart, featureType = "TSS", AnnotationData)
 
 if (interactive())
 {
+	## example 1: annotate myPeakList (RangedData) with TSS.human.NCBI36 (RangedData)
 	data(myPeakList)
 	data(TSS.human.NCBI36)
 	annotatedPeak = annotatePeakInBatch(myPeakList[1:6,], AnnotationData=TSS.human.NCBI36)
+	as.data.frame(annotatedPeak)
+	## example 2: you have a list of transcription factor biding sites from literature and are interested in 
+	## determining the extent of the overlap to the list of peaks from your experiment
+	## Prior calling the function annotatePeakInBatch, need to represent both dataset as RangedData where start is the start 
+	## of the binding site, end is the end of the binding site, names is the name of the binding site, 
+	## space and strand are the chromosome name and strand where the binding site is located.
+
+	myexp = RangedData(IRanges(start = c(967654, 2010897, 2496704), end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")), space = c("1", "2", "3"))
+	literature = RangedData(IRanges(start = c(967659, 2010898,  2496700, 3075866, 3123260), end = c(967869, 2011108, 2496920, 3076166, 3123470), names = c("t1", "t2", "t3", "t4", "t5")), space = c("1", "2", "3", "1", "2"), strand = c(1, 1, -1,-1,1))
+	annotatedPeak1= annotatePeakInBatch(myexp, AnnotationData = literature)
+
+	as.data.frame(annotatedPeak1)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -20,7 +20,7 @@ LazyLoad: \tab yes\cr
 
 }
 \author{
-Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson & Michael Green
+Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson, Simon Lin, David Lapointe and Michael Green
 
 
 Maintainer:
@@ -68,7 +68,7 @@ library(BSgenome.Ecoli.NCBI.20080805)
 
 	data(annotatedPeak)
 	y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
-hist(as.numeric(as.character(y)), xlab="Distance To Nearest TSS", main="", breaks=1000, ylim=c(0, 50), xlim=c(min(as.numeric(as.character(y)))-100, max(as.numeric(as.character(y)))+100))
+	hist(y, xlab="Distance To Nearest TSS", main="", breaks=1000, xlim=c(min(y)-100, max(y)+100))
 }
 
 }

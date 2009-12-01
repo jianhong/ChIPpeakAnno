@@ -38,16 +38,9 @@ getAllPeakSequence(myPeakList, upstream = 200, downstream = 200, genome, Annotat
 	peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
 	library(BSgenome.Ecoli.NCBI.20080805)
  	seq = getAllPeakSequence(peaks, upstream = 20,	downstream = 20, genome = Ecoli)
-if (interactive())
-{
-	### use Annotation data obtained from biomaRt
-	data(myPeakList)
-	myPeakList1 = myPeakList[1:2,]
-	data(TSS.human.NCBI36)
-	mart<-useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
-	seq1 = getAllPeakSequence(myPeakList1, upstream = 20,   downstream = 20, genome=mart, AnnotationData=TSS.human.NCBI36)
+	write2FASTA(seq)
 }
-}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ misc }

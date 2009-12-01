@@ -116,7 +116,12 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 				c(GOID(r[[1]]),Term(r[[1]]),Definition(r[[1]]), Ontology(r[[1]]))
 			}
 		}))
+	if (length(goterm.bp) <1)
+	{
+		goterm.bp =matrix(ncol=4)
+	}
 	colnames(goterm.bp) = c("go.id", "go.term", "Definition", "Ontology")
+	
 	goterm.mf = do.call(rbind, lapply(as.character(mf.s$go.id),function(x1)
 		{
 			r= xx[names(xx)==x1]
@@ -125,7 +130,12 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 				c(GOID(r[[1]]),Term(r[[1]]),Definition(r[[1]]), Ontology(r[[1]]))
 			}
 		}))
+	if (length(goterm.mf) <1)
+	{
+		goterm.mf =matrix(ncol=4)
+	}
 	colnames(goterm.mf) = c("go.id", "go.term", "Definition", "Ontology")
+	
 	goterm.cc = do.call(rbind, lapply(as.character(cc.s$go.id),function(x1)
 		{
 			r= xx[names(xx)==x1]
@@ -134,6 +144,10 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 				c(GOID(r[[1]]),Term(r[[1]]),Definition(r[[1]]), Ontology(r[[1]]))
 			}
 		}))
+	if (length(goterm.cc) <1)
+	{
+		goterm.cc =matrix(ncol=4)
+	}
 	colnames(goterm.cc) = c("go.id", "go.term", "Definition", "Ontology")
 	
 	bp.selected = merge(goterm.bp, bp.s,by="go.id")
@@ -141,4 +155,3 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 	cc.selected = merge(goterm.cc,cc.s,by="go.id")
 	list(bp=bp.selected, mf=mf.selected, cc=cc.selected)
 }
-

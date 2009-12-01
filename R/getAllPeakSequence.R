@@ -38,12 +38,14 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 			if (missing(AnnotationData))
 			{
 				message("No AnnotationData is passed in, so now querying biomart database for AnnotationData!")
-				TSS.ordered<- getAnnotation(genome)
+				AnnotationData <- getAnnotation(genome)
+				message("Done querying biomart database for AnnotationData, better way would be to call getAnnotation first, start querying for sequence ....")
 			}
 			if (class(AnnotationData)  != "RangedData")
 			{
 				message("No AnnotationData as RangedData is passed in, so now querying biomart database for AnnotationData!")
 				AnnotationData = getAnnotation(genome)
+				message("Done querying biomart database for AnnotationData, better way would be to call getAnnotation first, start querying for sequence ....")
 			}
 			downstream.bk = downstream
 			plusAnno = AnnotationData[AnnotationData$strand==1,]

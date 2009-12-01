@@ -101,12 +101,12 @@ enrichedGO$cc
 if (interactive()) {
 data(annotatedPeak)
 library(org.Hs.eg.db)
-enriched.GO = getEnrichedGO(annotatedPeak, orgAnn="org.Hs.eg.db", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
+enriched.GO = getEnrichedGO(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
  dim(enriched.GO$mf)
  colnames(enriched.GO$mf)
  dim(enriched.GO$bp)
  enriched.GO$cc
-} 
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
