@@ -1,7 +1,21 @@
 getEnrichedGO <-
 function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 {	
+	if (missing(annotatedPeak))
+	{
+		stop("Missing required argument annotatedPeak!")	
+	}
+	if (missing(orgAnn))
+	{
+		message("No valid organism specific GO gene mapping package as argument orgAnn is passed in!")
+		stop("Please refer http://www.bioconductor.org/packages/release/data/annotation/ for available org.xx.eg.db packages")
+	}
 	GOgenome = sub(".db","",orgAnn)
+	if (nchar(GOgenome) <1)
+	{
+		message("No valid organism specific GO gene mapping package as parameter orgAnn is passed in!")
+		stop("Please refer http://www.bioconductor.org/packages/release/data/annotation/ for available org.xx.eg.db packages")
+	}
 	if (class(annotatedPeak) == "RangedData")
 	{
 		feature_ids = unique(annotatedPeak$feature)

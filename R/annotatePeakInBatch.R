@@ -1,14 +1,22 @@
 annotatePeakInBatch <-
 function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 {
-		 featureType = match.arg(featureType)
-		 if (class(myPeakList) != "RangedData")
-		 {
-			stop("myPeakList needs to be RangedData object")
-		 }		
+		featureType = match.arg(featureType)
+		if (missing(myPeakList))
+		{
+			stop("Missing required argument myPeakList!")
+		}
+		if (class(myPeakList) != "RangedData")
+		{
+			stop("No valid myPeakList passed in. It needs to be RangedData object")
+		}
 		if (missing(AnnotationData))
 		{
 			message("No AnnotationData as RangedData is passed in, so now querying biomart database for AnnotationData ....")
+			if (missing(mart) || class(mart) !="Mart")
+			{
+				stop("Error in querying biomart database. No valid mart object is passed in! Suggest call getAnnotation before calling annotatePeakInBatch")
+			}
 			AnnotationData<- getAnnotation(mart, feature=featureType)
 			message("Done querying biomart database, start annotating ....Better way would be calling getAnnotation before calling annotatePeakInBatch")
 		}
@@ -18,22 +26,50 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 		}
 		
 		TSS.ordered <-AnnotationData
+		rm(AnnotationData)
 		
 		r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), TSS.ordered$strand)
 		colnames(r2) = c("feature_id", "start_position", "end_position", "strand")
 		allChr.Anno = unique(space(TSS.ordered))
 		
+		#allChr.Anno = sub("chr", '', allChr.Anno)
+		
 		numberOfChromosome = length(unique(space(myPeakList)))
 	
+		if (!length(rownames(myPeakList)))
+		{
+			rownames(myPeakList) = paste(as.character(space(myPeakList)),start(myPeakList),sep=":")
+		}
+		
+		allChr = unique(as.character(space(myPeakList)))
+		allChr = sub(' +', '',allChr)
+		
+		if(length(grep("chr", allChr, fixed=TRUE))>0 && length(grep("chr", allChr.Anno, fixed=TRUE))==0)
+		{
+			allChr = sub("chr", '', allChr)
+			myPeakList = RangedData(IRanges(start=start(myPeakList), 
+							end= end(myPeakList),
+							names = rownames(myPeakList)),
+							space = sub("chr", "", space(myPeakList))
+							)
+		}
+		
+		if(length(grep("chr", allChr, fixed=TRUE))==0 && length(grep("chr", allChr.Anno, fixed=TRUE))>0)
+		{
+			allChr = paste("chr", allChr, sep="")
+			myPeakList = RangedData(IRanges(start=start(myPeakList), 
+							end= end(myPeakList),
+							names = rownames(myPeakList)),
+							space = paste("chr", space(myPeakList), sep="")
+							)
+		}
 		z1 = cbind(as.character(rownames(myPeakList)), as.character(space(myPeakList)),start(myPeakList), end(myPeakList))
 		colnames(z1) = c("name", "chr", "peakStart", "peakEnd")
+		z1[,2] = sub(' +', '',z1[,2])
 		
-
-		allChr = unique(sub("chr", '', z1[,2]))
-		allChr = sub(' +', '',allChr, extended=TRUE)
-				
-		plusAnno = TSS.ordered[TSS.ordered$strand==1,]
-		minusAnno = TSS.ordered[TSS.ordered$strand== -1,]
+		plusAnno = TSS.ordered[TSS.ordered$strand==1 | TSS.ordered$strand =="+",]
+		
+		minusAnno = TSS.ordered[TSS.ordered$strand== -1 | TSS.ordered$strand =="-",]
 		r1 = do.call(rbind, lapply(seq_len(numberOfChromosome), function(i) {
          	chr = allChr[i]
 		  	if(chr %in% allChr.Anno)
@@ -58,8 +94,8 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 		
 		r = merge(r3, z1, all.y=TRUE)
 		
-		r11 = r[!is.na(r$strand) & r$strand==1,]
-		r22 = r[!is.na(r$strand) & r$strand==-1,]
+		r11 = r[!is.na(r$strand) & (r$strand==1 | r$strand =="+"),]
+		r22 = r[!is.na(r$strand) & (r$strand==-1 | r$strand =="-"),]
 		r33 = r[is.na(r$strand),]
 		r33$insideFeature = replicate(length(r33$name), NA)
 		r33$distancetoFeature = replicate(length(r33$name), NA)
@@ -79,7 +115,7 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 		RangedData(IRanges(start=c(as.numeric(as.character(r11$peakStart)),as.numeric(as.character(r22$peakStart)),as.numeric(as.character(r33$peakStart))), 
 						end=c(as.numeric(as.character(r11$peakEnd)),as.numeric(as.character(r22$peakEnd)),as.numeric(as.character(r33$peakEnd))),
 						names=c(as.character(r11$name),as.character(r22$name),as.character(r33$name))),
-          		strand = c(as.numeric(as.character(r11$strand)),as.numeric(as.character(r22$strand)), r33$strand), 
+          		strand = c(as.character(r11$strand),as.character(r22$strand), r33$strand), 
 				feature = c(as.character(r11$feature_id),as.character(r22$feature_id), r33$feature_id),
 				start_position= c(as.numeric(as.character(r11$start_position)),as.numeric(as.character(r22$start_position)),r33$start_position),
 				end_position=c(as.numeric(as.character(r11$end_position)),as.numeric(as.character(r22$end_position)), r33$end_position),
@@ -87,3 +123,4 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 				distancetoFeature=c(unlist(as.numeric(as.character(r11$distancetoFeature))), unlist(as.numeric(as.character(r22$distancetoFeature))), unlist(r33$distancetoFeature)),
 				space = c(as.character(r11$chr),as.character(r22$chr), as.character(r33$chr)))
 		}
+		

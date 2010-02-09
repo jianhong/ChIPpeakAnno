@@ -13,7 +13,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
   \item{myPeakList}{RangedData: See example below}
   \item{mart}{used if AnnotationData not supplied, a mart object, see useMart of bioMaRt package for details }
    \item{featureType}{ used if AnnotationData not supplied, TSS, miRNA or exon }
-  \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 for plus strand and -1 for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType}
+  \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType}
 }
 \details{
   }
@@ -24,7 +24,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
     \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site. The distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand}
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
-    \item{\code{strand}}{1 for positive strand and -1 for negative strand where the feature is located}
+    \item{\code{strand}}{1 or + for positive strand and -1 or - for negative strand where the feature is located}
 }
 \references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful link between biological biomarts and microarray data analysis. Bioinformatics, 21, 3439-3440.  }
 \author{ Lihua Julie Zhu }
@@ -51,6 +51,13 @@ if (interactive())
 	annotatedPeak1= annotatePeakInBatch(myexp, AnnotationData = literature)
 
 	as.data.frame(annotatedPeak1)
+	### use BED2RangedData or GFF2RangedData to convert BED format or GFF format to RangedData before calling annotatePeakInBatch
+	test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
+	test.rangedData = BED2RangedData(test.bed)
+	annotatePeakInBatch(test.rangedData, AnnotationData = literature)
+	test.GFF = data.frame(cbind(seqname  = c("chr1", "chr2"), source=rep("Macs", 2), feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), strand=c(1, -1), frame=c(".", 2), group=c("peak1", "peak2")))
+	test.rangedData = GFF2RangedData(test.GFF)
+	as.data.frame(annotatePeakInBatch(test.rangedData, AnnotationData = literature))
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
