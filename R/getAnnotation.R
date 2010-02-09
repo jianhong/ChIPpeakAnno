@@ -21,7 +21,7 @@ function(mart, featureType=c("TSS","miRNA", "Exon"))
 		
 		TSS = unique(TSS[,1:6])
 		TSS = TSS[order(TSS[,3]),]
-		RangedData(IRanges(start=as.numeric(TSS[,3]), end=as.numeric(TSS[,4]), names= TSS[,1]),
-          strand = TSS[,5],   description=TSS[,6], space = TSS[,2])
+		RangedData(IRanges(start=as.numeric(TSS[,3]), end=as.numeric(TSS[,4]), names= as.character(TSS[,1])),
+          strand = TSS[,5],   description=as.character(TSS[,6]), space = as.character(TSS[,2]))
 }
 
