@@ -12,7 +12,7 @@ GFF2RangedData <- function(data.GFF,header=FALSE)
 	{
 		myPeak = data.GFF
 	}	
-	strand = myPeak[,7]
+	strand = as.character(myPeak[,7])
 	strand[strand== "+"] = 1
 	strand[strand=="-"] = -1
 	names = paste(myPeak[,1], myPeak[,4], myPeak[,5],sep="-")

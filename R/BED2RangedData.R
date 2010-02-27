@@ -15,10 +15,14 @@ BED2RangedData <- function(data.BED,header=FALSE)
 	if (dim(myPeak)[2] >=4)
 	{
 		names = as.character(myPeak[,4])
+		if (length(unique(names))==1)
+		{
+			 names = paste(myPeak[,1], myPeak[,2], myPeak[,3], sep="-")
+		}
 	}
 	else
 	{
-		names = paste(myPeak[,1], myPeak[,2], myPeak[,3])
+		names = paste(myPeak[,1], myPeak[,2], myPeak[,3], sep="-")
 	}
 	if (dim(myPeak)[2] >= 5)
 	{		
@@ -30,7 +34,7 @@ BED2RangedData <- function(data.BED,header=FALSE)
 	}
 	if (dim(myPeak)[2] >= 6)
 	{		
-		strand = myPeak[,6]
+		strand = as.character(myPeak[,6])
 		strand[strand== "+"] = 1
 		strand[strand=="-"] = -1
 	}
