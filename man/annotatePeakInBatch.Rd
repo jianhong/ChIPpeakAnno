@@ -20,7 +20,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
 \value{
  RangedData with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
     \item{\code{feature}}{id of the feature such as ensembl gene ID}
-    \item{\code{insideFeature}}{TRUE for inside the feature and FALSE for between features}
+    \item{\code{insideFeature}}{upstream: peak resides upstream of the feature; downstream: peak resides downstream of the feature; inside: peak resides inside the feature; overlapStart: peak overlaps with the start of the feature; overlapEnd: peak overlaps with the end of the feature; includeFeature: peak include the feature entirely}
     \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site. The distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand}
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
@@ -30,7 +30,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
 \author{ Lihua Julie Zhu }
 \note{ 
 }
-\seealso{  }
+\seealso{ findOverlappingPeaks, makeVennDiagram }
 \examples{
 
 if (interactive())
@@ -46,16 +46,14 @@ if (interactive())
 	## of the binding site, end is the end of the binding site, names is the name of the binding site, 
 	## space and strand are the chromosome name and strand where the binding site is located.
 
-	myexp = RangedData(IRanges(start = c(967654, 2010897, 2496704), end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")), space = c("1", "2", "3"))
-	literature = RangedData(IRanges(start = c(967659, 2010898,  2496700, 3075866, 3123260), end = c(967869, 2011108, 2496920, 3076166, 3123470), names = c("t1", "t2", "t3", "t4", "t5")), space = c("1", "2", "3", "1", "2"), strand = c(1, 1, -1,-1,1))
-	annotatedPeak1= annotatePeakInBatch(myexp, AnnotationData = literature)
-
+	myexp =  RangedData(IRanges(start=c(1543200,1557200,1563000,1569800,167889600,100,1000),end=c(1555199,1560599,1565199,1573799,167893599,200,1200),names=c("p1","p2","p3","p4","p5","p6", "p7")),strand=as.integer(1),space=c(6,6,6,6,5,4,4))	literature = RangedData(IRanges(start=c(1549800,1554400,1565000,1569400,167888600,120,800),end=c(1550599,1560799,1565399,1571199,167888999,140,1400),names=c("f1","f2","f3","f4","f5","f6","f7")),strand=c(1,1,1,1,1,-1,-1),space=c(6,6,6,6,5,4,4))	annotatedPeak1= annotatePeakInBatch(myexp, AnnotationData = literature)
+	pie(table(as.data.frame(annotatedPeak1)$insideFeature))
 	as.data.frame(annotatedPeak1)
 	### use BED2RangedData or GFF2RangedData to convert BED format or GFF format to RangedData before calling annotatePeakInBatch
-	test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
+	test.bed = data.frame(cbind(chrom = c("4", "6"), chromStart=c("100", "1000"),chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
 	test.rangedData = BED2RangedData(test.bed)
 	annotatePeakInBatch(test.rangedData, AnnotationData = literature)
-	test.GFF = data.frame(cbind(seqname  = c("chr1", "chr2"), source=rep("Macs", 2), feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), strand=c(1, -1), frame=c(".", 2), group=c("peak1", "peak2")))
+	test.GFF = data.frame(cbind(seqname  = c("chr4", "chr4"), source=rep("Macs", 2), feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), strand=c(1, 1), frame=c(".", 2), group=c("peak1", "peak2")))
 	test.rangedData = GFF2RangedData(test.GFF)
 	as.data.frame(annotatePeakInBatch(test.rangedData, AnnotationData = literature))
 }

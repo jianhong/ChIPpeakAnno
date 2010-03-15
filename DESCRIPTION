@@ -1,12 +1,12 @@
 Package: ChIPpeakAnno
 Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip experiments.
-Version: 1.3.4
+Version: 1.3.5
 Date: 2009-07-30
 Author: Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson,Simon Lin, David Lapointe and Michael Green
 Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>
-Depends: biomaRt, multtest, IRanges, Biostrings, BSgenome,BSgenome.Ecoli.NCBI.20080805, GO.db,org.Hs.eg.db
-Imports: biomaRt, multtest, IRanges, Biostrings, BSgenome, GO.db
+Depends: biomaRt, multtest, IRanges, Biostrings, BSgenome,BSgenome.Ecoli.NCBI.20080805, GO.db,org.Hs.eg.db,limma
+Imports: biomaRt, multtest, IRanges, Biostrings, BSgenome, GO.db,limma
 biocViews: Annotation, ChIPseq, ChIPchip
 Description: The package includes functions to retrieve the sequences around the peak, obtain enriched Gene Ontology (GO) terms, find the nearest gene, exon, miRNA or custom features such as most conserved elements and other transcription factor binding sites supplied by users. This package leverages the biomaRt, IRanges, Biostrings, BSgenome, GO.db, multtest and stat packages
 License: GPL (>= 2)

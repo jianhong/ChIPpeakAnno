@@ -27,7 +27,10 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 		
 		TSS.ordered <-AnnotationData
 		rm(AnnotationData)
-		
+		if (!length(rownames(TSS.ordered)))
+		{
+			rownames(TSS.ordered) = formatC(1:dim(TSS.ordered)[1], width=nchar(dim(TSS.ordered)[1]), flag='0')
+		}
 		r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), TSS.ordered$strand)
 		colnames(r2) = c("feature_id", "start_position", "end_position", "strand")
 		allChr.Anno = unique(space(TSS.ordered))
@@ -38,7 +41,7 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 	
 		if (!length(rownames(myPeakList)))
 		{
-			rownames(myPeakList) = paste(as.character(space(myPeakList)),start(myPeakList),sep=":")
+			rownames(myPeakList) = formatC(1:dim(myPeakList)[1], width=nchar(dim(myPeakList)[1]), flag='0')
 		}
 		
 		allChr = unique(as.character(space(myPeakList)))
@@ -90,29 +93,101 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 			}
        }))
 		
-		r3 = merge(r1,r2, by="feature_id")
+		if (length(r1)>0)
+		{
+			r3 = merge(r1,r2, by="feature_id")
+			r = merge(r3, z1, all.y=TRUE)
 		
-		r = merge(r3, z1, all.y=TRUE)
+			r11 = r[!is.na(r$strand) & (r$strand==1 | r$strand =="+"),]
+			r22 = r[!is.na(r$strand) & (r$strand==-1 | r$strand =="-"),]
+			r33 = r[is.na(r$strand),]
+			r33$insideFeature = replicate(length(r33$name), NA)
+			r33$distancetoFeature = replicate(length(r33$name), NA)
 		
-		r11 = r[!is.na(r$strand) & (r$strand==1 | r$strand =="+"),]
-		r22 = r[!is.na(r$strand) & (r$strand==-1 | r$strand =="-"),]
-		r33 = r[is.na(r$strand),]
-		r33$insideFeature = replicate(length(r33$name), NA)
-		r33$distancetoFeature = replicate(length(r33$name), NA)
-		
+		if (dim(r11)[1] >0)
+		{
 		distancetoFeature =  as.numeric(as.character(r11$peakStart)) - as.numeric(as.character(r11$start_position))
 		length =  as.numeric(as.character(r11$end_position)) -  as.numeric(as.character(r11$start_position))
-		insideFeature = (distancetoFeature>=0 & distancetoFeature <= length)		
+		#insideFeature = (distancetoFeature>=0 & distancetoFeature <= length)
+		insideFeature = do.call(c, lapply(seq(from=1,to=dim(r11)[1],by=1), function(i) 	{
+		if (as.numeric(as.character(r11$peakStart[i]))>= as.numeric(as.character(r11$start_position[i])) &
+			as.numeric(as.character(r11$peakStart[i]))<= as.numeric(as.character(r11$end_position[i])))
+		{
+			if (as.numeric(as.character(r11$peakEnd[i])) >= as.numeric(as.character(r11$start_position[i])) &
+			as.numeric(as.character(r11$peakEnd[i])) <= as.numeric(as.character(r11$end_position[i])))
+			{
+				"inside"
+			}
+			else
+			{
+				"overlapEnd"
+			}
+		}
+		else if (as.numeric(as.character(r11$peakEnd[i])) >= as.numeric(as.character(r11$start_position[i])) &
+			as.numeric(as.character(r11$peakEnd[i])) <= as.numeric(as.character(r11$end_position[i])))
+		{
+				"overlapStart"
+		}
+		else if (as.numeric(as.character(r11$peakEnd[i])) >= as.numeric(as.character(r11$end_position[i])) &
+			as.numeric(as.character(r11$peakStart[i])) <= as.numeric(as.character(r11$start_position[i])))
+		{
+				 "includeFeature"
+		}
+		else if (as.numeric(as.character(r11$peakEnd[i])) < as.numeric(as.character(r11$start_position[i])))
+		{
+				"upstream"
+		}
+		else if (as.numeric(as.character(r11$peakStart[i])) > as.numeric(as.character(r11$end_position[i])))
+		{
+				"downstream"
+		}
+		}))
 		r11$insideFeature = insideFeature		
 		r11$distancetoFeature = distancetoFeature
-		
+		}
+		if (dim(r22)[1] >0)
+		{		
 		distancetoFeature =  as.numeric(as.character(r22$end_position)) - as.numeric(as.character(r22$peakStart))
 		length =  as.numeric(as.character(r22$end_position)) -  as.numeric(as.character(r22$start_position))
-		insideFeature = (distancetoFeature>=0 & distancetoFeature <= length)		
+		#insideFeature = (distancetoFeature>=0 & distancetoFeature <= length)	
+		insideFeature = do.call(c, lapply(seq(from=1,to=dim(r22)[1],by=1), function(i) 	{		
+			if (as.numeric(as.character(r22$peakStart[i]))>= as.numeric(as.character(r22$start_position[i])) &
+			as.numeric(as.character(r22$peakStart[i]))<= as.numeric(as.character(r22$end_position[i])))
+			{
+			if (as.numeric(as.character(r22$peakEnd[i])) >= as.numeric(as.character(r22$start_position[i])) &
+			as.numeric(as.character(r22$peakEnd[i])) <= as.numeric(as.character(r22$end_position[i])))
+			{
+				"inside"
+			}
+			else
+			{
+				"overlapStart"
+			}
+			}
+		else if (as.numeric(as.character(r22$peakEnd[i])) >= as.numeric(as.character(r22$start_position[i])) &
+			as.numeric(as.character(r22$peakEnd[i])) <= as.numeric(as.character(r22$end_position[i])))
+		{
+				"overlapEnd"
+		}
+		else if (as.numeric(as.character(r22$peakEnd[i])) >= as.numeric(as.character(r22$end_position[i])) &
+			as.numeric(as.character(r22$peakStart[i])) <= as.numeric(as.character(r22$start_position[i])))
+		{
+				 "includeFeature"
+		}
+		else if (as.numeric(as.character(r22$peakEnd[i])) < as.numeric(as.character(r22$start_position[i])))
+		{
+				"downstream"
+		}
+		else if (as.numeric(as.character(r22$peakStart[i])) > as.numeric(as.character(r22$end_position[i])))
+		{
+				"upstream"
+		}
+		}))					
+							
 		r22$insideFeature = insideFeature
 		r22$distancetoFeature = distancetoFeature
-		
-		RangedData(IRanges(start=c(as.numeric(as.character(r11$peakStart)),as.numeric(as.character(r22$peakStart)),as.numeric(as.character(r33$peakStart))), 
+		}
+		r = RangedData(IRanges(start=c(as.numeric(as.character(r11$peakStart)),as.numeric(as.character(r22$peakStart)),as.numeric(as.character(r33$peakStart))), 
 						end=c(as.numeric(as.character(r11$peakEnd)),as.numeric(as.character(r22$peakEnd)),as.numeric(as.character(r33$peakEnd))),
 						names=c(as.character(r11$name),as.character(r22$name),as.character(r33$name))),
           		strand = c(as.character(r11$strand),as.character(r22$strand), r33$strand), 
@@ -122,5 +197,11 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData)
 				insideFeature=c(unlist(r11$insideFeature),unlist(r22$insideFeature),unlist(r33$insideFeature)), 
 				distancetoFeature=c(unlist(as.numeric(as.character(r11$distancetoFeature))), unlist(as.numeric(as.character(r22$distancetoFeature))), unlist(r33$distancetoFeature)),
 				space = c(as.character(r11$chr),as.character(r22$chr), as.character(r33$chr)))
+		r
+		#r[order(rownames(r)),]
 		}
-		
+		else
+		{
+			myPeakList
+		}
+		}		

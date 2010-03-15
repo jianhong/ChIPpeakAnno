@@ -17,12 +17,12 @@ BED2RangedData <- function(data.BED,header=FALSE)
 		names = as.character(myPeak[,4])
 		if (length(unique(names))==1)
 		{
-			 names = paste(myPeak[,1], myPeak[,2], myPeak[,3], sep="-")
+			  names = formatC(1:dim(myPeak)[1], width=nchar(dim(myPeak)[1]), flag='0')
 		}
 	}
 	else
 	{
-		names = paste(myPeak[,1], myPeak[,2], myPeak[,3], sep="-")
+		 names = formatC(1:dim(myPeak)[1], width=nchar(dim(myPeak)[1]), flag='0')
 	}
 	if (dim(myPeak)[2] >= 5)
 	{		
