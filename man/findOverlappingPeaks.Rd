@@ -35,7 +35,7 @@ Name of the Peaks2, used for generating column name.
 Efficiently perform overlap queries with an interval tree implemented in IRanges.
 }
 \value{
-  \item{OverlappingPeaks}{a data frame consists of input peaks information with added information: overlapFeature (upstream: peak1 resides upstream of the peak2; downstream: peak1 resides downstream of the peak2; inside: peak1 resides inside the peak2 entirely; overlapStart: peak1 overlaps with the start of the peak2; overlapEnd: peak1 overlaps with the end of the peak2; includeFeature: peak1 include the peak2 entirely) and shortestDistance (shortest distance between the overlapping peaks}
+  \item{OverlappingPeaks}{a data frame consists of input peaks information with added information: overlapFeature (upstream: peak1 resides upstream of the peak2; downstream: peak1 resides downstream of the peak2; inside: peak1 resides inside the peak2 entirely; overlapStart: peak1 overlaps with the start of the peak2; overlapEnd: peak1 overlaps with the end of the peak2; includeFeature: peak1 include the peak2 entirely) and shortestDistance (shortest distance between the overlapping peaks)}
   \item{MergedPeaks}{RangedData contains merged overlapping peaks}
 }
 \references{
@@ -57,7 +57,7 @@ Lihua Julie Zhu
 	if (interactive())
 	{	
 	peaks1 = RangedData(IRanges(start=c(1543200,1557200,1563000,1569800,167889600),end=c(1555199,1560599,1565199,1573799,167893599),names=c("p1","p2","p3","p4","p5")),strand=as.integer(1),space=c(6,6,6,6,5))	peaks2 =  RangedData(IRanges(start=c(1549800,1554400,1565000,1569400,167888600),end=c(1550599,1560799,1565399,1571199,167888999),names=c("f1","f2","f3","f4","f5")),strand=as.integer(1),space=c(6,6,6,6,5))
-	t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F) 
+	t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F,NameOfPeaks1="TF1", NameOfPeaks2="TF2") 
 	r = t1$OverlappingPeaks
 	pie(table(r$overlapFeature))
 	as.data.frame(t1$MergedPeaks)

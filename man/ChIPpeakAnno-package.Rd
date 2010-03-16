@@ -12,7 +12,7 @@ Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip exper
 \tabular{ll}{
 Package: \tab ChIPpeakAnno\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 1.3.6\cr
 Date: \tab 2009-03-20\cr
 License: \tab LGPL\cr
 LazyLoad: \tab yes\cr
@@ -38,7 +38,7 @@ Maintainer:
 }
 
 \keyword{ package }
-\seealso{getAnnotation, annotatePeakInBatch,  getAllPeakSequence, write2FASTA, convert2EntrezID, addAncestors, getEnrichedGO
+\seealso{getAnnotation, annotatePeakInBatch,  getAllPeakSequence, write2FASTA, convert2EntrezID, addAncestors, getEnrichedGO,BED2RangedData, GFF2RangedData, makeVennDiagram,findOverlappingPeaks)
 
 }
 \examples{
