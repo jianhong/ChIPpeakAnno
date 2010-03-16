@@ -27,7 +27,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		}
 
 		r2 = cbind(rownames(Peaks2), start(Peaks2), end(Peaks2),Peaks2$strand)
-		colnames(r2) = c(NameOfPeaks2, paste(NameOfPeaks2, "start", sep="_"), paste(NameOfPeaks2,"end", sep="_"))
+		colnames(r2) = c(NameOfPeaks2, paste(NameOfPeaks2, "start", sep="_"), paste(NameOfPeaks2,"end", sep="_"),"strand")
 		allChr.Anno = unique(space(Peaks2))
 			
 		numberOfChromosome = length(unique(space(Peaks1)))
@@ -102,7 +102,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 			{
 				"inside"
 			}
-			else if (as.character(r$strand) == "1" |  as.character(r$strand) =="+")
+			else if (as.character(r$strand[i]) == "1" |  as.character(r$strand[i]) =="+")
 			{
 				"overlapEnd"
 			}
@@ -114,7 +114,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		else if (as.numeric(as.character(r[[paste(NameOfPeaks1, "end", sep="_")]][i])) >= as.numeric(as.character(r[[paste(NameOfPeaks2, "start", sep="_")]][i])) &
 			as.numeric(as.character(r[[paste(NameOfPeaks1, "end", sep="_")]][i])) <= as.numeric(as.character(r[[paste(NameOfPeaks2, "end", sep="_")]][i])))
 		{
-			if (as.character(r$strand) == "1" |  as.character(r$strand) =="+")
+			if (as.character(r$strand[i]) == "1" |  as.character(r$strand[i]) =="+")
 			{
 				"overlapStart"
 			}
@@ -130,7 +130,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		}
 		else if (as.numeric(as.character(r[[paste(NameOfPeaks1, "end", sep="_")]][i])) < as.numeric(as.character(r[[paste(NameOfPeaks2, "start", sep="_")]][i])))
 		{
-			if (as.character(r$strand) == "1" |  as.character(r$strand) =="+")
+			if (as.character(r$strand[i]) == "1" |  as.character(r$strand[i]) =="+")
 			{
 				"upstream"
 			}
@@ -141,7 +141,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		}
 		else if (as.numeric(as.character(r[[paste(NameOfPeaks1, "start", sep="_")]][i])) > as.numeric(as.character(r[[paste(NameOfPeaks2, "end", sep="_")]][i])))
 		{
-			if (as.character(r$strand) == "1" |  as.character(r$strand) =="+")
+			if (as.character(r$strand[i]) == "1" |  as.character(r$strand[i]) =="+")
 			{
 				"downstream"
 			}
