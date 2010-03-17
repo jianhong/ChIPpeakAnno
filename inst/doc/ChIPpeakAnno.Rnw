@@ -70,7 +70,7 @@ Here is an example of obtaining overlapping peaks with maximum gap 1kb for two p
 
 \begin{scriptsize}
 <<>>=
-peaks1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 3075869, 3123260 ,3857501,201089,1543200,1557200,1563000,1569800,167889600), end= c(967754, 2010997, 2496804, 3075969, 3123360 ,3857601,201089,1555199,1560599,1565199,1573799,167893599),names=c("Site1", "Site2", "Site3", "Site4", "Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"))
+peaks1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 3075869, 3123260 ,3857501,201089,1543200,1557200,1563000,1569800,167889600), end= c(967754, 2010997, 2496804, 3075969, 3123360 ,3857601,201089,1555199,1560599,1565199,1573799,167893599),names=c("Site1", "Site2", "Site3", "Site4", "Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"),strand=as.integer(1))
 
 peaks2 = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260 ,3857500, 96765, 201089, 249670, 307586, 312326 ,385750,1549800,1554400,1565000,1569400,167888600), end=c(967869, 2011108, 2496920,3076166,3123470,3857780, 96985, 201299, 249890, 307796,312586,385960,1550599,1560799,1565399,1571199,167888999), names=c("t1", "t2", "t3", "t4", "t5", "t6","t7", "t8", "t9", "t10", "t11", "t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", "5", "6","6","6","6","6","5"), strand=
 c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
@@ -92,6 +92,31 @@ Here is the merged overlapping peaks, which can be used to obtain overlapping pe
 \begin{scriptsize}
 <<>>=
 as.data.frame(t1$MergedPeaks)
+@
+\end{scriptsize}
+
+Here is the peaks in peaks1 that overlaps with peaks in peaks2
+
+\begin{scriptsize}
+<<>>=
+as.data.frame(t1$Peaks1withOverlaps)
+@
+\end{scriptsize}
+
+Here is the peaks in peaks2 that overlap with peaks in peaks1
+
+\begin{scriptsize}
+<<>>=
+as.data.frame(t1$Peaks2withOverlaps)
+@
+\end{scriptsize}
+The \Rfunction{findOVerlappingPeaks} function can be repeatedly called to obtain for example, the peaks in peaks1 that overlap with peaks in both peaks2 and peaks3.
+\begin{scriptsize}
+<<>>=
+peaks3 = RangedData(IRanges(start=c(967859, 2010868, 2496500, 3075966, 3123460 ,3851500, 96865, 201189, 249600, 307386), end=c(967969, 2011908, 2496720,3076166,3123470,3857680, 96985, 201299, 249890, 307796), names=c("p1", "p2", "p3", "p4", "p5", "p6","p7", "p8", "p9", "p10")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4"), strand=
+c(1,1,1,1,1,1,-1,-1,-1,-1))
+
+findOverlappingPeaks(findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F,NameOfPeaks1="TF1", NameOfPeaks2="TF2")$Peaks1withOverlap, peaks3, maxgap=1000, multiple=F, NameOfPeaks1="TF1TF2", NameOfPeaks2="TF3")$Peaks1withOverlap
 @
 \end{scriptsize}
 
