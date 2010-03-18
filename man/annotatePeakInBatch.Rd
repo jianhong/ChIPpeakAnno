@@ -6,7 +6,7 @@
   obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
 }
 \usage{
-annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData)
+annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -14,6 +14,9 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
   \item{mart}{used if AnnotationData not supplied, a mart object, see useMart of bioMaRt package for details }
    \item{featureType}{ used if AnnotationData not supplied, TSS, miRNA or exon }
   \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType}
+\item{output}{nearestStart: will output the nearest features calculated as peak start - feature start (feature end if feature resides at minus strand);
+	overlapping: will output overlapping features with maximum gap =0 between peak range and feature range;
+	both: will output all the nearest features, in addition, will output any features that overlap the peak that is not the nearest features.}
 }
 \details{
   }
@@ -25,6 +28,10 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
     \item{\code{strand}}{1 or + for positive strand and -1 or - for negative strand where the feature is located}
+	\item{\code{shortestDistance}}{The shortest distance from either end of peak to either end the feature.
+	}
+\item{\code{fromOverlappingOrNearest}}{NearestStart: indicates this feature's start (feature's end for features at minus strand) is closest to the peak start; Overlapping: indicates this feature overlaps with this peak although it is not the nearest feature start
+	}
 }
 \references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful link between biological biomarts and microarray data analysis. Bioinformatics, 21, 3439-3440.  }
 \author{ Lihua Julie Zhu }
