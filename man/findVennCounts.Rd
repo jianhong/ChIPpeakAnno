@@ -5,7 +5,7 @@
 Obtain Counts for Venn Diagram, internal function for makeVennDigram
 }
 \description{
-
+Obtain Counts for two peak ranges, internal function for makeVennDigram
 }
 \usage{
 findVennCounts(Peaks, NameOfPeaks, maxgap = 0, totalTest)

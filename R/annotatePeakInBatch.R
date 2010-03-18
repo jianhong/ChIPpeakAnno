@@ -1,8 +1,7 @@
 annotatePeakInBatch <-
-function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"))
+function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), maxgap=0)
 {
 		featureType = match.arg(featureType)
-		multiple=FALSE
 		if (missing(output))
 		{
 			output = "nearestStart"
@@ -230,7 +229,7 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 		} ## if output == "nearestStart"
 		if (output == "overlapping" || output == "both" || output == "o" || output == "b")
 		{
-			r.o = findOverlappingPeaks(myPeakList,TSS.ordered ,maxgap=0,multiple=multiple, NameOfPeaks1="peak", NameOfPeaks2="feature")$OverlappingPeaks
+			r.o = findOverlappingPeaks(myPeakList,TSS.ordered ,maxgap=maxgap,multiple=multiple, NameOfPeaks1="peak", NameOfPeaks2="feature")$OverlappingPeaks
 			r.o$fromOverlappingOrNearest = rep("Overlapping", dim(r.o)[1])
 			distancetoFeature =  do.call(c, lapply(seq_len(dim(r.o)[1]), function(i)
 			{
@@ -288,8 +287,8 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 		}		
 		else if (output == "both" || output=="b")
 		{
-			debug =1
-			if (debug == 1)
+			debug =0
+			if (debug == 0)
 			{
 			r.o = cbind(as.character(r.o$peak), as.character(r.o$chr),as.numeric(as.character(r.o$peak_start)), 
 						as.numeric(as.character(r.o$peak_end)), as.character(r.o$feature),
@@ -303,7 +302,10 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 			if (length(temp) >0)
 			{
 				r.o.only = r.o[paste(r.o[,1], r.o[,5]) %in% temp,]
-				r.both = cbind(r.n, r.o.only)
+				r.o.only = matrix(r.o.only, ncol=12)
+				colnames(r.o.only) = c("name","chr", "peakStart", "peakEnd", "feature_id", "start_position", "end_position",
+								"strand", "insideFeature", "distancetoFeature", "fromOverlappingOrNearest", "shortestDistance")
+				r.both = rbind(r.n, r.o.only)
 				r.output = RangedData(IRanges(start=as.numeric(as.character(r.both$peakStart)), 
 						end=as.numeric(as.character(r.both$peakEnd)),
 						names=paste(as.character(r.both$name),as.character(r.both$feature_id))), 
