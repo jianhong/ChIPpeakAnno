@@ -13,7 +13,7 @@ function(alltermcount,thistermcount, totaltermInGenome, totaltermInPeakList)
 		####### n - number of GO terms total
 		####### q - number of this GO terms in the peak list
 		####### m - number of this GO terms total
-		pvalue[i] = phyper(q, m, n-m, k, lower.tail = FALSE, log.p = FALSE)
+		pvalue[i] = phyper(q-1, m, n-m, k, lower.tail = FALSE, log.p = FALSE)
 		thistermtotal[i] = m
 	}
 	list(thisterm=thistermcount$GOterm, thistermcount=thistermcount$GOcount,thistermtotal=thistermtotal, pvalue=pvalue, totaltermInPeakList=k, totaltermInGenome=n)

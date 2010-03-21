@@ -90,6 +90,10 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red")
 		Counts =c(neither123,p3only,p2only,p2.and.p3, p1only, p1.and.p3, p1.and.p2,p1.and.p2.and.p3)
 		a2[,4] = Counts		
 		vennDiagram(a2, names = NameOfPeaks)
+		p.value.overall3 = phyper(p1.and.p2.and.p3 -1, p3, totalTest-p3, p1.and.p2, lower.tail = FALSE,log.p = FALSE)	
+		p.value.overall1 = phyper(p1.and.p2.and.p3 -1, p1, totalTest-p1, p2.and.p3, lower.tail = FALSE,log.p = FALSE)
+  		p.value.overall2 = phyper(p1.and.p2.and.p3 -1, p2, totalTest-p2, p1.and.p3, lower.tail = FALSE,log.p = FALSE)
+		p.value.overall = max(p.value.overall1, p.value.overall2, p.value.overall3)
 		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, vennCounts=a2)
 	}
 	else
