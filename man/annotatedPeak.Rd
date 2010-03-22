@@ -19,9 +19,9 @@
 }
 \details{
   obtained by 
-	data(TSS.human.NCBI36)
+	data(TSS.human.GRCh37)
 	data(myPeakList)
-	annotatePeakInBatch(myPeakList, AnnotationData = TSS.human.NCBI36)
+	annotatePeakInBatch (myPeakList, AnnotationData = TSS.human.GRCh37, output="b",,multiple=F)
 }
 \source{
   

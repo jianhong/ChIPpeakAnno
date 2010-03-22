@@ -57,6 +57,10 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		}
 		
 		z1 = cbind(as.character(rownames(Peaks1)), as.character(space(Peaks1)),start(Peaks1), end(Peaks1), Peaks1$strand)
+		if (length(Peaks1$strand) ==0)
+		{
+			z1 = cbind(z1,rep("1", dim(z1)[1]))
+		}
 		colnames(z1) = c(NameOfPeaks1, "chr", paste(NameOfPeaks1, "start", sep="_"), paste(NameOfPeaks1,"end", sep="_"),"strand1")
 		z1[,2] = sub(' +', '',z1[,2])
 		
