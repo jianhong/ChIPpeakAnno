@@ -46,12 +46,14 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0,  totalTest)
 		a1 = cbind(c(0,0,1,1),c(0,1,0,1))
 		colnames(a1) = NameOfPeaks
 		a2 = vennCounts(a1)
-		overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]], maxgap=maxgap, multiple=F)$OverlappingPeaks
+		overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$OverlappingPeaks
 		p1.and.p2 = length(unique(overlappingPeaks[[NameOfPeaks[1]]]))
 		p1 = length(rownames(Peaks[[1]]))
 		p2 = length(rownames(Peaks[[2]]))
-		p1only = length(setdiff(as.character(rownames(Peaks[[1]])), as.character(overlappingPeaks[[NameOfPeaks[1]]])))
-		p2only = length(setdiff(as.character(rownames(Peaks[[2]])), as.character(overlappingPeaks[[NameOfPeaks[2]]])))
+		p1only = p1 - p1.and.p2
+		#p1only = length(setdiff(as.character(rownames(Peaks[[1]])), as.character(overlappingPeaks[[NameOfPeaks[1]]])))
+		#p2only = length(setdiff(as.character(rownames(Peaks[[2]])), as.character(overlappingPeaks[[NameOfPeaks[2]]])))
+		p2only = p2 - p1.and.p2
 		p2inp1 = length(unique(overlappingPeaks[[NameOfPeaks[2]]]))
 		neither = totalTest - p1only - p2 
 		Counts =c(neither,p2only,p1only,p1.and.p2)

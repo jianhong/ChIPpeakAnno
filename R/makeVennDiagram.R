@@ -74,8 +74,8 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red")
 		p2.and.p3 = counts3[4,3]
 		
 		overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[3]], maxgap=maxgap, multiple=F)$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
+				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, multiple=F)$OverlappingPeaks
 		p1.and.p2.and.p3 = length(unique(overlappingPeaks123[[NameOfPeaks[1]]]))
 		
 		p1 = length(rownames(Peaks[[1]]))
