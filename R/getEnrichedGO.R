@@ -40,24 +40,35 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 	goAnn <- get(paste(GOgenome,"GO", sep=""))
 	mapped_genes <- mappedkeys(goAnn)
 	xx <- as.list(goAnn[mapped_genes])
-	all.GO= matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE)
+	#all.GO= matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE)
+	
+	all.GO <- do.call(rbind, lapply(mapped_genes,function(x1)
+	{
+		temp = unlist(xx[names(xx) ==x1])
+		if (length(temp) >0)
+		{
+			temp1 =matrix(temp,ncol=3,byrow=TRUE)
+			cbind(temp1,rep(x1,dim(temp1)[1]))
+		}
+	}))
 
 	this.GO <- do.call(rbind, lapply(entrezIDs,function(x1)
 	{
 		temp = unlist(xx[names(xx) ==x1])
 		if (length(temp) >0)
 		{
-			matrix(temp,ncol=3,byrow=TRUE)
+			temp1 =matrix(temp,ncol=3,byrow=TRUE)
+			cbind(temp1,rep(x1,dim(temp1)[1]))
 		}
 	}))
 
-	bp.go.this  = addAncestors(this.GO[this.GO[,3]=="BP",1],"bp")
-	cc.go.this = addAncestors(this.GO[this.GO[,3]=="CC",1], "cc")
-	mf.go.this = addAncestors(this.GO[this.GO[,3]=="MF",1],"mf")
+	bp.go.this  = addAncestors(this.GO[this.GO[,3]=="BP",],"bp")
+	cc.go.this = addAncestors(this.GO[this.GO[,3]=="CC",], "cc")
+	mf.go.this = addAncestors(this.GO[this.GO[,3]=="MF",],"mf")
 
-	bp.go.all  = addAncestors(all.GO[all.GO[,3]=="BP",1], "bp")
-	cc.go.all = addAncestors(all.GO[all.GO[,3]=="CC",1], "cc")
-	mf.go.all = addAncestors(all.GO[all.GO[,3]=="MF",1], "mf")
+	bp.go.all  = addAncestors(all.GO[all.GO[,3]=="BP",], "bp")
+	cc.go.all = addAncestors(all.GO[all.GO[,3]=="CC",], "cc")
+	mf.go.all = addAncestors(all.GO[all.GO[,3]=="MF",], "mf")
 		
 	total.mf = length(mf.go.all)
 	total.cc = length(cc.go.all)

@@ -1,5 +1,14 @@
-addAncestors <- function(go.ids, ontology="bp")
+addAncestors <- function(go.ids, ontology=c("bp","cc", "mf"))
 {
+		ontology = match.arg(ontology)
+		if (missing(go.ids))
+		{
+			stop("missing required parameter go.ids!")
+		}
+		if (class(go.ids) != "matrix" | dim(go.ids)[2] <4)
+		{
+			stop("go.ids need to be a matrix with at least 4 columns, the first column is go id and the second column is the entrez ID!")
+		}
 		if (ontology =="bp")
 		{
 			xx <- as.list(GOBPANCESTOR)
@@ -18,7 +27,7 @@ addAncestors <- function(go.ids, ontology="bp")
 	{
 		stop("No GO Ancestors! Should not have happened!")
 	}
-	go.ids.withAncestor = intersect(as.character(go.ids), names(xx))
+	go.ids.withAncestor = intersect(as.character(go.ids[,1]), names(xx))
 	if (length(go.ids.withAncestor) >0)
 	{
 	Ancestors =	do.call(rbind, lapply(go.ids.withAncestor,function(x1)
@@ -31,13 +40,22 @@ addAncestors <- function(go.ids, ontology="bp")
 		}))
 	Ancestors = Ancestors[Ancestors[,2] !="all",]
 	colnames(Ancestors) = c("child", "ancestor")
-	children = cbind(go.ids[go.ids %in% go.ids.withAncestor])
-	colnames(children) = c("child")
+	children = cbind(go.ids[,1],go.ids[,4])
+	colnames(children) = c("child", "entrezID")
 	go.all = merge(children, Ancestors, by="child")
-	c(as.character(go.ids),as.character(go.all$ancestor))
+	temp = cbind(c(as.character(go.all$child),as.character(go.all$ancestor)), c(as.character(go.all$entrezID), as.character(go.all$entrezID)))
+	temp = unique(temp)
+	if (length(temp) <3)
+	{
+		as.character(go.ids[,1])
+	}
+	else
+	{
+		temp[,1]
+	}
   }
   else
   {
-	as.character(go.ids)
- }
+	as.character(go.ids[,1])
+  }
 }
