@@ -205,6 +205,7 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 		{
 			r.n = r22
 		}
+		}## if dim(r22)[1] >0
 		if (dim(r33)[1] >0)
 		{
 			if (dim(r11)[1] > 0 || dim(r22)[1] >0)
@@ -223,8 +224,7 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 					abs(as.numeric(as.character(r.n$end_position))-as.numeric(as.character(r.n$peakStart))))
 		,1,min)	
 		r.n$shortestDistance = shortestDistance
-		
-		} ## if dim(r22)[1] >0
+	
 		} ## if length(r1) >0
 		} ## if output == "nearestStart"
 		if (output == "overlapping" || output == "both" || output == "o" || output == "b")

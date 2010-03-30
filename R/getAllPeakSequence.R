@@ -9,7 +9,11 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 		{
 			Start = start(myPeakList) - as.numeric(upstream)
 			End = end(myPeakList) + as.numeric(downstream)
-		
+			strand = myPeakList$strand
+			if (length(strand) ==0)
+			{
+				strand = rep("+", length(Start))
+			}
 			chr = as.character(space(myPeakList))
 			if (!length(i<-grep("chr",chr[1])) &  length(i<- grep("chr",names(seqlengths(genome))[1])))
 			{
@@ -21,17 +25,26 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 				thisChr =chr[i]
 				thisEnd = min(End[i], seqlengths(genome)[thisChr][[1]])
 				thisStart = max(1, Start[i])
+				thisStrand = as.character(strand[i])
+				if (thisStrand == "1")
+				{
+					thisStrand = "+"
+				}
+				else if (thisStrand == "-1")
+				{
+					thisStrand = "-"
+				}
 				if (i ==1)
 				{
-					seq = getSeq(genome, thisChr, start=thisStart, end=thisEnd, width=NA, as.character=TRUE)
+					seq = getSeq(genome, thisChr, start=thisStart, end=thisEnd, strand=thisStrand, width=NA, as.character=TRUE)
 				}
 				else
 				{
-					seq = c(seq, getSeq(genome, thisChr, start=thisStart, end=thisEnd, width=NA, as.character=TRUE))
+					seq = c(seq, getSeq(genome, thisChr, start=thisStart, end=thisEnd, strand=thisStrand, width=NA, as.character=TRUE))
 				}
 			}
 			RangedData(IRanges(start=start(myPeakList), end = end(myPeakList), names=rownames(myPeakList)), space=chr, 
-				upstream=rep(upstream,length(start(myPeakList))), downstream=rep(downstream,length(start(myPeakList))), sequence=seq)
+				upstream=rep(upstream,length(start(myPeakList))), downstream=rep(downstream,length(start(myPeakList))), sequence=seq,strand=strand)
 		}
 		else if (class(genome) =="Mart")
 		{
@@ -48,7 +61,7 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 				message("Done querying biomart database for AnnotationData, better way would be to call getAnnotation first, start querying for sequence ....")
 			}
 			downstream.bk = downstream
-			plusAnno = AnnotationData[AnnotationData$strand==1,]
+			plusAnno = AnnotationData[AnnotationData$strand==1 | as.character(AnnotationData$strand)=="+",]
 			temp = annotatePeakInBatch(myPeakList, AnnotationData=plusAnno)
 			TSSlength =temp$end_position - temp$start_position
 			downstream = end(temp) - start(temp) + downstream
