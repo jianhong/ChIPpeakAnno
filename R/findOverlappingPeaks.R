@@ -94,6 +94,14 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 		colnames(r1) = c(NameOfPeaks1, "chr", NameOfPeaks2) 
 		r3 = merge(r1,r2, by=NameOfPeaks2)		
 		r = merge(r3, z1)
+		if (dim(r)[1] <1)
+		{
+			Peaks1withOverlaps=0
+			Peaks2withOverlaps=0
+			MergedPeaks = 0
+		}
+		else
+		{
 		shortestDistance = apply(cbind(abs(as.numeric(as.character(r[[paste(NameOfPeaks2, "start", sep="_")]]))-as.numeric(as.character(r[[paste(NameOfPeaks1, "end", sep="_")]]))), 
 			abs(as.numeric(as.character(r[[paste(NameOfPeaks2, "start", sep="_")]]))-as.numeric(as.character(r[[paste(NameOfPeaks1, "start", sep="_")]]))), 
 			abs(as.numeric(as.character(r[[paste(NameOfPeaks2, "end", sep="_")]]))-as.numeric(as.character(r[[paste(NameOfPeaks1, "end", sep="_")]]))),
@@ -188,6 +196,7 @@ function(Peaks1,Peaks2,maxgap=100,multiple=c(TRUE, FALSE), NameOfPeaks1="TF1", N
 							names = as.character(r2[,1])),
 							space = as.character(r2[,2]), 
 							strand=as.character(r2[,5]))
+		}
 		list(OverlappingPeaks = r[order(r[[NameOfPeaks1]]),], MergedPeaks = MergedPeaks,Peaks1withOverlaps=Peaks1withOverlaps, Peaks2withOverlaps=Peaks2withOverlaps)
 	}
 

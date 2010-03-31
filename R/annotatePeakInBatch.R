@@ -230,6 +230,8 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 		if (output == "overlapping" || output == "both" || output == "o" || output == "b")
 		{
 			r.o = findOverlappingPeaks(myPeakList,TSS.ordered ,maxgap=maxgap,multiple=multiple, NameOfPeaks1="peak", NameOfPeaks2="feature")$OverlappingPeaks
+			if (dim(r.o)[1] >0)
+			{
 			r.o$fromOverlappingOrNearest = rep("Overlapping", dim(r.o)[1])
 			distancetoFeature =  do.call(c, lapply(seq_len(dim(r.o)[1]), function(i)
 			{
@@ -243,8 +245,9 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 				}
 			}))
 			r.o$distancetoFeature = distancetoFeature
+			}
 		}
-		if (output == "nearestStart" || output == "n")
+		if (output == "nearestStart" || output == "n" || ((output =="both" || output=="b")  && dim(r.o)[1] ==0))
 		{
 			if(length(r1)>0)
 			{
@@ -271,7 +274,9 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 		}
 		else if ((output =="overlapping" || output =="o") || ((output =="both" || output=="b") && length(r1) ==0))
 		{
-			r.output=RangedData(IRanges(start=as.numeric(as.character(r.o$peak_start)), end=as.numeric(as.character(r.o$peak_end)),
+			if (dim(r.o)[1] >0)
+			{
+				r.output=RangedData(IRanges(start=as.numeric(as.character(r.o$peak_start)), end=as.numeric(as.character(r.o$peak_end)),
 								names=paste(as.character(r.o$peak),as.character(r.o$feature))), 
 								peak = as.character(r.o$peak),
 								strand = as.character(r.o$strand),
@@ -284,59 +289,64 @@ function(myPeakList, mart,featureType=c("TSS","miRNA", "Exon"), AnnotationData,o
 								fromOverlappingOrNearest = as.character(r.o$fromOverlappingOrNearest),
 								space = as.character(r.o$chr)
 								)
+			}
+			else
+			{
+				r.output = myPeakList
+			}
 		}		
 		else if (output == "both" || output=="b")
 		{
 			debug =0
 			if (debug == 0)
 			{
-			r.o = cbind(as.character(r.o$peak), as.character(r.o$chr),as.numeric(as.character(r.o$peak_start)), 
+				r.o = cbind(as.character(r.o$peak), as.character(r.o$chr),as.numeric(as.character(r.o$peak_start)), 
 						as.numeric(as.character(r.o$peak_end)), as.character(r.o$feature),
 						as.numeric(as.character(r.o$feature_start)), as.numeric(as.character(r.o$feature_end)),
 						as.character(r.o$strand),  as.character(r.o$overlapFeature),
 						as.numeric(as.character(r.o$distancetoFeature)),as.character(r.o$fromOverlappingOrNearest),as.numeric(as.character(r.o$shortestDistance))
 						)
-			colnames(r.o) = c("name","chr", "peakStart", "peakEnd", "feature_id", "start_position", "end_position",
+				colnames(r.o) = c("name","chr", "peakStart", "peakEnd", "feature_id", "start_position", "end_position",
 								"strand", "insideFeature", "distancetoFeature", "fromOverlappingOrNearest", "shortestDistance")
-			temp = setdiff(paste(r.o[,1], r.o[,5]), paste(r.n[,1], r.n[,5]))
-			if (length(temp) >0)
-			{
-				r.o.only = r.o[paste(r.o[,1], r.o[,5]) %in% temp,]
-				r.o.only = matrix(r.o.only, ncol=12)
-				colnames(r.o.only) = c("name","chr", "peakStart", "peakEnd", "feature_id", "start_position", "end_position",
+				temp = setdiff(paste(r.o[,1], r.o[,5]), paste(r.n[,1], r.n[,5]))
+				if (length(temp) >0)
+				{
+					r.o.only = r.o[paste(r.o[,1], r.o[,5]) %in% temp,]
+					r.o.only = matrix(r.o.only, ncol=12)
+					colnames(r.o.only) = c("name","chr", "peakStart", "peakEnd", "feature_id", "start_position", "end_position",
 								"strand", "insideFeature", "distancetoFeature", "fromOverlappingOrNearest", "shortestDistance")
-				r.both = rbind(r.n, r.o.only)
-				r.output = RangedData(IRanges(start=as.numeric(as.character(r.both$peakStart)), 
+					r.both = rbind(r.n, r.o.only)
+					r.output = RangedData(IRanges(start=as.numeric(as.character(r.both$peakStart)), 
 						end=as.numeric(as.character(r.both$peakEnd)),
 						names=paste(as.character(r.both$name),as.character(r.both$feature_id))), 
-				peak = as.character(r.both$name),
-          		strand = as.character(r.both$strand), 
-				feature = as.character(r.both$feature_id),
-				start_position= as.numeric(as.character(r.both$start_position)),
-				end_position=as.numeric(as.character(r.both$end_position)),
-				insideFeature=as.character(r.both$insideFeature), 
-				distancetoFeature=as.numeric(as.character(r.both$distancetoFeature)),
-				shortestDistance = as.numeric(as.character(r.both$shortestDistance)),
-				fromOverlappingOrNearest = as.character(r.both$fromOverlappingOrNearest),
-				space = as.character(r.both$chr))
-			}
-			else
-			{
-				r.output = RangedData(IRanges(start=as.numeric(as.character(r.n$peakStart)), 
+					peak = as.character(r.both$name),
+					strand = as.character(r.both$strand), 
+					feature = as.character(r.both$feature_id),
+					start_position= as.numeric(as.character(r.both$start_position)),
+					end_position=as.numeric(as.character(r.both$end_position)),
+					insideFeature=as.character(r.both$insideFeature), 
+					distancetoFeature=as.numeric(as.character(r.both$distancetoFeature)),
+					shortestDistance = as.numeric(as.character(r.both$shortestDistance)),
+					fromOverlappingOrNearest = as.character(r.both$fromOverlappingOrNearest),
+					space = as.character(r.both$chr))
+				}
+				else
+				{
+					r.output = RangedData(IRanges(start=as.numeric(as.character(r.n$peakStart)), 
 						end=as.numeric(as.character(r.n$peakEnd)),
 						names=paste(as.character(r.n$name),as.character(r.n$feature_id))),
-          		peak = as.character(r.n$name),
-				strand = as.character(r.n$strand), 
-				feature = as.character(r.n$feature_id),
-				start_position= as.numeric(as.character(r.n$start_position)),
-				end_position=as.numeric(as.character(r.n$end_position)),
-				insideFeature=as.character(r.n$insideFeature), 
-				distancetoFeature=as.numeric(as.character(r.n$distancetoFeature)),
-				shortestDistance = as.numeric(as.character(r.n$shortestDistance)),
-				fromOverlappingOrNearest = as.character(r.n$fromOverlappingOrNearest),
-				space = as.character(r.n$chr)
+					peak = as.character(r.n$name),
+					strand = as.character(r.n$strand), 
+					feature = as.character(r.n$feature_id),
+					start_position= as.numeric(as.character(r.n$start_position)),
+					end_position=as.numeric(as.character(r.n$end_position)),
+					insideFeature=as.character(r.n$insideFeature), 
+					distancetoFeature=as.numeric(as.character(r.n$distancetoFeature)),
+					shortestDistance = as.numeric(as.character(r.n$shortestDistance)),
+					fromOverlappingOrNearest = as.character(r.n$fromOverlappingOrNearest),
+					space = as.character(r.n$chr)
 				)
-			}
+				}
 			}
 		}
 			r.output
