@@ -6,7 +6,7 @@
   obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
 }
 \usage{
-annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), maxgap=0)
+annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), maxgap=0,PeakLocForDistance = c("start", "middle", "end"), FeatureLocForDistance = c("TSS", "middle","start", "end"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,6 +19,8 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
 	both: will output all the nearest features, in addition, will output any features that overlap the peak that is not the nearest features.}
 \item{multiple}{not applicable when output is nearestStart. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak}
 \item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping}
+\item{PeakLocForDistance}{Specify the location of peak for calculating distance,i.e., middle means using middle of the peak to calculate distance to feature, start means using start of the peak to calculate the distance to feature. To be compatible with previous version, by default using start}
+\item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
 }
 \details{
   }
@@ -26,7 +28,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
  RangedData with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
     \item{\code{feature}}{id of the feature such as ensembl gene ID}
     \item{\code{insideFeature}}{upstream: peak resides upstream of the feature; downstream: peak resides downstream of the feature; inside: peak resides inside the feature; overlapStart: peak overlaps with the start of the feature; overlapEnd: peak overlaps with the end of the feature; includeFeature: peak include the feature entirely}
-    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site. The distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand}
+    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site.  By default, the distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand. The user can specify the location of peak and location of feature for calculating this}
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
     \item{\code{strand}}{1 or + for positive strand and -1 or - for negative strand where the feature is located}
@@ -35,7 +37,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
 \item{\code{fromOverlappingOrNearest}}{NearestStart: indicates this feature's start (feature's end for features at minus strand) is closest to the peak start; Overlapping: indicates this feature overlaps with this peak although it is not the nearest feature start
 	}
 }
-\references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful link between biological biomarts and microarray data analysis. Bioinformatics, 21, 3439-3440.  }
+\references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237}
 \author{ Lihua Julie Zhu }
 \note{ 
 }
