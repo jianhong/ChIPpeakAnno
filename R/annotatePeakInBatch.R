@@ -152,9 +152,9 @@ myPeakList$PeakLoc = PeakLoc
                     end = featureStart, names = featureID)
                   nearestFeature = featureRanges[nearest(peakRanges, 
                     featureRanges)]
-                  data.frame(name = name, chr = rep(chr, length(peakStart)), 
-                    PeakLoc = peakLoc, peakStart = peakStart, peakEnd = peakEnd, 
-                    feature_id = names(nearestFeature))
+# data.frame(name = name, chr = rep(chr, length(peakStart)), 
+#     PeakLoc = peakLoc, peakStart = peakStart, peakEnd = peakEnd, 
+                   data.frame(name=name, feature_id = names(nearestFeature))
                 }
             }))
         if (length(r1) > 0) {
