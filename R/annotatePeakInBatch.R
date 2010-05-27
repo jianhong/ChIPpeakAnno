@@ -292,7 +292,7 @@ myPeakList$PeakLoc = PeakLoc
             r.n$shortestDistance = shortestDistance
 	   strand = do.call(c, lapply(seq_len(dim(r.n)[1]), 
                 function(i) {
-                  if (as.character(r.n$strand[i]) == "1" || as.character(r.n$strand[i]) == 
+                  if (is.na(r.n$strand[i]) || as.character(r.n$strand[i]) == "1" || as.character(r.n$strand[i]) == 
                     "+") {
                     "+"
                   }
@@ -362,7 +362,7 @@ r.o$PeakLoc = PeakLoc
 
  strand = do.call(c, lapply(seq_len(dim(r.o)[1]), 
                 function(i) {
-                  if (as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
+                  if (is.na(r.o$strand[i]) || as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
                     "+") {
                     "+"
                   }
