@@ -62,13 +62,25 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 		}
 	}))
 
-	bp.go.this  = addAncestors(this.GO[this.GO[,3]=="BP",],"bp")
-	cc.go.this = addAncestors(this.GO[this.GO[,3]=="CC",], "cc")
-	mf.go.this = addAncestors(this.GO[this.GO[,3]=="MF",],"mf")
+	bp.go.this.withEntrez = addAncestors(this.GO[this.GO[,3]=="BP",],"bp")
+     cc.go.this.withEntrez = addAncestors(this.GO[this.GO[,3]=="CC",], "cc")
+	mf.go.this.withEntrez = addAncestors(this.GO[this.GO[,3]=="MF",],"mf")
 
-	bp.go.all  = addAncestors(all.GO[all.GO[,3]=="BP",], "bp")
-	cc.go.all = addAncestors(all.GO[all.GO[,3]=="CC",], "cc")
-	mf.go.all = addAncestors(all.GO[all.GO[,3]=="MF",], "mf")
+	bp.go.all.withEntrez  = addAncestors(all.GO[all.GO[,3]=="BP",], "bp")
+	cc.go.all.withEntrez = addAncestors(all.GO[all.GO[,3]=="CC",], "cc")
+	mf.go.all.withEntrez = addAncestors(all.GO[all.GO[,3]=="MF",], "mf")
+	
+	colnames(bp.go.this.withEntrez) = c("go.id", "EntrezID")
+	colnames(cc.go.this.withEntrez) = c("go.id", "EntrezID")
+	colnames(mf.go.this.withEntrez) = c("go.id", "EntrezID")
+
+	bp.go.this  = bp.go.this.withEntrez[,1]
+	cc.go.this = cc.go.this.withEntrez[,1]
+	mf.go.this = mf.go.this.withEntrez[,1]
+
+	bp.go.all  = bp.go.all.withEntrez[,1]
+	cc.go.all = cc.go.all.withEntrez[,1]
+	mf.go.all = mf.go.all.withEntrez[,1]
 		
 	total.mf = length(mf.go.all)
 	total.cc = length(cc.go.all)
@@ -175,8 +187,13 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 	}
 	colnames(goterm.cc) = c("go.id", "go.term", "Definition", "Ontology")
 	
-	bp.selected = merge(goterm.bp, bp.s,by="go.id")
-	mf.selected = merge(goterm.mf, mf.s,by="go.id")
-	cc.selected = merge(goterm.cc,cc.s,by="go.id")
+	bp.selected1 = merge(goterm.bp, bp.s,by="go.id")
+	mf.selected1 = merge(goterm.mf, mf.s,by="go.id")
+	cc.selected1 = merge(goterm.cc,cc.s,by="go.id")
+
+	bp.selected = merge(bp.selected1, bp.go.this.withEntrez)
+	mf.selected = merge(mf.selected1, mf.go.this.withEntrez)
+	cc.selected = merge(cc.selected1, cc.go.this.withEntrez)
+
 	list(bp=bp.selected, mf=mf.selected, cc=cc.selected)
 }

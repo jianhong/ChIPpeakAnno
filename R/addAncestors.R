@@ -42,20 +42,20 @@ addAncestors <- function(go.ids, ontology=c("bp","cc", "mf"))
 	colnames(Ancestors) = c("child", "ancestor")
 	children = cbind(go.ids[,1],go.ids[,4])
 	colnames(children) = c("child", "entrezID")
-	go.all = merge(children, Ancestors, by="child")
+	go.all = merge(children, Ancestors, by="child", all.x=TRUE)
 	temp = cbind(c(as.character(go.all$child),as.character(go.all$ancestor)), c(as.character(go.all$entrezID), as.character(go.all$entrezID)))
 	temp = unique(temp)
 	if (length(temp) <3)
 	{
-		as.character(go.ids[,1])
+		unique(children)
 	}
 	else
 	{
-		temp[,1]
+		temp[!is.na(temp[,1]) & temp[,1] != "",]
 	}
   }
   else
   {
-	as.character(go.ids[,1])
+	unique(cbind(as.character(go.ids[,1]), go.ids[,4]))
   }
 }

@@ -87,13 +87,9 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red")
 		
 		neither123 = totalTest -p1only - p2only - p3only - p1.and.p2 - p1.and.p3 - p2.and.p3 + 2 * p1.and.p2.and.p3
 		
-		Counts =c(neither123,p3only,p2only,p2.and.p3, p1only, p1.and.p3, p1.and.p2,p1.and.p2.and.p3)
+		Counts =c(neither123,p3only,p2only,p2.and.p3-p1.and.p2.and.p3, p1only, p1.and.p3-p1.and.p2.and.p3, p1.and.p2-p1.and.p2.and.p3,p1.and.p2.and.p3)
 		a2[,4] = Counts		
 		vennDiagram(a2, names = NameOfPeaks)
-		p.value.overall3 = phyper(p1.and.p2.and.p3 -1, p3, totalTest-p3, p1.and.p2, lower.tail = FALSE,log.p = FALSE)	
-		p.value.overall1 = phyper(p1.and.p2.and.p3 -1, p1, totalTest-p1, p2.and.p3, lower.tail = FALSE,log.p = FALSE)
-  		p.value.overall2 = phyper(p1.and.p2.and.p3 -1, p2, totalTest-p2, p1.and.p3, lower.tail = FALSE,log.p = FALSE)
-		p.value.overall = max(p.value.overall1, p.value.overall2, p.value.overall3)
 		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, vennCounts=a2)
 	}
 	else
@@ -101,10 +97,3 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red")
 		stop("Larger than 3 lists are not implemented yet")
 	}
 }
-
-#source("~/dev/svndev/ChIPpeakAnno/R/makeVennDiagram.R")
-#peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704), end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")), space = c("1", "2", "3"), strand=as.integer(1))
-#peaks2 = RangedData(IRanges(start = c(967659, 2010898,  2496700, 3075866, 3123260), end = c(967869, 2011108, 2496920, 3076166, 3123470), names = c("t1", "t2", "t3", "t4", "t5")), space = c("1", "2", "3", "1", "2"), strand = c(1, 1, -1,-1,1))
-#makeVennDiagram(list(peaks1,peaks2,peaks2),NameOfPeaks,totalTest=100)
-#makeVennDiagram(list(peaks1,peaks1,peaks1),NameOfPeaks,totalTest=100)
-#makeVennDiagram(list(peaks1,peaks2,peaks1),NameOfPeaks,totalTest=100)
