@@ -1,7 +1,7 @@
 annotatePeakInBatch <-
 function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"), 
     AnnotationData, output = c("nearestStart", "overlapping", 
-        "both"), multiple = c(FALSE, TRUE), maxgap = 0, PeakLocForDistance=c("start","middle","end"), FeatureLocForDistance=c("TSS","middle","start","end")) 
+        "both"), multiple = c(FALSE, TRUE), maxgap = 0, PeakLocForDistance=c("start","middle","end"), FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd")) 
 {
     featureType = match.arg(featureType)
     if (missing(PeakLocForDistance))
@@ -59,25 +59,41 @@ if (FeatureLocForDistance == "middle" || FeatureLocForDistance == "m")
 		{
 		round(mean(c(as.numeric(r2[i,2]),as.numeric(r2[i,3]))))
 	}))
+	FeatureLocForDistance = "middle" 
 }
 else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
 {
 	FeatureLoc = r2[,2]
+	FeatureLocForDistance = "start"
 }
 else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
 {
 	FeatureLoc =r2[,3]
+	FeatureLocForDistance = "end"
+}
+else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
+{
+	FeatureLoc = unlist(lapply(1:dim(r2)[1], function(i) 
+		{
+			 if (as.character(r2[i,4]) == '+' || as.character(r2[i,4])== '1' || as.character(r2[i,4]) == '*' ) {
+				r2[i,3]
+			} else {
+				r2[i,2]
+			}
+		}))
+	FeatureLocForDistance = "geneEnd"
 }
 else
 {
 	FeatureLoc = unlist(lapply(1:dim(r2)[1], function(i) 
 		{
-			 if (as.character(r2[i,4]) == '+' || as.character(r2[i,4])== '1') {
+			 if (as.character(r2[i,4]) == '+' || as.character(r2[i,4])== '1' || as.character(r2[i,4]) == '*' ) {
 				r2[i,2]
 			} else {
 				r2[i,3]
 			}
 		}))
+		FeatureLocForDistance = "TSS"
  }
 r2 = cbind(r2, FeatureLoc)
 
@@ -132,10 +148,8 @@ z1 = cbind(z1, PeakLoc)
 TSS.ordered$FeatureLoc = FeatureLoc
 myPeakList$PeakLoc = PeakLoc
 
-        plusAnno = TSS.ordered[TSS.ordered$strand == 1 | TSS.ordered$strand == 
-            "+", ]
-        minusAnno = TSS.ordered[TSS.ordered$strand == -1 | TSS.ordered$strand == 
-            "-", ]
+        plusAnno = TSS.ordered[as.character(TSS.ordered$strand) %in% c("+", "*", "1") , ]
+        minusAnno = TSS.ordered[as.character(TSS.ordered$strand) %in% c("-1","-"), ]
         r1 = do.call(rbind, lapply(seq_len(numberOfChromosome), 
             function(i) {
                 chr = allChr[i]
@@ -161,11 +175,12 @@ myPeakList$PeakLoc = PeakLoc
             r3 = merge(r1, r2, by = "feature_id")
             r = merge(r3, z1, all.y = TRUE)
             r.n = r
-	if (FeatureLocForDistance =="TSS")
+	if (FeatureLocForDistance =="TSS" || FeatureLocForDistance =="geneEnd")
 	{
-            	r11 = r[!is.na(r$strand) & (r$strand == 1 | as.character(r$strand) == 
-                "+"), ]
-            	r22 = r[!is.na(r$strand) & (r$strand == -1 | as.character(r$strand) == 
+            	r11 = r[!is.na(r$strand) & (as.character(r$strand) == "1" | as.character(r$strand) == 
+                "+" | as.character(r$strand) == 
+                "*"), ]
+            	r22 = r[!is.na(r$strand) & (as.character(r$strand) == "-1" | as.character(r$strand) == 
                 "-"), ]
           	}
 	else
@@ -222,7 +237,7 @@ myPeakList$PeakLoc = PeakLoc
                 r11$distancetoFeature = distancetoFeature
                 r.n = r11
             }
-            if (FeatureLocForDistance =="TSS" && dim(r22)[1] > 0 ){
+            if ((FeatureLocForDistance =="TSS" || FeatureLocForDistance =="geneEnd") && dim(r22)[1] > 0 ){
 		distancetoFeature = as.numeric(as.character(r22$FeatureLoc)) - 
                   as.numeric(as.character(r22$PeakLoc))
 	length = as.numeric(as.character(r22$end_position)) - 
@@ -293,7 +308,8 @@ myPeakList$PeakLoc = PeakLoc
 	   strand = do.call(c, lapply(seq_len(dim(r.n)[1]), 
                 function(i) {
                   if (is.na(r.n$strand[i]) || as.character(r.n$strand[i]) == "1" || as.character(r.n$strand[i]) == 
-                    "+") {
+                    "+" ||  as.character(r$strand) == 
+                "*") {
                     "+"
                   }
                   else {
@@ -344,11 +360,22 @@ else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
 {
 	FeatureLoc = as.numeric(as.character(r.o[,5]))
 }
+else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
+{
+	FeatureLoc = unlist(lapply(1:dim(r2)[1], function(i) 
+		{
+			 if (as.character(r2[i,4]) == '+' || as.character(r2[i,4])== '1' || as.character(r2[i,4]) == '*' ) {
+				r2[i,3]
+			} else {
+				r2[i,2]
+			}
+		}))
+}
 else
 {
 	FeatureLoc = unlist(lapply(1:dim(r.o)[1], function(i) 
 		{
-			 if (as.character(r.o[i,6]) == '+' || as.character(r.o[i,6])== '1') {
+			 if (as.character(r.o[i,6]) == '+' || as.character(r.o[i,6])== '1' || as.character(r2[i,4]) == '*') {
 				 as.numeric(as.character(r.o[i,4]))
 			} else {
 				 as.numeric(as.character(r.o[i,5]))
@@ -363,7 +390,8 @@ r.o$PeakLoc = PeakLoc
  strand = do.call(c, lapply(seq_len(dim(r.o)[1]), 
                 function(i) {
                   if (is.na(r.o$strand[i]) || as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
-                    "+") {
+                    "+" ||  as.character(r$strand) == 
+                "*") {
                     "+"
                   }
                   else {
@@ -376,7 +404,8 @@ r.o$PeakLoc = PeakLoc
             distancetoFeature = do.call(c, lapply(seq_len(dim(r.o)[1]), 
                 function(i) {
                   if (as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
-                    "+" || FeatureLocForDistance != "TSS") {
+                    "+" ||  as.character(r$strand) == 
+                "*" || (FeatureLocForDistance != "TSS" && FeatureLocForDistance != "geneEnd")) {
                     as.numeric(as.character(r.o$PeakLoc[i])) - 
                       as.numeric(as.character(r.o$FeatureLoc[i]))
                   }

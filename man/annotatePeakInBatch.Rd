@@ -6,7 +6,7 @@
   obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
 }
 \usage{
-annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), maxgap=0,PeakLocForDistance = c("start", "middle", "end"), FeatureLocForDistance = c("TSS", "middle","start", "end"))
+annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), maxgap=0,PeakLocForDistance = c("start", "middle", "end"), FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,7 +20,7 @@ annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), An
 \item{multiple}{not applicable when output is nearestStart. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak}
 \item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping}
 \item{PeakLocForDistance}{Specify the location of peak for calculating distance,i.e., middle means using middle of the peak to calculate distance to feature, start means using start of the peak to calculate the distance to feature. To be compatible with previous version, by default using start}
-\item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
+\item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand, geneEnd means using end of feature when feature is on plus strand and using start of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
 }
 \details{
   }
