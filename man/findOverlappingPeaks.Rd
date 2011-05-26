@@ -29,6 +29,7 @@ Name of the Peaks1, used for generating column name.
 }
   \item{NameOfPeaks2}{
 Name of the Peaks2, used for generating column name.
+}
 \item{select}{
 all may return multiple overlapping peaks, first will return the first overlapping peak, last will return the last overlapping peak and arbitrary will return one of the overlapping peaks.
 }
