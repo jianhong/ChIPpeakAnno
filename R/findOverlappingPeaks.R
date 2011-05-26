@@ -1,5 +1,5 @@
 findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE, FALSE), 
-    NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2") 
+    NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", select=c("all", "first", "last", "arbitrary")) 
 {
     if (missing(Peaks1)) {
         stop("Missing Peaks1 which is required!")
@@ -38,7 +38,7 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
 	Peaks1$strand[as.character(Peaks1$strand) == "1"] = "+";
 	Peaks1$strand[as.character(Peaks1$strand) == "-1"] = "-";	
     }
-
+ select= match.arg(select)
     r2 = cbind(rownames(Peaks2), start(Peaks2), end(Peaks2), 
         Peaks2$strand)
     colnames(r2) = c(NameOfPeaks2, paste(NameOfPeaks2, "start", 
@@ -78,9 +78,22 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
             Ranges2 = sort(IRanges(start = start(Peaks2[chr]), 
                 end = end(Peaks2[chr]), names = rownames(Peaks2[chr])))
             tree = IntervalTree(Ranges2)
+		 if (multiple || select=="all")
+		{
             matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
-                multiple = multiple)
-            if (multiple) {
+                select ="all")
+		}
+		else if (missing(select))
+		{
+			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
+                select ="first")
+		}
+		else
+		{
+			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
+                select = select)
+		}
+         if (multiple || select=="all") {
                 matchmatrix = matchMatrix(matches)
                 qname = names(Ranges1)[matchmatrix[, 1]]
                 tname = names(Ranges2)[matchmatrix[, 2]]
