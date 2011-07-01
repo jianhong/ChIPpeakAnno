@@ -35,10 +35,11 @@ Lihua Julie Zhu
 
 }
 \examples{
-ensemblIDs = c("ENSG00000115956", "ENSG00000071082", "ENSG00000071054", "ENSG00000115594",
- "ENSG00000115594", "ENSG00000115598", "ENSG00000170417")
+ensemblIDs = c("ENSG00000115956", "ENSG00000071082", "ENSG00000071054",
+ "ENSG00000115594", "ENSG00000115594", "ENSG00000115598", "ENSG00000170417")
 library(org.Hs.eg.db)
-entrezIDs = convert2EntrezID(IDs=ensemblIDs, orgAnn="org.Hs.eg.db", ID_type="ensembl_gene_id")
+entrezIDs = convert2EntrezID(IDs=ensemblIDs, orgAnn="org.Hs.eg.db",
+ ID_type="ensembl_gene_id")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

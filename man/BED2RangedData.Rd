@@ -26,7 +26,8 @@ For converting the peakList in BED format to RangedData before calling annotateP
 }
 \seealso{  }
 \examples{
-	test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
+	test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),
+	chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
 	test.rangedData = BED2RangedData(test.bed)
 
 }

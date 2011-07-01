@@ -26,7 +26,9 @@ For converting the peakList in GFF format to RangedData before calling annotateP
 }
 \seealso{  }
 \examples{
-	test.GFF = data.frame(cbind(seqname  = c("chr1", "chr2"), source=rep("Macs", 2), feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), strand=c(1, -1), frame=c(".", 2), group=c("peak1", "peak2")))
+	test.GFF = data.frame(cbind(seqname  = c("chr1", "chr2"), source=rep("Macs", 2), 
+	feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), 
+	strand=c(1, -1), frame=c(".", 2), group=c("peak1", "peak2")))
 	test.rangedData = GFF2RangedData(test.GFF)
 
 }

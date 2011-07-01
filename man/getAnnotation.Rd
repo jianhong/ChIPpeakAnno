@@ -6,7 +6,8 @@
   Obtain the TSS, exon or miRNA annotation for the specified species using biomaRt package
 }
 \usage{
-getAnnotation(mart, featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr"))
+getAnnotation(mart, 
+featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -15,7 +15,7 @@ getAllPeakSequence(myPeakList, upstream = 200, downstream = 200, genome, Annotat
   \item{upstream}{upstream offset from the peak start, e.g., 200 }
   \item{downstream}{ downstream offset from the peak end, e.g., 200 }
   \item{genome}{ BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details}
-   \item{AnnotationData}{ RangedData used if mart object is parsed in which can be obtained from getAnnotation with featureType="TSS". For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8).  If not supplied, then annotation will be obtained from biomaRt automatically using the mart object}
+   \item{AnnotationData}{ RangedData used if mart object is parsed in which can be obtained from getAnnotation with featureType="TSS". For example, data(TSS.human.NCBI36), data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8).  If not supplied, then annotation will be obtained from biomaRt automatically using the mart object}
 }
 \details{
  

@@ -34,7 +34,9 @@ data(annotatedPeak)
 str(annotatedPeak) 
 if (interactive()) {
 y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
-hist(as.numeric(as.character(y)), xlab="Distance To Nearest TSS", main="", breaks=1000, ylim=c(0, 50), xlim=c(min(as.numeric(as.character(y)))-100, max(as.numeric(as.character(y)))+100))
+hist(as.numeric(as.character(y)), xlab="Distance To Nearest TSS", main="", breaks=1000, 
+ylim=c(0, 50), xlim=c(min(as.numeric(as.character(y)))-100, 
+max(as.numeric(as.character(y)))+100))
 }
 }
 \keyword{datasets}

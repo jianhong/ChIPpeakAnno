@@ -53,15 +53,18 @@ if (interactive())
 
 	annotatedPeak = annotatePeakInBatch(myPeakList1, AnnotationData=TSS.human.NCBI36)
 
-	peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
+	peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), 
+	names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
 library(BSgenome.Ecoli.NCBI.20080805)
 	
-	peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,	downstream = 20, genome = Ecoli)
+	peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,
+	downstream = 20, genome = Ecoli)
 
 	write2FASTA(peaksWithSequences, file="testseq.fasta", width=50)
 
 	library(org.Hs.eg.db)
-	enrichedGO = getEnrichedGO(annotatedPeak, orgAnn ="org.Hs.eg.db", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
+	enrichedGO = getEnrichedGO(annotatedPeak, orgAnn ="org.Hs.eg.db", maxP=0.01, 
+	multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 
 	enriched.biologicalprocess = enrichedGO$bp
 	enriched.molecularfunction = enrichedGO$mf
@@ -69,7 +72,8 @@ library(BSgenome.Ecoli.NCBI.20080805)
 
 	data(annotatedPeak)
 	y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
-	hist(y, xlab="Distance To Nearest TSS", main="", breaks=1000, xlim=c(min(y)-100, max(y)+100))
+	hist(y, xlab="Distance To Nearest TSS", main="", breaks=1000, 
+	xlim=c(min(y)-100, max(y)+100))
 }
 
 }

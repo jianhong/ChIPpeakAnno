@@ -26,7 +26,8 @@ write2FASTA(mySeq, file="", width=80)
 }
 \seealso{  }
 \examples{
-peaksWithSequences = RangedData(IRanges(start=c(1000, 2000), end=c(1010, 2010), names=c("id1", "id2")), sequence= c("CCCCCCCCGGGGG", "TTTTTTTAAAAAA"))
+peaksWithSequences = RangedData(IRanges(start=c(1000, 2000), end=c(1010, 2010), 
+names=c("id1", "id2")), sequence= c("CCCCCCCCGGGGG", "TTTTTTTAAAAAA"))
 write2FASTA(peaksWithSequences, file="testseq.fasta", width=50)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

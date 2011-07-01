@@ -6,7 +6,8 @@
   Obtain enriched gene ontology (GO) terms that are near the peaks using GO.db package and GO gene mapping package such as org.Hs.db.eg to obtain the GO annotation and using hypergeometric test (phyper) and  multtest package for adjusting p-values
 }
 \usage{
-getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
+getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", 
+maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -101,7 +102,8 @@ enrichedGO$cc
 if (interactive()) {
 data(annotatedPeak)
 library(org.Hs.eg.db)
-enriched.GO = getEnrichedGO(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
+enriched.GO = getEnrichedGO(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", maxP=0.01,
+ multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
  dim(enriched.GO$mf)
  colnames(enriched.GO$mf)
  dim(enriched.GO$bp)

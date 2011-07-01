@@ -8,7 +8,9 @@ Find the overlapping peaks for two peak ranges.
 Find the overlapping peaks for two input peak ranges.
 }
 \usage{
-findOverlappingPeaks(Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE, FALSE), NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",select=c("all", "first","last","arbitrary"))
+findOverlappingPeaks(Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE, FALSE), 
+NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
+select=c("all", "first","last","arbitrary"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -60,9 +62,14 @@ Lihua Julie Zhu
 \examples{
 	if (interactive())
 	{	
-	peaks1 = RangedData(IRanges(start=c(1543200,1557200,1563000,1569800,167889600),end=c(1555199,1560599,1565199,1573799,167893599),names=c("p1","p2","p3","p4","p5")),strand=as.integer(1),space=c(6,6,6,6,5))
-	peaks2 =  RangedData(IRanges(start=c(1549800,1554400,1565000,1569400,167888600),end=c(1550599,1560799,1565399,1571199,167888999),names=c("f1","f2","f3","f4","f5")),strand=as.integer(1),space=c(6,6,6,6,5))
-	t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F,NameOfPeaks1="TF1", NameOfPeaks2="TF2") 
+	peaks1 = RangedData(IRanges(start=c(1543200,1557200,1563000,1569800,167889600),
+end=c(1555199,1560599,1565199,1573799,167893599),names=c("p1","p2","p3","p4","p5")),
+strand=as.integer(1),space=c(6,6,6,6,5))
+	peaks2 =  RangedData(IRanges(start=c(1549800,1554400,1565000,1569400,167888600),
+end=c(1550599,1560799,1565399,1571199,167888999),names=c("f1","f2","f3","f4","f5")),
+strand=as.integer(1),space=c(6,6,6,6,5))
+	t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F,
+NameOfPeaks1="TF1", NameOfPeaks2="TF2") 
 	r = t1$OverlappingPeaks
 	pie(table(r$overlapFeature))
 	as.data.frame(t1$MergedPeaks)

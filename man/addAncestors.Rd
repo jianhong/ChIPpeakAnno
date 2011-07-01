@@ -39,7 +39,8 @@ Lihua Julie Zhu
 
 }
 \examples{
-go.ids = cbind(c("GO:0008150", "GO:0005576", "GO:0003674"),c("ND", "IDA", "ND"), c("BP", "BP", "BP"), c("1", "1", "1"))
+go.ids = cbind(c("GO:0008150", "GO:0005576", "GO:0003674"),c("ND", "IDA", "ND"), 
+c("BP", "BP", "BP"), c("1", "1", "1"))
 addAncestors(go.ids, ontology="bp")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

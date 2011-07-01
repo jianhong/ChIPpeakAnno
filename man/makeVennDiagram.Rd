@@ -8,7 +8,8 @@ Make Venn Diagram from two peak ranges
 Make Venn Diagram from two peak ranges and also calculate p-value for determining whether two peak ranges overlap significantly.
 }
 \usage{
-makeVennDiagram(Peaks, NameOfPeaks, maxgap=0, totalTest, cex = 1.5, counts.col = "red")
+makeVennDiagram(Peaks, NameOfPeaks, maxgap=0, totalTest, cex = 1.5,
+ counts.col = "red")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,7 +23,7 @@ Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"), this will 
  Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping.
 }
 \item{totalTest}{
-Numeric value to specify the total number of tests performed to obtain the list of peaks.
+Numeric value to specify the total number of tests performed to obtain the list of peaks. It should be much larger than the number of peaks in the largest peak set.
 }
   \item{cex}{
 Numerical value giving the amount by which the contrast names should be scaled on the plot relative to the default.plotting text. See par.}
@@ -51,9 +52,15 @@ Lihua Julie Zhu
 \examples{
 if (interactive())
 {
-	peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704), end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")), space = c("1", "2", "3"), strand=as.integer(1))
-	peaks2 = RangedData(IRanges(start = c(967659, 2010898,  2496700, 3075866, 3123260), end = c(967869, 2011108, 2496920, 3076166, 3123470), names = c("t1", "t2", "t3", "t4", "t5")), space = c("1", "2", "3", "1", "2"), strand = c(1, 1, -1,-1,1))
-	makeVennDiagram(RangedDataList(peaks1,peaks2), NameOfPeaks=c("TF1", "TF2"), totalTest=100)
+peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704),
+	 end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")),
+	 space = c("1", "2", "3"), strand=as.integer(1))
+peaks2 = RangedData(IRanges(start = c(967659, 2010898,2496700,3075866,3123260),
+	end = c(967869, 2011108, 2496920, 3076166, 3123470),
+	names = c("t1", "t2", "t3", "t4", "t5")), 
+	space = c("1", "2", "3", "1", "2"), strand = c(1, 1, -1,-1,1))
+makeVennDiagram(RangedDataList(peaks1,peaks2), NameOfPeaks=c("TF1", "TF2"),
+ totalTest=100)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -39,6 +39,8 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 		
 	goAnn <- get(paste(GOgenome,"GO", sep=""))
 	mapped_genes <- mappedkeys(goAnn)
+	totalN.genes=length(unique(mapped_genes))
+	thisN.genes = length(unique(entrezIDs))
 	xx <- as.list(goAnn[mapped_genes])
 	#all.GO= matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE)
 	
