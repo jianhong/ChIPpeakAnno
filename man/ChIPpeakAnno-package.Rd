@@ -12,8 +12,8 @@ Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip exper
 \tabular{ll}{
 Package: \tab ChIPpeakAnno\cr
 Type: \tab Package\cr
-Version: \tab 1.3.6\cr
-Date: \tab 2009-03-20\cr
+Version: \tab 1.9.6\cr
+Date: \tab 2011-07-19\cr
 License: \tab LGPL\cr
 LazyLoad: \tab yes\cr
 }
@@ -55,12 +55,15 @@ if (interactive())
 
 	peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), 
 	names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
-library(BSgenome.Ecoli.NCBI.20080805)
+	library(BSgenome.Ecoli.NCBI.20080805)
 	
 	peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,
 	downstream = 20, genome = Ecoli)
-
 	write2FASTA(peaksWithSequences, file="testseq.fasta", width=50)
+	
+	filepath =system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
+	summarizePatternInPeaks(patternFilePath=filepath, format="fasta", skip=0L, BSgenomeName=Ecoli, peaks=peaks)
+
 
 	library(org.Hs.eg.db)
 	enrichedGO = getEnrichedGO(annotatedPeak, orgAnn ="org.Hs.eg.db", maxP=0.01, 
@@ -74,6 +77,10 @@ library(BSgenome.Ecoli.NCBI.20080805)
 	y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
 	hist(y, xlab="Distance To Nearest TSS", main="", breaks=1000, 
 	xlim=c(min(y)-100, max(y)+100))
+
+	annotatedBDP = peaksNearBDP(myPeakList1, AnnotationData=TSS.human.NCBI36,
+	MaxDistance=5000,PeakLocForDistance =  "middle", FeatureLocForDistance = "TSS")
+	c(annotatedBDP$percentPeaksWithBDP, annotatedBDP$n.peaks, annotatedBDP$n.peaksWithBDP)
 }
 
 }
