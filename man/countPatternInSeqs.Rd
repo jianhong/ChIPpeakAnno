@@ -41,7 +41,6 @@ Lihua Julie Zhu
 summarizePatternInPeaks, translatePattern
 }
 \examples{
-#dict = read.DNAStringSet(filepath = "~/Dev/BiocTrunk/ChIPpeakAnno/inst/extdata/examplePattern.fa", format="fasta", use.names=TRUE)
 	filepath = system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
 	dict = read.DNAStringSet(filepath = filepath, format="fasta", use.names=TRUE)
 	sequences = c("ACTGGGGGGGGCCTGGGCCCCCAAAT", "AAAAAACCCCTTTTGGCCATCCCGGGACGGGCCCAT", "ATCGAAAATTTCC")

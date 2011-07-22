@@ -1,5 +1,6 @@
 translatePattern <- function(pattern)
 {
+	pattern = toupper(pattern)
 	pattern = gsub("Y","[C|T]", pattern)
 	pattern = gsub("R", "[A|G]", pattern)
 	pattern = gsub("S", "[G|C]", pattern)

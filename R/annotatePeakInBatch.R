@@ -97,30 +97,30 @@ else
  }
 r2 = cbind(r2, FeatureLoc)
 
-allChr.Anno = unique(space(TSS.ordered))
-    numberOfChromosome = length(unique(space(myPeakList)))
+allChr.Anno = unique(as.character(IRanges:::space(TSS.ordered)))
+    numberOfChromosome = length(unique(IRanges:::space(myPeakList)))
     if (!length(rownames(myPeakList))) {
         rownames(myPeakList) = formatC(1:dim(myPeakList)[1], 
             width = nchar(dim(myPeakList)[1]), flag = "0")
     }
-    allChr = unique(as.character(space(myPeakList)))
+    allChr = unique(as.character(IRanges:::space(myPeakList)))
     allChr = sub(" +", "", allChr)
     if (length(grep("chr", allChr, fixed = TRUE)) > 0 && length(grep("chr", 
         allChr.Anno, fixed = TRUE)) == 0) {
         allChr = sub("chr", "", allChr)
         myPeakList = RangedData(IRanges(start = start(myPeakList), 
             end = end(myPeakList), names = rownames(myPeakList)), 
-            space = sub("chr", "", space(myPeakList)))
+            space = sub("chr", "", IRanges:::space(myPeakList)))
     }
     if (length(grep("chr", allChr, fixed = TRUE)) == 0 && length(grep("chr", 
         allChr.Anno, fixed = TRUE)) > 0) {
         allChr = paste("chr", allChr, sep = "")
         myPeakList = RangedData(IRanges(start = start(myPeakList), 
             end = end(myPeakList), names = rownames(myPeakList)), 
-            space = paste("chr", space(myPeakList), sep = ""))
+            space = paste("chr",IRanges:::space(myPeakList), sep = ""))
     }
     if (output == "nearestStart" || output == "both" || output =="n" || output == "b") {
-        z1 = cbind(as.character(rownames(myPeakList)), as.character(space(myPeakList)), 
+        z1 = cbind(as.character(rownames(myPeakList)), as.character(IRanges:::space(myPeakList)), 
             start(myPeakList), end(myPeakList))
         colnames(z1) = c("name", "chr", "peakStart", "peakEnd")
         z1[, 2] = sub(" +", "", z1[, 2])
@@ -308,7 +308,7 @@ myPeakList$PeakLoc = PeakLoc
 	   strand = do.call(c, lapply(seq_len(dim(r.n)[1]), 
                 function(i) {
                   if (is.na(r.n$strand[i]) || as.character(r.n$strand[i]) == "1" || as.character(r.n$strand[i]) == 
-                    "+" ||  as.character(r$strand) == 
+                    "+" ||  as.character(r.n$strand) == 
                 "*") {
                     "+"
                   }
@@ -390,7 +390,7 @@ r.o$PeakLoc = PeakLoc
  strand = do.call(c, lapply(seq_len(dim(r.o)[1]), 
                 function(i) {
                   if (is.na(r.o$strand[i]) || as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
-                    "+" ||  as.character(r$strand) == 
+                    "+" ||  as.character(r.o$strand) == 
                 "*") {
                     "+"
                   }
@@ -404,7 +404,7 @@ r.o$PeakLoc = PeakLoc
             distancetoFeature = do.call(c, lapply(seq_len(dim(r.o)[1]), 
                 function(i) {
                   if (as.character(r.o$strand[i]) == "1" || as.character(r.o$strand[i]) == 
-                    "+" ||  as.character(r$strand) == 
+                    "+" ||  as.character(r.o$strand) == 
                 "*" || (FeatureLocForDistance != "TSS" && FeatureLocForDistance != "geneEnd")) {
                     as.numeric(as.character(r.o$PeakLoc[i])) - 
                       as.numeric(as.character(r.o$FeatureLoc[i]))

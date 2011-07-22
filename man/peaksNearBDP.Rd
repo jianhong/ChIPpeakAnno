@@ -22,16 +22,26 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
   }
 \value{
 A list of 4
- \item{\code{peaksWithBDP}}{annotated Peaks containing bi-directional promoters
+ \item{\code{peaksWithBDP}}{annotated Peaks containing bi-directional promoters.
+
  RangedData with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
+
     feature: id of the feature such as ensembl gene ID
-    insideFeature: upstream: peak resides upstream of the feature; downstream: peak resides downstream of the feature; inside: peak resides inside the feature; overlapStart: peak overlaps with the start of the feature; overlapEnd: peak overlaps with the end of the feature; includeFeature: peak include the feature entirely
+
+    insideFeature: upstream: peak resides upstream of the feature; downstream: peak resides downstream of the feature; inside: peak resides inside the feature; overlapStart: peak overlaps with the start of the feature; overlapEnd: peak overlaps with the end of the feature; includeFeature: peak include the feature entirely.
+
     distancetoFeature: distance to the nearest feature such as transcription start site.  By default, the distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand. The user can specify the location of peak and location of feature for calculating this
+
     start_position: start position of the feature such as gene
+
     end_position: end position of the feature such as the gene
+
     strand: 1 or + for positive strand and -1 or - for negative strand where the feature is located
+
     shortestDistance: The shortest distance from either end of peak to either end the feature
-    fromOverlappingOrNearest: NearestStart: indicates this PeakLocForDistance is closest to the FeatureLocForDistance
+
+    fromOverlappingOrNearest: NearestStart: indicates this PeakLocForDistance is closest to the 
+FeatureLocForDistance
 }
 \item{\code{percentPeaksWithBDP}}{The percent of input peaks containing bi-directional promoters}
 \item{\code{n.peaks}}{The total number of input peaks}
