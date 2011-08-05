@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ obtain the peaks near bi-directional promoters}
 \description{
-  Obtain the peaks near bi-directional promoters. Also output % of peaks near bi-directional promoters.
+  Obtain the peaks near bi-directional promoters. Also output percent of peaks near bi-directional promoters.
 }
 \usage{
 peaksNearBDP(myPeakList, mart,AnnotationData, MaxDistance=5000,PeakLocForDistance = c("start", "middle", "end"), 

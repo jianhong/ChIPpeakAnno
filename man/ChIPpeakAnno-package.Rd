@@ -39,7 +39,7 @@ Maintainer:
 }
 
 \keyword{ package }
-\seealso{getAnnotation, annotatePeakInBatch,  getAllPeakSequence, write2FASTA, convert2EntrezID, addAncestors, getEnrichedGO,BED2RangedData, GFF2RangedData, makeVennDiagram,findOverlappingPeaks)
+\seealso{getAnnotation, annotatePeakInBatch,  getAllPeakSequence, write2FASTA, convert2EntrezID, addAncestors, getEnrichedGO,BED2RangedData, GFF2RangedData, makeVennDiagram,findOverlappingPeaks, addGeneIDs, peaksNearBDP,summarizePatternInPeaks)
 
 }
 \examples{
@@ -66,6 +66,7 @@ if (interactive())
 
 
 	library(org.Hs.eg.db)
+	annotatedPeak.withSymbol =addGeneIDs(annotatedPeak,"org.Hs.eg.db",c("symbol"))
 	enrichedGO = getEnrichedGO(annotatedPeak, orgAnn ="org.Hs.eg.db", maxP=0.01, 
 	multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 

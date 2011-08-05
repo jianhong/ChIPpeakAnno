@@ -17,8 +17,8 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
  \item{mart}{used if AnnotationData not supplied, a mart object, see useMart of bioMaRt package for details }
   \item{featureType}{ used if AnnotationData not supplied, TSS, miRNA or exon }
  \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType}
-\item{output}{nearestStart: will output the nearest features calculated as peak start - feature start (feature end if feature resides at minus strand);
-	overlapping: will output overlapping features with maximum gap =0 between peak range and feature range;
+\item{output}{nearestStart (default): will output the nearest features calculated as peak start - feature start (feature end if feature resides at minus strand);
+	overlapping: will output overlapping features with maximum gap specified as maxgap between peak range and feature range;
 	both: will output all the nearest features, in addition, will output any features that overlap the peak that is not the nearest features.}
 \item{multiple}{not applicable when output is nearestStart. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak}
 \item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping}
@@ -44,7 +44,7 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 \author{ Lihua Julie Zhu }
 \note{ 
 }
-\seealso{ findOverlappingPeaks, makeVennDiagram }
+\seealso{ findOverlappingPeaks, makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks}
 \examples{
 
 if (interactive())

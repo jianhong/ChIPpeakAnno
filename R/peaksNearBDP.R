@@ -33,6 +33,6 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 	BDP = summary[summary[,2] >1,]
 	peaksWithBDP = passed[passed$peak %in% BDP[,1],]
 	temp = as.data.frame(table(summary[,2]))
-	percentPeaksWithBDP  = temp[2,2]/dim(myPeakList)[1]
-	list(peaksWithBDP = peaksWithBDP, percentPeaksWithBDP = percentPeaksWithBDP, n.peaks=dim(myPeakList)[1], n.peaksWithBDP=temp[2,2])
+	percentPeaksWithBDP  = temp[temp[,1]==2,2]/dim(myPeakList)[1]
+	list(peaksWithBDP = peaksWithBDP, percentPeaksWithBDP = percentPeaksWithBDP, n.peaks=dim(myPeakList)[1], n.peaksWithBDP=temp[temp[,1]==2,2])
 }
