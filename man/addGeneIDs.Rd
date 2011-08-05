@@ -19,39 +19,39 @@ addGeneIDs(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type="ensembl_
   \item{silence}{TRUE or FALSE. If TRUE, will not show unmapped entrez id for feature ids.}
 }
 \details{
-	The common IDs are firstly converted to entrez IDs and then mapped to other Gene IDs.
-	Parameter "IDs2Add" can be set to any combination of "accnum","ensembl","ensemblprot","ensembltrans","entrez_id","enzyme","genename","pfam","pmid","prosite","refseq","symbol","unigene","uniprot". It can be different vectors depending on the organism annotation dataset. For org.Hs.eg.db, it can also include "omim"; for org.Mm.eg.db, it can include "mgi".
-	Mean of parameter "IDs2Add": 
+	Parameter IDs2Add can be set to any combination of identifiers such as "accnum","ensembl","ensemblprot","ensembltrans","entrez_id","enzyme","genename","pfam","pmid","prosite","refseq","symbol","unigene" and "uniprot". Some IDs are unique to a organism, such as "omim" for org.Hs.eg.db and "mgi" for org.Mm.eg.db.
 
-	accnum: GenBank accession numbers;
+	Here is the definition of different IDs : 
 
-	ensembl: Ensembl gene accession numbers;
+	accnum: GenBank accession numbers
 
-	ensemblprot: Ensembl protein accession numbers;
+	ensembl: Ensembl gene accession numbers
 
-	ensembltrans: Ensembl transcript accession numbers;
+	ensemblprot: Ensembl protein accession numbers
 
-	entrez_id: entrez gene identifiers;
+	ensembltrans: Ensembl transcript accession numbers
 
-	enzyme: EC numbers;
+	entrez_id: entrez gene identifiers
 
-	genename: gene name;
+	enzyme: EC numbers
 
-	pfam: Pfam identifiers;
+	genename: gene name
 
-	pmid: PubMed identifiers;
+	pfam: Pfam identifiers
 
-	prosite: PROSITE identifiers;
+	pmid: PubMed identifiers
 
-	refseq: RefSeq identifiers;
+	prosite: PROSITE identifiers
 
-	symbol: gene abbreviations;
+	refseq: RefSeq identifiers
 
-	unigene: UniGene cluster identifiers;
+	symbol: gene abbreviations
 
-	uniprot: Uniprot accession numbers;
+	unigene: UniGene cluster identifiers
 
-	omim: OMIM(Mendelian Inheritance in Man) identifiers;
+	uniprot: Uniprot accession numbers
+
+	omim: OMIM(Mendelian Inheritance in Man) identifiers
 
 	mgi: Jackson Laboratory MGI gene accession numbers
 }
@@ -71,13 +71,10 @@ Jianhong Ou, Lihua Julie Zhu
 
 }
 \examples{
-if(interactive())
-{
 data(annotatedPeak)
 library(org.Hs.eg.db)
 addGeneIDs(annotatedPeak[1:6,],"org.Hs.eg.db",c("symbol","omim"))
 addGeneIDs(annotatedPeak$feature[1:6],"org.Hs.eg.db",c("symbol","genename"))
-}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
