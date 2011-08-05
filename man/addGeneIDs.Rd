@@ -22,21 +22,37 @@ addGeneIDs(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type="ensembl_
 	The common IDs are firstly converted to entrez IDs and then mapped to other Gene IDs.
 	Parameter "IDs2Add" can be set to any combination of "accnum","ensembl","ensemblprot","ensembltrans","entrez_id","enzyme","genename","pfam","pmid","prosite","refseq","symbol","unigene","uniprot". It can be different vectors depending on the organism annotation dataset. For org.Hs.eg.db, it can also include "omim"; for org.Mm.eg.db, it can include "mgi".
 	Mean of parameter "IDs2Add": 
-	accnum: GenBank accession numbers
-	ensembl: Ensembl gene accession numbers
-	ensemblprot: Ensembl protein accession numbers
-	ensembltrans: Ensembl transcript accession numbers
-	entrez_id: entrez gene identifiers
-	enzyme: EC numbers
-	genename: gene name
-	pfam: Pfam identifiers
-	pmid: PubMed identifiers
-	prosite: PROSITE identifiers
-	refseq: RefSeq identifiers
-	symbol: gene abbreviations
-	unigene: UniGene cluster identifiers
-	uniprot: Uniprot accession numbers
-	omim: OMIM(Mendelian Inheritance in Man) identifiers
+
+	accnum: GenBank accession numbers;
+
+	ensembl: Ensembl gene accession numbers;
+
+	ensemblprot: Ensembl protein accession numbers;
+
+	ensembltrans: Ensembl transcript accession numbers;
+
+	entrez_id: entrez gene identifiers;
+
+	enzyme: EC numbers;
+
+	genename: gene name;
+
+	pfam: Pfam identifiers;
+
+	pmid: PubMed identifiers;
+
+	prosite: PROSITE identifiers;
+
+	refseq: RefSeq identifiers;
+
+	symbol: gene abbreviations;
+
+	unigene: UniGene cluster identifiers;
+
+	uniprot: Uniprot accession numbers;
+
+	omim: OMIM(Mendelian Inheritance in Man) identifiers;
+
 	mgi: Jackson Laboratory MGI gene accession numbers
 }
 \value{

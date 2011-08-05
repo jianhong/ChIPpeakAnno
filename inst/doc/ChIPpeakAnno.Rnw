@@ -23,7 +23,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-Chromatin immunoprecipitation (ChIP) followed by high-throughput tag sequencing (ChIP-seq) and ChIP followed by genome tiling array analysis (ChIP-chip) become more and more prevalent high throughput technologies for identifying the binding sites of DNA-binding proteins in a genome-wide bases. A number of algorithms have been published to facilitate the identification of the binding sites of the DNA-binding proteins of interest. The identified binding sites in the list of peaks are usually converted to BED or WIG file format to be loaded to UCSC genome browser as custom tracks for investigators to view the proximity to various genomic features such as genes, exons and conserved elements. However, clicking through the genome browser could be a daunting task for the biologist if the number of peaks gets large or the peaks spread widely across the genome. Here we have developed a Bioconducor package called ChIPpeakAnno to facilitate the batch annotation of the peaks identified from either ChIP-seq or ChIP-chip experiments. We have implemented functionality to find the nearest gene, exon, miRNA or custom features supplied by users such as most conserved elements and other transcription factor binding sites leveraging IRanges. Since the genome annotation gets updated from time to time, we have leveraged the \Rpackage{biomaRt} package from Bioconductor to retrieve the annotation data on the fly if the annotation of interest is available via the \Rpackage{biomaRt} package. The users also have the flexibility to pass their own annotation data as RangedData or pass in annotation data from \Rpackage{GenomicFeatures}. We have also leveraged \Rpackage{BSgenome} and \Rpackage{biomaRt} package on implementing functions to retrieve the sequences around the peak identified for peak validation. To understand whether the identified peaks are enriched around genes with certain GO terms, we have implemented GO enrichment test in ChIPpeakAnno package leveraging the hypergeometric test \Rfunction{phyper} in \Rpackage{stats} package and integrated with Gene Ontology (GO) annotation from \Rpackage{GO.db} package and multiplicity adjustment functions from \Rpackage{multtest} package.
+Chromatin immunoprecipitation (ChIP) followed by high-throughput tag sequencing (ChIP-seq) and ChIP followed by genome tiling array analysis (ChIP-chip) become more and more prevalent high throughput technologies for identifying the binding sites of DNA-binding proteins in a genome-wide bases. A number of algorithms have been published to facilitate the identification of the binding sites of the DNA-binding proteins of interest. The identified binding sites in the list of peaks are usually converted to BED or WIG file format to be loaded to UCSC genome browser as custom tracks for investigators to view the proximity to various genomic features such as genes, exons and conserved elements. However, clicking through the genome browser could be a daunting task for the biologist if the number of peaks gets large or the peaks spread widely across the genome. Here we have developed a Bioconducor package called ChIPpeakAnno to facilitate the batch annotation of the peaks identified from either ChIP-seq or ChIP-chip experiments. We have implemented functionality to find the nearest gene, exon, miRNA, gene end or custom features supplied by users such as most conserved elements and other transcription factor binding sites leveraging IRanges. Since the genome annotation gets updated from time to time, we have leveraged the \Rpackage{biomaRt} package from Bioconductor to retrieve the annotation data on the fly if the annotation of interest is available via the \Rpackage{biomaRt} package. The users also have the flexibility to pass their own annotation data as RangedData or pass in annotation data from \Rpackage{GenomicFeatures}. We have also leveraged \Rpackage{BSgenome} and \Rpackage{biomaRt} package on implementing functions to retrieve the sequences around the peak identified for peak validation. To understand whether the identified peaks are enriched around genes with certain GO terms, we have implemented GO enrichment test in ChIPpeakAnno package leveraging the hypergeometric test \Rfunction{phyper} in \Rpackage{stats} package and integrated with Gene Ontology (GO) annotation from \Rpackage{GO.db} package and multiplicity adjustment functions from \Rpackage{multtest} package.
 
 \section{Examples of using ChIPpeakAnno}
 
@@ -50,10 +50,20 @@ You could also pass your own annotation data into the function \Rfunction{annota
 
 \begin{scriptsize}
 <<>>=
-myPeak1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 3075869, 3123260 ,3857501,201089,1543200,1557200,1563000,1569800,167889600), end= c(967754, 2010997, 2496804, 3075969, 3123360 ,3857601,201089,1555199,1560599,1565199,1573799,167893599),names=c("Site1", "Site2", "Site3", "Site4", "Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"))
+myPeak1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 3075869, 
+3123260 ,3857501,201089,1543200,1557200,1563000,1569800,167889600), 
+end= c(967754, 2010997, 2496804, 3075969, 3123360 ,3857601,201089,1555199,
+1560599,1565199,1573799,167893599),names=c("Site1", "Site2", "Site3", "Site4", 
+"Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), 
+space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"))
 
-TFbindingSites = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260 ,3857500, 96765, 201089, 249670, 307586, 312326 ,385750,1549800,1554400,1565000,1569400,167888600), end=c(967869, 2011108, 2496920,3076166,3123470,3857780, 96985, 201299, 249890, 307796,312586,385960,1550599,1560799,1565399,1571199,167888999), names=c("t1", "t2", "t3", "t4", "t5", "t6","t7", "t8", "t9", "t10", "t11", "t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", "5", "6","6","6","6","6","5"), strand=
-c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
+TFbindingSites = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 
+3123260 ,3857500, 96765, 201089, 249670, 307586, 312326 ,385750,1549800,1554400,
+1565000,1569400,167888600), end=c(967869, 2011108, 2496920,3076166,3123470,
+3857780, 96985, 201299, 249890, 307796,312586,385960,1550599,1560799,1565399,
+1571199,167888999), names=c("t1", "t2", "t3", "t4", "t5", "t6","t7", "t8", "t9", "t10", "t11", 
+"t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", 
+"5", "6","6","6","6","6","5"), strand=c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
 annotatedPeak2 = annotatePeakInBatch(myPeak1, AnnotationData=TFbindingSites)
 pie(table(as.data.frame(annotatedPeak2)$insideFeature))
 as.data.frame(annotatedPeak2)
@@ -70,10 +80,21 @@ Here is an example of obtaining overlapping peaks with maximum gap 1kb for two p
 
 \begin{scriptsize}
 <<>>=
-peaks1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 3075869, 3123260 ,3857501,201089,1543200,1557200,1563000,1569800,167889600), end= c(967754, 2010997, 2496804, 3075969, 3123360 ,3857601,201089,1555199,1560599,1565199,1573799,167893599),names=c("Site1", "Site2", "Site3", "Site4", "Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"),strand=as.integer(1))
+peaks1 = RangedData(IRanges(start=c(967654, 2010897, 2496704, 
+3075869, 3123260 ,3857501,201089,1543200,1557200,1563000,
+1569800,167889600), end= c(967754, 2010997, 2496804, 3075969, 
+3123360 ,3857601,201089,1555199,1560599,1565199,1573799,
+167893599),names=c("Site1", "Site2", "Site3", "Site4", 
+"Site5", "Site6", "Site7","Site8","Site9","Site10","Site11","Site12")), 
+space=c("1", "2", "3", "4", "5", "6","2","6","6","6","6","5"),strand=as.integer(1))
 
-peaks2 = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260 ,3857500, 96765, 201089, 249670, 307586, 312326 ,385750,1549800,1554400,1565000,1569400,167888600), end=c(967869, 2011108, 2496920,3076166,3123470,3857780, 96985, 201299, 249890, 307796,312586,385960,1550599,1560799,1565399,1571199,167888999), names=c("t1", "t2", "t3", "t4", "t5", "t6","t7", "t8", "t9", "t10", "t11", "t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", "5", "6","6","6","6","6","5"), strand=
-c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
+peaks2 = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260 ,
+3857500, 96765, 201089, 249670, 307586, 312326 ,385750,1549800,1554400,1565000,
+1569400,167888600), end=c(967869, 2011108, 2496920,3076166,3123470,3857780, 
+96985, 201299, 249890, 307796,312586,385960,1550599,1560799,1565399,
+1571199,167888999), names=c("t1", "t2", "t3", "t4", "t5", "t6","t7", "t8", "t9", "t10", "t11", 
+"t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", "5", 
+"6","6","6","6","6","5"), strand=c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
 
 t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F, NameOfPeaks1="TF1", NameOfPeaks2="TF2") 
 
@@ -113,17 +134,24 @@ as.data.frame(t1$Peaks2withOverlaps)
 The \Rfunction{findOVerlappingPeaks} function can be repeatedly called to obtain for example, the peaks in peaks1 that overlap with peaks in both peaks2 and peaks3.
 \begin{scriptsize}
 <<>>=
-peaks3 = RangedData(IRanges(start=c(967859, 2010868, 2496500, 3075966, 3123460 ,3851500, 96865, 201189, 249600, 307386), end=c(967969, 2011908, 2496720,3076166,3123470,3857680, 96985, 201299, 249890, 307796), names=c("p1", "p2", "p3", "p4", "p5", "p6","p7", "p8", "p9", "p10")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4"), strand=
+peaks3 = RangedData(IRanges(start=c(967859, 2010868, 2496500, 3075966, 
+3123460 ,3851500, 96865, 201189, 249600, 307386), 
+end=c(967969, 2011908, 2496720,3076166,3123470,3857680, 96985, 
+201299, 249890, 307796), names=c("p1", "p2", "p3", "p4", "p5", "p6","p7", "p8", "p9", "p10")),
+ space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4"), strand=
 c(1,1,1,1,1,1,-1,-1,-1,-1))
 
-findOverlappingPeaks(findOverlappingPeaks(peaks1, peaks2, maxgap=1000, multiple=F,NameOfPeaks1="TF1", NameOfPeaks2="TF2")$Peaks1withOverlap, peaks3, maxgap=1000, multiple=F, NameOfPeaks1="TF1TF2", NameOfPeaks2="TF3")$Peaks1withOverlap
+findOverlappingPeaks(findOverlappingPeaks(peaks1, peaks2, maxgap=1000, 
+multiple=F,NameOfPeaks1="TF1", NameOfPeaks2="TF2")$Peaks1withOverlap, 
+peaks3, maxgap=1000, multiple=F, NameOfPeaks1="TF1TF2", NameOfPeaks2="TF3")$Peaks1withOverlap
 @
 \end{scriptsize}
 
 Venn Diagram can be generated by the following function call with p-value that indicates whether the extent of overlapping is significant.
 \begin{scriptsize}
 <<>>=
-makeVennDiagram(RangedDataList(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"), maxgap=0, totalTest=100, cex = 1, counts.col = "red")
+makeVennDiagram(RangedDataList(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"), 
+maxgap=0, totalTest=100, cex = 1, counts.col = "red",useFeature=FALSE)
 @
 \end{scriptsize}
 
@@ -135,7 +163,8 @@ Here is an example of obtaining sequences surrounding the peak intervals includi
 <<>>=
 peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
 library(BSgenome.Ecoli.NCBI.20080805)
-peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,	downstream = 20, genome = Ecoli)
+peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,
+	downstream = 20, genome = Ecoli)
 @
 \end{scriptsize}
 
@@ -147,7 +176,7 @@ write2FASTA(peaksWithSequences)
 @ 
 \end{scriptsize}
 
-\subsection{Task 3:  Obtain enriched gene ontology (GO) terms near the peaks}
+\subsection{Task 4:  Obtain enriched gene ontology (GO) terms near the peaks}
 
 Once you have obtained the annotated peak data from the example above, you can also use the function \Rfunction{getEnrichedGO} to obtain a list of enriched gene ontology (GO) terms using hypergeometric test.
 
@@ -193,6 +222,48 @@ Heres is a list of enriched GO cellular components for myPeakList dataset.
 enrichedGO$cc
 @
 
+\subsection{Task 5:  Find peaks with bi-directional promoters}
+
+Here is an example to find peaks with bi-directional promoters and output percent of peaks near bi-directional promoters.
+
+\begin{scriptsize}
+<<>>=
+data(myPeakList)
+data(TSS.human.NCBI36)
+annotatedBDP = peaksNearBDP(myPeakList[1:10,], AnnotationData=TSS.human.NCBI36,
+MaxDistance=5000,PeakLocForDistance =  "middle", 
+	FeatureLocForDistance = "TSS")
+annotatedBDP$peaksWithBDP
+c(annotatedBDP$percentPeaksWithBDP, annotatedBDP$n.peaks, annotatedBDP$n.peaksWithBDP)
+@
+\end{scriptsize}
+
+\subsection{Task 6: Output a summary of motif occurrence in the peaks.}
+
+Here is an example to search the peaks for the motifs in examplepattern.fa file.
+
+\begin{scriptsize}
+<<>>=
+peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), names=c("peak1", "peak2")), 
+space=c("NC_008253", "NC_010468"))
+filepath =system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
+library(BSgenome.Ecoli.NCBI.20080805)
+summarizePatternInPeaks(patternFilePath=filepath, format="fasta", skip=0L, BSgenomeName=Ecoli, peaks=peaks)
+@
+\end{scriptsize}
+
+\subsection{Task 7: Add other IDs to annotated peaks or enrichedGO}
+
+Here is an example to add gene symbol to annotated peaks .
+
+\begin{scriptsize}
+<<>>=
+data(annotatedPeak)
+library(org.Hs.eg.db)
+addGeneIDs(annotatedPeak[1:6,],"org.Hs.eg.db",c("symbol"))
+addGeneIDs(annotatedPeak$feature[1:6],"org.Hs.eg.db",c("symbol"))
+@
+\end{scriptsize}
 
 \section{References}
 1. Y. Benjamini and Y. Hochberg (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. J. R. Statist. Soc. B. Vol. 57: 289-300. 

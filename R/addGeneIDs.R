@@ -1,13 +1,13 @@
 addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type="ensembl_gene_id",silence=TRUE){
 	if (missing(annotatedPeak))
 	{
-		stop("Missing required argument annotatedPeak!")	
+		stop("Missing required argument annotatedPeak!",call.=FALSE)	
 	}
 	if(missing(orgAnn)){
-		stop('no annotation database selected')
+		stop('no annotation database selected',call.=FALSE)
 	}
 	if(!grepl(".eg.db",orgAnn,ignore.case=TRUE)){
-		stop('Annotation database must be *.eg.db')
+		stop('Annotation database must be *.eg.db',call.=FALSE)
 	}
 	if (class(annotatedPeak) == "RangedData"){
 		feature_ids <- unique(annotatedPeak$feature)
@@ -16,12 +16,12 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type
 		annotatedPeak<-as.data.frame(feature_ids[!is.na(feature_ids)])
 		colnames(annotatedPeak)[1] = feature_id_type
 	}else{
-		stop("annotatedPeak needs to be RangedData type with feature variable holding the feature id or a character vector holding the IDs of the features used to annotate the peaks!")
+		stop("annotatedPeak needs to be RangedData type with feature variable holding the feature id or a character vector holding the IDs of the features used to annotate the peaks!",call.=FALSE)
 	}
 	feature_ids<-feature_ids[!is.na(feature_ids)]
 	if (length(feature_ids) == 0)
 	{
-		stop("There is no feature column in annotatedPeak or annotatedPeak has size 0!")
+		stop("There is no feature column in annotatedPeak or annotatedPeak has size 0!",call.=FALSE)
 		
 	}
 	orgAnn<-sub("\\.db$","",orgAnn,ignore.case=TRUE)
@@ -34,23 +34,19 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type
 		prefix<-switch(feature_id_type,
 					   gene_alias		= "ALIAS",
 					   gene_symbol		= "SYMBOL",
-					   symbol = "SYMBOL",
 					   ensembl_gene_id	= "ENSEMBL",
 					   refseq_id		= "REFSEQ",
 					   "UNKNOWN"
 					   )
 		if(prefix=="UNKNOWN"){
 			stop("Currently only the following type of IDs are supported: gene_alias, 
-				 ensembl_gene_id, refseq_id and gene_symbol!")
+				 ensembl_gene_id, refseq_id and gene_symbol!",call.=FALSE)
 		}
-		orgAnn1 = get(paste(orgAnn,prefix,"2EG",sep=""))
-		if(class(orgAnn1) != "AnnDbBimap")
-		{
-			stop("orgAnn is not a valid annotation dataset! For example, orgs.Hs.eg.db package for human
-			 and the org.Mm.eg.db package for mouse.")
-		}
-
-		entrez <- mget(feature_ids,orgAnn1,ifnotfound=NA)
+		tryCatch(env<-get(paste(orgAnn,prefix,"2EG",sep="")),error = function(e){
+					stop(paste("Annotation database ",orgAnn,"2EG does not exist!\n\tPlease try to load annotation database by library(",orgAnn,".db)",sep=""),call.=FALSE)
+				 })
+		#entrez <- AnnotationDbi::mget(feature_ids,env,ifnotfound=NA)
+		entrez <- mget(feature_ids,env,ifnotfound=NA)
 		gene_ids <- names(entrez)
 		m_ent <- do.call(rbind,lapply(gene_ids,function(.ele){
 									  r = entrez[names(entrez)==.ele]
@@ -60,7 +56,7 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type
 									  }
 									  }))
 		if(is.null(m_ent)){
-			stop("No entrez identifier can be mapped by input data based on the feature_id_type.\nPlease consider to use correct feature_id_type, orgAnn or annotatedPeak\n");
+			stop("No entrez identifier can be mapped by input data based on the feature_id_type.\nPlease consider to use correct feature_id_type, orgAnn or annotatedPeak\n",call.=FALSE);
 		}
 		m_ent<-as.data.frame(m_ent)
 		m_ent<-m_ent[!is.na(m_ent[,1]),]
@@ -87,6 +83,7 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type
 				cat(paste("The IDs2Add you input, \"", IDtoAdd, "\", is not supported!\n",sep=""))
 				next
 			}
+			#x <- AnnotationDbi::mget(IDs, orgDB,ifnotfound=NA)
 			x <- mget(IDs, orgDB,ifnotfound=NA)
 			x <- lapply(x,function(.ele){
 						tmp<-paste(as.character(unlist(.ele)),sep="",collapse=";")
