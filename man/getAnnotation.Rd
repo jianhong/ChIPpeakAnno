@@ -7,12 +7,12 @@
 }
 \usage{
 getAnnotation(mart, 
-featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr"))
+featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr", "transcript"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mart}{mart object, see useMart of bioMaRt package for details }
-  \item{featureType}{TSS, miRNA, Exon, 5'UTR, 3'UTR or Exon plus UTR }
+  \item{featureType}{TSS, miRNA, Exon, 5'UTR, 3'UTR, transcript or Exon plus UTR }
 }
 \details{
 
