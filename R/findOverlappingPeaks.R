@@ -27,6 +27,8 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
     else
     {
 	Peaks2$strand[as.character(Peaks2$strand) == "1"] = "+";
+	Peaks2$strand[as.character(Peaks2$strand) == "*"] = "+";
+	Peaks2$strand[is.na(Peaks2$strand)] = "+";
 	Peaks2$strand[as.character(Peaks2$strand) == "-1"] = "-";
    }
     if (length(Peaks1$strand) == 0) {
@@ -35,6 +37,8 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
     else
     {
 	Peaks1$strand[as.character(Peaks1$strand) == "1"] = "+";
+	Peaks1$strand[as.character(Peaks1$strand) == "*"] = "+";
+	 Peaks1$strand[is.na(Peaks1$strand)] = "+";
 	Peaks1$strand[as.character(Peaks1$strand) == "-1"] = "-";	
     }
  select= match.arg(select)
