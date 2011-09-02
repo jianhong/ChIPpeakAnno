@@ -1,7 +1,7 @@
 annotatePeakInBatch <-
 function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"), 
     AnnotationData, output = c("nearestStart", "overlapping", 
-        "both"), multiple = c(FALSE, TRUE), maxgap = 0, PeakLocForDistance=c("start","middle","end"), FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd")) 
+        "both"), multiple = c(TRUE,FALSE), maxgap = 0, PeakLocForDistance=c("start","middle","end"), FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"), select=c("all", "first", "last", "arbitrary")) 
 {
     featureType = match.arg(featureType)
     if (missing(PeakLocForDistance))
@@ -16,9 +16,11 @@ function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"),
     if (missing(output)) {
         output = "nearestStart"
     }
-    if ((output == "overlapping" || output == "both") && missing(multiple)) {
-        stop("Missing requried logical argument multiple. It is requried when output is overlapping or both!")
-    }
+	select= match.arg(select)
+    if ((output == "overlapping" || output == "both") && select =="all" && multiple==FALSE) {
+		warning("Please use select instead of multiple!") 
+		select = "first"
+	}
     if (missing(myPeakList)) {
         stop("Missing required argument myPeakList!")
     }
@@ -321,7 +323,7 @@ myPeakList$PeakLoc = PeakLoc
     }
     if (output == "overlapping" || output == "both" || output =="o" || output == "b") {
         r.o = findOverlappingPeaks(myPeakList, TSS.ordered, maxgap = maxgap, 
-            multiple = multiple, NameOfPeaks1 = "peak", NameOfPeaks2 = "feature")$OverlappingPeaks
+            select=select, NameOfPeaks1 = "peak", NameOfPeaks2 = "feature")$OverlappingPeaks
         if (dim(r.o)[1] > 0) {
             r.o$fromOverlappingOrNearest = rep("Overlapping", 
                 dim(r.o)[1])

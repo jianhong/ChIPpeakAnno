@@ -7,9 +7,9 @@
 }
 \usage{
 annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), 
-AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(FALSE,TRUE), 
+AnnotationData,output=c("nearestStart", "overlapping","both"),multiple=c(TRUE,FALSE), 
 maxgap=0,PeakLocForDistance = c("start", "middle", "end"), 
-FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
+FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"), select=c("all", "first","last","arbitrary"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,10 +20,13 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 \item{output}{nearestStart (default): will output the nearest features calculated as peak start - feature start (feature end if feature resides at minus strand);
 	overlapping: will output overlapping features with maximum gap specified as maxgap between peak range and feature range;
 	both: will output all the nearest features, in addition, will output any features that overlap the peak that is not the nearest features.}
-\item{multiple}{not applicable when output is nearestStart. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak}
+\item{multiple}{not applicable when output is nearestStart. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak. This parameter is kept for backward compatibility, please use select.}
 \item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping}
 \item{PeakLocForDistance}{Specify the location of peak for calculating distance,i.e., middle means using middle of the peak to calculate distance to feature, start means using start of the peak to calculate the distance to feature. To be compatible with previous version, by default using start}
 \item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand, geneEnd means using end of feature when feature is on plus strand and using start of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
+\item{select}{
+all may return multiple overlapping peaks, first will return the first overlapping peak, last will return the last overlapping peak and arbitrary will return one of the overlapping peaks.
+}
 }
 \details{
   }

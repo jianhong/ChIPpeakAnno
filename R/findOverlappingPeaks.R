@@ -1,4 +1,4 @@
-findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE, FALSE), 
+findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,FALSE), 
     NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", select=c("all", "first", "last", "arbitrary")) 
 {
     if (missing(Peaks1)) {
@@ -21,7 +21,6 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
         rownames(Peaks2) = formatC(1:dim(Peaks2)[1], width = nchar(dim(Peaks2)[1]), 
             flag = "0")
     }
-
     if (length(Peaks2$strand) == 0) {
         Peaks2$strand = rep("+", length(start(Peaks2)))
     }
@@ -39,6 +38,10 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
 	Peaks1$strand[as.character(Peaks1$strand) == "-1"] = "-";	
     }
  select= match.arg(select)
+  if ( select == "all" && multiple == FALSE) {
+            warning("Please use select instead of multiple!")                 
+            select = "first"
+     }
     r2 = cbind(rownames(Peaks2), start(Peaks2), end(Peaks2), 
         Peaks2$strand)
     colnames(r2) = c(NameOfPeaks2, paste(NameOfPeaks2, "start", 
@@ -78,22 +81,17 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
             Ranges2 = sort(IRanges(start = start(Peaks2[chr]), 
                 end = end(Peaks2[chr]), names = rownames(Peaks2[chr])))
             tree = IntervalTree(Ranges2)
-		 if (multiple || select=="all")
+		 if (select=="all")
 		{
             matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
                 select ="all")
-		}
-		else if (missing(select))
-		{
-			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
-                select ="first")
 		}
 		else
 		{
 			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
                 select = select)
 		}
-         if (multiple || select=="all") {
+         if (select=="all") {
                 matchmatrix = matchMatrix(matches)
                 qname = names(Ranges1)[matchmatrix[, 1]]
                 tname = names(Ranges2)[matchmatrix[, 2]]

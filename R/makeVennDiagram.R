@@ -76,8 +76,8 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		if(!useFeature)
 		{
 			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, multiple=F)$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
+				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, select="first")$OverlappingPeaks
 			p1.and.p2.and.p3 = length(unique(overlappingPeaks123[[NameOfPeaks[1]]]))
 		
 			p1 = length(rownames(Peaks[[1]]))
@@ -148,27 +148,27 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		if (!useFeature)
 		{
 			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, multiple=F)
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
+				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, select="first")
 			p1.and.p2.and.p3 = length(unique(overlappingPeaks123$OverlappingPeaks[[NameOfPeaks[1]]]))
 		
 			overlappingPeaks124 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, multiple=F)$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
 			p1.and.p2.and.p4 = length(unique(overlappingPeaks124[[NameOfPeaks[1]]]))
 		
 			overlappingPeaks234 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[2]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, multiple=F)$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[2]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
 			p2.and.p3.and.p4 = length(unique(overlappingPeaks234[[NameOfPeaks[2]]]))
 		
 			overlappingPeaks134 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, multiple=F)$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, multiple=F)$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
 			p1.and.p3.and.p4 = length(unique(overlappingPeaks134[[NameOfPeaks[1]]]))
 				
 			overlappingPeaks1234 = findOverlappingPeaks(overlappingPeaks123$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, multiple=F)$OverlappingPeaks
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
 			p1.and.p2.and.p3.and.p4 = length(unique(overlappingPeaks1234[[NameOfPeaks[1]]]))
 		
 			p1 = length(rownames(Peaks[[1]]))
