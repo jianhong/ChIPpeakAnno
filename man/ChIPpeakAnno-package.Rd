@@ -12,8 +12,8 @@ Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip exper
 \tabular{ll}{
 Package: \tab ChIPpeakAnno\cr
 Type: \tab Package\cr
-Version: \tab 1.9.6\cr
-Date: \tab 2011-07-19\cr
+Version: \tab 2.0.6\cr
+Date: \tab 2011-10-31\cr
 License: \tab LGPL\cr
 LazyLoad: \tab yes\cr
 }
