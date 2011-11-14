@@ -1,4 +1,5 @@
 import(gplots)
+import(BiocGenerics)
 importFrom(biomaRt, useMart, getBM, getSequence)
 importFrom(multtest, mt.rawp2adjp)
 importFrom(limma, vennCounts,vennDiagram)
