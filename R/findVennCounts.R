@@ -70,6 +70,11 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0,  totalTest, useFeature=
 		#p2inp1 = length(unique(overlappingPeaks[[NameOfPeaks[2]]]))
 		neither = totalTest - p1only - p2 
 		Counts =c(neither,p2only,p1only,p1.and.p2)
+		if (p1only <0 || p2only <0)
+                {
+                        warning("negative counts generated when multiple peaks overlap with one peak!")
+                }
+
 		a2[,3] = Counts
 		p.value = phyper(p1.and.p2 -1, p2, totalTest-p2, p1, lower.tail = FALSE,log.p = FALSE)
 		list(p.value=p.value, vennCounts = a2)

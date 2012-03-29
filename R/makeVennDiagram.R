@@ -98,7 +98,10 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		p1only = p1 - p1.and.p2 - p1.and.p3 + p1.and.p2.and.p3
 		p2only = p2 - p1.and.p2 - p2.and.p3 + p1.and.p2.and.p3
 		p3only = p3 - p2.and.p3 - p1.and.p3 + p1.and.p2.and.p3
-		
+		if (p1only <0 || p2only <0 || p3only <0)
+		{
+			warning("negative counts generated when multiple peaks overlap with one peak!")
+		}	
 		neither123 = totalTest -p1only - p2only - p3only - p1.and.p2 - p1.and.p3 - p2.and.p3 + 2 * p1.and.p2.and.p3
 		
 		Counts =c(neither123,p3only,p2only,p2.and.p3-p1.and.p2.and.p3, p1only, p1.and.p3-p1.and.p2.and.p3, p1.and.p2-p1.and.p2.and.p3,p1.and.p2.and.p3)
@@ -198,7 +201,12 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		p2only =  p2 - p1.and.p2 - p2.and.p3 + p1.and.p2.and.p3 - p2.and.p4 + p2.and.p3.and.p4 + p1.and.p2.and.p4 - p1.and.p2.and.p3.and.p4
 		p3only =  p3 - p1.and.p3 - p2.and.p3 + p1.and.p2.and.p3 - p3.and.p4 + p2.and.p3.and.p4 + p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4
 		p4only =  p4 - p1.and.p4 - p2.and.p4 + p1.and.p2.and.p4 - p3.and.p4 + p2.and.p3.and.p4 + p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4
-		
+	
+		 if (p1only <0 || p2only <0 || p3only <0 || p4only <0)
+                {
+                        warning("negative counts generated when multiple peaks overlap with one peak!")
+                }
+	
 		neither1234 = totalTest - ( p1 + p2 - p1.and.p2 + p3only + p4only + p3.and.p4
 				- p1.and.p3.and.p4 - p2.and.p3.and.p4 + p1.and.p2.and.p3.and.p4)
 		Counts =c(neither1234, p4only, p3only, p3.and.p4 - p1.and.p3.and.p4 - p2.and.p3.and.p4 + p1.and.p2.and.p3.and.p4, p2only, p2.and.p4 - p2.and.p3.and.p4 - p1.and.p2.and.p4 + p1.and.p2.and.p3.and.p4, p2.and.p3 - p2.and.p3.and.p4 - p1.and.p2.and.p3 + p1.and.p2.and.p3.and.p4, 
