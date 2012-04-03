@@ -35,12 +35,12 @@ BED2RangedData <- function(data.BED,header=FALSE)
 	if (dim(myPeak)[2] >= 6)
 	{		
 		strand = as.character(myPeak[,6])
-		strand[strand== "+"] = 1
-		strand[strand=="-"] = -1
+		strand[strand== "1"] = "+"
+		strand[strand== "-1"] = "-"
 	}
 	else
 	{
-		strand = rep(1, dim(myPeak)[1])
+		strand = rep("+", dim(myPeak)[1])
 	}
 	RangedData(IRanges(start=as.numeric(as.character(myPeak[,2])), end=as.numeric(as.character(myPeak[,3])), names = names), space = sub("chr", "", as.character(myPeak[,1])), strand = strand, score=score )
 }
