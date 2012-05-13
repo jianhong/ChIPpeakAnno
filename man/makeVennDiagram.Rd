@@ -8,7 +8,7 @@ Make Venn Diagram from two peak ranges
 Make Venn Diagram from two peak ranges and also calculate p-value for determining whether two peak ranges overlap significantly.
 }
 \usage{
-makeVennDiagram(Peaks, NameOfPeaks, maxgap=0, totalTest, cex = 1.5,
+makeVennDiagram(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex = 1.5,
  counts.col = "red", useFeature=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -22,6 +22,8 @@ Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"), this will 
  \item{maxgap}{
  Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping.
 }
+\item{minoverlap}{
+Non-negative integer. Intervals with an overlapping of minoverlap or more are considered to be overlapping.}
 \item{totalTest}{
 Numeric value to specify the total number of tests performed to obtain the list of peaks. It should be much larger than the number of peaks in the largest peak set.
 }

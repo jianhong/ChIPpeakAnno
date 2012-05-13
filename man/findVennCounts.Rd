@@ -8,7 +8,7 @@ Obtain Venn Counts for Venn Diagram, internal function for makeVennDigram
 Obtain Venn Counts for two peak ranges using chromosome ranges or feature field, internal function for makeVennDigram
 }
 \usage{
-findVennCounts(Peaks, NameOfPeaks, maxgap = 0, totalTest, useFeature=FALSE)
+findVennCounts(Peaks, NameOfPeaks, maxgap = 0L, minoverlap = 1L, totalTest, useFeature=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,8 @@ Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"), this will 
   \item{maxgap}{
  Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping.
 }
+\item{minoverlap}{
+Non-negative integer. Intervals with an overlapping of minoverlap or more are considered to be overlapping.}
   \item{totalTest}{
 Numeric value to specify the total number of tests performed to obtain the list of peaks.
 }

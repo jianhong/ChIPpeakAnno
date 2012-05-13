@@ -10,5 +10,5 @@ function(mySeq, file="", width=80)
         seq <- sequences[i]
         list(desc = desc, seq = seq)
     })
-	writeFASTA(ff, file=file, width=width)
+	write.XStringSet(ff, file=file, width=width)
 }

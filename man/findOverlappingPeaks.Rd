@@ -8,7 +8,7 @@ Find the overlapping peaks for two peak ranges.
 Find the overlapping peaks for two input peak ranges.
 }
 \usage{
-findOverlappingPeaks(Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE, FALSE), 
+findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L, multiple = c(TRUE, FALSE), 
 NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
 select=c("all", "first","last","arbitrary"))
 }
@@ -22,6 +22,9 @@ RangedData: See example below.
 }
   \item{maxgap}{
 Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping.
+}
+\item{minoverlap}{
+Non-negative integer. Intervals with an overlapping of minoverlap or more are considered to be overlapping.
 }
   \item{multiple}{
 TRUE or FALSE: TRUE may return multiple overlapping peaks in Peaks2 for one peak in Peaks1; FALSE will return at most one overlapping peaks in Peaks2 for one peak in Peaks1. This parameter is kept for backward compatibility, please use select.

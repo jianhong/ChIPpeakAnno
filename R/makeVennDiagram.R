@@ -1,5 +1,5 @@
 makeVennDiagram <-
-function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", useFeature=FALSE)
+function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, counts.col="red", useFeature=FALSE)
 {
 	if (missing(totalTest))
 	{
@@ -44,7 +44,7 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 	})
 	if (n1 == 2)
 	{
-		x = findVennCounts(Peaks=Peaks,NameOfPeaks=NameOfPeaks,maxgap=maxgap,totalTest=totalTest,useFeature=useFeature)
+		x = findVennCounts(Peaks=Peaks,NameOfPeaks=NameOfPeaks,maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
 		a2 = x$vennCounts
 		p.value = x$p.value
 		vennDiagram(a2,names = NameOfPeaks, cex=cex, counts.col = counts.col)
@@ -55,20 +55,18 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		a1 = cbind(c(0, 0, 0,0,1, 1,1,1), c(0, 0,1,1, 0,0,1, 1),c(0,1,0,1,0,1,0,1))
 		colnames(a1) = NameOfPeaks
 		a2 = vennCounts(a1)
-		x1 = findVennCounts(list(Peaks[[1]],Peaks[[2]]), NameOfPeaks=NameOfPeaks[1:2], maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+		x1 = findVennCounts(list(Peaks[[1]],Peaks[[2]]), NameOfPeaks=NameOfPeaks[1:2], maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.1vs2 = x1$p.value
 		counts1 = x1$vennCounts
 		p1.and.p2 = counts1[4,3]
 		
-		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.1vs3 = x2$p.value
 		counts2 = x2$vennCounts	
 		p1.and.p3 = counts2[4,3]
 		
 		x3 = findVennCounts(list(Peaks[[2]],Peaks[[3]]), NameOfPeaks=NameOfPeaks[2:3], maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.2vs3 = x3$p.value
 		counts3 = x3$vennCounts
 		p2.and.p3 = counts3[4,3]
@@ -76,8 +74,9 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		if(!useFeature)
 		{
 			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, select="first")$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, minoverlap = minoverlap,  select="first")$Peaks1withOverlap,
+				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap,
+				 minoverlap = minoverlap, select="first")$OverlappingPeaks
 			p1.and.p2.and.p3 = length(unique(overlappingPeaks123[[NameOfPeaks[1]]]))
 		
 			p1 = length(rownames(Peaks[[1]]))
@@ -115,35 +114,34 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		colnames(a1) = NameOfPeaks
 		a2 = vennCounts(a1)
 		x1 = findVennCounts(list(Peaks[[1]],Peaks[[2]]), NameOfPeaks=NameOfPeaks[1:2], maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.1vs2 = x1$p.value
 		counts1 = x1$vennCounts
 		p1.and.p2 = counts1[4,3]
 		
-		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap, minoverlap = minoverlap,	totalTest=totalTest,useFeature=useFeature)
 		p.value.1vs3 = x2$p.value
 		counts2 = x2$vennCounts	
 		p1.and.p3 = counts2[4,3]
 		
 		x3 = findVennCounts(list(Peaks[[2]],Peaks[[3]]), NameOfPeaks=NameOfPeaks[2:3], maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+			minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.2vs3 = x3$p.value
 		counts3 = x3$vennCounts
 		p2.and.p3 = counts3[4,3]
 		
 		x4 = findVennCounts(list(Peaks[[3]],Peaks[[4]]), NameOfPeaks=NameOfPeaks[3:4], maxgap=maxgap,
-						totalTest=totalTest,useFeature=useFeature)
+				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.3vs4 = x4$p.value
 		counts4 = x4$vennCounts
 		p3.and.p4 = counts4[4,3]
 		
-		x5 = findVennCounts(list(Peaks[[1]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[1],NameOfPeaks[4]), maxgap=maxgap,totalTest=totalTest,useFeature=useFeature)
+		x5 = findVennCounts(list(Peaks[[1]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[1],NameOfPeaks[4]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.1vs4 = x5$p.value
 		counts5 = x5$vennCounts
 		p1.and.p4 = counts5[4,3]
 		
-		x6 = findVennCounts(list(Peaks[[2]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[2],NameOfPeaks[4]), maxgap=maxgap,totalTest=totalTest,useFeature=useFeature)
+		x6 = findVennCounts(list(Peaks[[2]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[2],NameOfPeaks[4]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.2vs4 = x6$p.value
 		counts6 = x6$vennCounts
 		p2.and.p4 = counts6[4,3]		
@@ -151,27 +149,31 @@ function(Peaks, NameOfPeaks, maxgap=0,  totalTest, cex=1.5, counts.col="red", us
 		if (!useFeature)
 		{
 			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap, select="first")
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, minoverlap = minoverlap, select="first")$Peaks1withOverlap,
+				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap,
+				 minoverlap = minoverlap, select="first")
 			p1.and.p2.and.p3 = length(unique(overlappingPeaks123$OverlappingPeaks[[NameOfPeaks[1]]]))
 		
 			overlappingPeaks124 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap,  minoverlap = minoverlap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
+				 minoverlap = minoverlap, select="first")$OverlappingPeaks
 			p1.and.p2.and.p4 = length(unique(overlappingPeaks124[[NameOfPeaks[1]]]))
 		
 			overlappingPeaks234 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[2]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[2]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, minoverlap = minoverlap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
+				 minoverlap = minoverlap, select="first")$OverlappingPeaks
 			p2.and.p3.and.p4 = length(unique(overlappingPeaks234[[NameOfPeaks[2]]]))
 		
 			overlappingPeaks134 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
+				findOverlappingPeaks(Peaks[[1]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap,  minoverlap = minoverlap, select="first")$Peaks1withOverlap,
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
+				 minoverlap = minoverlap, select="first")$OverlappingPeaks
 			p1.and.p3.and.p4 = length(unique(overlappingPeaks134[[NameOfPeaks[1]]]))
 				
 			overlappingPeaks1234 = findOverlappingPeaks(overlappingPeaks123$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, select="first")$OverlappingPeaks
+				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, minoverlap = minoverlap,  select="first")$OverlappingPeaks
 			p1.and.p2.and.p3.and.p4 = length(unique(overlappingPeaks1234[[NameOfPeaks[1]]]))
 		
 			p1 = length(rownames(Peaks[[1]]))

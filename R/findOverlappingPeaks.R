@@ -1,4 +1,4 @@
-findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,FALSE), 
+findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  multiple = c(TRUE,FALSE), 
     NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", select=c("all", "first", "last", "arbitrary")) 
 {
     if (missing(Peaks1)) {
@@ -87,12 +87,12 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 100, multiple = c(TRUE,
             tree = IntervalTree(Ranges2)
 		 if (select=="all")
 		{
-            matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
+            matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, minoverlap = minoverlap,
                 select ="all")
 		}
 		else
 		{
-			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, 
+			matches = findOverlaps(tree, query = Ranges1, maxgap = maxgap, minoverlap = minoverlap, 
                 select = select)
 		}
          if (select=="all") {

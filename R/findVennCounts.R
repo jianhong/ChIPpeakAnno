@@ -1,4 +1,4 @@
-findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0,  totalTest, useFeature=FALSE)
+findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap = 1L,  totalTest, useFeature=FALSE)
 {
 	if (missing(totalTest))
 	{
@@ -48,7 +48,7 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0,  totalTest, useFeature=
 		a2 = vennCounts(a1)
 		if (!useFeature)
 		{
-			overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, multiple=F)$OverlappingPeaks
+			overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap,  minoverlap = minoverlap, select="first")$OverlappingPeaks
 			p1.and.p2 = length(unique(overlappingPeaks[[NameOfPeaks[1]]]))
 			p1 = length(rownames(Peaks[[1]]))
 			p2 = length(rownames(Peaks[[2]]))
