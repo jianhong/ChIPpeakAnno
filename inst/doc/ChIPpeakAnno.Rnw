@@ -172,7 +172,7 @@ You can easily convert the obtained sequences into fasta format for motif discov
 
 \begin{scriptsize}
 <<>>=
-write2FASTA(peaksWithSequences)
+write2FASTA(peaksWithSequences,"test.fa")
 @ 
 \end{scriptsize}
 

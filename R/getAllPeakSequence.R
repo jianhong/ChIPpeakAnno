@@ -19,10 +19,14 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 			{
 				chr = paste("chr", chr, sep="")
 			}
-					
+			
 			for (i in 1:length(Start))		
 			{
 				thisChr =chr[i]
+				if (thisChr == "chrMT")
+				{
+					thisChr = "chrM")
+				}
 				thisEnd = min(End[i], seqlengths(genome)[thisChr][[1]])
 				thisStart = max(1, Start[i])
 				thisStrand = as.character(strand[i])

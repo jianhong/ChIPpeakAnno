@@ -1,5 +1,16 @@
-1. Find the peaks with bi-directional promoters with summary statistics (peaksNearBDP). 
-2. Summarize the occurrence of motifs in peaks (summarizePatternInPeaks). 
-3. Add other IDs to annotated peaks or enrichedGO (addGeneIDs)The function makeVennDiagram supports 4-way venn diagram.
-4. Enriched Gene Ontology (GO) terms are annotated with a list of genes which can be traced back to peaks. 
-5. FAQ: http://pgfe.umassmed.edu/ChIPpeakAnno/FAQ.html. 
+CHANGES IN VERSION 2.2.0
+------------------------
+
+     o Find the peaks with bi-directional promoters with summary
+     statistics (peaksNearBDP).
+
+     o Summarize the occurrence of motifs in peaks
+     (summarizePatternInPeaks).
+
+     o Add other IDs to annotated peaks or enrichedGO (addGeneIDs)The
+     function makeVennDiagram supports 4-way venn diagram.
+
+     o Enriched Gene Ontology (GO) terms are annotated with a list of
+     genes which can be traced back to peaks.
+
+     o FAQ: http://pgfe.umassmed.edu/ChIPpeakAnno/FAQ.html.
