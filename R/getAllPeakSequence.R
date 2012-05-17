@@ -25,7 +25,7 @@ function(myPeakList, upstream=200, downstream=200, genome, AnnotationData)
 				thisChr =chr[i]
 				if (thisChr == "chrMT")
 				{
-					thisChr = "chrM")
+					thisChr = "chrM"
 				}
 				thisEnd = min(End[i], seqlengths(genome)[thisChr][[1]])
 				thisStart = max(1, Start[i])
