@@ -12,7 +12,7 @@ function(mart, featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr
 		}
 		else if (featureType == "miRNA")
 		{
-			TSS = getBM(c("ensembl_gene_id","chromosome_name", "start_position", "end_position",  "strand", "description", "gene_biotype"), filter=c("biotype"),values="miRNA", mart = mart)
+			TSS = getBM(c("ensembl_gene_id","chromosome_name", "start_position", "end_position",  "strand", "description", "gene_biotype"), filters=c("biotype"),values="miRNA", mart = mart)
 		}
 		else if (featureType == "Exon")
 		{

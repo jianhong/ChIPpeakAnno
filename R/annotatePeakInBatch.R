@@ -32,7 +32,7 @@ function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"),
         if (missing(mart) || class(mart) != "Mart") {
             stop("Error in querying biomart database. No valid mart object is passed in! Suggest call getAnnotation before calling annotatePeakInBatch")
         }
-        AnnotationData <- getAnnotation(mart, feature = featureType)
+        AnnotationData <- getAnnotation(mart, featureType = featureType)
         message("Done querying biomart database, start annotating ....Better way would be calling getAnnotation before calling annotatePeakInBatch")
     }
     if (class(AnnotationData) != "RangedData") {

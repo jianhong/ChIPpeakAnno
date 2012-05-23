@@ -42,7 +42,7 @@ summarizePatternInPeaks, translatePattern
 }
 \examples{
 	filepath = system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
-	dict = read.DNAStringSet(filepath = filepath, format="fasta", use.names=TRUE)
+	dict = readDNAStringSet(filepath = filepath, format="fasta", use.names=TRUE)
 	sequences = c("ACTGGGGGGGGCCTGGGCCCCCAAAT", "AAAAAACCCCTTTTGGCCATCCCGGGACGGGCCCAT", "ATCGAAAATTTCC")
 	countPatternInSeqs(pattern=dict[1], sequences=sequences)
 	countPatternInSeqs(pattern=dict[2], sequences=sequences)

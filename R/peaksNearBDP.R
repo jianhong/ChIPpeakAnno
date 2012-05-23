@@ -19,7 +19,7 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
       	  }
 	else
 	{
-       	AnnotationData <- getAnnotation(mart, feature = "TSS") 
+       	AnnotationData <- getAnnotation(mart, featureType = "TSS") 
 		message("Done querying biomart database, start annotating ....Better way would be calling getAnnotation before calling peaksNearBDP")
 		AnnoPlus =AnnotationData[AnnotationData$strand =="+"  | AnnotationData$strand ==1,]
 		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
