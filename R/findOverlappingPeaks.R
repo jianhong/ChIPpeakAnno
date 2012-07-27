@@ -96,7 +96,7 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
                 select = select)
 		}
          if (select=="all") {
-                matchmatrix = matchMatrix(matches)
+                matchmatrix = as.matrix(matches)
                 qname = names(Ranges1)[matchmatrix[, 1]]
                 tname = names(Ranges2)[matchmatrix[, 2]]
                 data.frame(Peaks1 = qname, chr = rep(chr, dim(matchmatrix)[1]), 
