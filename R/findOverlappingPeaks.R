@@ -1,5 +1,5 @@
 findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  multiple = c(TRUE,FALSE), 
-    NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", select=c("all", "first", "last", "arbitrary")) 
+    NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", select=c("all", "first", "last", "arbitrary"), annotate =0) 
 {
     if (missing(Peaks1)) {
         stop("Missing Peaks1 which is required!")
@@ -119,6 +119,7 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
         MergedPeaks = 0
     }
     else {
+	 if (annotate == 1) {
         shortestDistance = apply(cbind(abs(as.numeric(as.character(r[[paste(NameOfPeaks2, 
             "start", sep = "_")]])) - as.numeric(as.character(r[[paste(NameOfPeaks1, 
             "end", sep = "_")]]))), abs(as.numeric(as.character(r[[paste(NameOfPeaks2, 
@@ -195,6 +196,7 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
         }))
         r$overlapFeature = overlapFeature
         r$shortestDistance = shortestDistance
+	 } # end of annotate =1
         minstart = apply(cbind(as.numeric(as.character(r[[paste(NameOfPeaks1, 
             "start", sep = "_")]])), as.numeric(as.character(r[[paste(NameOfPeaks2, 
             "start", sep = "_")]]))), MARGIN = 1, min)
@@ -221,7 +223,7 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
             3])), end = as.numeric(as.character(r2[, 4])), names = as.character(r2[, 
             1])), space = as.character(r2[, 2]), strand = as.character(r2[, 
             5]))
-    }
+    } # end of else
     list(OverlappingPeaks = r[order(r[[NameOfPeaks1]]), ], MergedPeaks = MergedPeaks, 
         Peaks1withOverlaps = Peaks1withOverlaps, Peaks2withOverlaps = Peaks2withOverlaps)
 }

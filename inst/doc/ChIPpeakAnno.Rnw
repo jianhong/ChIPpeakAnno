@@ -96,7 +96,7 @@ peaks2 = RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260 ,
 "t12","t13","t14","t15","t16","t17")), space=c("1", "2", "3", "4", "5", "6","1", "2", "3", "4", "5", 
 "6","6","6","6","6","5"), strand=c(1,1,1,1,1,1,-1,-1,-1,-1,-1,-1,1,1,1,1,1))
 
-t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, minoverlap =20,select="first", NameOfPeaks1="TF1", NameOfPeaks2="TF2") 
+t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, minoverlap =20,select="first", NameOfPeaks1="TF1", NameOfPeaks2="TF2", annotate=1) 
 
 @
 \end{scriptsize}

@@ -25,7 +25,7 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
 	}
     plus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoPlus,PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
-	minus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoMinus)
+	minus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoMinus, PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
 	plus.passed = plus[!is.na(plus$shortestDistance) & plus$shortestDistance<=MaxDistance, ]
 	minus.passed = minus[!is.na(minus$shortestDistance) & minus$shortestDistance <=MaxDistance, ]
 	passed = rbind(plus.passed, minus.passed)

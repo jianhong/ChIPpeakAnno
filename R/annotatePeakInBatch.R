@@ -323,7 +323,7 @@ myPeakList$PeakLoc = PeakLoc
     }
     if (output == "overlapping" || output == "both" || output =="o" || output == "b") {
         r.o = findOverlappingPeaks(myPeakList, TSS.ordered, maxgap = maxgap, 
-            select=select, NameOfPeaks1 = "peak", NameOfPeaks2 = "feature")$OverlappingPeaks
+            select=select, NameOfPeaks1 = "peak", NameOfPeaks2 = "feature", annotate=1)$OverlappingPeaks
         if (dim(r.o)[1] > 0) {
             r.o$fromOverlappingOrNearest = rep("Overlapping", 
                 dim(r.o)[1])

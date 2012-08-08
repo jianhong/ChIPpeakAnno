@@ -48,10 +48,24 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap = 1L,  tota
 		a2 = vennCounts(a1)
 		if (!useFeature)
 		{
-			overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap,  minoverlap = minoverlap, select="first")$OverlappingPeaks
-			p1.and.p2 = length(unique(overlappingPeaks[[NameOfPeaks[1]]]))
-			p1 = length(rownames(Peaks[[1]]))
-			p2 = length(rownames(Peaks[[2]]))
+			overlappingPeaks = findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap,  minoverlap = minoverlap, select="first")
+			if (length(overlappingPeaks$Peaks1withOverlaps) ==0)
+			{
+				p1.and.p2 = 0
+			}
+			else
+			{	
+				p1.inBoth = dim(overlappingPeaks$Peaks1withOverlaps)[1]
+				p2.inBoth = dim(overlappingPeaks$Peaks2withOverlaps)[1]
+				p1.and.p2 = min(p1.inBoth, p2.inBoth)
+			}	
+		#	p1.and.p2 = length(unique(overlappingPeaks$OverlappingPeaks[[NameOfPeaks[1]]]))
+			print(overlappingPeaks)
+			p1 = dim(Peaks[[1]])[1]
+			p2 = dim(Peaks[[2]])[1]
+			print(p1)
+			print(p2)
+			
 		}
 		else
 		{
@@ -64,11 +78,8 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap = 1L,  tota
 			p2 = length(unique(Peaks[[2]]$feature))	
 		}
 		p1only = p1 - p1.and.p2
-		#p1only = length(setdiff(as.character(rownames(Peaks[[1]])), as.character(overlappingPeaks[[NameOfPeaks[1]]])))
-		#p2only = length(setdiff(as.character(rownames(Peaks[[2]])), as.character(overlappingPeaks[[NameOfPeaks[2]]])))
 		p2only = p2 - p1.and.p2
-		#p2inp1 = length(unique(overlappingPeaks[[NameOfPeaks[2]]]))
-		neither = totalTest - p1only - p2 
+		neither = totalTest - (p1 + p2 - p1.and.p2) 
 		Counts =c(neither,p2only,p1only,p1.and.p2)
 		if (p1only <0 || p2only <0)
                 {

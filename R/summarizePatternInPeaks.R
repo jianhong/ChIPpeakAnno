@@ -27,7 +27,7 @@ function(patternFilePath,format="fasta",skip=0L, BSgenomeName, peaks, outfile, a
 		seq = getAllPeakSequence(peaks, upstream = 0, downstream = 0, genome=BSgenomeName)
 		n.peaks = dim(peaks)[1]
 
-		dict = read.DNAStringSet(patternFilePath, format, use.names=TRUE)
+		dict = readDNAStringSet(patternFilePath, format, use.names=TRUE)
  
 		temp = do.call(rbind, lapply(1:length(dict), function(i){
 			total=countPatternInSeqs(pattern=dict[i], sequences=seq$sequence)

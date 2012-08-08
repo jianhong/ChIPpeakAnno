@@ -10,7 +10,7 @@ Find the overlapping peaks for two input peak ranges.
 \usage{
 findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L, multiple = c(TRUE, FALSE), 
 NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
-select=c("all", "first","last","arbitrary"))
+select=c("all", "first","last","arbitrary"), annotate = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -37,6 +37,9 @@ Name of the Peaks2, used for generating column name.
 }
 \item{select}{
 all may return multiple overlapping peaks, first will return the first overlapping peak, last will return the last overlapping peak and arbitrary will return one of the overlapping peaks.
+}
+\item{annotate}{
+Include overlapFeature and shortestDistance in the OverlappingPeaks or not. 1 means yes and 0 means no. Default to 0.
 }
 }
 \details{
@@ -72,7 +75,7 @@ strand=as.integer(1),space=c(6,6,6,6,5))
 end=c(1550599,1560799,1565399,1571199,167888999),names=c("f1","f2","f3","f4","f5")),
 strand=as.integer(1),space=c(6,6,6,6,5))
 	t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000,
-NameOfPeaks1="TF1", NameOfPeaks2="TF2", select="all") 
+NameOfPeaks1="TF1", NameOfPeaks2="TF2", select="all", annotate=1) 
 	r = t1$OverlappingPeaks
 	pie(table(r$overlapFeature))
 	as.data.frame(t1$MergedPeaks)
