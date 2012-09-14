@@ -70,7 +70,7 @@ as.data.frame(annotatedPeak2)
 @
 \end{scriptsize}
 
-Both BED format and GFF format are common file format that provides a flexible way to define the peaks and annotations as the data lines. Therefore, conversion functions Rfunction{BED2RangedData} and Rfunction{GFF2RangedData} were implemented for converting these data format to RangedData before calling \Rfunction{annotatePeakInBatch}
+Both BED format and GFF format are common file format that provides a flexible way to define the peaks and annotations as the data lines. Therefore, conversion functions \Rfunction{BED2RangedData} and \Rfunction{GFF2RangedData} were implemented for converting these data format to RangedData before calling \Rfunction{annotatePeakInBatch}
 
 Once you annotated the peak list, you can plot the distance to nearest feature such as TSS.
 
