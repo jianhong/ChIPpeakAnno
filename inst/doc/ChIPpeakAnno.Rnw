@@ -201,26 +201,27 @@ data(enrichedGO)
 \end{scriptsize}
 
 Here is a list of enriched GO biological process for myPeakList dataset.
-
+\begin{scriptsize}
 <<>>=
 enrichedGO$bp[1:6,]
 @
-
+\end{scriptsize}
 
 Here is a list of enriched GO molecular functions for myPeakList dataset.
 
-
+\begin{scriptsize}
 <<>>=
 enrichedGO$mf[1:6,]
 @ 
-
+\end{scriptsize}
  
 Heres is a list of enriched GO cellular components for myPeakList dataset.
 
-
+\begin{scriptsize}
 <<>>=
 enrichedGO$cc
 @
+\end{scriptsize}
 
 \subsection{Task 5:  Find peaks with bi-directional promoters}
 

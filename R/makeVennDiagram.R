@@ -1,5 +1,5 @@
 makeVennDiagram <-
-function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, counts.col="red", useFeature=FALSE)
+function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, ...)
 {
 	if (missing(totalTest))
 	{
@@ -27,6 +27,7 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, count
 	{
 		stop("The number of element in NameOfPeaks is larger than the number of elements in Peaks, need to be equal!")
 	}
+	NameOfPeaks <- make.names(NameOfPeaks, unique=TRUE, allow_=TRUE)
 	lapply(seq_len(n1), function(i)
 	{
 		if (class(Peaks[[i]]) != "RangedData")
@@ -42,12 +43,43 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, count
 			rownames(Peaks[[i]]) = formatC(1:dim(Peaks[[i]])[1], width=nchar(dim(Peaks[[i]])[1]), flag='0')
 		}		
 	})
+	getCountsList<-function(counts){
+		CountsList <- list()
+		cnt <- 1
+		for(i in 1:length(counts)){
+			CountsList[[i]] <- seq(cnt, length.out=counts[i])
+			cnt <- cnt+counts[i]
+		}
+		CountsList
+	}
+	getVennList<-function(a, NameOfPeaks, CountsList){
+		.x<-lapply(NameOfPeaks, function(.ele, cl, a){
+			   .y<-c()
+			   for(i in 1:nrow(a)){
+				if(a[i,.ele]!=0) .y <- c(.y, cl[[i]])
+			   }
+			   .y
+			   }, CountsList, a)
+		names(.x)<-NameOfPeaks
+		.x
+	}
+	plotVenn<-function(a, NameOfPeaks, countsColName="Counts", cat.cex = 1, 
+					   cat.col = "black", cat.fontface = "plain", cat.fontfamily = "serif", ...){
+		Counts <- getCountsList(a[,countsColName])
+		vennx <- getVennList(a, NameOfPeaks, Counts)
+		venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = 1, 
+								 cat.col = "black", cat.fontface = "plain", cat.fontfamily = "serif", ...)
+		tmp <- textGrob(label=a[1,countsColName], x=0.9, y=0.1, gp=gpar(col = cat.col, cex = cat.cex, 
+																		 fontface = cat.fontface, fontfamily = cat.fontfamily))
+		venngrid <- gList(venngrid, tmp)
+		grid.draw(venngrid)
+	}
 	if (n1 == 2)
 	{
 		x = findVennCounts(Peaks=Peaks,NameOfPeaks=NameOfPeaks,maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
 		a2 = x$vennCounts
-		p.value = x$p.value
-		vennDiagram(a2,names = NameOfPeaks, cex=cex, counts.col = counts.col)
+		p.value = x$p.value		
+		plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName="Counts", ...)
 		list(p.value=p.value,vennCounts=a2)
 	}
 	else if (n1 == 3)
@@ -104,8 +136,8 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, count
 		neither123 = totalTest -p1only - p2only - p3only - p1.and.p2 - p1.and.p3 - p2.and.p3 + 2 * p1.and.p2.and.p3
 		
 		Counts =c(neither123,p3only,p2only,p2.and.p3-p1.and.p2.and.p3, p1only, p1.and.p3-p1.and.p2.and.p3, p1.and.p2-p1.and.p2.and.p3,p1.and.p2.and.p3)
-		a2[,4] = Counts		
-		vennDiagram(a2, names = NameOfPeaks)
+		a2[,4] = Counts
+		plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName=4, ...)
 		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, vennCounts=a2)
 	}
 	else if(n1 == 4)
@@ -130,7 +162,7 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, cex=1.5, count
 		counts3 = x3$vennCounts
 		p2.and.p3 = counts3[4,3]
 		
-		x4 = findVennCounts(list(Peaks[[3]],Peaks[[4]]), NameOfPeaks=NameOfPeaks[3:4], maxgap=maxgap,
+		x4 =findVennCounts(list(Peaks[[3]],Peaks[[4]]), NameOfPeaks=NameOfPeaks[3:4], maxgap=maxgap,
 				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
 		p.value.3vs4 = x4$p.value
 		counts4 = x4$vennCounts
@@ -227,7 +259,7 @@ p2.and.p3.and.p4 - p1.and.p2.and.p3.and.p4, p1only,
 		#vennDiagram(a2, names = NameOfPeaks)
 		rownames(a)=c("0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010",
 		 "1011", "1100", "1101", "1110", "1111")
-		gplots:::drawVennDiagram(a)
+		plotVenn(a, NameOfPeaks=NameOfPeaks, countsColName=1, ...)
 		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, p.value.1vs4= p.value.1vs4, p.value.2vs4= p.value.2vs4, p.value.3vs4= p.value.3vs4, vennCounts=a2)
 	}	
 	else
