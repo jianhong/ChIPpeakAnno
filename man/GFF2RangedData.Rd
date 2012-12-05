@@ -5,12 +5,13 @@
 \description{
   convert GFF format to RangedData}
 \usage{
-GFF2RangedData(data.GFF,header=FALSE)
+GFF2RangedData(data.GFF,header=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{data.GFF}{ GFF format data frame, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format3 for details }
+  \item{data.GFF}{ GFF format data frame or GFF file name, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format3 for details }
   \item{header}{TRUE or FALSE, default to FALSE, indicates whether data.GFF file has GFF header} 
+  \item{...}{any parameter need to be passed into read.delim function}
 }
 \details{
   
