@@ -14,3 +14,5 @@ CHANGES IN VERSION 2.2.0
      genes which can be traced back to peaks.
 
      o FAQ: http://pgfe.umassmed.edu/ChIPpeakAnno/FAQ.html.
+
+     o Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 prime UTR and 3 prime UTR (assignChromosomeRegion)
