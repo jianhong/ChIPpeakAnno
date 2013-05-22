@@ -65,6 +65,9 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FAL
 	}
 	plotVenn<-function(a, NameOfPeaks, countsColName="Counts", cat.cex = 1, 
 					   cat.col = "black", cat.fontface = "plain", cat.fontfamily = "serif", ...){
+        op=par(mar=c(0,0,0,0))
+        on.exit(par(op))
+        plot.new()
 		Counts <- getCountsList(a[,countsColName])
 		vennx <- getVennList(a, NameOfPeaks, Counts)
 		venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = 1, 

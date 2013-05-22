@@ -110,13 +110,14 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
             }
         }
     }))
+    if(is.null(r1)) r1 <- matrix(nrow=0, ncol=3)
     colnames(r1) = c(NameOfPeaks1, "chr", NameOfPeaks2)
     r3 = merge(r1, r2, by = NameOfPeaks2)
     r = merge(r3, z1)
     if (dim(r)[1] < 1) {
-        Peaks1withOverlaps = 0
-        Peaks2withOverlaps = 0
-        MergedPeaks = 0
+        Peaks1withOverlaps = NULL
+        Peaks2withOverlaps = NULL
+        MergedPeaks = NULL
     }
     else {
 	 if (annotate == 1) {
