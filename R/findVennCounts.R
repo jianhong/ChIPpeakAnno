@@ -60,11 +60,11 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap = 1L,  tota
 				p1.and.p2 = min(p1.inBoth, p2.inBoth)
 			}	
 		#	p1.and.p2 = length(unique(overlappingPeaks$OverlappingPeaks[[NameOfPeaks[1]]]))
-			print(overlappingPeaks)
+        #	print(overlappingPeaks)
 			p1 = dim(Peaks[[1]])[1]
 			p2 = dim(Peaks[[2]])[1]
-			print(p1)
-			print(p2)
+        #	print(p1)
+        #	print(p2)
 			
 		}
 		else

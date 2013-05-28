@@ -47,8 +47,13 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FAL
 		CountsList <- list()
 		cnt <- 1
 		for(i in 1:length(counts)){
-			CountsList[[i]] <- seq(cnt, length.out=counts[i])
-			cnt <- cnt+counts[i]
+            .lengthout <- counts[i]
+            if(.lengthout<0 || is.null(.lengthout) || is.na(.lengthout)) {
+              .lengthout <- 0
+                warning("count less than 0, Please update your totalTest.")
+            }
+			CountsList[[i]] <- seq(cnt, length.out=.lengthout)
+			cnt <- cnt+.lengthout
 		}
 		CountsList
 	}
@@ -139,6 +144,7 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FAL
 		neither123 = totalTest -p1only - p2only - p3only - p1.and.p2 - p1.and.p3 - p2.and.p3 + 2 * p1.and.p2.and.p3
 		
 		Counts =c(neither123,p3only,p2only,p2.and.p3-p1.and.p2.and.p3, p1only, p1.and.p3-p1.and.p2.and.p3, p1.and.p2-p1.and.p2.and.p3,p1.and.p2.and.p3)
+        Counts[Counts<0] <- 0 ##abnormal value here <---
 		a2[,4] = Counts
 		plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName=4, ...)
 		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, vennCounts=a2)
@@ -256,6 +262,7 @@ p2.and.p3.and.p4 - p1.and.p2.and.p3.and.p4, p1only,
 		p1.and.p2.and.p3 - p1.and.p2.and.p3.and.p4,
 		p1.and.p2.and.p3.and.p4
 		)
+        Counts[Counts<0] <- 0 ##abnormal value here <---
 		a2[,5] = Counts	
 		a = cbind(a2[,5], a2[,1:4])
 		colnames(a)[1]="num"

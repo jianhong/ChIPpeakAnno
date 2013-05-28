@@ -4,11 +4,18 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
     if (missing(Peaks1)) {
         stop("Missing Peaks1 which is required!")
     }
-    if (class(Peaks1) != "RangedData") {
-        stop("No valid Peaks1 passed in. It needs to be RangedData object")
-    }
     if (missing(Peaks2)) {
         stop("No Peaks2 as RangedData is passed in")
+    }
+    if(is.null(Peaks1) || is.null(Peaks2)){
+        r1 <- matrix(nrow=0, ncol=9)
+        colnames(r1) <- c(NameOfPeaks1, "chr", NameOfPeaks2, paste(NameOfPeaks2, c("start", "end"), sep="_"), "strand", paste(NameOfPeaks1, c("start", "end"), sep="_"), "strand1")
+        r1 <- as.data.frame(r1)
+        return(list(OverlappingPeaks = r1, MergedPeaks = NULL,
+        Peaks1withOverlaps = NULL, Peaks2withOverlaps = NULL))
+    }
+    if (class(Peaks1) != "RangedData") {
+        stop("No valid Peaks1 passed in. It needs to be RangedData object")
     }
     if (class(Peaks2) != "RangedData") {
         stop("Peaks2 needs to be RangedData object")
