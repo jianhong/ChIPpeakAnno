@@ -105,6 +105,7 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type
 		tryCatch(m_ent<-getBM(attributes=c(feature_id_type,IDs2Add),filters = feature_id_type, values = feature_ids, mart=mart),error = function(e){
 				 stop(paste("Get error when calling getBM:",e,sep="\n"),call.=FALSE)
 				 })
+        if(any(colnames(m_ent)!=c(feature_id_type, IDs2Add))) colnames(m_ent) <- c(feature_id_type, IDs2Add)
 	}
 	cat("prepare output ... ")
 #dealing with multiple entrez_id for single feature_id

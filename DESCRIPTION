@@ -1,7 +1,7 @@
 Package: ChIPpeakAnno
 Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq, ChIP-chip experiments or any experiments resulted in large number of chromosome ranges.
-Version: 2.9.2
+Version: 2.9.3
 Date: 2013-05-28
 Author: Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson, Jianhong Ou, Simon Lin, David Lapointe and Michael Green
 Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>
