@@ -7,6 +7,10 @@ findOverlappingPeaks<-function (Peaks1, Peaks2, maxgap = 0L, minoverlap=1L,  mul
     if (missing(Peaks2)) {
         stop("No Peaks2 as RangedData is passed in")
     }
+    if(minoverlap>1){ 
+        maxgap <- 0
+        message("maxgap is setted to 0 because minoverlap > 1")
+    }
     if(is.null(Peaks1) || is.null(Peaks2)){
         r1 <- matrix(nrow=0, ncol=9)
         colnames(r1) <- c(NameOfPeaks1, "chr", NameOfPeaks2, paste(NameOfPeaks2, c("start", "end"), sep="_"), "strand", paste(NameOfPeaks1, c("start", "end"), sep="_"), "strand1")
