@@ -54,7 +54,7 @@ precedence order is specified, for example, if promoter is specified before
     \item{\code{threeUTRs}}{Percent of peaks reside in 3 prime UTR regions.}
    \item{\code{Promoter}}{Percent of peaks reside in proximal promoter regions.}
    \item{\code{ImmediateDownstream}}{Percent of peaks reside in immediate downstream regions.}
-   \item{\code{Enhancer.Silencer}}{Percent of peaks reside in enhancer/silencer regions.}
+   \item{\code{Intergenic.Region}}{Percent of peaks reside in intergenic regions except above regions.}
 }
 \references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237}
 \author{ Jianhong Ou, Lihua Julie Zhu }
@@ -82,10 +82,9 @@ if (interactive())
   barplot(Feature.distribution$percentage)
   assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TranscriptDb=TranscriptDb)
   data(myPeakList)
-  assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, precedence=c("Exons", "Introns", "fiveUTRs", "threeUTRs", "Promoters", "immediateDownstream"), TranscriptDb=TranscriptDb)
+  assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, precedence=c("Promoters", "Exons", "Introns", "fiveUTRs", "threeUTRs", "immediateDownstream"), TranscriptDb=TranscriptDb)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ misc }

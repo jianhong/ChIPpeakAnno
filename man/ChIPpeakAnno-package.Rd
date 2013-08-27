@@ -12,19 +12,19 @@ Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip exper
 \tabular{ll}{
 Package: \tab ChIPpeakAnno\cr
 Type: \tab Package\cr
-Version: \tab 2.0.6\cr
-Date: \tab 2011-10-31\cr
+Version: \tab 2.9.6\cr
+Date: \tab 2013-08-22\cr
 License: \tab LGPL\cr
 LazyLoad: \tab yes\cr
 }
 
 }
 \author{
-Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson, Simon Lin, David Lapointe and Michael Green
+Lihua Julie Zhu, Jianhong Ou, Herve Pages, Claude Gazin, Nathan Lawson, Simon Lin, David Lapointe and Michael Green
 
 
 Maintainer:
- Lihua Julie Zhu <julie.zhu@umassmed.edu>
+ Lihua Julie Zhu <julie.zhu@umassmed.edu>, Jianhong Ou <Jianhong.Ou@umassmed.edu>
 }
 \references{
 1. Y. Benjamini and Y. Hochberg (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. J. R. Statist. Soc. B. Vol. 57: 289-300. \cr

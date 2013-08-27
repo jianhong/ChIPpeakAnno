@@ -51,7 +51,7 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
     if(!is.null(precedence)){
       annotation <- annotation[unique(c(precedence,names(annotation)))]
     }
-    annotation$Enhancer.Silencer <- peaks.RD
+    annotation$Intergenic.Region <- peaks.RD
     anno.names <- names(annotation)
     if(nucleotideLevel){
       ##create a new annotation GRanges
@@ -61,10 +61,10 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
       ol.anno <- findOverlaps(newAnno, annotation)
       ##calculate Jaccard index
       ol.anno.splited <- split(queryHits(ol.anno),anno.names[subjectHits(ol.anno)])
-      Enhancer.Silencer <- ol.anno.splited$Enhancer.Silencer
+      Intergenic.Region <- ol.anno.splited$Intergenic.Region
       jaccardIndex <- unlist(lapply(ol.anno.splited, function(.ele){
-        intersection <- intersect(.ele, Enhancer.Silencer)
-        union <- union(.ele, Enhancer.Silencer)
+        intersection <- intersect(.ele, Intergenic.Region)
+        union <- union(.ele, Intergenic.Region)
         length(intersection)/length(union)
       }))
       jaccardIndex <- jaccardIndex[anno.names]
@@ -72,9 +72,9 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
       ol.anno <- findOverlaps(peaks.RD, annotation)
       ##calculate Jaccard index
       ol.anno.splited <- split(queryHits(ol.anno),anno.names[subjectHits(ol.anno)])
-      Enhancer.Silencer <- ol.anno.splited$Enhancer.Silencer
+      Intergenic.Region <- ol.anno.splited$Intergenic.Region
       jaccardIndex <- unlist(lapply(anno.names, function(.name){
-        union <- length(Enhancer.Silencer)+length(annotation[[.name]])-length(ol.anno.splited[[.name]])
+        union <- length(Intergenic.Region)+length(annotation[[.name]])-length(ol.anno.splited[[.name]])
         intersection <- length(ol.anno.splited[[.name]])
         intersection/union
       }))
@@ -85,13 +85,13 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
       ####keep the part in peaks.RD
       ol.anno <- ol.anno[ol.anno[,1] %in% unique(ol.anno[ol.anno[,2]==length(annotation),1]),]
     }
-    ####keep the part only annotated in peaks.RD for Enhancer.Silencer
+    ####keep the part only annotated in peaks.RD for Intergenic.Region
     ol.anno.splited <- split(ol.anno, ol.anno[,2])
     hasAnnoHits <- do.call(rbind, ol.anno.splited[names(ol.anno.splited)!=as.character(length(anno.names))])
     hasAnnoHits <- unique(hasAnnoHits[,1])
     ol.anno <- ol.anno[!(ol.anno[,2]==length(anno.names) & (ol.anno[,1] %in% hasAnnoHits)), ]    
-    ###recalculate Jaccard index for Enhancer.Silencer
-    jaccardIndex["Enhancer.Silencer"] <- nrow(ol.anno[ol.anno[,2]==as.character(length(anno.names)),])/length(Enhancer.Silencer)
+    ###recalculate Jaccard index for Intergenic.Region
+    jaccardIndex["Intergenic.Region"] <- nrow(ol.anno[ol.anno[,2]==as.character(length(anno.names)),])/length(Intergenic.Region)
     if(!is.null(precedence)){
       ol.anno <- ol.anno[!duplicated(ol.anno[,1]), ]
     }
@@ -162,6 +162,6 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
     
     total = dim(peaks.RD)[1]/100
     
-    list( "Exons" =exon.n/total, "Introns"=intron.n/total, "fiveUTRs" = utr5.n/total, "threeUTRs" = utr3.n/total, "Promoters"= proximal.promoter.n/total, "immediate.Downstream" = immediateDownstream.n/total, "Enhancer.Silencer" = enhancer.n/total)
+    list( "Exons" =exon.n/total, "Introns"=intron.n/total, "fiveUTRs" = utr5.n/total, "threeUTRs" = utr3.n/total, "Promoters"= proximal.promoter.n/total, "immediate.Downstream" = immediateDownstream.n/total, "Intergenic.Region" = enhancer.n/total)
   }
 }
