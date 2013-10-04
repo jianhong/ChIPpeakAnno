@@ -44,7 +44,7 @@ as.data.frame(annotatedPeak)
 To annotate the peaks with other genomic feature, you will need to call function \Rfunction{getAnnotation} with featureType, e.g., ``Exon" for finding the nearest exon, and ``miRNA" for finding the nearest miRNA, ``5utr" or `3utr"for finding the overlapping 5 prime UTR or 3 prime UTR. Please refer to \Rfunction{getAnnotation} function for more details. 
 
 We have presented the examples using human genome as annotation source. To annotate your data with other species, you will need to pass to the function \Rfunction{getAnnotation} the appropriate dataset for example, drerio\_gene\_ensembl for zebrafish genome, mmusculus\_gene\_ensembl for mouse genome and rnorvegicus\_gene\_ensembl for rat genome.
-For a list of available biomart and dataset, please refer to the \Rpackage{biomaRt} package documentation (Durinck S. et al., 2005).  For fast access, in addition to TSS.human.NCBI36, TSS.mouse.NCBIM37, TSS.rat.RGSC3.4 and TSS.zebrafish.Zv8 are included as annotation data packages.
+For a list of available biomart and dataset, please refer to the \Rpackage{biomaRt} package documentation (Durinck S. et al., 2005).  For fast access, in addition to TSS.human.NCBI36, TSS.human.GRCh37, TSS.mouse.NCBIM37, TSS.mouse.GRCm38, TSS.rat.RGSC3.4, TSS.rat.Rnor\_5.0, TSS.zebrafish.Zv8, and TSS.zebrafish.Zv9 are included as annotation data packages.
 
 You could also pass your own annotation data into the function \Rfunction{annotatePeakInBatch}. For example, if you have a list of transcription factor biding sites from literature and are interested in obtaining the nearest binding site of the transcription factor and distance to it for the list of peaks.
 
