@@ -1,18 +1,23 @@
+CHANGES IN VERSION 2.11.3
+------------------------
+NEW FEATURE
+
+    o Improved efficiency of annotatePeakInBatch.
+
 CHANGES IN VERSION 2.9.6
 ------------------------
 BUG FIXES
 
-    o Change Enhancer.Silencer to intergenic.Region in assignChromosomeRegion.
+    o Changed Enhancer.Silencer to intergenic.Region in assignChromosomeRegion.
 
 CHANGES IN VERSION 2.9.5
 ------------------------
 BUG FIXES
 
-    o fixed bug error in negative widths are not allowed when call 
-    findOverlappingPeaks.
+    o negative widths are not allowed when call findOverlappingPeaks.
 
 
-CHANGES IN VERSION 2.2.0
+NEW FEATURES IN VERSION 2.2.0
 ------------------------
 
      o Find the peaks with bi-directional promoters with summary
@@ -29,4 +34,4 @@ CHANGES IN VERSION 2.2.0
 
      o FAQ: http://pgfe.umassmed.edu/ChIPpeakAnno/FAQ.html.
 
-     o Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 prime UTR and 3 prime UTR (assignChromosomeRegion)
+     o Summarize peak distribution over exon, intron, enhancer, proximal promoter, 5 prime UTR and 3 prime UTR (assignChromosomeRegion)
