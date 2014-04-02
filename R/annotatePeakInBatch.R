@@ -1,7 +1,11 @@
 annotatePeakInBatch <-
     function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"),
               AnnotationData, output = c("nearestStart", "overlapping",
-                                         "both"), multiple = c(TRUE,FALSE), maxgap = 0, PeakLocForDistance=c("start","middle","end"), FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"), select=c("all", "first", "last", "arbitrary"))
+                                         "both", "shortestDistance"), 
+              multiple = c(TRUE,FALSE), maxgap = 0, 
+              PeakLocForDistance=c("start","middle","end"), 
+              FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"), 
+              select=c("all", "first", "last", "arbitrary"))
     {
         featureType = match.arg(featureType)
         if (missing(PeakLocForDistance))
@@ -15,6 +19,10 @@ annotatePeakInBatch <-
         
         if (missing(output)) {
             output = "nearestStart"
+        }
+        oldoutput=output
+        if(output=="shortestDistance"){
+            output="both"
         }
         select = match.arg(select)
         if ((output == "overlapping" || output == "both") && select == "all" && multiple == FALSE) {
@@ -412,6 +420,16 @@ annotatePeakInBatch <-
                                           space = as.character(r.n1$chr))
                 }
             }
+        }
+        if(oldoutput=="shortestDistance"){
+            dup <- unique(r.output$peak[duplicated(r.output$peak)])
+            dup <- r.output[r.output$peak %in% dup, ]
+            dup$insideFeature <- as.numeric(grepl("stream", dup$insideFeature)) ##all overlaping with distance 0
+            dup <- cbind(rownames(dup), dup$peak, dup$insideFeature, dup$shortestDistance)
+            dup0 <- dup[dup[,3]==0, ,drop=F]
+            dup1 <- dup[dup[,3]==1, ,drop=F]
+            unsel <- dup1[dup1[,2] %in% dup0[,2], 1] ##get the peak name which has overlapping
+            r.output <- r.output[!rownames(r.output) %in% unsel,]
         }
         if (returnAsGRanges)
             r.output <- as(r.output, "GRanges")
