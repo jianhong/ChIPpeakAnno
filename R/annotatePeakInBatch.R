@@ -296,24 +296,22 @@ annotatePeakInBatch <-
                 }
                 else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
                 {
-                    FeatureLoc <- ifelse(as.character(r2[, 4]) %in% c("+", "1", "*"),
-                                         r2[, 3], r2[, 2])
+                    FeatureLoc <- ifelse(as.character(r.o[, 6]) %in% c("+", "1", "*"),
+                                         as.numeric(as.character(r.o[, 5])), as.numeric(as.character(r.o[, 4])))
                 }
                 else
                 {
                     FeatureLoc <- ifelse(as.character(r.o[,6]) %in% c("+", "1", "*"),
-                                         r.o[,4], r.o[,5])
-                    FeatureLoc <- as.numeric(as.character(FeatureLoc))
+                                         as.numeric(as.character(r.o[,4])), as.numeric(as.character(r.o[,5])))
                 }
                 r.o$FeatureLoc = FeatureLoc
                 r.o$PeakLoc = PeakLoc
                 #TSS.ordered$FeatureLoc = FeatureLoc
                 #myPeakList$PeakLoc = PeakLoc
-                strand = ifelse(is.na(r.o$strand) | as.character(r.o$strand) %in% c("1", "+", "*"), "+", "-")
-                r.o$strand = strand
+                r.o$strand = unlist(lapply(1:dim(r.o)[1], function(i) {ifelse(is.na(r.o[i,6]) || as.character(r.o[i,6]) %in% c("1", "+", "*"), "+", "-")}))
                 distancetoFeature = as.numeric(as.character(r.o$PeakLoc)) -
                     as.numeric(as.character(r.o$FeatureLoc))
-                negstrand <- ! as.character(r.o$strand) %in% c("1", "+", "*")
+                negstrand <- ! as.character(r.o[,6]) %in% c("1", "+", "*")
                 distancetoFeature[negstrand] <- -1 * distancetoFeature[negstrand]
                 r.o$distancetoFeature = distancetoFeature
             }
