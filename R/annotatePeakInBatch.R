@@ -308,7 +308,8 @@ annotatePeakInBatch <-
                 r.o$PeakLoc = PeakLoc
                 #TSS.ordered$FeatureLoc = FeatureLoc
                 #myPeakList$PeakLoc = PeakLoc
-                r.o$strand = unlist(lapply(1:dim(r.o)[1], function(i) {ifelse(is.na(r.o[i,6]) || as.character(r.o[i,6]) %in% c("1", "+", "*"), "+", "-")}))
+		strand = ifelse(is.na(r.o$strand) | as.character(r.o$strand) %in% c("1", "+", "*"), "+", "-")
+		r.o$strand = strand
                 distancetoFeature = as.numeric(as.character(r.o$PeakLoc)) -
                     as.numeric(as.character(r.o$FeatureLoc))
                 negstrand <- ! as.character(r.o[,6]) %in% c("1", "+", "*")
