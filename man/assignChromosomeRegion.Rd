@@ -8,7 +8,7 @@ Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 
 Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 prime UTR and 3 prime UTR
 }
 \usage{
-assignChromosomeRegion(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, nucleotideLevel=FALSE, precedence=NULL, TranscriptDb=NULL)
+assignChromosomeRegion(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, nucleotideLevel=FALSE, precedence=NULL, TxDb=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,16 +16,16 @@ assignChromosomeRegion(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff
 peaks in RangedData or GRanges: See example below
 }
   \item{exon}{
-exon data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TranscriptDb}} instead.
+exon data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TxDb}} instead.
 }
   \item{TSS}{
-TSS data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8). Will not use anymore! use \code{\link[GenomicFeatures]{TranscriptDb}} instead.
+TSS data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8). Will not use anymore! use \code{\link[GenomicFeatures]{TxDb}} instead.
 }
   \item{utr5}{
-5 prime UTR data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TranscriptDb}} instead.
+5 prime UTR data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TxDb}} instead.
 }
   \item{utr3}{
-3 prime UTR data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TranscriptDb}} instead.
+3 prime UTR data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Will not use anymore! use \code{\link[GenomicFeatures]{TxDb}} instead.
 }
   \item{proximal.promoter.cutoff}{
 Specify the cutoff in bases to be classified as proximal promoter region. Peaks that reside within proximal.promoter.cutoff upstream from or overlap with transcription start site are classified as proximal promoters. Peaks that reside upstream over proximal.promoter.cutoff from gene start are classified as enhancers. The default is 1000 bases.
@@ -40,7 +40,7 @@ Specify the cutoff in bases to be classified as immediate downstream. Peaks that
 promoter and 5'UTR, then both promoter and 5'UTR will be incremented. If a
 precedence order is specified, for example, if promoter is specified before
 5'UTR, then only promoter will be incremented for the same example. Default=NULL}
-  \item{TranscriptDb}{an object of \code{\link[GenomicFeatures]{TranscriptDb}}}
+  \item{TxDb}{an object of \code{\link[GenomicFeatures]{TxDb}}}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -75,14 +75,14 @@ if (interactive())
   ## Display the list of Tracks supported by makeTranscriptDbFromUCSC()
   #supportedUCSCtables()
   ##Retrieving a full transcript dataset for Human from UCSC
-  TranscriptDb <- makeTranscriptDbFromUCSC(genome="hg19", tablename="ensGene")
-  exons <- exons(TranscriptDb, columns=NULL)
-  fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TranscriptDb)))
-  Feature.distribution <- assignChromosomeRegion(exons, nucleotideLevel=TRUE, TranscriptDb=TranscriptDb)
+  TxDb <- makeTranscriptDbFromUCSC(genome="hg19", tablename="ensGene")
+  exons <- exons(TxDb, columns=NULL)
+  fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
+  Feature.distribution <- assignChromosomeRegion(exons, nucleotideLevel=TRUE, TxDb=TxDb)
   barplot(Feature.distribution$percentage)
-  assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TranscriptDb=TranscriptDb)
+  assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TxDb=TxDb)
   data(myPeakList)
-  assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, precedence=c("Promoters", "Exons", "Introns", "fiveUTRs", "threeUTRs", "immediateDownstream"), TranscriptDb=TranscriptDb)
+  assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, precedence=c("Promoters", "Exons", "Introns", "fiveUTRs", "threeUTRs", "immediateDownstream"), TxDb=TxDb)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

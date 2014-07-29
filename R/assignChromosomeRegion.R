@@ -1,29 +1,29 @@
 #import GenomicFeatures
 ## Jianhong Ou @ Mar.20, 2013
 assignChromosomeRegion <-
-function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, nucleotideLevel=FALSE, precedence=NULL, TranscriptDb=NULL)
+function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, nucleotideLevel=FALSE, precedence=NULL, TxDb=NULL)
 {
   ##check inputs
-  if(!is.null(TranscriptDb)){
-    if(!inherits(TranscriptDb, "TranscriptDb")) 
-      stop("TranscriptDb must be an object of TranscriptDb, try\n?TranscriptDb\tto see more info.")
+  if(!is.null(TxDb)){
+    if(!inherits(TxDb, "TxDb")) 
+      stop("TxDb must be an object of TxDb, try\n?TxDb\tto see more info.")
     if(!inherits(peaks.RD, c("RangedData","GRanges"))) stop("peaks.RD must be a RangedData or GRanges object.")
     if(!is.null(precedence)) {
       if(!all(precedence %in% c("Exons", "Introns", "fiveUTRs", "threeUTRs", "Promoters", "immediateDownstream"))) stop("precedence must be a combination of Exons, Introns, fiveUTRs, threeUTRs, Promoters, immediateDownstream")
     }
     if(inherits(peaks.RD, "RangedData")) peaks.RD <- as(peaks.RD, "GRanges")
-    exons <- exons(TranscriptDb, columns=NULL)
-    introns <- unique(unlist(intronsByTranscript(TranscriptDb)))
-    fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TranscriptDb)))
-    threeUTRs <- unique(unlist(threeUTRsByTranscript(TranscriptDb)))
-    transcripts <- transcripts(TranscriptDb, columns=NULL)
+    exons <- exons(TxDb, columns=NULL)
+    introns <- unique(unlist(intronsByTranscript(TxDb)))
+    fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
+    threeUTRs <- unique(unlist(threeUTRsByTranscript(TxDb)))
+    transcripts <- transcripts(TxDb, columns=NULL)
     options(warn = -1)
     try({
-      promoters <- promoters(TranscriptDb, upstream=proximal.promoter.cutoff, downstream=0)
+      promoters <- promoters(TxDb, upstream=proximal.promoter.cutoff, downstream=0)
       immediateDownstream <- flank(transcripts, width=immediate.downstream.cutoff, start=FALSE, use.names=FALSE)
     })
-    microRNAs <- tryCatch(microRNAs(TranscriptDb), error=function(e) return(NULL))
-    tRNAs <- tryCatch(tRNAs(TranscriptDb), error=function(e) return(NULL))
+    microRNAs <- tryCatch(microRNAs(TxDb), error=function(e) return(NULL))
+    tRNAs <- tryCatch(tRNAs(TxDb), error=function(e) return(NULL))
     options(warn = 0)
     annotation <- list(exons, introns, fiveUTRs, threeUTRs, promoters, immediateDownstream)
     if(!is.null(microRNAs)) annotation <- c(annotation, "microRNAs"=microRNAs)
@@ -43,7 +43,7 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
     annotation <- GRangesList(annotation)
     newAnno <- c(unlist(annotation))
     if(!all(seqlevels(peaks.RD) %in% seqlevels(newAnno))){
-      warning("peaks.RD has sequence levels not in TranscriptDb.")
+      warning("peaks.RD has sequence levels not in TxDb.")
       sharedlevels <- intersect(seqlevels(newAnno), seqlevels(peaks.RD))
       peaks.RD <- keepSeqlevels(peaks.RD, sharedlevels)
     }
@@ -117,7 +117,7 @@ function(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immedi
     percentage <- percentage[anno.names]
     return(list(percentage=percentage, jaccard=jaccardIndex))
   }else{
-    message("Please try to use TranscriptDb next time. Try\n?TranscriptDb\tto see more info.")
+    message("Please try to use TxDb next time. Try\n?TxDb\tto see more info.")
     annotationList <- list(exon, TSS, utr5, utr3)
     names(annotationList) <- c("Exon", "TSS", "UTR5", "UTR3")
     status <- lapply(annotationList, function(.ele) {
