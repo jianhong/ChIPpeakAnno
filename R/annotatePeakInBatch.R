@@ -268,7 +268,7 @@ annotatePeakInBatch <-
                                                    dim(r.o)[1])
                 if (PeakLocForDistance == "middle" || PeakLocForDistance == "m")
                 {
-                    PeakLoc <- round(rowMeans(matrix(as.numeric(r.o[,7:8]), ncol=2)))
+                    PeakLoc <- round(rowMeans(apply(r.o[,7:8], 2, as.numeric())))
                 }
                 else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
                 {
@@ -284,7 +284,7 @@ annotatePeakInBatch <-
                 }
                 if (FeatureLocForDistance == "middle" || FeatureLocForDistance == "m")
                 {
-                    FeatureLoc <- round(rowMeans(matrix(as.numeric(r.o[,4:5]), ncol=2)))
+                    FeatureLoc <- round(rowMeans(apply(r.o[,4:5], 2, as.numeric)))
                 }
                 else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
                 {

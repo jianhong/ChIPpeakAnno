@@ -58,6 +58,9 @@ if (interactive())
 	data(TSS.human.NCBI36)
 	annotatedPeak = annotatePeakInBatch(myPeakList[1:6,], AnnotationData=TSS.human.NCBI36)
 	as.data.frame(annotatedPeak)
+	annotatedPeak = annotatePeakInBatch(myPeakList[1:6,], AnnotationData=TSS.human.NCBI36,
+	    FeatureLocForDistance="TSS", PeakLocForDistance="middle", output="both" )
+        
 	## example 2: you have a list of transcription factor biding sites from literature and
 	## are interested in determining the extent of the overlap to the list of peaks from 
 	## your experiment. Prior calling the function annotatePeakInBatch, need to represent
