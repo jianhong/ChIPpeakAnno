@@ -1,3 +1,9 @@
+CHANGES IN VERSION 2.12.3
+------------------------
+BUG FIXES
+
+    o relative postion for negative strand are not correct when call findOverlappingPeaks.
+
 CHANGES IN VERSION 2.11.4
 ------------------------
 NEW FEATURE

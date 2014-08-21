@@ -67,9 +67,7 @@ annotatePeakInBatch <-
         if (length(TSS.ordered$strand) == length(start(TSS.ordered)))
         {
             r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), as.character(TSS.ordered$strand))
-        }
-        else
-        {
+        }else{
             TSS.ordered$strand = rep("+", length(start(TSS.ordered)))
             r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), rep("+", length(start(TSS.ordered))))
         }
@@ -79,24 +77,20 @@ annotatePeakInBatch <-
         {
             FeatureLoc <- round(rowMeans(matrix(as.numeric(r2[,2:3]), ncol=2)))
             FeatureLocForDistance = "middle"
-        }
-        else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
+        }else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
         {
             FeatureLoc = r2[, 2]
             FeatureLocForDistance = "start"
-        }
-        else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
+        }else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
         {
             FeatureLoc = r2[, 3]
             FeatureLocForDistance = "end"
-        }
-        else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
+        }else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
         {
             FeatureLoc <- ifelse(as.character(r2[, 4]) %in% c("+", "1", "*"),
                                  r2[, 3], r2[, 2])
             FeatureLocForDistance = "geneEnd"
-        }
-        else
+        }else
         {
             FeatureLoc <- ifelse(as.character(r2[, 4]) %in% c("+", "1", "*"),
                                  r2[, 2], r2[, 3])
@@ -135,16 +129,13 @@ annotatePeakInBatch <-
             if (PeakLocForDistance == "middle" || PeakLocForDistance == "m")
             {
                 PeakLoc <- round(rowMeans(matrix(as.numeric(z1[,3:4]), ncol=2)))
-            }
-            else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
+            }else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
             {
                 PeakLoc = as.numeric(as.character(z1[, 3]))
-            }
-            else if (PeakLocForDistance == "end" || PeakLocForDistance == "e")
+            }else if (PeakLocForDistance == "end" || PeakLocForDistance == "e")
             {
                 PeakLoc = as.numeric(as.character(z1[, 4]))
-            }
-            else
+            }else
             {
                 PeakLoc = as.numeric(as.character(z1[, 3]))
             }
@@ -185,8 +176,7 @@ annotatePeakInBatch <-
                                                     "*"), ]
                     r22 = r[!is.na(r$strand) & (as.character(r$strand) == "-1" | as.character(r$strand) ==
                                                     "-"), ]
-                }
-                else
+                }else
                 {
                     r11 = r[!is.na(r$strand), ]
                 }
@@ -200,7 +190,7 @@ annotatePeakInBatch <-
                         as.numeric(as.character(r11$start_position))
                     temp <- Map(as.numeric, Map(as.character, r11[c("peakStart", "peakEnd", "start_position", "end_position")]))
                     insideFeature <- with(temp, {
-                        insideFeature = as.character(NA)
+                        insideFeature = character(length(peakEnd))
                         insideFeature[peakEnd < start_position] <- "upstream"
                         insideFeature[peakStart > end_position] <- "downstream"
                         insideFeature[peakStart <= start_position & peakEnd >= end_position] <- "includeFeature"
@@ -221,12 +211,12 @@ annotatePeakInBatch <-
                         as.numeric(as.character(r22$start_position))
                     temp <- Map(as.numeric, Map(as.character, r22[c("peakStart", "peakEnd", "start_position", "end_position")]))
                     insideFeature <- with(temp, {
-                        insideFeature = as.character(NA)
-                        insideFeature[peakEnd < start_position] <- "upstream"
-                        insideFeature[peakStart > end_position] <- "downstream"
+                        insideFeature = character(length(peakEnd))
+                        insideFeature[peakEnd < start_position] <- "downstream"
+                        insideFeature[peakStart > end_position] <- "upstream"
                         insideFeature[peakStart <= start_position & peakEnd >= end_position] <- "includeFeature"
-                        insideFeature[peakStart < start_position & peakEnd >= start_position & peakEnd < end_position] <- "overlapStart"
-                        insideFeature[peakStart > start_position & peakStart <= end_position & peakEnd > end_position] <- "overlapEnd"
+                        insideFeature[peakStart < start_position & peakEnd >= start_position & peakEnd < end_position] <- "overlapEnd"
+                        insideFeature[peakStart > start_position & peakStart <= end_position & peakEnd > end_position] <- "overlapStart"
                         insideFeature[peakStart >= start_position & peakEnd <= end_position] <- "inside"
                         stopifnot(all(!is.na(insideFeature)))
                         insideFeature
@@ -268,7 +258,7 @@ annotatePeakInBatch <-
                                                    dim(r.o)[1])
                 if (PeakLocForDistance == "middle" || PeakLocForDistance == "m")
                 {
-                    PeakLoc <- round(rowMeans(apply(r.o[,7:8], 2, as.numeric())))
+                    PeakLoc <- round(rowMeans(apply(r.o[,7:8], 2,as.numeric)))
                 }
                 else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
                 {
@@ -331,12 +321,10 @@ annotatePeakInBatch <-
                                       shortestDistance = as.numeric(as.character(r.n$shortestDistance)),
                                       fromOverlappingOrNearest = as.character(r.n$fromOverlappingOrNearest),
                                       space = as.character(r.n$chr))
-            }
-            else {
+            }else {
                 r.output = myPeakList
             }
-        }
-        else if ((output == "overlapping" || output == "o") || ((output == "both" || output == "b") && length(r1) == 0)) {
+        }else if ((output == "overlapping" || output == "o") || ((output == "both" || output == "b") && length(r1) == 0)) {
             if (dim(r.o)[1] > 0) {
                 r.output = RangedData(IRanges(start = as.numeric(as.character(r.o$peak_start)),
                                               end = as.numeric(as.character(r.o$peak_end)),
@@ -353,8 +341,7 @@ annotatePeakInBatch <-
             else {
                 r.output = myPeakList
             }
-        }
-        else if (output == "both" || output == "b") {
+        }else if (output == "both" || output == "b") {
             r.n = as.data.frame(r.n)
             r.n1 = r.n
             debug = 0
@@ -404,8 +391,7 @@ annotatePeakInBatch <-
                                           shortestDistance = as.numeric(as.character(r.both$shortestDistance)),
                                           fromOverlappingOrNearest = as.character(r.both$fromOverlappingOrNearest),
                                           space = as.character(r.both$chr))
-                }
-                else {
+                }else {
                     r.output = RangedData(IRanges(start = as.numeric(as.character(r.n1$peakStart)),
                                                   end = as.numeric(as.character(r.n1$peakEnd)),
                                                   names = paste(as.character(r.n1$name), as.character(r.n1$feature_id))),
