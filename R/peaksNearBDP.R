@@ -11,6 +11,9 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
     FeatureLocForDistance = match.arg(FeatureLocForDistance)
     if (!missing(AnnotationData))
 	{
+        if(class(AnnotationData)!="RangedData"){
+            stop("No valid AnnotationData passed in. It needs to be RangedData object")
+        }
 		AnnoPlus =AnnotationData[AnnotationData$strand =="+"  | AnnotationData$strand ==1,]
 		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
 	}
@@ -24,6 +27,9 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 		AnnoPlus =AnnotationData[AnnotationData$strand =="+"  | AnnotationData$strand ==1,]
 		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
 	}
+    if(nrow(AnnoPlus)<1 || nrow(AnnoMinus)<1){
+        return(NULL)
+    }
     plus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoPlus,PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
 	minus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoMinus, PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
 	plus.passed = plus[!is.na(plus$shortestDistance) & plus$shortestDistance<=MaxDistance, ]
