@@ -70,7 +70,7 @@ library(org.Hs.eg.db)
 addGeneIDs(annotatedPeak[1:6,],orgAnn="org.Hs.eg.db",IDs2Add=c("symbol","omim"))
 addGeneIDs(annotatedPeak$feature[1:6],orgAnn="org.Hs.eg.db",IDs2Add=c("symbol","genename"))
 mart=useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
-addGeneIDs(annotatedPeak[1:6,],mart=mart,IDs2Add=c("external_gene_id","entrezgene"))
+addGeneIDs(annotatedPeak[1:6,],mart=mart,IDs2Add=c("external_gene_name","entrezgene"))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
