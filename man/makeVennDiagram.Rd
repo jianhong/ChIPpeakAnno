@@ -8,7 +8,7 @@ Make Venn Diagram from two peak ranges
 Make Venn Diagram from two peak ranges and also calculate p-value for determining whether two peak ranges overlap significantly.
 }
 \usage{
-makeVennDiagram(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, ...)
+makeVennDiagram(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, byBase=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,6 +28,7 @@ Numeric value to specify the total number of tests performed to obtain the list 
 }
 \item{useFeature}{TRUE or FALSE, default FALSE, true means using feature field in the RangedData for calculating overlap, false means using chromosome range for calculating overlap.
 }
+\item{byBase}{TRUE or FALSE, default FALSE. true means to calculate overlap in nucleotide level}
 \item{\dots}{Additional arguments to be passed to \link[VennDiagram:venn.diagram]{venn.diagram}}
 }
 \details{
@@ -62,7 +63,10 @@ makeVennDiagram(RangedDataList(peaks1,peaks2), NameOfPeaks=c("TF1", "TF2"),
  totalTest=100,scaled=F, euler.d=F)
 
 makeVennDiagram(RangedDataList(peaks1,peaks2), NameOfPeaks=c("TF1", "TF2"),
-  totalTest=100,useFeature=FALSE)
+  totalTest=100, useFeature=FALSE)
+
+makeVennDiagram(RangedDataList(peaks1,peaks2), NameOfPeaks=c("TF1", "TF2"),
+  totalTest=10000, byBase=TRUE)
 
 ###### 4-way diagram using annotated feature instead of chromosome ranges
 

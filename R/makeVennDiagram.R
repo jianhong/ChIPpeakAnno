@@ -1,5 +1,5 @@
 makeVennDiagram <-
-function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, ...)
+function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, byBase=FALSE, ...)
 {
 	if (missing(totalTest))
 	{
@@ -36,13 +36,13 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FAL
 			stop(err.msg)
 		}
 	})
-	lapply(seq_len(n1), function(i)
+	for(i in seq_len(n1))
 	{	
 		if (!length(rownames(Peaks[i])))
 		{
 			rownames(Peaks[[i]]) = formatC(1:dim(Peaks[[i]])[1], width=nchar(dim(Peaks[[i]])[1]), flag='0')
 		}		
-	})
+	}
 	getCountsList<-function(counts){
 		CountsList <- list()
 		cnt <- 1
@@ -82,6 +82,84 @@ function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FAL
 		venngrid <- gList(venngrid, tmp)
 		grid.draw(venngrid)
 	}
+    if(byBase){
+        ignore.strand <- FALSE
+        for(i in 1:n1){
+            rownames(Peaks[[i]]) <- paste(NameOfPeaks[i], rownames(Peaks[[i]]), sep="___conn___")
+            if(is.null(Peaks[[i]]$strand)) ignore.strand <- TRUE
+        }
+        if(ignore.strand){
+            Peaks.ir <- lapply(Peaks, function(.ele){
+                .ele <- .ele@ranges
+                names(.ele) <- NULL
+                unlist(.ele)
+            })
+            Peaks.ir <- list("*"=unlist(IRangesList(Peaks.ir)))
+        }else{
+            Peaks <- unlist(Peaks)
+            Peaks.ir <- split(Peaks, Peaks$strand)
+            Peaks.ir <- lapply(Peaks.ir, function(.ele){
+                .ele <- .ele@ranges
+                names(.ele) <- NULL
+                unlist(.ele)
+            })
+        }
+        ncontrasts <- n1
+        noutcomes <- 2^ncontrasts
+        outcomes <- matrix(0,noutcomes,ncontrasts)
+        colnames(outcomes) <- NameOfPeaks
+        for (j in 1:ncontrasts)
+            outcomes[,j] <- rep(0:1,times=2^(j-1),each=2^(ncontrasts-j))
+        idx <- apply(outcomes, 1, paste, collapse="")
+        cnt <- lapply(Peaks.ir, function(.ele){
+            disj <- disjoin(.ele)
+            ol <- findOverlaps(.ele, disj)
+            ol.query <- .ele[queryHits(ol)]
+            ol.subject <- disj[subjectHits(ol)]
+            group <- gsub("___conn___.*$", "", names(ol.query))
+            subject <- subjectHits(ol)
+            gps <- split(group, subject)
+            xlist <- list()
+            for(i in 1:ncontrasts)
+                xlist[[i]] <- factor(as.numeric(sapply(gps, function(.ele) NameOfPeaks[ncontrasts-i+1] %in% .ele)), levels=c(0,1))
+            counts <- do.call(cbind, xlist)
+            counts <- counts - 1
+            counts <- apply(counts, 1, paste, collapse="")
+            wids <- width(disj[as.numeric(names(gps))])
+            wids <- split(wids, counts)
+            wids <- wids[idx]
+            names(wids) <- idx
+            counts <- sapply(wids, sum)
+        })
+        cnt <- do.call(cbind, cnt)
+        cnt <- rowSums(cnt)
+        a2 <- cbind(outcomes, Counts=cnt)
+        
+        getPval<-function(venn_cnt, totalTest){
+            n <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
+            s <- apply(venn_cnt[,1:n], 1, sum)
+            venn_cnt_s <- venn_cnt[s==2, , drop=FALSE]
+            for(i in 1:nrow(venn_cnt_s)){
+                venn_cnt_s[i,n+1] <- sum(venn_cnt[as.numeric(venn_cnt[,1:n]%*%venn_cnt_s[i,1:n])==2,n+1,drop=TRUE])
+            }
+            cnt <- venn_cnt[,n+1]
+            cnt_s <- apply(venn_cnt[,1:n], 2, function(.ele){
+                sum(cnt[as.logical(.ele)])
+            })
+            p.value <- apply(venn_cnt_s, 1, function(.ele){
+                ab <- cnt_s[as.logical(.ele[1:n])]
+                a <- ab[1]
+                b <- ab[2]
+                a.and.b <- .ele[(n+1)]
+                phyper <- phyper(a.and.b-1, b, totalTest-b, a, lower.tail=FALSE, log.p=FALSE)
+            })
+            cbind(venn_cnt_s[, 1:n, drop=FALSE], pval=p.value)
+        }
+        
+        p.value <- getPval(a2, totalTest)
+        plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName="Counts", ...)
+        return(list(p.value=p.value, vennCounts=a2))
+    }
 	if (n1 == 2)
 	{
 		x = findVennCounts(Peaks=Peaks,NameOfPeaks=NameOfPeaks,maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
