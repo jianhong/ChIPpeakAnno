@@ -35,11 +35,14 @@ Johnson, N. L., Kotz, S., and Kemp, A. W. (1992) Univariate Discrete Distributio
 }
 \seealso{ phyper, getEnrichedGO }
 \examples{
-goList= c("GO:0000075", "GO:0000082","GO:0000082","GO:0000122","GO:0000122","GO:0000075",
-"GO:0000082","GO:0000082","GO:0000122","GO:0000122","GO:0000122","GO:0000122","GO:0000075", "GO:0000082","GO:000012")
+goList= c("GO:0000075", "GO:0000082","GO:0000082","GO:0000122",
+          "GO:0000122","GO:0000075","GO:0000082","GO:0000082",
+          "GO:0000122","GO:0000122","GO:0000122","GO:0000122",
+          "GO:0000075", "GO:0000082","GO:000012")
   
-alltermcount = list(GOterm=c("GO:0000075" , "GO:0000082", "GO:000012", "GO:0000122"), GOcount=c(100, 200,10,10))
-thistermcount =   getUniqueGOidCount(goList)
+alltermcount = list(GOterm=c("GO:0000075", "GO:0000082", "GO:000012", "GO:0000122"), 
+                    GOcount=c(100, 200, 10, 10))
+thistermcount = getUniqueGOidCount(goList)
 totaltermInPeakList = 15
 totaltermInGenome = 1000
 hyperGtest(alltermcount,thistermcount, totaltermInGenome, totaltermInPeakList)

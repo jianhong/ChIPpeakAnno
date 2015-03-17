@@ -16,9 +16,9 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 		message("No valid organism specific GO gene mapping package as parameter orgAnn is passed in!")
 		stop("Please refer http://www.bioconductor.org/packages/release/data/annotation/ for available org.xx.eg.db packages")
 	}
-	if (class(annotatedPeak) == "RangedData")
+	if (inherits(annotatedPeak, what=c("RangedData", "GRanges")))
 	{
-		feature_ids = unique(annotatedPeak$feature)
+		feature_ids = unique(as.character(annotatedPeak$feature))
 	}
 	else if (class(annotatedPeak)  ==  "character")
 	{
@@ -26,7 +26,7 @@ function(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", maxP=0.01, mu
 	}
 	else
 	{
-		stop("annotatedPeak needs to be RangedData type with feature variable holding the feature id or a character vector holding the IDs of the features used to annotate the peaks!")
+		stop("annotatedPeak needs to be RangedData or GRanges type with feature variable holding the feature id or a character vector holding the IDs of the features used to annotate the peaks!")
 	}
 	if (feature_id_type == "entrez_id")
 	{

@@ -8,11 +8,12 @@ Add common IDs to annotated peaks such as gene symbol, entrez ID, ensemble gene 
 \description{
 Add common IDs to annotated peaks such as gene symbol, entrez ID, ensemble gene id and refseq id leveraging organism annotation dataset! For example, org.Hs.eg.db is the dataset from orgs.Hs.eg.db package for human, while org.Mm.eg.db is the dataset from the org.Mm.eg.db package for mouse}
 \usage{
-addGeneIDs(annotatedPeak, orgAnn, IDs2Add=c("symbol"), feature_id_type="ensembl_gene_id", silence=TRUE, mart)
+addGeneIDs(annotatedPeak, orgAnn, IDs2Add=c("symbol"), 
+           feature_id_type="ensembl_gene_id", silence=TRUE, mart)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{annotatedPeak}{RangedData such as data(annotatedPeak) or a vector of feature IDs}
+  \item{annotatedPeak}{RangedData or GRanges such as data(annotatedPeak) or a vector of feature IDs}
   \item{orgAnn}{organism annotation dataset such as org.Hs.eg.db}
   \item{IDs2Add}{a vector of annotation identifiers to be added}
   \item{feature_id_type}{type of ID to be annotated}
@@ -69,8 +70,11 @@ data(annotatedPeak)
 library(org.Hs.eg.db)
 addGeneIDs(annotatedPeak[1:6,],orgAnn="org.Hs.eg.db",IDs2Add=c("symbol","omim"))
 addGeneIDs(annotatedPeak$feature[1:6],orgAnn="org.Hs.eg.db",IDs2Add=c("symbol","genename"))
-mart=useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
-addGeneIDs(annotatedPeak[1:6,],mart=mart,IDs2Add=c("external_gene_name","entrezgene"))
+if(interactive()){
+mart <- useMart("ENSEMBL_MART_ENSEMBL",host="www.ensembl.org",dataset="hsapiens_gene_ensembl")
+##mart <- useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
+addGeneIDs(annotatedPeak[1:6,],mart=mart,IDs2Add=c("hgnc_symbol","entrezgene"))
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -12,8 +12,8 @@ Batch annotation of the peaks identified from either ChIP-seq or ChIP-chip exper
 \tabular{ll}{
 Package: \tab ChIPpeakAnno\cr
 Type: \tab Package\cr
-Version: \tab 2.9.6\cr
-Date: \tab 2013-08-22\cr
+Version: \tab 3.0.0\cr
+Date: \tab 2014-10-24\cr
 License: \tab LGPL\cr
 LazyLoad: \tab yes\cr
 }
@@ -24,7 +24,7 @@ Lihua Julie Zhu, Jianhong Ou, Herve Pages, Claude Gazin, Nathan Lawson, Simon Li
 
 
 Maintainer:
- Lihua Julie Zhu <julie.zhu@umassmed.edu>, Jianhong Ou <Jianhong.Ou@umassmed.edu>
+Jianhong Ou <jianhong.ou@umassmed.edu>, Lihua Julie Zhu <julie.zhu@umassmed.edu>
 }
 \references{
 1. Y. Benjamini and Y. Hochberg (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. J. R. Statist. Soc. B. Vol. 57: 289-300. \cr
@@ -43,45 +43,8 @@ Maintainer:
 
 }
 \examples{
-
-if (interactive())
-{
-	data(myPeakList)
-        data(TSS.human.NCBI36)
-	
-	myPeakList1 = myPeakList[1:6,]
-
-	annotatedPeak = annotatePeakInBatch(myPeakList1, AnnotationData=TSS.human.NCBI36)
-
-	peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), 
-	names=c("peak1", "peak2")), space=c("NC_008253", "NC_010468"))
-	library(BSgenome.Ecoli.NCBI.20080805)
-	
-	peaksWithSequences = getAllPeakSequence(peaks, upstream = 20,
-	downstream = 20, genome = Ecoli)
-	write2FASTA(peaksWithSequences, file="testseq.fasta", width=50)
-	
-	filepath =system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
-	summarizePatternInPeaks(patternFilePath=filepath, format="fasta", skip=0L, BSgenomeName=Ecoli, peaks=peaks)
-
-
-	library(org.Hs.eg.db)
-	annotatedPeak.withSymbol =addGeneIDs(annotatedPeak,"org.Hs.eg.db",c("symbol"))
-	enrichedGO = getEnrichedGO(annotatedPeak, orgAnn ="org.Hs.eg.db", maxP=0.01, 
-	multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
-
-	enriched.biologicalprocess = enrichedGO$bp
-	enriched.molecularfunction = enrichedGO$mf
-	enriched.cellularcomponent = enrichedGO$cc
-
-	data(annotatedPeak)
-	y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
-	hist(y, xlab="Distance To Nearest TSS", main="", breaks=1000, 
-	xlim=c(min(y)-100, max(y)+100))
-
-	annotatedBDP = peaksNearBDP(myPeakList1, AnnotationData=TSS.human.NCBI36,
-	MaxDistance=5000,PeakLocForDistance =  "middle", FeatureLocForDistance = "TSS")
-	c(annotatedBDP$percentPeaksWithBDP, annotatedBDP$n.peaks, annotatedBDP$n.peaksWithBDP)
-}
-
+  data(myPeakList)
+  data(TSS.human.NCBI36)
+  annotatedPeak <- annotatePeakInBatch(myPeakList[1:6],
+        AnnotationData=TSS.human.NCBI36)
 }

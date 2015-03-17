@@ -20,23 +20,11 @@ addAncestors(go.ids, ontology = c("bp", "cc", "mf"))
  bp for biological process, cc for cellular component and mf for molecular function
 }
 }
-\details{
-
-}
 \value{
  a vector of GO IDs containing the input GO IDs with the GO IDs of their ancestors added
 }
-\references{
-}
 \author{
 Lihua Julie Zhu
-}
-\note{
-
-}
-
-\seealso{
-
 }
 \examples{
 go.ids = cbind(c("GO:0008150", "GO:0005576", "GO:0003674"),c("ND", "IDA", "ND"), 

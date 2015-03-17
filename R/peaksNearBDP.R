@@ -4,41 +4,43 @@ FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 	if (missing(myPeakList)) {
         stop("Missing required argument myPeakList!")
     }
-    if (class(myPeakList) != "RangedData") {
-        stop("No valid myPeakList passed in. It needs to be RangedData object")
+    if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
+        stop("myPeakList needs to be RangedData or GRanges object")
     }
     PeakLocForDistance = match.arg(PeakLocForDistance)
     FeatureLocForDistance = match.arg(FeatureLocForDistance)
     if (!missing(AnnotationData))
-	{
-        if(class(AnnotationData)!="RangedData"){
-            stop("No valid AnnotationData passed in. It needs to be RangedData object")
+	{        
+        if (!inherits(AnnotationData, c("RangedData", "GRanges"))) {
+            stop("AnnotationData needs to be RangedData or GRanges object")
         }
-		AnnoPlus =AnnotationData[AnnotationData$strand =="+"  | AnnotationData$strand ==1,]
-		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
+        if(class(AnnotationData)=="RangedData") AnnotationData <- toGRanges(AnnotationData, format="RangedData")
 	}
 	else if (missing(mart) || class(mart) != "Mart") {
           		  stop("Error in querying biomart database. No valid mart object is passed in! Suggest call getAnnotation before calling PeaksNearBDP")
       	  }
 	else
 	{
-       	AnnotationData <- getAnnotation(mart, featureType = "TSS") 
+       	AnnotationData <- getAnnotation(mart, featureType = "TSS", output="GRanges")
 		message("Done querying biomart database, start annotating ....Better way would be calling getAnnotation before calling peaksNearBDP")
-		AnnoPlus =AnnotationData[AnnotationData$strand =="+"  | AnnotationData$strand ==1,]
-		AnnoMinus =AnnotationData[AnnotationData$strand =="-" | AnnotationData$strand ==-1,]
 	}
-    if(nrow(AnnoPlus)<1 || nrow(AnnoMinus)<1){
-        return(NULL)
-    }
+    AnnoPlus =AnnotationData[strand(AnnotationData) =="+"  | strand(AnnotationData) ==1]
+    AnnoMinus =AnnotationData[strand(AnnotationData) =="-" | strand(AnnotationData) ==-1]
+    if(class(myPeakList)=="RangedData") myPeakList <- toGRanges(myPeakList, format="RangedData")
     plus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoPlus,PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
 	minus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoMinus, PeakLocForDistance=PeakLocForDistance, FeatureLocForDistance=FeatureLocForDistance)
-	plus.passed = plus[!is.na(plus$shortestDistance) & plus$shortestDistance<=MaxDistance, ]
-	minus.passed = minus[!is.na(minus$shortestDistance) & minus$shortestDistance <=MaxDistance, ]
-	passed = rbind(plus.passed, minus.passed)
-	summary = as.data.frame(table(passed$peak))
-	BDP = summary[summary[,2] >1,]
-	peaksWithBDP = passed[passed$peak %in% BDP[,1],]
-	temp = as.data.frame(table(summary[,2]))
-	percentPeaksWithBDP  = temp[temp[,1]==2,2]/dim(myPeakList)[1]
-	list(peaksWithBDP = peaksWithBDP, percentPeaksWithBDP = percentPeaksWithBDP, n.peaks=dim(myPeakList)[1], n.peaksWithBDP=temp[temp[,1]==2,2])
+	plus.passed = plus[!is.na(plus$shortestDistance) & plus$shortestDistance<=MaxDistance]
+	minus.passed = minus[!is.na(minus$shortestDistance) & minus$shortestDistance <=MaxDistance]
+	passed = c(plus.passed, minus.passed)
+	summary = table(as.data.frame(mcols(passed)[, c("peak", "feature_strand")]))
+    if(nrow(summary)<1) return(NULL)
+    isBDP <- apply(summary, 1, function(.ele) sum(.ele>0)) > 1
+	BDP = summary[isBDP, , drop=FALSE]
+	peaksWithBDP = passed[passed$peak %in% rownames(BDP)]
+    peaksWithBDP <- peaksWithBDP[order(as.character(seqnames(peaksWithBDP)), 
+                                       peaksWithBDP$peak, 
+                                       peaksWithBDP$feature_strand)]
+	temp = nrow(BDP)
+	percentPeaksWithBDP  = temp/length(myPeakList)
+	list(peaksWithBDP = peaksWithBDP, percentPeaksWithBDP = percentPeaksWithBDP, n.peaks=length(myPeakList), n.peaksWithBDP=temp)
 }

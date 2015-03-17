@@ -11,7 +11,7 @@ maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{annotatedPeak}{RangedData such as data(annotatedPeak) or a vector of feature IDs }
+  \item{annotatedPeak}{RangedData or GRanges such as data(annotatedPeak) or a vector of feature IDs }
   \item{orgAnn}{ organism annotation package such as org.Hs.eg.db for human and org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat, org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish }
  \item{feature_id_type}{the feature type in annotatedPeakRanges such as ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
   \item{maxP}{ maximum p-value to be considered to be significant}
@@ -19,8 +19,6 @@ maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
   \item{minGOterm}{ minimum count in a genome for a GO term to be included  }
   \item{multiAdjMethod}{ multiple testing procedures, for details, see mt.rawp2adjp in multtest package}
 }
-\details{
-  }
 \value{
 A list of 3
  \item{\code{bp}}{ enriched biological process with the following 9 variables
@@ -89,10 +87,6 @@ A list of 3
 }
 \references{ Johnson, N. L., Kotz, S., and Kemp, A. W. (1992) Univariate Discrete Distributions, Second Edition. New York: Wiley }
 \author{ Lihua Julie Zhu }
-\note{  
-
- 
-}
 \seealso{ phyper, hyperGtest}
 \examples{
 data(enrichedGO)

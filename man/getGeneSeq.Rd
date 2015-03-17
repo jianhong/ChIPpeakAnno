@@ -12,9 +12,6 @@ getGeneSeq(LocationParameters, mart)
   \item{LocationParameters}{ c(ensembl_gene_id, distance from the peak to the transcription start site of the gene with the above ensemblID, upstream offset from the peak, downstream offset from the peak, Gene Start, Gene End) }
   \item{mart}{see useMart of bioMaRt package for details} 
 }
-\details{
-  
-}
 \value{
   a list with the following items
   \item{feature_id}{ensemble gene ID}
@@ -23,12 +20,10 @@ getGeneSeq(LocationParameters, mart)
   \item{downstream}{downstream offset from the peakEnd}
   \item{seq}{sequence obtained around the peak with above upstream and downstream offset}
 }
-\references{  }
 \author{ Lihua Julie Zhu }
 \note{ 
 internal function not intended to be called directly by users
 }
-\seealso{  }
 \examples{
 
 

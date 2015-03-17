@@ -14,17 +14,11 @@ write2FASTA(mySeq, file="", width=80)
   \item{file}{Either a character string naming a file or a connection open for reading or writing. If "" (the default for write2FASTA), then the function writes to the standard output connection (the console) unless redirected by sink}
   \item{width}{ The maximum number of letters per line of sequence }
 }
-\details{
-}
 \value{
   Output as FASTA file format to the naming file or the console. 
 }
-\references{ }
 \author{ Lihua Julie Zhu}
-\note{
- 
-}
-\seealso{  }
+
 \examples{
 peaksWithSequences = RangedData(IRanges(start=c(1000, 2000), end=c(1010, 2010), 
 names=c("id1", "id2")), sequence= c("CCCCCCCCGGGGG", "TTTTTTTAAAAAA"))

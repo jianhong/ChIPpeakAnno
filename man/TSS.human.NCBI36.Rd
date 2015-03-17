@@ -10,23 +10,17 @@
 }
 \usage{data(TSS.human.NCBI36)}
 \format{
-   RangedData with slot start holding the start position of the gene, slot end holding the end position of the gene, slot rownames holding ensembl gene id and slot space holding the chromosome location where the gene is located. In addition, the following variables are included.
+      GRanges with slot start holding the start position of the gene, slot end holding the end position of the gene, slot names holding ensembl gene id, slot seqnames holding the chromosome location where the gene is located and slot strand holding the strinad information. In addition, the following variables are included.
   \describe{
-    \item{\code{strand}}{1 for positive strand and -1 for negative strand}
     \item{\code{description}}{description of the gene}}}
 \details{
  used in the examples
   Annotation data obtained by:
 
-	mart = useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+	mart = useMart(biomart = "ensembl_mart_47", dataset = "hsapiens_gene_ensembl", archive=TRUE)
 		
 	getAnnotation(mart, featureType = "TSS")
 
-}
-\source{
-
-}
-\references{
 }
 \examples{
 data(TSS.human.NCBI36)

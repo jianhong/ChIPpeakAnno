@@ -25,8 +25,8 @@ function(annotatedPeak, orgAnn, pathAnn, feature_id_type="ensembl_gene_id", maxP
 	   length(objects(paste("package",pathAnn,sep=":"),pattern=path2name))!=1 ){
 		stop("argument pathAnn is not the annotation data with objects named as xxxxxEXTID2PATHID and/or xxxxxPATHID2NAME")
 	}
-	if (class(annotatedPeak) == "RangedData"){
-		feature_ids = unique(annotatedPeak$feature)
+	if (inherits(annotatedPeak, what=c("RangedData", "GRanges"))){
+		feature_ids = unique(as.character(annotatedPeak$feature))
 	}else if (class(annotatedPeak)  ==  "character"){
 		feature_ids = unique(annotatedPeak)
 	}else{

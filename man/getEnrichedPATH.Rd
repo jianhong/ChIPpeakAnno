@@ -11,7 +11,7 @@ maxP=0.01, minPATHterm=10, multiAdjMethod=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{annotatedPeak}{RangedData such as data(annotatedPeak) or a vector of feature IDs }
+  \item{annotatedPeak}{RangedData or GRanges such as data(annotatedPeak) or a vector of feature IDs }
   \item{orgAnn}{ organism annotation package such as org.Hs.eg.db for human and org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat, org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish }
   \item{pathAnn}{ pathway annotation package such as KEGG.db, reactome.db }
   \item{feature_id_type}{the feature type in annotatedPeakRanges such as ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
@@ -38,8 +38,9 @@ if (interactive()) {
 data(annotatedPeak)
 library(org.Hs.eg.db)
 library(reactome.db)
-enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", pathAnn="reactome.db", maxP=0.01,
- minPATHterm=10, multiAdjMethod=NULL)
+enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+                 pathAnn="reactome.db", maxP=0.01,
+                 minPATHterm=10, multiAdjMethod=NULL)
  head(enriched.PATH)
 }
 }

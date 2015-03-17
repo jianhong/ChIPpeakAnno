@@ -11,9 +11,6 @@
 \format{
     RangedData with slot rownames containing the ID of peak as character, slot start containing the start position of the peak, slot end containing the end position of the peak and space containing the chromosome where the peak is located.
 }
-\details{
-
-}
 \source{http://www.biomedcentral.com/1471-2164/10/37
 }
 \references{

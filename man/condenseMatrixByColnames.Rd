@@ -16,22 +16,11 @@ condenseMatrixByColnames(mx,iname,sep=";",cnt=FALSE)
   \item{sep}{separator for condensed values,default ;}
   \item{cnt}{TRUE/FALSE specifying whether adding count column or not?}
 }
-\details{
-
-}
 \value{
 dataframe of condensed matrix
 }
-\references{
-}
 \author{
 Jianhong Ou, Lihua Julie Zhu
-}
-\note{
-}
-
-\seealso{
-
 }
 \examples{
 a<-matrix(c(rep(rep(1:5,2),2),rep(1:10,2)),ncol=4)

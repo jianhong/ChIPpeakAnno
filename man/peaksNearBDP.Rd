@@ -6,20 +6,19 @@
   Obtain the peaks near bi-directional promoters. Also output percent of peaks near bi-directional promoters.
 }
 \usage{
-peaksNearBDP(myPeakList, mart,AnnotationData, MaxDistance=5000,PeakLocForDistance = c("start", "middle", "end"), 
-FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
+peaksNearBDP(myPeakList, mart,AnnotationData, MaxDistance=5000,
+             PeakLocForDistance = c("start", "middle", "end"),
+             FeatureLocForDistance = c("TSS", "middle","start", "end","geneEnd"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
- \item{myPeakList}{RangedData: See example below}
+ \item{myPeakList}{\link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData}: See example below}
  \item{mart}{used if AnnotationData not supplied, a mart object, see useMart of bioMaRt package for details }
- \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class RangedData containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType TSS}
+ \item{AnnotationData}{ annotation data obtained from getAnnotation or customized annotation of class \link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData} containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8) . If not supplied, then annotation will be obtained from biomaRt automatically using the parameters of mart and featureType TSS}
 \item{MaxDistance}{Specify the maximum gap allowed between the peak and nearest gene}
 \item{PeakLocForDistance}{Specify the location of peak for calculating distance,i.e., middle means using middle of the peak to calculate distance to feature, start means using start of the peak to calculate the distance to feature. To be compatible with previous version, by default using start}
 \item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand, geneEnd means using end of feature when feature is on plus strand and using start of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
 }
-\details{
-  }
 \value{
 A list of 4
  \item{\code{peaksWithBDP}}{annotated Peaks containing bi-directional promoters.
@@ -48,9 +47,7 @@ FeatureLocForDistance
 \item{\code{n.peaksWithBDP}}{The # of input peaks containing bi-directional promoters}
 }
 \references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237}
-\author{ Lihua Julie Zhu }
-\note{ 
-}
+\author{ Lihua Julie Zhu, Jianhong Ou}
 \seealso{annotatePeakInBatch, findOverlappingPeaks, makeVennDiagram }
 \examples{
 

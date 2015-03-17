@@ -1,422 +1,431 @@
 annotatePeakInBatch <-
     function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"),
-              AnnotationData, output = c("nearestStart", "overlapping",
-                                         "both", "shortestDistance"), 
-              multiple = c(TRUE,FALSE), maxgap = 0, 
-              PeakLocForDistance=c("start","middle","end"), 
-              FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"), 
-              select=c("all", "first", "last", "arbitrary"))
+              AnnotationData, 
+              output = c("nearestLocation", "overlapping", "both", 
+                         "shortestDistance", "inside",
+                         "upstream&inside", "inside&downstream",
+                         "upstream", "downstream", 
+                         "upstreamORdownstream"),
+              multiple = c(TRUE,FALSE), maxgap = 0L,
+              PeakLocForDistance=c("start","middle","end"),
+              FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"),
+              select=c("all", "first", "last", "arbitrary"),
+              ignore.strand=TRUE)
     {
+        if(output[1]=="nearestStart") output <- "nearestLocation"
         featureType = match.arg(featureType)
-        if (missing(PeakLocForDistance))
-        {
-            PeakLocForDistance = "start"
-        }
-        if (missing(FeatureLocForDistance))
-        {
-            FeatureLocForDistance = "TSS"
-        }
-        
-        if (missing(output)) {
-            output = "nearestStart"
-        }
-        oldoutput=output
-        if(output=="shortestDistance"){
-            output="both"
-        }
+        PeakLocForDistance = match.arg(PeakLocForDistance)
+        FeatureLocForDistance = match.arg(FeatureLocForDistance)
+        output = match.arg(output)
         select = match.arg(select)
-        if ((output == "overlapping" || output == "both") && select == "all" && multiple == FALSE) {
+        
+        if ((output == "overlapping" || output == "both")
+            && select =="all" && multiple==FALSE) {
             warning("Please use select instead of multiple!")
             select = "first"
         }
-        if (missing(myPeakList)) {
-            stop("Missing required argument myPeakList!")
+        if(output=="upstream&inside"){
+            if(FeatureLocForDistance!="TSS") {
+                FeatureLocForDistance <- "TSS"
+                warning("FeatureLocForDistance is set to TSS")
+            }
+            select <- "all"
         }
-        returnAsGRanges <- FALSE
-        if (class(myPeakList) != "RangedData") {
-            if (is(myPeakList, "GRanges")) {
-                myPeakList <- as(myPeakList, "RangedData")
-                returnAsGRanges <- TRUE
+        if(output=="inside&downstream"){
+            if(FeatureLocForDistance!="geneEnd"){
+                FeatureLocForDistance <- "geneEnd"
+                warning("FeatureLocForDistance is set to geneEnd")
             }
-            else {
-                stop("No valid myPeakList passed in. It needs to be RangedData or GRanges object")
-            }
+            select <- "all"
+        }
+        if (missing(myPeakList)) stop("Missing required argument myPeakList!")
+        if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
+            stop("No valid myPeakList passed in. It needs to be RangedData or GRanges object")
+        }
+        if(inherits(myPeakList, "RangedData")){
+            myPeakList <- RangedData2GRanges(myPeakList)
+            flagRD <- TRUE
+        }else{
+            flagRD <- FALSE
         }
         if (missing(AnnotationData)) {
-            message("No AnnotationData as RangedData is passed in, so now querying biomart database for AnnotationData ....")
+            message("No AnnotationData as RangedData or GRanges is passed in, so now querying biomart database for AnnotationData ....")
             if (missing(mart) || class(mart) != "Mart") {
                 stop("Error in querying biomart database. No valid mart object is passed in! Suggest call getAnnotation before calling annotatePeakInBatch")
             }
             AnnotationData <- getAnnotation(mart, featureType = featureType)
             message("Done querying biomart database, start annotating ....Better way would be calling getAnnotation before calling annotatePeakInBatch")
         }
-        if (class(AnnotationData) != "RangedData") {
-            if (is(AnnotationData, "GRanges")) {
-                AnnotationData <- as(AnnotationData, "RangedData")
-            }
-            else {
-                stop("AnnotationData needs to be RangedData or GRanges object")
-            }
+        if (!inherits(AnnotationData, c("RangedData", "GRanges"))) {
+            stop("AnnotationData needs to be RangedData or GRanges object")
         }
-        TSS.ordered <- AnnotationData
-        rm(AnnotationData)
-        if (!length(rownames(TSS.ordered))) {
-            rownames(TSS.ordered) = formatC(1:dim(TSS.ordered)[1],
-                                            width = nchar(dim(TSS.ordered)[1]), flag = "0")
-        }
-        if (length(TSS.ordered$strand) == length(start(TSS.ordered)))
-        {
-            r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), as.character(TSS.ordered$strand))
+        if (inherits(AnnotationData, "RangedData")) {
+            TSS.ordered <- RangedData2GRanges(AnnotationData)
         }else{
-            TSS.ordered$strand = rep("+", length(start(TSS.ordered)))
-            r2 = cbind(rownames(TSS.ordered), start(TSS.ordered), end(TSS.ordered), rep("+", length(start(TSS.ordered))))
+            TSS.ordered <- AnnotationData
         }
-        colnames(r2) = c("feature_id", "start_position", "end_position",
-                         "strand")
-        if (FeatureLocForDistance == "middle" || FeatureLocForDistance == "m")
-        {
-            FeatureLoc <- round(rowMeans(matrix(as.numeric(r2[,2:3]), ncol=2)))
-            FeatureLocForDistance = "middle"
-        }else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
-        {
-            FeatureLoc = r2[, 2]
-            FeatureLocForDistance = "start"
-        }else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
-        {
-            FeatureLoc = r2[, 3]
-            FeatureLocForDistance = "end"
-        }else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
-        {
-            FeatureLoc <- ifelse(as.character(r2[, 4]) %in% c("+", "1", "*"),
-                                 r2[, 3], r2[, 2])
-            FeatureLocForDistance = "geneEnd"
-        }else
-        {
-            FeatureLoc <- ifelse(as.character(r2[, 4]) %in% c("+", "1", "*"),
-                                 r2[, 2], r2[, 3])
-            FeatureLocForDistance = "TSS"
-        }
-        r2 = cbind(r2, FeatureLoc)
+        nAnno <- length(TSS.ordered)
+        #TSS.ordered <- unique(TSS.ordered)
+        #if(length(TSS.ordered)!=nAnno) message("AnnotationData has duplicated ranges.")
+        rm(AnnotationData)
+        rm(nAnno)
         
-        allChr.Anno = unique(as.character(IRanges:::space(TSS.ordered)))
-        numberOfChromosome = length(unique(IRanges:::space(myPeakList)))
-        if (!length(rownames(myPeakList))) {
-            rownames(myPeakList) = formatC(1:dim(myPeakList)[1],
-                                           width = nchar(dim(myPeakList)[1]), flag = "0")
+        ### rownames of RangedData changed into names of GRanges
+        if (is.null(names(TSS.ordered))){
+            names(TSS.ordered) <- formatC(1:length(TSS.ordered),
+                                          width=nchar(length(TSS.ordered)),
+                                          flag="0")
         }
-        allChr = unique(as.character(IRanges:::space(myPeakList)))
-        allChr = sub(" +", "", allChr)
-        if (length(grep("chr", allChr, fixed = TRUE)) > 0 && length(grep("chr",
-                                                                         allChr.Anno, fixed = TRUE)) == 0) {
-            allChr = sub("chr", "", allChr)
-            myPeakList = RangedData(IRanges(start = start(myPeakList),
-                                            end = end(myPeakList), names = rownames(myPeakList)),
-                                    space = sub("chr", "", IRanges:::space(myPeakList)))
+        if (is.null(names(myPeakList))) {
+            names(myPeakList) <- formatC(1:length(myPeakList),
+                                         width = nchar(length(myPeakList)),
+                                         flag = "0")
         }
-        if (length(grep("chr", allChr, fixed = TRUE)) == 0 && length(grep("chr",
-                                                                          allChr.Anno, fixed = TRUE)) > 0) {
-            allChr = paste("chr", allChr, sep = "")
-            myPeakList = RangedData(IRanges(start = start(myPeakList),
-                                            end = end(myPeakList), names = rownames(myPeakList)),
-                                    space = paste("chr", IRanges:::space(myPeakList), sep = ""))
+        if(any(duplicated(names(myPeakList)))){
+            warning("Found duplicated names in myPeakList. Changing the peak names ...")
+            names(myPeakList) <- formatC(1:length(myPeakList),
+                                         width = nchar(length(myPeakList)),
+                                         flag = "0")
         }
-        if (output == "nearestStart" || output == "both" || output == "n" || output == "b") {
-            z1 = cbind(as.character(rownames(myPeakList)), as.character(IRanges:::space(myPeakList)),
-                       start(myPeakList), end(myPeakList))
-            colnames(z1) = c("name", "chr", "peakStart", "peakEnd")
-            z1[, 2] = sub(" +", "", z1[, 2])
-            
-            if (PeakLocForDistance == "middle" || PeakLocForDistance == "m")
-            {
-                PeakLoc <- round(rowMeans(matrix(as.numeric(z1[,3:4]), ncol=2)))
-            }else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
-            {
-                PeakLoc = as.numeric(as.character(z1[, 3]))
-            }else if (PeakLocForDistance == "end" || PeakLocForDistance == "e")
-            {
-                PeakLoc = as.numeric(as.character(z1[, 4]))
-            }else
-            {
-                PeakLoc = as.numeric(as.character(z1[, 3]))
+        savedNames <- names(myPeakList)
+        
+        ##clear seqnames, the format should be chr+NUM
+        ##TODO, how about the seqname not start with chr?
+        TSS.ordered <- formatSeqnames(TSS.ordered)
+        myPeakList <- formatSeqnames(myPeakList)
+        if(!all(seqlevels(myPeakList) %in% seqlevels(TSS.ordered))){
+            warning("not all the seqnames of myPeakList is in the AnnotationData.")
+        }
+        
+        if(length(myPeakList)>10000){
+            ##huge dataset
+            myPeakList <- split(myPeakList, cut(1:length(myPeakList), ceiling(length(myPeakList)/5000)))
+            myPeakList <- lapply(myPeakList, annotatePeakInBatch, 
+                                 AnnotationData=TSS.ordered, 
+                                 output = output, maxgap = maxgap,
+                                 PeakLocForDistance=PeakLocForDistance,
+                                 FeatureLocForDistance=FeatureLocForDistance,
+                                 select=select,
+                                 ignore.strand=ignore.strand)
+            names(myPeakList) <- NULL
+            myPeakList <- unlist(GRangesList(myPeakList))
+            if(flagRD){
+                names(myPeakList) <- paste(myPeakList$peak, myPeakList$feature)
+                ##output RangedData
+                myPeakList <- as(myPeakList, "RangedData")
+                ##myPeakList <- myPeakList[!is.na(myPeakList$feature),]
+            }else{
+                names(myPeakList) <- make.names(paste(myPeakList$peak, myPeakList$feature))
             }
-            z1 = cbind(z1, PeakLoc)
-            TSS.ordered$FeatureLoc = FeatureLoc
-            myPeakList$PeakLoc = PeakLoc
-            plusAnno = TSS.ordered[as.character(TSS.ordered$strand) %in% c("+", "*", "1"), ]
-            minusAnno = TSS.ordered[as.character(TSS.ordered$strand) %in% c("-1", "-"), ]
-            r1 = do.call(rbind, lapply(seq_len(numberOfChromosome),
-                                       function(i) {
-                                           chr = allChr[i]
-                                           if (chr %in% allChr.Anno) {
-                                               featureStart = as.numeric(TSS.ordered[chr]$FeatureLoc)
-                                               peakLoc = as.numeric(myPeakList[chr]$PeakLoc)
-                                               peakStart = as.numeric(start(myPeakList[chr]))
-                                               peakEnd = as.numeric(end(myPeakList[chr]))
-                                               name = rownames(myPeakList[chr])
-                                               peakRanges = IRanges(start = peakStart, end = peakEnd,
-                                                                    names = name)
-                                               featureID = rownames(TSS.ordered[chr])
-                                               featureRanges = IRanges(start = featureStart,
-                                                                       end = featureStart, names = featureID)
-                                               nearestFeature = featureRanges[nearest(peakRanges,
-                                                                                      featureRanges)]
-                                               # data.frame(name = name, chr = rep(chr, length(peakStart)),
-                                               #     PeakLoc = peakLoc, peakStart = peakStart, peakEnd = peakEnd,
-                                               data.frame(name = name, feature_id = names(nearestFeature))
-                                           }
-                                       }))
-            if (length(r1) > 0) {
-                r3 = merge(r1, r2, by = "feature_id")
-                r = merge(r3, z1, all.y = TRUE)
-                r.n = r
-                if (FeatureLocForDistance == "TSS" || FeatureLocForDistance == "geneEnd")
-                {
-                    r11 = r[!is.na(r$strand) & (as.character(r$strand) == "1" | as.character(r$strand) ==
-                                                    "+" | as.character(r$strand) ==
-                                                    "*"), ]
-                    r22 = r[!is.na(r$strand) & (as.character(r$strand) == "-1" | as.character(r$strand) ==
-                                                    "-"), ]
-                }else
-                {
-                    r11 = r[!is.na(r$strand), ]
-                }
-                r33 = r[is.na(r$strand), ]
-                r33$insideFeature = replicate(length(r33$name), NA)
-                r33$distancetoFeature = replicate(length(r33$name), NA)
-                if (dim(r11)[1] > 0) {
-                    distancetoFeature = as.numeric(as.character(r11$PeakLoc)) -
-                        as.numeric(as.character(r11$FeatureLoc))
-                    length = as.numeric(as.character(r11$end_position)) -
-                        as.numeric(as.character(r11$start_position))
-                    temp <- Map(as.numeric, Map(as.character, r11[c("peakStart", "peakEnd", "start_position", "end_position")]))
-                    insideFeature <- with(temp, {
-                        insideFeature = character(length(peakEnd))
-                        insideFeature[peakEnd < start_position] <- "upstream"
-                        insideFeature[peakStart > end_position] <- "downstream"
-                        insideFeature[peakStart <= start_position & peakEnd >= end_position] <- "includeFeature"
-                        insideFeature[peakStart < start_position & peakEnd >= start_position & peakEnd < end_position] <- "overlapStart"
-                        insideFeature[peakStart > start_position & peakStart <= end_position & peakEnd > end_position] <- "overlapEnd"
-                        insideFeature[peakStart >= start_position & peakEnd <= end_position] <- "inside"
-                        stopifnot(all(!is.na(insideFeature)))
-                        insideFeature
+            ##myPeakList
+            return(myPeakList)
+        }
+        ###STEP1 get nearst annotation for each peak, use distanceToNearest(query, subject, ignore.strand=T/F, select)
+        ## the distance got here is the shortestDistance
+        ## select could only be arbitrary or all, if it is "first" or "last", use "all" instead.
+        ## if output=="nearest", annotation should only consider the the start point
+#         ignore.strand <- all(strand(myPeakList)=="*") || 
+#             all(strand(TSS.ordered)=="*") || 
+#             all(strand(myPeakList)=="+")
+        nsel <- ifelse(select %in% c("all", "first", "last"), "all", "arbitrary")
+        featureGR <- TSS.ordered
+        end(featureGR) <- start(featureGR) <- switch(FeatureLocForDistance,
+                                                     TSS=ifelse(strand(featureGR)=="-", end(featureGR), start(featureGR)), 
+                                                     geneEnd=ifelse(strand(featureGR)=="-", start(featureGR), end(featureGR)),
+                                                     middle=round(rowMeans(cbind(start(featureGR), end(featureGR)))),
+                                                     start=start(featureGR),
+                                                     end=end(featureGR) 
+            )
+        myPeaksGR <- myPeakList
+#         end(myPeaksGR) <- start(myPeaksGR) <-switch(PeakLocForDistance,
+#                                                     start=ifelse(strand(myPeakList)=="-",
+#                                                                  end(myPeakList),
+#                                                                  start(myPeakList)),
+#                                                     end=ifelse(strand(myPeakList)=="-",
+#                                                                start(myPeakList),
+#                                                                end(myPeakList)),
+#                                                     middle=round(rowMeans(cbind(start(myPeakList), end(myPeakList)))))
+        if(output=="nearestLocation"){
+            dist <- as.data.frame(nearest(myPeaksGR, featureGR, ignore.strand=ignore.strand, select=nsel))            
+            if(nrow(dist)==0) dist[1,] <- NA ##in case no match at all
+            if(nsel=="arbitrary") {
+                dist <- cbind(queryHits=1:length(myPeakList), subjectHits=dist)
+                colnames(dist) <- c("queryHits", "subjectHits")
+            }
+            dist$output <- rep("NearestLocation", nrow(dist))
+        }
+        if(output=="both"){
+            distN <- as.data.frame(nearest(myPeaksGR, featureGR,
+                                           ignore.strand=ignore.strand,
+                                           select=nsel))
+            if(nrow(distN)==0) distN[1,]<-NA
+            if(nsel=="arbitrary") {
+                distN <- cbind(queryHits=1:length(myPeakList), subjectHits=distN)
+                colnames(distN) <- c("queryHits", "subjectHits")
+            }
+            distO <- as.data.frame(findOverlaps(myPeakList, TSS.ordered,
+                                                maxgap=maxgap,
+                                                ignore.strand=ignore.strand,
+                                                select=select))
+            if(nrow(distO)==0) distO[1,]<-NA
+            if(ncol(distO)==1){
+                distO <- cbind(queryHits=1:length(myPeakList), subjectHits=distO)
+                colnames(distO) <- c("queryHits", "subjectHits")
+            }
+            distN$output <- rep("NearestLocation", nrow(distN))
+            distN <- distN[!is.na(distN$subjectHits),]
+            distO$output <- rep("Overlapping", nrow(distO))
+            distO <- distO[!is.na(distO$subjectHits),]
+            dist <- rbind(distN, distO)
+            dist <- dist[!duplicated(dist[,c("queryHits", "subjectHits")]),,drop=FALSE]
+            dist <- dist[order(dist$queryHits, dist$subjectHits),,drop=FALSE]
+        }
+        if(output=="overlapping"){
+            dist <- as.data.frame(findOverlaps(myPeakList, TSS.ordered,
+                                               maxgap=maxgap,
+                                               ignore.strand=ignore.strand,
+                                               select=select))
+            if(nrow(dist)==0) dist[1,] <- NA
+            if(ncol(dist)==1){
+                dist <- cbind(queryHits=1:length(myPeakList), subjectHits=dist)
+                colnames(dist) <- c("queryHits", "subjectHits")
+            }
+            dist$output <- rep("Overlapping", nrow(dist))
+        }
+        if(output=="shortestDistance"){
+            dist <- as.data.frame(nearest(myPeakList, TSS.ordered,
+                                          ignore.strand=ignore.strand,
+                                          select=nsel))
+            if(nrow(dist)==0) dist[1,] <- NA ##in case no match at all
+            if(nsel=="arbitrary") {
+                dist <- cbind(queryHits=1:length(myPeakList), subjectHits=dist)
+                colnames(dist) <- c("queryHits", "subjectHits")
+            }
+            dist$output <- rep("shortestDistance", nrow(dist))
+        }
+        if(output=="upstream&inside"){
+            #upstream
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", start(featureGR), start(featureGR)-max(maxgap, 1))
+            width <- width(featureGR) + max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                                maxgap=0,
+                                                ignore.strand=ignore.strand,
+                                                select=select,
+                                                type="any"))
+            dist$output <- rep("Upstream&Inside", nrow(dist))
+        }
+        if(output=="upstream"){
+            #upstream
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", end(featureGR)+1, start(featureGR)-max(maxgap, 1))
+            width <- max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="any"))
+            dist$output <- rep("Upstream", nrow(dist))
+        }
+        if(output=="inside&downstream"){
+            #downstream
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", start(featureGR)-max(maxgap, 1), start(featureGR))
+            width <- width(featureGR) + max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                                maxgap=0,
+                                                ignore.strand=ignore.strand,
+                                                select=select,
+                                                type="any"))
+            dist$output <- rep("Inside&Downstream", nrow(dist))
+        }
+        if(output=="downstream"){
+            #downstream
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", start(featureGR)-max(maxgap, 1), end(featureGR)+1)
+            width <- max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="any"))
+            dist$output <- rep("Downstream", nrow(dist))
+        }
+        if(output=="upstreamORdownstream"){
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", end(featureGR)+1, start(featureGR)-max(maxgap, 1))
+            width <- max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist1 <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="any"))
+            dist1$output <- rep("Upstream", nrow(dist1))
+            featureGR <- TSS.ordered
+            start <- ifelse(strand(featureGR)=="-", start(featureGR)-max(maxgap, 1), end(featureGR)+1)
+            width <- max(maxgap, 1)
+            start(featureGR) <- start
+            width(featureGR) <- width
+            dist2 <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="any"))
+            dist2$output <- rep("Downstream", nrow(dist2))
+            dist <- rbind(dist1, dist2)
+        }
+        if(output=="inside"){
+            dist <- as.data.frame(findOverlaps(myPeakList, TSS.ordered,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="within"))
+            dist$output <- rep("inside", nrow(dist))
+        }
+        if(output=="upstream2downstream"){
+            featureGR <- TSS.ordered
+            start(featureGR) <- apply(cbind(start(featureGR) - maxgap, 1), 1, max)
+            end(featureGR) <- end(featureGR) + maxgap
+            dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
+                                               maxgap=0,
+                                               ignore.strand=ignore.strand,
+                                               select=select,
+                                               type="any"))
+            dist$output <- rep("upstream2downstream", nrow(dist))
+        }
+##        nearest is NOT filtered by maxgap, is this should be changed?
+##        dist <- dist[!is.na(dist$subjectHits), ]
+##        distance <- distance(myPeakList[dist$queryHits],
+##                             TSS.ordered[dist$subjectHits],
+##                             ignore.strand=ignore.strand)
+##        dist <- dist[abs(distance) <= maxgap, ]
+        myPeakList.Hit <- myPeakList[dist$queryHits[!is.na(dist$subjectHits)]]
+        myPeakList.NA <- myPeakList[!names(myPeakList) %in% names(myPeakList.Hit)]
+        subjectHits <- TSS.ordered[dist$subjectHits[!is.na(dist$subjectHits)]]
+        subjectHits$output <- dist[!is.na(dist$subjectHits),"output"]
+        #    myPeakList.Hit$distanceToNearest <- dist$distance[!is.na(dist$subjectHits)]
+        
+        ###STEP2 get distance for each peak and nearest annotation by distance(x, y)
+        ## the distance is calculated by
+        ##        PeakLocForDistance=c("start","middle","end"),
+        ##        FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd")
+        FeatureLoc<-switch(FeatureLocForDistance,
+                           middle=as.integer(round(rowMeans(cbind(start(subjectHits), end(subjectHits))))),
+                           start=start(subjectHits),
+                           end=end(subjectHits),
+                           geneEnd=as.integer(ifelse(strand(subjectHits)=="-", start(subjectHits), end(subjectHits))),
+                           TSS=as.integer(ifelse(strand(subjectHits)=="-", end(subjectHits), start(subjectHits))))
+        
+        PeakLoc<-switch(PeakLocForDistance,
+                        start=start(myPeakList.Hit),
+                        end=end(myPeakList.Hit),
+                        middle=as.integer(round(rowMeans(cbind(start(myPeakList.Hit), end(myPeakList.Hit))))))
+        
+        distancetoFeature <- as.numeric(ifelse(strand(subjectHits)=="-", FeatureLoc - PeakLoc, PeakLoc - FeatureLoc))
+        
+        ###STEP3 relationship between query and subject:
+        ###   "inside", "overlapEnd", "overlapStart", "includeFeature", "upstream", "downstream"
+        insideFeature <- getRelationship(myPeakList.Hit, subjectHits)
+        myPeakList.Hit$peak <- names(myPeakList.Hit)
+        myPeakList.Hit$feature <- names(subjectHits)
+        myPeakList.Hit$start_position <- start(subjectHits)
+        myPeakList.Hit$end_position <- end(subjectHits)
+        myPeakList.Hit$feature_strand <- as.character(strand(subjectHits))
+        
+        myPeakList.Hit$insideFeature <- insideFeature[, "insideFeature"]
+        myPeakList.Hit$distancetoFeature <- distancetoFeature
+        
+        myPeakList.Hit$shortestDistance <- as.integer(insideFeature[,"shortestDistance"])
+        
+        myPeakList.Hit$fromOverlappingOrNearest <- subjectHits$output
+        ##save oid for select == "first" or "last" filter
+        myPeakList.Hit$oid <- insideFeature[, "ss"]
+        ###combind data of NA with Hits
+        if(length(myPeakList.NA)>0){
+            myPeakList.NA$peak <- names(myPeakList.NA)
+            for(ncol in c("feature",
+                          "start_position",
+                          "end_position",
+                          "feature_strand",
+                          "insideFeature",
+                          "distancetoFeature",
+                          "shortestDistance",
+                          "fromOverlappingOrNearest",
+                          "oid")){
+                mcols(myPeakList.NA)[, ncol] <- NA
+            }
+            myPeakList <- c(myPeakList.Hit, myPeakList.NA)
+        }else{
+            myPeakList <- myPeakList.Hit
+        }
+        ###output the results
+        ##select=c("all", "first", "last", "arbitrary"))
+        ##output = c("nearest", "overlapping", "both")
+        ##if select %in% first or last, must filter the duplicate annotation
+        ##if output="both", must filter the duplicate annotation
+        ###output should be a RangedData or GRanges?
+        ##if input is RangedData, output is RangedData
+        ##if input is GRanges, output is GRanges
+        ###the order of output should be same as input
+        if(select=="first"){
+            myPeakList <- myPeakList[order(names(myPeakList), abs(myPeakList$oid))]
+            myPeakList <- myPeakList[!duplicated(names(myPeakList))]
+        }
+        if(select=="last"){
+            myPeakList <- myPeakList[order(names(myPeakList), -abs(myPeakList$oid))]
+            myPeakList <- myPeakList[!duplicated(names(myPeakList))]
+        }
+        ##remove column oid
+        myPeakList$oid <- NULL
+        ##re-order myPeakList as the original order
+        oid <- 1:length(savedNames)
+        names(oid) <- savedNames
+        oid <- oid[names(myPeakList)]
+        if(!any(is.na(oid))){
+            myPeakList <- myPeakList[order(oid)]
+        }
+        
+
+        if(output=="nearestLocation"){## remove duplicate annotation, just keep the nearest one
+            removeDuplicates <- function(gr){
+                dup <- duplicated(gr$peak)
+                if(any(dup)){
+                    gr$oid <- 1:length(gr)
+                    dup <- gr[dup]
+                    gr.dup <- gr[gr$peak %in% dup$peak] ## bugs peak name must be different.
+                    gr.NOTdup <- gr[!gr$peak %in% dup$peak]
+                    gr.dup <- split(gr.dup, gr.dup$peak)
+                    gr.dup <- lapply(gr.dup, function(.ele){
+                        .ele[.ele$shortestDistance == min(.ele$shortestDistance)]
                     })
-                    r11$insideFeature = insideFeature
-                    r11$distancetoFeature = distancetoFeature
-                    r.n = r11
+                    gr.dup <- unlist(GRangesList(gr.dup))
+                    gr <- c(gr.dup, gr.NOTdup)
+                    gr <- gr[order(gr$oid)]
+                    gr$oid <- NULL  
                 }
-                if ((FeatureLocForDistance == "TSS" || FeatureLocForDistance == "geneEnd") && dim(r22)[1] > 0 ){
-                    distancetoFeature = as.numeric(as.character(r22$FeatureLoc)) -
-                        as.numeric(as.character(r22$PeakLoc))
-                    length = as.numeric(as.character(r22$end_position)) -
-                        as.numeric(as.character(r22$start_position))
-                    temp <- Map(as.numeric, Map(as.character, r22[c("peakStart", "peakEnd", "start_position", "end_position")]))
-                    insideFeature <- with(temp, {
-                        insideFeature = character(length(peakEnd))
-                        insideFeature[peakEnd < start_position] <- "downstream"
-                        insideFeature[peakStart > end_position] <- "upstream"
-                        insideFeature[peakStart <= start_position & peakEnd >= end_position] <- "includeFeature"
-                        insideFeature[peakStart < start_position & peakEnd >= start_position & peakEnd < end_position] <- "overlapEnd"
-                        insideFeature[peakStart > start_position & peakStart <= end_position & peakEnd > end_position] <- "overlapStart"
-                        insideFeature[peakStart >= start_position & peakEnd <= end_position] <- "inside"
-                        stopifnot(all(!is.na(insideFeature)))
-                        insideFeature
-                    })
-                    r22$insideFeature = insideFeature
-                    r22$distancetoFeature = distancetoFeature
-                    if (dim(r11)[1] > 0) {
-                        r.n = rbind(r.n, r22)
-                    }
-                    else {
-                        r.n = r22
-                    }
-                }
-                if (dim(r33)[1] > 0) {
-                    if (dim(r11)[1] > 0 || dim(r22)[1] > 0) {
-                        r.n = rbind(r.n, r33)
-                    }
-                    else {
-                        r.n = r33
-                    }
-                }
-                r.n$fromOverlappingOrNearest = rep("NearestStart",
-                                                   dim(r.n)[1])
-                shortestDistance = pmin(abs(as.numeric(as.character(r.n$start_position)) -
-                                                as.numeric(as.character(r.n$peakEnd))), abs(as.numeric(as.character(r.n$start_position)) -
-                                                                                                as.numeric(as.character(r.n$peakStart))), abs(as.numeric(as.character(r.n$end_position)) -
-                                                                                                                                                  as.numeric(as.character(r.n$peakEnd))), abs(as.numeric(as.character(r.n$end_position)) -
-                                                                                                                                                                                                  as.numeric(as.character(r.n$peakStart))))
-                r.n$shortestDistance = shortestDistance
-                strand = ifelse(is.na(r.n$strand) | as.character(r.n$strand) %in% c("1", "+", "*"), "+", "-")
-                r.n$strand = strand
+                gr
             }
+            myPeakList <- removeDuplicates(myPeakList)
         }
-        if (output == "overlapping" || output == "both" || output == "o" || output == "b") {
-            r.o = findOverlappingPeaks(myPeakList, TSS.ordered, maxgap = maxgap,
-                                       select = select, NameOfPeaks1 = "peak", NameOfPeaks2 = "feature", annotate = 1)$OverlappingPeaks
-            if (dim(r.o)[1] > 0) {
-                r.o$fromOverlappingOrNearest = rep("Overlapping",
-                                                   dim(r.o)[1])
-                if (PeakLocForDistance == "middle" || PeakLocForDistance == "m")
-                {
-                    PeakLoc <- round(rowMeans(apply(r.o[,7:8], 2,as.numeric)))
-                }
-                else if (PeakLocForDistance == "start" || PeakLocForDistance == "s")
-                {
-                    PeakLoc = as.numeric(as.character(r.o[, 7]))
-                }
-                else if (PeakLocForDistance == "end" || PeakLocForDistance == "e")
-                {
-                    PeakLoc = as.numeric(as.character(r.o[, 8]))
-                }
-                else
-                {
-                    PeakLoc = as.numeric(as.character(r.o[, 7]))
-                }
-                if (FeatureLocForDistance == "middle" || FeatureLocForDistance == "m")
-                {
-                    FeatureLoc <- round(rowMeans(apply(r.o[,4:5], 2, as.numeric)))
-                }
-                else if (FeatureLocForDistance == "start" || FeatureLocForDistance == "s")
-                {
-                    FeatureLoc = as.numeric(as.character(r.o[, 4]))
-                }
-                else if (FeatureLocForDistance == "end" || FeatureLocForDistance == "e")
-                {
-                    FeatureLoc = as.numeric(as.character(r.o[, 5]))
-                }
-                else if (FeatureLocForDistance == "geneEnd" || FeatureLocForDistance == "g")
-                {
-                    FeatureLoc <- ifelse(as.character(r.o[, 6]) %in% c("+", "1", "*"),
-                                         as.numeric(as.character(r.o[, 5])), as.numeric(as.character(r.o[, 4])))
-                }
-                else
-                {
-                    FeatureLoc <- ifelse(as.character(r.o[,6]) %in% c("+", "1", "*"),
-                                         as.numeric(as.character(r.o[,4])), as.numeric(as.character(r.o[,5])))
-                }
-                r.o$FeatureLoc = FeatureLoc
-                r.o$PeakLoc = PeakLoc
-                #TSS.ordered$FeatureLoc = FeatureLoc
-                #myPeakList$PeakLoc = PeakLoc
-		strand = ifelse(is.na(r.o$strand) | as.character(r.o$strand) %in% c("1", "+", "*"), "+", "-")
-		r.o$strand = strand
-                distancetoFeature = as.numeric(as.character(r.o$PeakLoc)) -
-                    as.numeric(as.character(r.o$FeatureLoc))
-                negstrand <- ! as.character(r.o[,6]) %in% c("1", "+", "*")
-                distancetoFeature[negstrand] <- -1 * distancetoFeature[negstrand]
-                r.o$distancetoFeature = distancetoFeature
-            }
+
+        if(flagRD){
+            names(myPeakList) <- paste(myPeakList$peak, myPeakList$feature)
+            ##output RangedData
+            myPeakList <- as(myPeakList, "RangedData")
+            ##myPeakList <- myPeakList[!is.na(myPeakList$feature),]
+        }else{
+            names(myPeakList) <- make.names(paste(myPeakList$peak, myPeakList$feature))
         }
-        if (output == "nearestStart" || output == "n" || ((output == "both" || output == "b") && dim(r.o)[1] == 0)) {
-            if (length(r1) > 0) {
-                r.n = as.data.frame(r.n)
-                r.output = RangedData(IRanges(start = as.numeric(as.character(r.n$peakStart)),
-                                              end = as.numeric(as.character(r.n$peakEnd)),
-                                              names = paste(as.character(r.n$name), as.character(r.n$feature_id))),
-                                      peak = as.character(r.n$name), strand = as.character(r.n$strand),
-                                      feature = as.character(r.n$feature_id), start_position = as.numeric(as.character(r.n$start_position)),
-                                      end_position = as.numeric(as.character(r.n$end_position)),
-                                      insideFeature = as.character(r.n$insideFeature),
-                                      distancetoFeature = as.numeric(as.character(r.n$distancetoFeature)),
-                                      shortestDistance = as.numeric(as.character(r.n$shortestDistance)),
-                                      fromOverlappingOrNearest = as.character(r.n$fromOverlappingOrNearest),
-                                      space = as.character(r.n$chr))
-            }else {
-                r.output = myPeakList
-            }
-        }else if ((output == "overlapping" || output == "o") || ((output == "both" || output == "b") && length(r1) == 0)) {
-            if (dim(r.o)[1] > 0) {
-                r.output = RangedData(IRanges(start = as.numeric(as.character(r.o$peak_start)),
-                                              end = as.numeric(as.character(r.o$peak_end)),
-                                              names = paste(as.character(r.o$peak), as.character(r.o$feature))),
-                                      peak = as.character(r.o$peak), strand = as.character(r.o$strand),
-                                      feature = as.character(r.o$feature), start_position = as.numeric(as.character(r.o$feature_start)),
-                                      end_position = as.numeric(as.character(r.o$feature_end)),
-                                      insideFeature = as.character(r.o$overlapFeature),
-                                      distancetoFeature = as.numeric(as.character(r.o$distancetoFeature)),
-                                      shortestDistance = as.numeric(as.character(r.o$shortestDistance)),
-                                      fromOverlappingOrNearest = as.character(r.o$fromOverlappingOrNearest),
-                                      space = as.character(r.o$chr))
-            }
-            else {
-                r.output = myPeakList
-            }
-        }else if (output == "both" || output == "b") {
-            r.n = as.data.frame(r.n)
-            r.n1 = r.n
-            debug = 0
-            if (debug == 0) {
-                
-                r.n = cbind(as.character(r.n$name), as.character(r.n$chr),
-                            as.numeric(as.character(r.n$peakStart)), as.numeric(as.character(r.n$peakEnd)),
-                            as.character(r.n$feature_id), as.numeric(as.character(r.n$start_position)),
-                            as.numeric(as.character(r.n$end_position)), as.character(r.n$strand),
-                            as.character(r.n$insideFeature), as.numeric(as.character(r.n$distancetoFeature)),
-                            as.character(r.n$fromOverlappingOrNearest), as.numeric(as.character(r.n$shortestDistance)))
-                colnames(r.n) = c("name", "chr", "peakStart", "peakEnd",
-                                  "feature_id", "start_position", "end_position",
-                                  "strand", "insideFeature", "distancetoFeature",
-                                  "fromOverlappingOrNearest", "shortestDistance")
-                r.o = cbind(as.character(r.o$peak), as.character(r.o$chr),
-                            as.numeric(as.character(r.o$peak_start)), as.numeric(as.character(r.o$peak_end)),
-                            as.character(r.o$feature), as.numeric(as.character(r.o$feature_start)),
-                            as.numeric(as.character(r.o$feature_end)), as.character(r.o$strand),
-                            as.character(r.o$overlapFeature), as.numeric(as.character(r.o$distancetoFeature)),
-                            as.character(r.o$fromOverlappingOrNearest), as.numeric(as.character(r.o$shortestDistance)))
-                colnames(r.o) = c("name", "chr", "peakStart", "peakEnd",
-                                  "feature_id", "start_position", "end_position",
-                                  "strand", "insideFeature", "distancetoFeature",
-                                  "fromOverlappingOrNearest", "shortestDistance")
-                temp = setdiff(paste(r.o[, 1], r.o[, 5]), paste(r.n[,
-                                                                    1], r.n[, 5]))
-                if (length(temp) > 0) {
-                    r.o.only = r.o[paste(r.o[, 1], r.o[, 5]) %in%
-                                       temp, ]
-                    r.o.only = matrix(r.o.only, ncol = 12)
-                    colnames(r.o.only) = c("name", "chr", "peakStart",
-                                           "peakEnd", "feature_id", "start_position",
-                                           "end_position", "strand", "insideFeature",
-                                           "distancetoFeature", "fromOverlappingOrNearest",
-                                           "shortestDistance")
-                    r.both = as.data.frame(rbind(r.n, r.o.only))
-                    r.output = RangedData(IRanges(start = as.numeric(as.character(r.both$peakStart)),
-                                                  end = as.numeric(as.character(r.both$peakEnd)),
-                                                  names = paste(as.character(r.both$name), as.character(r.both$feature_id))),
-                                          peak = as.character(r.both$name), strand = as.character(r.both$strand),
-                                          feature = as.character(r.both$feature_id),
-                                          start_position = as.numeric(as.character(r.both$start_position)),
-                                          end_position = as.numeric(as.character(r.both$end_position)),
-                                          insideFeature = as.character(r.both$insideFeature),
-                                          distancetoFeature = as.numeric(as.character(r.both$distancetoFeature)),
-                                          shortestDistance = as.numeric(as.character(r.both$shortestDistance)),
-                                          fromOverlappingOrNearest = as.character(r.both$fromOverlappingOrNearest),
-                                          space = as.character(r.both$chr))
-                }else {
-                    r.output = RangedData(IRanges(start = as.numeric(as.character(r.n1$peakStart)),
-                                                  end = as.numeric(as.character(r.n1$peakEnd)),
-                                                  names = paste(as.character(r.n1$name), as.character(r.n1$feature_id))),
-                                          peak = as.character(r.n1$name), strand = as.character(r.n1$strand),
-                                          feature = as.character(r.n1$feature_id), start_position = as.numeric(as.character(r.n1$start_position)),
-                                          end_position = as.numeric(as.character(r.n1$end_position)),
-                                          insideFeature = as.character(r.n1$insideFeature),
-                                          distancetoFeature = as.numeric(as.character(r.n1$distancetoFeature)),
-                                          shortestDistance = as.numeric(as.character(r.n1$shortestDistance)),
-                                          fromOverlappingOrNearest = as.character(r.n1$fromOverlappingOrNearest),
-                                          space = as.character(r.n1$chr))
-                }
-            }
-        }
-        if(oldoutput=="shortestDistance"){
-            dup <- unique(r.output$peak[duplicated(r.output$peak)])
-            dup <- r.output[r.output$peak %in% dup, ]
-            dup$insideFeature <- as.numeric(grepl("stream", dup$insideFeature)) ##all overlaping with distance 0
-            dup <- cbind(rownames(dup), dup$peak, dup$insideFeature, dup$shortestDistance)
-            dup0 <- dup[dup[,3]==0, ,drop=F]
-            dup1 <- dup[dup[,3]==1, ,drop=F]
-            unsel <- dup1[dup1[,2] %in% dup0[,2], 1] ##get the peak name which has overlapping
-            r.output <- r.output[!rownames(r.output) %in% unsel,]
-        }
-        if (returnAsGRanges)
-            r.output <- as(r.output, "GRanges")
-        r.output
+        ##myPeakList
+        return(myPeakList)
     }

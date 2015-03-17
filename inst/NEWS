@@ -1,8 +1,25 @@
+CHANGES IN VERSION 3.0.0
+-------------------------
+NEW FEATURE
+
+     o From RangedData to Granges
+     o High efficiency
+     o Find Overlaps for more than 2 groups 
+     o Add Utility test 
+     o Add new function binOverFeature, egOrgMap.
+
 CHANGES IN VERSION 2.17.2
 ------------------------
 NEW FEATURE
 
     o add byBase for makeVennDiagram.
+
+CHANGES IN VERSION 2.11.4
+------------------------
+NEW FEATURE
+
+    o Add selection of 'shortestDistance' to output parameter of annotatePeakInBatch.
+
 
 CHANGES IN VERSION 2.12.3
 ------------------------

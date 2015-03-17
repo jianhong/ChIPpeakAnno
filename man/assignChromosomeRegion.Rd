@@ -8,7 +8,9 @@ Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 
 Summarizing peak distribution over exon, intron, enhancer, proximal promoter, 5 prime UTR and 3 prime UTR
 }
 \usage{
-assignChromosomeRegion(peaks.RD, exon, TSS, utr5, utr3, proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, nucleotideLevel=FALSE, precedence=NULL, TxDb=NULL)
+assignChromosomeRegion(peaks.RD, exon, TSS, utr5, utr3, 
+         proximal.promoter.cutoff=1000L, immediate.downstream.cutoff=1000L, 
+         nucleotideLevel=FALSE, precedence=NULL, TxDb=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -39,11 +41,10 @@ Specify the cutoff in bases to be classified as immediate downstream. Peaks that
   double count will be enabled, which means that if a peak overlap with both
 promoter and 5'UTR, then both promoter and 5'UTR will be incremented. If a
 precedence order is specified, for example, if promoter is specified before
-5'UTR, then only promoter will be incremented for the same example. Default=NULL}
+5'UTR, then only promoter will be incremented for the same example. 
+The values could be any conbinations of "Promoters", "immediateDownstream", 
+"fiveUTRs", "threeUTRs", "Exons" and "Introns", Default=NULL}
   \item{TxDb}{an object of \code{\link[GenomicFeatures]{TxDb}}}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
 %%  ~Describe the value returned
@@ -54,37 +55,42 @@ precedence order is specified, for example, if promoter is specified before
     \item{\code{threeUTRs}}{Percent of peaks reside in 3 prime UTR regions.}
    \item{\code{Promoter}}{Percent of peaks reside in proximal promoter regions.}
    \item{\code{ImmediateDownstream}}{Percent of peaks reside in immediate downstream regions.}
-   \item{\code{Intergenic.Region}}{Percent of peaks reside in intergenic regions except above regions.}
+   \item{\code{Enhancer.Silencer}}{Percent of peaks reside in enhancer/silencer regions.}
+\item{\code{queryHits}}{GRanges of hitted in each regions.}
 }
 \references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237}
 \author{ Jianhong Ou, Lihua Julie Zhu }
-\note{ 
-}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{annotatePeakInBatch, findOverlappingPeaks,getEnrichedGO, getEnrichedPATH, makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks}
+\seealso{annotatePeakInBatch, findOverlapsOfPeaks,getEnriched, makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks}
 
 \examples{
-if (interactive())
-{
-	library(ChIPpeakAnno)
-	##Display the list of genomes available at UCSC:
-  #library(rtracklayer)
-  #ucscGenomes()[, "db"]
-  ## Display the list of Tracks supported by makeTranscriptDbFromUCSC()
-  #supportedUCSCtables()
-  ##Retrieving a full transcript dataset for Human from UCSC
-  TxDb <- makeTranscriptDbFromUCSC(genome="hg19", tablename="ensGene")
-  exons <- exons(TxDb, columns=NULL)
-  fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
-  Feature.distribution <- assignChromosomeRegion(exons, nucleotideLevel=TRUE, TxDb=TxDb)
-  barplot(Feature.distribution$percentage)
-  assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TxDb=TxDb)
-  data(myPeakList)
-  assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, precedence=c("Promoters", "Exons", "Introns", "fiveUTRs", "threeUTRs", "immediateDownstream"), TxDb=TxDb)
+if (interactive()){
+    ##Display the list of genomes available at UCSC:
+    #library(rtracklayer)
+    #ucscGenomes()[, "db"]
+    ## Display the list of Tracks supported by makeTranscriptDbFromUCSC()
+    #supportedUCSCtables()
+    ##Retrieving a full transcript dataset for Human from UCSC
+    ##TranscriptDb <- 
+    ##     makeTranscriptDbFromUCSC(genome="hg19", tablename="ensGene")
+    if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
+        TxDb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+        exons <- exons(TxDb, columns=NULL)
+        fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
+        Feature.distribution <- 
+            assignChromosomeRegion(exons, nucleotideLevel=TRUE, TxDb=TxDb)
+        barplot(Feature.distribution$percentage)
+        assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TxDb=TxDb)
+        data(myPeakList)
+        assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, 
+                               precedence=c("Promoters", "immediateDownstream", 
+                                            "fiveUTRs", "threeUTRs", 
+                                            "Exons", "Introns"), 
+                               TxDb=TxDb)
+    }
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ misc }
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

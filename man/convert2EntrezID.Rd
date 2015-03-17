@@ -17,22 +17,11 @@ convert2EntrezID(IDs, orgAnn, ID_type="ensembl_gene_id")
   \item{orgAnn}{organism annotation dataset such as org.Hs.eg.db}
   \item{ID_type}{type of ID: can be ensemble_gene_id, gene_symbol or refseq_id}
 }
-\details{
-
-}
 \value{
 vector of entrez ids
 }
-\references{
-}
 \author{
 Lihua Julie Zhu
-}
-\note{
-}
-
-\seealso{
-
 }
 \examples{
 ensemblIDs = c("ENSG00000115956", "ENSG00000071082", "ENSG00000071054",

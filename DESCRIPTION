@@ -3,17 +3,20 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
         ChIP-chip experiments or any experiments resulted in large
         number of chromosome ranges.
-Version: 2.17.2
-Date: 2015-01-04
-Author: Lihua Julie Zhu, Herve Pages, Claude Gazin, Nathan Lawson,
-        Jianhong Ou, Ryan Thompson, Simon Lin, David Lapointe and
+Version: 3.0.0
+Date: 2015-03-12
+Author: Lihua Julie Zhu, Jianhong Ou, Herve Pages, Claude Gazin, 
+        Nathan Lawson, Ryan Thompson, Simon Lin, David Lapointe and
         Michael Green
-Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>
-Depends: R (>= 2.10), grid,VennDiagram, biomaRt, IRanges, Biostrings
+Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>, Jianhong Ou <Jianhong.ou@umassmed.edu>
+Depends: R (>= 2.10), grid, VennDiagram, biomaRt, IRanges, Biostrings, GenomicRanges
 Imports: BiocGenerics (>= 0.1.0), GO.db, BSgenome, GenomicFeatures,
-        AnnotationDbi, limma, multtest
-Suggests: reactome.db, BSgenome.Ecoli.NCBI.20080805, org.Hs.eg.db,
-        gplots, RUnit
+        AnnotationDbi, limma, multtest, RBGL, graph, BiocInstaller, stats
+Suggests: reactome.db, BSgenome.Ecoli.NCBI.20080805, 
+        org.Ce.eg.db, org.Hs.eg.db, 
+        BSgenome.Celegans.UCSC.ce10, BSgenome.Drerio.UCSC.danRer7,
+        TxDb.Hsapiens.UCSC.hg19.knownGene, TxDb.Hsapiens.UCSC.hg38.knownGene, 
+        gplots, RUnit, BiocStyle, rtracklayer
 Description: The package includes functions to retrieve the sequences
         around the peak, obtain enriched Gene Ontology (GO) terms, find
         the nearest gene, exon, miRNA or custom features such as most

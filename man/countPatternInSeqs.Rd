@@ -19,31 +19,21 @@ DNAstringSet object
  a vector of sequences
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
 \value{
 Total number of occurrence of the pattern in the sequences
-}
-\references{
-%% ~put references to the literature/web site here ~
 }
 \author{
 Lihua Julie Zhu
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 summarizePatternInPeaks, translatePattern
 }
 \examples{
 	filepath = system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
 	dict = readDNAStringSet(filepath = filepath, format="fasta", use.names=TRUE)
-	sequences = c("ACTGGGGGGGGCCTGGGCCCCCAAAT", "AAAAAACCCCTTTTGGCCATCCCGGGACGGGCCCAT", "ATCGAAAATTTCC")
+	sequences = c("ACTGGGGGGGGCCTGGGCCCCCAAAT", 
+                "AAAAAACCCCTTTTGGCCATCCCGGGACGGGCCCAT", 
+                "ATCGAAAATTTCC")
 	countPatternInSeqs(pattern=dict[1], sequences=sequences)
 	countPatternInSeqs(pattern=dict[2], sequences=sequences)
 	pattern = DNAStringSet("ATNGMAA")

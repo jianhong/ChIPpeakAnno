@@ -1,5 +1,6 @@
 \name{findOverlappingPeaks}
 \alias{findOverlappingPeaks}
+\alias{findOverlappingPeaks-deprecated}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Find the overlapping peaks for two peak ranges.
@@ -8,9 +9,12 @@ Find the overlapping peaks for two peak ranges.
 Find the overlapping peaks for two input peak ranges.
 }
 \usage{
-findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L, multiple = c(TRUE, FALSE), 
-NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
-select=c("all", "first","last","arbitrary"), annotate = 0)
+findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,
+    minoverlap=1L, multiple = c(TRUE, FALSE), 
+    NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
+    select=c("all", "first","last","arbitrary"), annotate = 0,
+    ignore.strand=TRUE, 
+    connectedPeaks=c("min", "merge"), \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,6 +45,15 @@ all may return multiple overlapping peaks, first will return the first overlappi
 \item{annotate}{
 Include overlapFeature and shortestDistance in the OverlappingPeaks or not. 1 means yes and 0 means no. Default to 0.
 }
+\item{ignore.strand}{
+    When set to TRUE, the strand information is ignored in the overlap calculations.
+  }
+\item{connectedPeaks}{
+  If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as only 1, while set it to "min" will count it as the minimal involved peaks in any concered groups 
+}
+\item{\dots}{
+    Objects of \link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData}: See also \code{\link{findOverlapsOfPeaks}}.
+}
 }
 \details{
 Efficiently perform overlap queries with an interval tree implemented in IRanges.
@@ -55,9 +68,6 @@ Efficiently perform overlap queries with an interval tree implemented in IRanges
 }
 \author{
 Lihua Julie Zhu
-}
-\note{
-
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

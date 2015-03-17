@@ -17,15 +17,16 @@ function(patternFilePath,format="fasta",skip=0L, BSgenomeName, peaks, outfile, a
 		{
 			stop("BSgenomeName is required as BSgenome object!")
 		}
-		if (missing(peaks) || class(peaks) != "RangedData") {
-        		stop("No valid peaks passed in. It needs to be RangedData object.")
+		if (missing(peaks) || (class(peaks) != "RangedData" && class(peaks) !="GRanges")) {
+        		stop("No valid peaks passed in. It needs to be RangedData or GRanges object.")
     		}
+        if(class(peaks)=="RangedData") peaks <- toGRanges(peaks, format="RangedData")
 		if (!missing(outfile) && file.exists(outfile) && !append)
 		{
 			stop("outfile specified as ", outfile, " already exists! Please rename the outfile or set append = TRUE!")
 		}
 		seq = getAllPeakSequence(peaks, upstream = 0, downstream = 0, genome=BSgenomeName)
-		n.peaks = dim(peaks)[1]
+		n.peaks = length(peaks)
 
 		dict = readDNAStringSet(patternFilePath, format, use.names=TRUE)
  

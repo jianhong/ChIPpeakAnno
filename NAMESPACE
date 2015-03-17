@@ -3,6 +3,11 @@ importFrom(biomaRt, useMart, getBM, getSequence)
 importFrom(multtest, mt.rawp2adjp)
 importFrom(limma, vennCounts,vennDiagram)
 importFrom(stats, phyper)
+importClassFrom(graph, "graphNEL")
+importFrom(graph, ugraph)
+importFrom(RBGL, 
+           connectedComp)
+importFrom(BiocInstaller, biocLite)
 import(IRanges)
 import(Biostrings)
 import(BSgenome)
@@ -10,5 +15,32 @@ import(GO.db)
 import(grid)
 import(VennDiagram)
 import(GenomicFeatures)
+import(GenomicRanges)
 importMethodsFrom(AnnotationDbi, mget, get)
-export(getAnnotation, annotatePeakInBatch, assignChromosomeRegion, getAllPeakSequence, write2FASTA, getEnrichedGO,getEnrichedPATH, getUniqueGOidCount, hyperGtest,convert2EntrezID, addAncestors, BED2RangedData, GFF2RangedData, makeVennDiagram, findOverlappingPeaks,peaksNearBDP,summarizePatternInPeaks,countPatternInSeqs,translatePattern, addGeneIDs,condenseMatrixByColnames)
+export( 
+       addAncestors,  
+       addGeneIDs,
+       annotatePeakInBatch, 
+       assignChromosomeRegion, 
+       BED2RangedData, 
+       binOverFeature,
+       condenseMatrixByColnames, 
+       convert2EntrezID,
+       countPatternInSeqs,
+       egOrgMap,
+       findOverlappingPeaks,
+       findOverlapsOfPeaks,
+       getAllPeakSequence, 
+       getAnnotation, 
+       getEnrichedGO,
+       getEnrichedPATH, 
+       getUniqueGOidCount, 
+       getVennCounts,
+       GFF2RangedData, 
+       hyperGtest,
+       makeVennDiagram, 
+       peaksNearBDP,
+       summarizePatternInPeaks,
+       toGRanges, 
+       translatePattern,
+       write2FASTA)

@@ -1,357 +1,198 @@
-makeVennDiagram <-
-function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, useFeature=FALSE, byBase=FALSE, ...)
-{
-	if (missing(totalTest))
-	{
-		stop("Missing totalTest which is required! The parameter totalTest is the total number of possible Peaks in the testing space.")
-	}
-	if (missing(Peaks))
-	{
-		stop("Missing Peaks which is a list of peaks in RangedData!")
-	}
-	if (missing(NameOfPeaks) ||  mode(NameOfPeaks) != "character")
-	{
-		stop("Missing required character vector NameOfPeaks")
-	}
-	n1 = length(Peaks)
-	n2 = length(NameOfPeaks)
-	if (n1 <2)
-	{
-		stop("The number of element in NameOfPeaks is less than 1, need at least 2 peak ranges!")
-	}
-	if (n1 > n2)
-	{
-		stop("The number of element in NameOfPeaks is less than the number of elements in Peaks, need to be equal!")
-	}
-	if (n1 < n2)
-	{
-		stop("The number of element in NameOfPeaks is larger than the number of elements in Peaks, need to be equal!")
-	}
-	NameOfPeaks <- make.names(NameOfPeaks, unique=TRUE, allow_=TRUE)
-	lapply(seq_len(n1), function(i)
-	{
-		if (class(Peaks[[i]]) != "RangedData")
-		{
-			err.msg = paste("Element", i, "in Peaks is not a valid RangedData object", sep=" ")
-			stop(err.msg)
-		}
-	})
-	for(i in seq_len(n1))
-	{	
-		if (!length(rownames(Peaks[i])))
-		{
-			rownames(Peaks[[i]]) = formatC(1:dim(Peaks[[i]])[1], width=nchar(dim(Peaks[[i]])[1]), flag='0')
-		}		
-	}
-	getCountsList<-function(counts){
-		CountsList <- list()
-		cnt <- 1
-		for(i in 1:length(counts)){
-            .lengthout <- counts[i]
-            if(.lengthout<0 || is.null(.lengthout) || is.na(.lengthout)) {
-              .lengthout <- 0
-                warning("count less than 0, Please update your totalTest.")
-            }
-			CountsList[[i]] <- seq(cnt, length.out=.lengthout)
-			cnt <- cnt+.lengthout
-		}
-		CountsList
-	}
-	getVennList<-function(a, NameOfPeaks, CountsList){
-		.x<-lapply(NameOfPeaks, function(.ele, cl, a){
-			   .y<-c()
-			   for(i in 1:nrow(a)){
-				if(a[i,.ele]!=0) .y <- c(.y, cl[[i]])
-			   }
-			   .y
-			   }, CountsList, a)
-		names(.x)<-NameOfPeaks
-		.x
-	}
-	plotVenn<-function(a, NameOfPeaks, countsColName="Counts", cat.cex = 1, 
-					   cat.col = "black", cat.fontface = "plain", cat.fontfamily = "serif", ...){
-        op=par(mar=c(0,0,0,0))
-        on.exit(par(op))
-        plot.new()
-		Counts <- getCountsList(a[,countsColName])
-		vennx <- getVennList(a, NameOfPeaks, Counts)
-		venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = 1, 
-								 cat.col = "black", cat.fontface = "plain", cat.fontfamily = "serif", ...)
-		tmp <- textGrob(label=a[1,countsColName], x=0.9, y=0.1, gp=gpar(col = cat.col, cex = cat.cex, 
-																		 fontface = cat.fontface, fontfamily = cat.fontfamily))
-		venngrid <- gList(venngrid, tmp)
-		grid.draw(venngrid)
-	}
-    if(byBase){
-        ignore.strand <- FALSE
-        for(i in 1:n1){
-            rownames(Peaks[[i]]) <- paste(NameOfPeaks[i], rownames(Peaks[[i]]), sep="___conn___")
-            if(is.null(Peaks[[i]]$strand)) ignore.strand <- TRUE
-        }
-        if(ignore.strand){
-            Peaks.ir <- lapply(Peaks, function(.ele){
-                .ele <- .ele@ranges
-                names(.ele) <- NULL
-                unlist(.ele)
-            })
-            Peaks.ir <- list("*"=unlist(IRangesList(Peaks.ir)))
-        }else{
-            Peaks <- unlist(Peaks)
-            Peaks.ir <- split(Peaks, Peaks$strand)
-            Peaks.ir <- lapply(Peaks.ir, function(.ele){
-                .ele <- .ele@ranges
-                names(.ele) <- NULL
-                unlist(.ele)
-            })
-        }
-        ncontrasts <- n1
-        noutcomes <- 2^ncontrasts
-        outcomes <- matrix(0,noutcomes,ncontrasts)
-        colnames(outcomes) <- NameOfPeaks
-        for (j in 1:ncontrasts)
-            outcomes[,j] <- rep(0:1,times=2^(j-1),each=2^(ncontrasts-j))
-        idx <- apply(outcomes, 1, paste, collapse="")
-        cnt <- lapply(Peaks.ir, function(.ele){
-            disj <- disjoin(.ele)
-            ol <- findOverlaps(.ele, disj)
-            ol.query <- .ele[queryHits(ol)]
-            ol.subject <- disj[subjectHits(ol)]
-            group <- gsub("___conn___.*$", "", names(ol.query))
-            subject <- subjectHits(ol)
-            gps <- split(group, subject)
-            xlist <- list()
-            for(i in 1:ncontrasts)
-                xlist[[i]] <- factor(as.numeric(sapply(gps, function(.ele) NameOfPeaks[ncontrasts-i+1] %in% .ele)), levels=c(0,1))
-            counts <- do.call(cbind, xlist)
-            counts <- counts - 1
-            counts <- apply(counts, 1, paste, collapse="")
-            wids <- width(disj[as.numeric(names(gps))])
-            wids <- split(wids, counts)
-            wids <- wids[idx]
-            names(wids) <- idx
-            counts <- sapply(wids, sum)
-        })
-        cnt <- do.call(cbind, cnt)
-        cnt <- rowSums(cnt)
-        a2 <- cbind(outcomes, Counts=cnt)
-        
-        getPval<-function(venn_cnt, totalTest){
-            n <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
-            s <- apply(venn_cnt[,1:n], 1, sum)
-            venn_cnt_s <- venn_cnt[s==2, , drop=FALSE]
-            for(i in 1:nrow(venn_cnt_s)){
-                venn_cnt_s[i,n+1] <- sum(venn_cnt[as.numeric(venn_cnt[,1:n]%*%venn_cnt_s[i,1:n])==2,n+1,drop=TRUE])
-            }
-            cnt <- venn_cnt[,n+1]
-            cnt_s <- apply(venn_cnt[,1:n], 2, function(.ele){
-                sum(cnt[as.logical(.ele)])
-            })
-            p.value <- apply(venn_cnt_s, 1, function(.ele){
-                ab <- cnt_s[as.logical(.ele[1:n])]
-                a <- ab[1]
-                b <- ab[2]
-                a.and.b <- .ele[(n+1)]
-                phyper <- phyper(a.and.b-1, b, totalTest-b, a, lower.tail=FALSE, log.p=FALSE)
-            })
-            cbind(venn_cnt_s[, 1:n, drop=FALSE], pval=p.value)
-        }
-        
-        p.value <- getPval(a2, totalTest)
-        plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName="Counts", ...)
-        return(list(p.value=p.value, vennCounts=a2))
+makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, 
+                            totalTest, by=c("region", "feature", "base"), 
+                            ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"), ...){
+  ###Functions to be used
+  getCountsList<-function(counts){
+    CountsList <- list()
+    cnt <- 1
+    for(i in 1:length(counts)){
+      CountsList[[i]] <- seq(cnt, length.out=counts[i])
+      cnt <- cnt+counts[i]
     }
-	if (n1 == 2)
-	{
-		x = findVennCounts(Peaks=Peaks,NameOfPeaks=NameOfPeaks,maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
-		a2 = x$vennCounts
-		p.value = x$p.value		
-		plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName="Counts", ...)
-		list(p.value=p.value,vennCounts=a2)
-	}
-	else if (n1 == 3)
-	{
-		a1 = cbind(c(0, 0, 0,0,1, 1,1,1), c(0, 0,1,1, 0,0,1, 1),c(0,1,0,1,0,1,0,1))
-		colnames(a1) = NameOfPeaks
-		a2 = vennCounts(a1)
-		x1 = findVennCounts(list(Peaks[[1]],Peaks[[2]]), NameOfPeaks=NameOfPeaks[1:2], maxgap=maxgap, minoverlap=minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.1vs2 = x1$p.value
-		counts1 = x1$vennCounts
-		p1.and.p2 = counts1[4,3]
-		
-		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.1vs3 = x2$p.value
-		counts2 = x2$vennCounts	
-		p1.and.p3 = counts2[4,3]
-		
-		x3 = findVennCounts(list(Peaks[[2]],Peaks[[3]]), NameOfPeaks=NameOfPeaks[2:3], maxgap=maxgap,
-				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.2vs3 = x3$p.value
-		counts3 = x3$vennCounts
-		p2.and.p3 = counts3[4,3]
-		
-		if(!useFeature)
-		{
-			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, minoverlap = minoverlap,  select="first")$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap,
-				 minoverlap = minoverlap, select="first")$OverlappingPeaks
-			p1.and.p2.and.p3 = length(unique(overlappingPeaks123[[NameOfPeaks[1]]]))
-		
-			p1 = length(rownames(Peaks[[1]]))
-			p2 = length(rownames(Peaks[[2]]))
-			p3 = length(rownames(Peaks[[3]]))
-		}
-		else
-		{
-			if (length(Peaks[[1]]$feature) ==0 || length(Peaks[[2]]$feature) ==0 ||  length(Peaks[[3]]$feature) ==0)
-			{
-				warning("feature field in at least one of the Peaks RangedData has 0 elements!")				
-			}
-			p1.and.p2.and.p3 = length(intersect(intersect(Peaks[[1]]$feature, Peaks[[2]]$feature),Peaks[[3]]$feature))
-			p1 = length(unique(Peaks[[1]]$feature))
-			p2 = length(unique(Peaks[[2]]$feature))	
-			p3 = length(unique(Peaks[[3]]$feature))
-		}
-		p1only = p1 - p1.and.p2 - p1.and.p3 + p1.and.p2.and.p3
-		p2only = p2 - p1.and.p2 - p2.and.p3 + p1.and.p2.and.p3
-		p3only = p3 - p2.and.p3 - p1.and.p3 + p1.and.p2.and.p3
-		if (p1only <0 || p2only <0 || p3only <0)
-		{
-			warning("negative counts generated when multiple peaks overlap with one peak!")
-		}	
-		neither123 = totalTest -p1only - p2only - p3only - p1.and.p2 - p1.and.p3 - p2.and.p3 + 2 * p1.and.p2.and.p3
-		
-		Counts =c(neither123,p3only,p2only,p2.and.p3-p1.and.p2.and.p3, p1only, p1.and.p3-p1.and.p2.and.p3, p1.and.p2-p1.and.p2.and.p3,p1.and.p2.and.p3)
-        Counts[Counts<0] <- 0 ##abnormal value here <---
-		a2[,4] = Counts
-		plotVenn(a2, NameOfPeaks=NameOfPeaks, countsColName=4, ...)
-		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, vennCounts=a2)
-	}
-	else if(n1 == 4)
-        {
-		a1 = cbind(c(0, 0, 0,0,0, 0, 0,0,1, 1,1,1,1, 1,1,1), c(0, 0,1,1,0, 0,1,1,0, 0,1,1, 0,0,1, 1),c(0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1), c(0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1))
-		colnames(a1) = NameOfPeaks
-		a2 = vennCounts(a1)
-		x1 = findVennCounts(list(Peaks[[1]],Peaks[[2]]), NameOfPeaks=NameOfPeaks[1:2], maxgap=maxgap,
-				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.1vs2 = x1$p.value
-		counts1 = x1$vennCounts
-		p1.and.p2 = counts1[4,3]
-		
-		x2 = findVennCounts(list(Peaks[[1]],Peaks[[3]]), NameOfPeaks=c(NameOfPeaks[1], NameOfPeaks[3]), maxgap=maxgap, minoverlap = minoverlap,	totalTest=totalTest,useFeature=useFeature)
-		p.value.1vs3 = x2$p.value
-		counts2 = x2$vennCounts	
-		p1.and.p3 = counts2[4,3]
-		
-		x3 = findVennCounts(list(Peaks[[2]],Peaks[[3]]), NameOfPeaks=NameOfPeaks[2:3], maxgap=maxgap,
-			minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.2vs3 = x3$p.value
-		counts3 = x3$vennCounts
-		p2.and.p3 = counts3[4,3]
-		
-		x4 =findVennCounts(list(Peaks[[3]],Peaks[[4]]), NameOfPeaks=NameOfPeaks[3:4], maxgap=maxgap,
-				minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.3vs4 = x4$p.value
-		counts4 = x4$vennCounts
-		p3.and.p4 = counts4[4,3]
-		
-		x5 = findVennCounts(list(Peaks[[1]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[1],NameOfPeaks[4]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.1vs4 = x5$p.value
-		counts5 = x5$vennCounts
-		p1.and.p4 = counts5[4,3]
-		
-		x6 = findVennCounts(list(Peaks[[2]],Peaks[[4]]), NameOfPeaks=c(NameOfPeaks[2],NameOfPeaks[4]), maxgap=maxgap, minoverlap = minoverlap, totalTest=totalTest,useFeature=useFeature)
-		p.value.2vs4 = x6$p.value
-		counts6 = x6$vennCounts
-		p2.and.p4 = counts6[4,3]		
-		
-		if (!useFeature)
-		{
-			overlappingPeaks123 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap, minoverlap = minoverlap, select="first")$Peaks1withOverlap,
-				Peaks[[3]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3],maxgap=maxgap,
-				 minoverlap = minoverlap, select="first")
-			p1.and.p2.and.p3 = length(unique(overlappingPeaks123$OverlappingPeaks[[NameOfPeaks[1]]]))
-		
-			overlappingPeaks124 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[2]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[2], maxgap=maxgap,  minoverlap = minoverlap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
-				 minoverlap = minoverlap, select="first")$OverlappingPeaks
-			p1.and.p2.and.p4 = length(unique(overlappingPeaks124[[NameOfPeaks[1]]]))
-		
-			overlappingPeaks234 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[2]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap, minoverlap = minoverlap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[2], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
-				 minoverlap = minoverlap, select="first")$OverlappingPeaks
-			p2.and.p3.and.p4 = length(unique(overlappingPeaks234[[NameOfPeaks[2]]]))
-		
-			overlappingPeaks134 = findOverlappingPeaks(
-				findOverlappingPeaks(Peaks[[1]],Peaks[[3]],NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[3], maxgap=maxgap,  minoverlap = minoverlap, select="first")$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap,
-				 minoverlap = minoverlap, select="first")$OverlappingPeaks
-			p1.and.p3.and.p4 = length(unique(overlappingPeaks134[[NameOfPeaks[1]]]))
-				
-			overlappingPeaks1234 = findOverlappingPeaks(overlappingPeaks123$Peaks1withOverlap,
-				Peaks[[4]], NameOfPeaks1 = NameOfPeaks[1], NameOfPeaks2=NameOfPeaks[4],maxgap=maxgap, minoverlap = minoverlap,  select="first")$OverlappingPeaks
-			p1.and.p2.and.p3.and.p4 = length(unique(overlappingPeaks1234[[NameOfPeaks[1]]]))
-		
-			p1 = length(rownames(Peaks[[1]]))
-			p2 = length(rownames(Peaks[[2]]))
-			p3 = length(rownames(Peaks[[3]]))
-			p4 = length(rownames(Peaks[[4]]))
-		}
-		else
-		{
-			if (length(Peaks[[1]]$feature) ==0 || length(Peaks[[2]]$feature) ==0 ||  length(Peaks[[3]]$feature) ==0 || length(Peaks[[4]]$feature) ==0)
-			{
-				warning("feature field in at least one of the Peaks RangedData has 0 elements!")				
-			}
-			p1.and.p2.and.p3 = length(intersect(intersect(Peaks[[1]]$feature, Peaks[[2]]$feature),Peaks[[3]]$feature))
-			p1.and.p2.and.p4 = length(intersect(intersect(Peaks[[1]]$feature, Peaks[[2]]$feature),Peaks[[4]]$feature))
-			p2.and.p3.and.p4 = length(intersect(intersect(Peaks[[2]]$feature, Peaks[[3]]$feature),Peaks[[4]]$feature))
-			p1.and.p3.and.p4 = length(intersect(intersect(Peaks[[1]]$feature, Peaks[[3]]$feature),Peaks[[4]]$feature))
-			p1.and.p2.and.p3.and.p4 = length(intersect(intersect(intersect(Peaks[[1]]$feature, Peaks[[2]]$feature),Peaks[[3]]$feature),Peaks[[4]]$feature))
-			
-			p1 = length(unique(Peaks[[1]]$feature))
-			p2 = length(unique(Peaks[[2]]$feature))	
-			p3 = length(unique(Peaks[[3]]$feature))
-			p4 = length(unique(Peaks[[4]]$feature))
-		}
-
-		p1only = p1 - p1.and.p2 - p1.and.p3 + p1.and.p2.and.p3 - p1.and.p4 + p1.and.p2.and.p4 + p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4
-		p2only =  p2 - p1.and.p2 - p2.and.p3 + p1.and.p2.and.p3 - p2.and.p4 + p2.and.p3.and.p4 + p1.and.p2.and.p4 - p1.and.p2.and.p3.and.p4
-		p3only =  p3 - p1.and.p3 - p2.and.p3 + p1.and.p2.and.p3 - p3.and.p4 + p2.and.p3.and.p4 + p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4
-		p4only =  p4 - p1.and.p4 - p2.and.p4 + p1.and.p2.and.p4 - p3.and.p4 + p2.and.p3.and.p4 + p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4
-	
-		 if (p1only <0 || p2only <0 || p3only <0 || p4only <0)
-                {
-                        warning("negative counts generated when multiple peaks overlap with one peak!")
+    CountsList
+  }
+  getVennList<-function(a, NameOfPeaks, CountsList){
+    .x<-lapply(NameOfPeaks, function(.ele, cl, a){
+      .y<-c()
+      for(i in 1:nrow(a)){
+        if(a[i,.ele]!=0) .y <- c(.y, cl[[i]])
+      }
+      .y
+    }, CountsList, a)
+    names(.x)<-NameOfPeaks
+    .x
+  }
+  plotVenn<-function(venn_cnt, vennx, otherCounts=NULL, cat.cex = 1, cat.col = "black", 
+                     cat.fontface = "plain", cat.fontfamily = "serif", ...){
+    op=par(mar=c(0,0,0,0))
+    on.exit(par(op))
+    plot.new()
+    venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = cat.cex,
+                             cat.col = cat.col, cat.fontface = cat.fontface, 
+                             cat.fontfamily = cat.fontfamily, ...)
+    if(grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)]) && connectedPeaks=="keepAll"){
+        n <- which(colnames(venn_cnt)=="Counts")-1
+        venn_cnt.Counts.gt.1 <- rowSums(venn_cnt[ ,1:n]) > 1
+        counts <- venn_cnt[-1,"Counts"]
+        counts <- counts[counts!=0]
+        if(!any(duplicated(counts))){## there is no duplicated counts number
+            w <- 1
+            for(i in 1:length(venngrid)){
+                if(inherits(venngrid[[i]], what="text") && w<nrow(venn_cnt)){
+                    w <- w+1
+                    cnt <- as.numeric(venngrid[[i]]$label)
+                    if(!is.na(cnt) && cnt!=0){
+                        j <- which(venn_cnt[,n+1]==cnt)
+                        if(venn_cnt.Counts.gt.1[j]){
+                            labels <- venn_cnt[j, -(1:(n+1))]
+                            if(nrow(venn_cnt)==4 && sum(venn_cnt[,4]) < sum(venn_cnt[,5])){
+                                ## the venn diagrame will always show small one in the right
+                                labels <- rev(labels)
+                            }
+                            labels <- paste(as.character(labels[labels>0]), collapse="/", sep="")
+                            if(labels!="") venngrid[[i]]$label <- paste(venngrid[[i]]$label, "(", labels, ")", sep="")
+                        }
+                    }
                 }
-	
-		neither1234 = totalTest - ( p1 + p2 - p1.and.p2 + p3only + p4only + p3.and.p4
-				- p1.and.p3.and.p4 - p2.and.p3.and.p4 + p1.and.p2.and.p3.and.p4)
-		Counts =c(neither1234, p4only, p3only, p3.and.p4 - p1.and.p3.and.p4 - p2.and.p3.and.p4 + p1.and.p2.and.p3.and.p4, p2only, p2.and.p4 - p2.and.p3.and.p4 - p1.and.p2.and.p4 + p1.and.p2.and.p3.and.p4, p2.and.p3 - p2.and.p3.and.p4 - p1.and.p2.and.p3 + p1.and.p2.and.p3.and.p4, 
-p2.and.p3.and.p4 - p1.and.p2.and.p3.and.p4, p1only,
-		p1.and.p4 - p1.and.p3.and.p4 - p1.and.p2.and.p4 + p1.and.p2.and.p3.and.p4,
-		p1.and.p3 - p1.and.p3.and.p4 - p1.and.p2.and.p3 + p1.and.p2.and.p3.and.p4,
-		p1.and.p3.and.p4 - p1.and.p2.and.p3.and.p4,
-		p1.and.p2 - p1.and.p2.and.p3 - p1.and.p2.and.p4 + p1.and.p2.and.p3.and.p4,
-		p1.and.p2.and.p4 - p1.and.p2.and.p3.and.p4,
-		p1.and.p2.and.p3 - p1.and.p2.and.p3.and.p4,
-		p1.and.p2.and.p3.and.p4
-		)
-        Counts[Counts<0] <- 0 ##abnormal value here <---
-		a2[,5] = Counts	
-		a = cbind(a2[,5], a2[,1:4])
-		colnames(a)[1]="num"
-		#vennDiagram(a2, names = NameOfPeaks)
-		rownames(a)=c("0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010",
-		 "1011", "1100", "1101", "1110", "1111")
-		plotVenn(a, NameOfPeaks=NameOfPeaks, countsColName=1, ...)
-		list(p.value.1vs2 = p.value.1vs2, p.value.1vs3 = p.value.1vs3, p.value.2vs3 = p.value.2vs3, p.value.1vs4= p.value.1vs4, p.value.2vs4= p.value.2vs4, p.value.3vs4= p.value.3vs4, vennCounts=a2)
-	}	
-	else
-	{
-		stop("Larger than 4 lists are not implemented yet")
-	}
+            }
+        }else{##otherwise guess the order of the number, Bugs, the map order maybe wrong
+            j <- 1
+            map <- switch(as.character(nrow(venn_cnt)),
+                          '4'=c(3, 4, 2),
+                          '8'=c(5, 7, 3, 6, 8, 4, 2),
+                          '16'=c(3, 4, 2, 11, 12, 16, 8, 6, 9, 10, 14, 15, 7, 5, 13),
+                          '32'=c(17, 9, 5, 3, 2, 6, 18, 19, 25, 10, 13, 21, 7, 11, 4, 8, 22, 20, 27, 26, 30, 29, 23, 15, 12, 16, 24, 28, 30, 31, 32))
+            for(i in 1:length(venngrid)){
+                if(inherits(venngrid[[i]], what="text") && j<length(map)){
+                    while(j < length(map) && as.numeric(venngrid[[i]]$label) != venn_cnt[map[j],n+1]) j <- j+1
+                    if(as.numeric(venngrid[[i]]$label) == venn_cnt[map[j],n+1] && j <= length(map)){
+                        if(venn_cnt.Counts.gt.1[map[j]]){
+                            labels <- venn_cnt[map[j], -(1:(n+1))]
+                            labels <- paste(as.character(labels[labels>0]), collapse="/", sep="")
+                            if(labels!="") venngrid[[i]]$label <- paste(venngrid[[i]]$label, "(", labels, ")", sep="")
+                        }
+                        j <- j+1
+                    }
+                }
+            }
+        }
+    }
+    if(!is.null(otherCounts)){
+      tmp <- textGrob(label=otherCounts, x=0.9, y=0.1, gp=gpar(col = cat.col, cex = cat.cex, 
+                                                                    fontface = cat.fontface, fontfamily = cat.fontfamily))
+      venngrid <- gList(venngrid, tmp)
+    }
+    grid.draw(venngrid)
+  }
+  getPval<-function(venn_cnt, totalTest){
+    n <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
+    s <- apply(venn_cnt[,1:n], 1, sum)
+    venn_cnt_s <- venn_cnt[s==2, , drop=FALSE]
+	  for(i in 1:nrow(venn_cnt_s)){
+		  venn_cnt_s[i,n+1] <- sum(venn_cnt[as.numeric(venn_cnt[,1:n]%*%venn_cnt_s[i,1:n])==2,n+1,drop=TRUE])
+	  }
+    cnt <- venn_cnt[,n+1]
+    cnt_s <- apply(venn_cnt[,1:n], 2, function(.ele){
+      sum(cnt[as.logical(.ele)])
+    })
+    p.value <- apply(venn_cnt_s, 1, function(.ele){
+      ab <- cnt_s[as.logical(.ele[1:n])]
+      a <- ab[1]
+      b <- ab[2]
+      a.and.b <- .ele[(n+1)]
+      phyper <- phyper(a.and.b-1, b, totalTest-b, a, lower.tail=FALSE, log.p=FALSE)
+    })
+    cbind(venn_cnt_s[, 1:n, drop=FALSE], pval=p.value)
+  }
+  ###check inputs
+  if (missing(totalTest))
+  {
+    message("Missing totalTest! totalTest is required for HyperG test. 
+If totalTest is missing, pvalue will be calculated by estimating 
+the total binding sites of encoding region of human.
+totalTest = humanGenomeSize * (2%(codingDNA) + 1%(regulationRegion)) / ( 2 * averagePeakWidth )
+          = 3.3e+9 * 0.03 / ( 2 * averagePeakWidth)
+          = 5e+7 /averagePeakWidth")
+  }
+  if (missing(Peaks))
+  {
+    stop("Missing Peaks which is a list of peaks in RangedData or GRanges!")
+  }
+  connectedPeaks <- match.arg(connectedPeaks)
+  by <- match.arg(by)
+  n1 = length(Peaks)
+  olout_flag <- FALSE
+  if(class(Peaks)=="overlappingPeaks"){
+    if(!is.null(Peaks$venn_cnt) && class(Peaks$venn_cnt)=="VennCounts"){
+        venn_cnt <- Peaks$venn_cnt
+        n1 <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
+        if(missing(NameOfPeaks)){
+            NameOfPeaks <- colnames(venn_cnt)[1:n1]
+        }
+        olout_flag <- TRUE
+    }else{
+        stop("Input is object of overlappingPeaks. But it does not have venn counts data.")
+    }
+  }
+  if (missing(NameOfPeaks) ||  mode(NameOfPeaks) != "character")
+  {
+    warning("Missing required character vector NameOfPeaks. NameOfPeaks will be extract from the names of input Peaks.")
+    NameOfPeaks <- names(Peaks)
+    if(is.null(NameOfPeaks)){
+      NameOfPeaks <- paste("peaks", 1:length(Peaks), sep="")
+    }
+  }
+  n2 = length(NameOfPeaks)
+  if (n1 <2)
+  {
+    stop("The number of element in Peaks is less than 1, need at least 2 peak ranges!")
+  }
+  if (n1 > 5) stop("The length of input peaks list should no more than 5")
+  if (n1 > n2)
+  {
+     stop("The number of element in NameOfPeaks is less than the number of elements in Peaks, need to be equal!")
+  }
+  if (n1 < n2)
+  {
+    warning("The number of element in NameOfPeaks is larger than the number of elements in Peaks! NameOfPeaks will be cut by the length of Peaks")
+    NameOfPeaks <- NameOfPeaks[1:n1]
+  }
+  NameOfPeaks <- make.names(NameOfPeaks, unique=TRUE, allow_=TRUE)
+  if(!olout_flag){
+      for(i in seq_len(n1)){
+        if (!inherits(Peaks[[i]], c("RangedData", "GRanges")))
+        {
+          err.msg = paste("Element", i, "in Peaks is not a valid RangedData or GRanges object", sep=" ")
+          stop(err.msg)
+        }
+        if (inherits(Peaks[[i]], "RangedData")) Peaks[[i]] <- toGRanges(Peaks[[i]], format="RangedData")
+        if (is.null(names(Peaks[[i]]))) names(Peaks[[i]]) <-  formatC(1:length(Peaks[[i]]), width=nchar(length(Peaks[[i]])), flag="0")
+      }
+      if(!missing(totalTest)){
+          if(totalTest < max(sapply(Peaks, length))){
+              stop("totaltest specifies the total number of possible peaks in the testing space. It should be larger than the largest peak numbers in the input sets. Please see more details at http://pgfe.umassmed.edu/ChIPpeakAnno/FAQ.html")
+          }
+      }
+      names(Peaks) <- NameOfPeaks
+      venn_cnt <- getVennCounts(Peaks, maxgap=maxgap, minoverlap=minoverlap, by=by, ignore.strand=ignore.strand, connectedPeaks=connectedPeaks)
+  }
+  colnames(venn_cnt)[1:n1] <- NameOfPeaks 
+  Counts <- getCountsList(venn_cnt[,"Counts"])
+  vennx <- getVennList(venn_cnt, NameOfPeaks, Counts)
+  if(!missing(totalTest)){
+    otherCount <- totalTest - sum(venn_cnt[, "Counts"])
+    venn_cnt[1, "Counts"] <- otherCount
+    p.value <- getPval(venn_cnt, totalTest)
+  }else{
+    otherCount <- venn_cnt[1, "Counts"]
+    if(class(Peaks)=="overlappingPeaks"){
+        averagePeakWidth = median(unlist(lapply(Peaks$peaklist, width)))
+    }else{
+        averagePeakWidth = median(unlist(lapply(Peaks, width))) 
+    }
+    
+    p.value <- getPval(venn_cnt, round(5e+7/averagePeakWidth))
+  }
+  plotVenn(venn_cnt, vennx, otherCount=otherCount, ...)
+  return(list(p.value=p.value, vennCounts=venn_cnt))
 }

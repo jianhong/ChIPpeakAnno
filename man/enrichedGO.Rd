@@ -76,18 +76,7 @@
 }
 }
 }
-\details{
-
-}
-\source{
-}
-\references{
-
-}
 \author{ Lihua Julie Zhu }
-\note{ 
-
-}
 
 \examples{
 data(enrichedGO)

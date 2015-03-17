@@ -10,9 +10,8 @@
 }
 \usage{data(TSS.mouse.GRCm38)}
 \format{
-    RangedData with slot start holding the start position of the gene, slot end holding the end position of the gene, slot rownames holding ensembl gene id and slot space holding the chromosome location where the gene is located. In addition, the following variables are included.
+       GRanges with slot start holding the start position of the gene, slot end holding the end position of the gene, slot names holding ensembl gene id, slot seqnames holding the chromosome location where the gene is located and slot strand holding the strinad information. In addition, the following variables are included.
   \describe{
-     \item{\code{strand}}{1 for positive strand and -1 for negative strand}
     \item{\code{description}}{description of the gene}}}
 
 \details{

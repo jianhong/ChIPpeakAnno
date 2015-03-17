@@ -1,2 +1,6 @@
-#require("ChIPpeakAnno") || stop("unable to load Package:ChIPpeakAnno")
-#BiocGenerics:::testPackage("ChIPpeakAnno")
+require("ChIPpeakAnno") || stop("unable to load Package:ChIPpeakAnno")
+require("BSgenome.Drerio.UCSC.danRer7") || stop("unable to load Package:BSgenome.Drerio.UCSC.danRer7")
+require("org.Hs.eg.db") || stop("unable to load Package:org.Hs.eg.db")
+require("org.Ce.eg.db") || stop("unable to load Package:org.Ce.eg.db")
+require("BSgenome.Celegans.UCSC.ce10") || stop("unable to load Package:BSgenome.Celegans.UCSC.ce10")
+BiocGenerics:::testPackage("ChIPpeakAnno")

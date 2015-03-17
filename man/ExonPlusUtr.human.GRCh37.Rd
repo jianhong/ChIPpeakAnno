@@ -25,11 +25,6 @@
 	mart = useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
 	ExonPlusUtr.human.GRCh37 = getAnnotation(mart=human, featureType="ExonPlusUtr")
 }
-\source{
-
-}
-\references{
-}
 \examples{
 data(ExonPlusUtr.human.GRCh37)
 slotNames(ExonPlusUtr.human.GRCh37)

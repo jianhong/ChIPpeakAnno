@@ -13,19 +13,14 @@ GFF2RangedData(data.GFF,header=FALSE, ...)
   \item{header}{TRUE or FALSE, default to FALSE, indicates whether data.GFF file has GFF header} 
   \item{...}{any parameter need to be passed into read.delim function}
 }
-\details{
-  
-}
 \value{
    RangedData with slot start holding the start position of the feature, slot end holding the end position of the feature, slot names holding the id of the feature, slot space holding the chromosome location where the feature is located. In addition, the following variables are included.
     \item{\code{strand}}{1 for positive strand and -1 for negative strand where the feature is located.}
 }
-\references{  }
 \author{ Lihua Julie Zhu }
 \note{ 
 For converting the peakList in GFF format to RangedData before calling annotatePeakInBatch function
 }
-\seealso{  }
 \examples{
 	test.GFF = data.frame(cbind(seqname  = c("chr1", "chr2"), source=rep("Macs", 2), 
 	feature=rep("peak", 2), start=c("100", "1000"), end=c("200", "1100"), score=c(60, 26), 

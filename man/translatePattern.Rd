@@ -18,20 +18,11 @@ translatePattern(pattern)
 a character vector with the IUPAC nucleotide ambiguity codes
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
 \value{
 a character vector with the pattern represented as regular expression
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
 Lihua Julie Zhu
-}
-\note{
-%%  ~~further notes~~
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
