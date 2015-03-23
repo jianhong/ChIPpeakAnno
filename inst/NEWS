@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.0.1
+-------------------------
+BUG FIXES
+    o give errors when inputs of addGeneIDs is incorrect.
+
 CHANGES IN VERSION 3.0.0
 -------------------------
 NEW FEATURE
