@@ -68,11 +68,11 @@ if (interactive()){
     ##Display the list of genomes available at UCSC:
     #library(rtracklayer)
     #ucscGenomes()[, "db"]
-    ## Display the list of Tracks supported by makeTranscriptDbFromUCSC()
+    ## Display the list of Tracks supported by makeTxDbFromUCSC()
     #supportedUCSCtables()
     ##Retrieving a full transcript dataset for Human from UCSC
     ##TranscriptDb <- 
-    ##     makeTranscriptDbFromUCSC(genome="hg19", tablename="ensGene")
+    ##     makeTxDbFromUCSC(genome="hg19", tablename="ensGene")
     if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
         TxDb <- TxDb.Hsapiens.UCSC.hg19.knownGene
         exons <- exons(TxDb, columns=NULL)
