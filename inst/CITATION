@@ -15,3 +15,22 @@ citEntry(entry="Article",
 	abstract="BACKGROUND:Chromatin immunoprecipitation (ChIP) followed by high-throughput sequencing (ChIP-seq) or ChIP followed by genome tiling array analysis (ChIP-chip) have become standard technologies for genome-wide identification of DNA-binding protein target sites. A number of algorithms have been developed in parallel that allow identification of binding sites from ChIP-seq or ChIP-chip datasets and subsequent visualization in the University of California Santa Cruz (UCSC) Genome Browser as custom annotation tracks. However, summarizing these tracks can be a daunting task, particularly if there are a large number of binding sites or the binding sites are distributed widely across the genome.RESULTS:We have developed ChIPpeakAnno as a Bioconductor package within the statistical programming environment R to facilitate batch annotation of enriched peaks identified from ChIP-seq, ChIP-chip, cap analysis of gene expression (CAGE) or any experiments resulting in a large number of enriched genomic regions. The binding sites annotated with ChIPpeakAnno can be viewed easily as a table, a pie chart or plotted in histogram form, i.e., the distribution of distances to the nearest genes for each set of peaks. In addition, we have implemented functionalities for determining the significance of overlap between replicates or binding sites among transcription factors within a complex, and for drawing Venn diagrams to visualize the extent of the overlap between replicates. Furthermore, the package includes functionalities to retrieve sequences flanking putative binding sites for PCR amplification, cloning, or motif discovery, and to identify Gene Ontology (GO) terms associated with adjacent genes.CONCLUSIONS:ChIPpeakAnno enables batch annotation of the binding sites identified from ChIP-seq, ChIP-chip, CAGE or any technology that results in a large number of enriched genomic regions within the statistical programming environment R. Allowing users to pass their own annotation data such as a different Chromatin immunoprecipitation (ChIP) preparation and a dataset from literature, or existing annotation packages, such as GenomicFeatures and BSgenome, provides flexibility. Tight integration to the biomaRt package enables up-to-date annotation retrieval from the BioMart database.",
 	textVersion="Lihua J Zhu, Claude Gazin, Nathan D Lawson, Herve Pages, Simon M Lin, David S Lapointe and Michael R Green, ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics. 2010, 11:237"
 )
+
+citEntry(entry="inbook",
+    booktitle="Tilling Arrays",
+    title="Integrative analysis of ChIP-chip and ChIP-seq dataset",
+    author="Zhu, Lihua",
+    chapter=4,
+    editor="Tin-Lap Lee, Alfred Chun Shui Luk",
+    publisher="Humana Press",
+    journal="Methods in Molecular Biology",
+    volume=1067,
+    year=2013,
+    pages=105-124,
+    url="http://link.springer.com/protocol/10.1007%2F978-1-62703-607-8_8",
+    doi="10.1007/978-1-62703-607-8_8",
+    PubMedID="23975789",
+    ISSN="1064-3745",
+    abstract="Epigenetic regulation and interactions between transcription factors and regulatory genomic regions play crucial roles in controlling transcriptional regulatory networks that drive development, environmental responses, and disease. Chromatin immunoprecipitation (ChIP) followed by high-throughput sequencing (ChIP-seq) and ChIP followed by genomic tiling microarray hybridization (ChIP-chip) are the two of the most widely used technologies for genome-wide identification of DNA protein interactions and histone modification in vivo. Many algorithms and tools have been developed and evaluated that allow identification of transcription factor binding sites from ChIP-seq or ChIP-chip datasets. However, binding site identification is only the first step; the ultimate goal is to discover the regulatory network of the transcription factor (TF). Here, we present a common workflow for downstream analysis of ChIP-chip and ChIP-seq with an emphasis on annotating binding sites and integration with gene expression data to identify direct and indirect targets of the TF. These tools will help with the overall goal of unraveling transcriptional regulatory networks using datasets publicly available in GEO.",
+    textVersion="Zhu LJ. Integrative analysis of ChIP-chip and ChIP-seq dataset. Methods Mol Biol. 2013;1067:105-24."
+)
