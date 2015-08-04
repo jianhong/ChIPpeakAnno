@@ -17,6 +17,7 @@ import(VennDiagram)
 import(GenomicFeatures)
 import(GenomicRanges)
 importMethodsFrom(AnnotationDbi, mget, get)
+importMethodsFrom(matrixStats, makeGRangesFromDataFrame)
 export( 
        addAncestors,  
        addGeneIDs,
@@ -43,4 +44,5 @@ export(
        summarizePatternInPeaks,
        toGRanges, 
        translatePattern,
-       write2FASTA)
+       write2FASTA,
+       mergePlusMinusPeaks)
