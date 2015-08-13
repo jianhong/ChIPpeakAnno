@@ -1,12 +1,17 @@
 \name{findOverlappingPeaks}
 \alias{findOverlappingPeaks}
 \alias{findOverlappingPeaks-deprecated}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Find the overlapping peaks for two peak ranges.
 }
 \description{
 Find the overlapping peaks for two input peak ranges.
+
+This function is to keep the backward compatibility with previous versions for RangedData object.
+
+The new function findOverlapsOfPeaks is recommended. 
+
+Convert RangedData to GRanges with toGRanges function.
 }
 \usage{
 findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,
@@ -16,7 +21,6 @@ findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,
     ignore.strand=TRUE, 
     connectedPeaks=c("min", "merge"), \dots)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Peaks1}{
 RangedData: See example below.
@@ -64,16 +68,16 @@ Efficiently perform overlap queries with an interval tree implemented in IRanges
 }
 \references{
 1.Interval tree algorithm from: Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford. Introduction to Algorithms, second edition, MIT Press and McGraw-Hill. ISBN 0-262-53196-8
+
 2.Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237
-}
+
+3. Zhu L (2013). Integrative analysis of ChIP-chip and ChIP-seq dataset. In Lee T and Luk ACS (eds.), Tilling Arrays, volume 1067, chapter 4, pp. -19. Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8}
 \author{
 Lihua Julie Zhu
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-	annotatePeakInBatch, makeVennDiagram
+	findOverlapsOfPeaks, annotatePeakInBatch, makeVennDiagram
 }
 \examples{
 	if (interactive())
@@ -91,6 +95,4 @@ NameOfPeaks1="TF1", NameOfPeaks2="TF2", select="all", annotate=1)
 	as.data.frame(t1$MergedPeaks)
 	}
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ misc }

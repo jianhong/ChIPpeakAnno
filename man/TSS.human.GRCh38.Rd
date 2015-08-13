@@ -9,7 +9,7 @@
 }
 \usage{data(TSS.human.GRCh38)}
 \format{
-   Formal class 'GRanges' [package "GenomicRanges"] with ensembl id as names.
+  A 'GRanges' [package "GenomicRanges"] object with ensembl id as names.
 }
 \details{
  used in the examples

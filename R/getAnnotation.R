@@ -1,5 +1,5 @@
 getAnnotation <-
-  function(mart, featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr", "transcript"), output=c("RangedData", "GRanges"))
+  function(mart, featureType=c("TSS","miRNA", "Exon", "5utr", "3utr", "ExonPlusUtr", "transcript"), output=c("GRanges", "RangedData"))
   {
     featureType = match.arg(featureType)
     output = match.arg(output)

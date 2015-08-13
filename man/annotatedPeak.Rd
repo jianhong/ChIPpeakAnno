@@ -19,8 +19,10 @@
 \details{
   obtained by 
 	data(TSS.human.GRCh37)
+  
 	data(myPeakList)
-	annotatePeakInBatch (myPeakList, AnnotationData = TSS.human.GRCh37, output="b",,multiple=F)
+  
+	annotatePeakInBatch(myPeakList, AnnotationData = TSS.human.GRCh37, output="b", multiple=F)
 }
 \examples{
 data(annotatedPeak)

@@ -1,33 +1,34 @@
 \name{toGRanges}
 \alias{toGRanges}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Convert dataset to GRanges
 }
 \description{
-  Convert BED, GFF, RangeData or any user defined dataset to GRanges
+  Convert UCSC BED format and its variants, such as GFF, or any user defined dataset such as RangedDate or MACS output file to GRanges
 }
 \usage{
-toGRanges(data, format=c("BED", "GFF", "RangedData", "MACS", "others"), 
-                      header=FALSE, comment.char="#", colNames=NULL, \dots)
+toGRanges(data, format=c("BED", "GFF", "RangedData", 
+                         "MACS", "MACS2", 
+                         "narrowPeak", "broadPeak",
+                         "others"), 
+          header=FALSE, comment.char="#", colNames=NULL, \dots)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{
   BED, GFF, RangedData or any user defined dataset or their file path.
 }
 \item{format}{
-  data format.  If the data format is set to BED or GFF, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for column order. or MACS output file.
+  data format.  If the data format is set to BED, GFF, narrowPeak or broadPeak, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for column order. "MACS" is for converting the excel output file from MACS1. "MACS2" is for converting the output file from MACS2.
 }
 \item{header}{
-  a logical value indicating whether the file contains the names of the variables as its first line. If missing, the value is determined from the file format: header is set to TRUE if and only if the first row contains one fewer field than the number of columns.
+  A logical value indicating whether the file contains the names of the variables as its first line. If missing, the value is determined from the file format: header is set to TRUE if and only if the first row contains one fewer field than the number of columns.
 }
 \item{comment.char}{
   character: a character vector of length one containing a single character or an empty string. Use "" to turn off the interpretation of comments altogether.
 }
   \item{colNames}{
   If the data format is set to "others", colname must be defined. And the colname must contain
-  space, start and end. If your columne is names as seqname or chrom, and so on, please rename it as space.
+  space, start and end. The column name for the chromosome # should be named as space.
 }
   \item{\dots}{
   parameters passed to \link{read.table}
@@ -40,9 +41,7 @@ toGRanges(data, format=c("BED", "GFF", "RangedData", "MACS", "others"),
   Jianhong Ou
 }
 \examples{
-  rd <- RangedData(IRanges(start = c(967654, 2010897, 2496704),
-   end = c(967754, 2010997, 2496804), names = c("Site1", "Site2", "Site3")),
-	 space = c("1", "2", "3"), strand=as.integer(1),feature=c("a","b","f"))
-  toGRanges(rd, format="RangedData")
+  macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
+  macsOutput <- toGRanges(macs, format="MACS")
 }
 \keyword{ misc }

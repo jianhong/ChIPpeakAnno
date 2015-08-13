@@ -1,11 +1,10 @@
 \name{binOverFeature}
 \alias{binOverFeature}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-peak aggregation over bins from TSS
+Aggregate peaks over bins from the TSS
 }
 \description{
-peak aggregation over bins from feature sites.
+Aggregate peaks over bins from the feature sites.
 }
 \usage{
 binOverFeature(..., annotationData=GRanges(),
@@ -16,28 +15,27 @@ binOverFeature(..., annotationData=GRanges(),
                     PeakLocForDistance=c("all", "end","start","middle"), 
                     FUN=sum, xlab, ylab, main)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{\dots}{
-    objects of GRanges to be analyzed
+    Objects of GRanges to be analyzed
 }
   \item{annotationData}{
-    an object of GRanges for annotation
+    An object of GRanges for annotation
 }
   \item{select}{
-    annotate the peaks to all features or the nearest one
+    Logical: annotate the peaks to all features or the nearest one
 }
   \item{radius}{
-    radius of the longest distance to feature site
+    The radius of the longest distance to feature site
 }
   \item{nbins}{
-    number of bins
+    The number of bins
 }
   \item{minGeneLen}{
-    minimal gene length
+    The minimal gene length
 }
   \item{aroundGene}{
-    count peaks around features or a give site of the features
+    Logical: count peaks around features or a given site of the features. Default = FALSE
 }
   \item{mbins}{
     if aroundGene set as TRUE, the number of bins intra-feature
@@ -62,7 +60,7 @@ binOverFeature(..., annotationData=GRanges(),
 }
 }
 \value{
- an object of data.frame with bin values.
+ A data.frame with bin values.
 }
 \author{
 Jianhong Ou
@@ -74,6 +72,4 @@ data(TSS.human.GRCh37)
 binOverFeature(gr1, annotationData=TSS.human.GRCh37,
                radius=5000, nbins=10, FUN=length)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ misc }

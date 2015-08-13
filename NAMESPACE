@@ -1,4 +1,5 @@
 import(BiocGenerics)
+import(methods)
 importFrom(biomaRt, useMart, getBM, getSequence)
 importFrom(multtest, mt.rawp2adjp)
 importFrom(limma, vennCounts,vennDiagram)
@@ -7,6 +8,7 @@ importClassFrom(graph, "graphNEL")
 importFrom(graph, ugraph)
 importFrom(RBGL, 
            connectedComp)
+importFrom(regioneR, permTest, numOverlaps)
 importFrom(BiocInstaller, biocLite)
 import(IRanges)
 import(Biostrings)
@@ -16,8 +18,13 @@ import(grid)
 import(VennDiagram)
 import(GenomicFeatures)
 import(GenomicRanges)
-importMethodsFrom(AnnotationDbi, mget, get)
-importMethodsFrom(matrixStats, makeGRangesFromDataFrame)
+import(GenomeInfoDb)
+import(S4Vectors)
+importFrom(matrixStats, rowMins, rowMaxs)
+importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
+                  GOID, Term, Definition, Ontology)
+exportClass("bindist", "permPool")
+exportMethods("$", "$<-")
 export( 
        addAncestors,  
        addGeneIDs,
@@ -40,7 +47,9 @@ export(
        GFF2RangedData, 
        hyperGtest,
        makeVennDiagram, 
+       peakPermTest,
        peaksNearBDP,
+       preparePool,
        summarizePatternInPeaks,
        toGRanges, 
        translatePattern,

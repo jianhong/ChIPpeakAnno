@@ -1,4 +1,7 @@
-toGRanges <- function(data, format=c("BED", "GFF", "RangedData", "MACS", "others"), 
+toGRanges <- function(data, format=c("BED", "GFF", "RangedData", 
+                                     "MACS", "MACS2", 
+                                     "narrowPeak", "broadPeak",
+                                     "others"), 
                       header=FALSE, comment.char="#", colNames=NULL, ...)
 {
   if (missing(data)){
@@ -6,41 +9,54 @@ toGRanges <- function(data, format=c("BED", "GFF", "RangedData", "MACS", "others
   }
   format <- match.arg(format)
   if (inherits(data, "character")){
-    tab5rows <- read.table(data, header=header, ..., nrows=5)
-    classes <- sapply(tab5rows, class)
-      if(format=="BED"){##check class of column 2 and 3
-          if(classes[2]!="integer"||classes[3]!="integer")
-          stop("No valid data passed in. For example a data frame as BED format file with at least 3 fields
+      if(format %in% c("narrowPeak", "broadPeak")){
+          data <- read.table(data, header=FALSE, fill=TRUE, stringsAsFactors=FALSE)
+          data <- data[!grepl("track|browser", data[, 1]), 1:10]
+          classes <- c("character", "integer", "integer", "character", "integer", "character", "numeric", "numeric", "numeric", "integer")
+          for(i in 1:10){ 
+              class(data[, i]) <- mode(data[, i]) <- classes[i]
+          }
+      }else{
+          tab5rows <- read.table(data, header=header, ..., nrows=5)
+          classes <- sapply(tab5rows, class)
+          if(format=="BED"){##check class of column 2 and 3
+              if(classes[2]!="integer"||classes[3]!="integer")
+                  stop("No valid data passed in. For example a data frame as BED format file with at least 3 fields
           in the order of: chromosome, start and end. Optional fields are name, score and strand etc.
           Column 2 and 3 must be integer. 
           Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
-          if(!is.na(classes[5])) classes[5] <- "numeric"
-      }else{
-          if(format=="GFF"){##check class of column 4 and 5
-              if(classes[4]!="integer"||classes[5]!="integer")
-              stop("No valid data passed in. For example a data frame as GFF format file with 9 fields
+              if(!is.na(classes[5])) classes[5] <- "numeric"
+          }else{
+              if(format=="GFF"){##check class of column 4 and 5
+                  if(classes[4]!="integer"||classes[5]!="integer")
+                      stop("No valid data passed in. For example a data frame as GFF format file with 9 fields
               in the order of: seqname, source, feature, start, end, score, strand, frame and group.
               Column 4 and 5 must be integer.
               Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
-          }else{
-              if(format=="MACS"){
-                  header <- TRUE
-                  comment.char <- "#"
               }else{
-                  if(header && is.null(colNames)){ ## format=="others"
-                      colNames <- colnames(tab5rows)
+                  if(format %in% c("MACS", "MACS2")){
+                      header <- TRUE
+                      comment.char <- "#"
+                  }else{
+                      if(header && is.null(colNames)){ ## format=="others"
+                          colNames <- colnames(tab5rows)
+                      }
                   }
               }
           }
+          if(format=="BED" && length(classes)>12) classes[13:length(classes)] <- rep("NULL", length(classes)-12)
+          
+          data <- read.table(data, header=header, comment.char=comment.char, ..., colClasses=classes)
+          rm(list=c("tab5rows", "classes"))
       }
-      if(format=="BED" && length(classes)>12) classes[13:length(classes)] <- rep("NULL", length(classes)-12)
-    data <- read.table(data, header=header, comment.char=comment.char, ..., colClasses=classes)
-    rm(list=c("tab5rows", "classes"))
-    colNames <- switch(format,
-                      BED=c("space", "start", "end", "names", "score", "strand", "thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts"),
-                      GFF=c("space", "source", "names", "start", "end", "score", "strand", "frame", "group"),
-                      MACS=c("space", "start", "end", "length", "summit", "tags", "qvalue", "fold_enrichment", "FDR"),
-                      others=colNames)
+      colNames <- switch(format,
+                         BED=c("space", "start", "end", "names", "score", "strand", "thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts"),
+                         GFF=c("space", "source", "names", "start", "end", "score", "strand", "frame", "group"),
+                         MACS=c("space", "start", "end", "length", "summit", "tags", "qvalue", "fold_enrichment", "FDR"),
+                         MACS2=c("space", "start", "end", "length", "abs_summit", "pileup", "qvalue", "fold_enrichment", "FDR", "names"),
+                         narrowPeak=c("space", "start", "end", "names", "score", "strand", "signalValue", "pValue", "qValue", "peak"),
+                         broadPeak=c("space", "start", "end", "names", "score", "strand", "signalValue", "pValue", "qValue"),
+                         others=colNames)
   }
   if (inherits(data, "RangedData")){
     ##RangedData to data.frame

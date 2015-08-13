@@ -1,6 +1,5 @@
 \name{mergePlusMinusPeaks}
 \alias{mergePlusMinusPeaks}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Merge peaks from plus strand and minus strand}
 \description{
   Merge peaks from plus strand and minus strand within certain distance apart,
@@ -8,11 +7,11 @@
 }
 \usage{
 mergePlusMinusPeaks(peaks.file, 
-   columns=c("name", "chromosome", "start", "end", "strand", "count", "count", "count", "count"),
+   columns=c("name", "chromosome", "start", "end", "strand", 
+             "count", "count", "count", "count"),
    sep = "\t", header = TRUE,  distance.threshold = 100, 
    plus.strand.start.gt.minus.strand.end = TRUE, output.bedfile)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
  \item{peaks.file}{Specify the peak file. The peak file should contain peaks
 from both plus and minus strand}
@@ -45,6 +44,4 @@ if (interactive())
            plus.strand.start.gt.minus.strand.end = TRUE, output.bedfile = "T2test100bp.bed")
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ misc }

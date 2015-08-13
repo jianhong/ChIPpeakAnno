@@ -1,55 +1,58 @@
 \name{makeVennDiagram}
 \alias{makeVennDiagram}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Make Venn Diagram from two peak ranges
+Make Venn Diagram from a list of peaks
 }
 \description{
-Make Venn Diagram from two peak ranges and also calculate p-value for determining whether two peak ranges overlap significantly.
+Make Venn Diagram from two or more peak ranges, Also calculate p-value to determine whether those peaks overlap significantly.
 }
 \usage{
-makeVennDiagram(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, totalTest, 
-                by=c("region", "feature", "base"), ignore.strand=TRUE, 
-                connectedPeaks=c("min", "merge", "keepAll"), ...)
+makeVennDiagram(Peaks, NameOfPeaks, maxgap = 0L, minoverlap = 1L,
+                 totalTest, by = c("region", "feature", "base"),
+                 ignore.strand = TRUE, connectedPeaks = c("min",
+                 "merge", "keepAll"), method = c("hyperG",
+                 "permutation"), TxDb, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Peaks}{
-A list of \link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData}: See example below.
+A list of peaks in \link[GenomicRanges:GRanges]{GRanges} format: See example below.
 }
   \item{NameOfPeaks}{
-Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"), this will be used as label in the Venn Diagram.
+Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"). This will be used as label in the Venn Diagram.
 }
  \item{maxgap}{
  Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping.
 }
 \item{minoverlap}{
-Non-negative integer. Intervals with an overlapping of minoverlap or more are considered to be overlapping.}
+Non-negative integer. Intervals with an overlapping of minoverlap or more are considered to be overlapping.
+}
 \item{totalTest}{
 Numeric value to specify the total number of tests performed to obtain the list of peaks. It should be much larger than the number of peaks in the largest peak set.
 }
-\item{by}{region, feature or base, default region. feature means using feature field in the RangedData or GRanges for calculating overlap, region means using chromosome range for calculating overlap, and base means using calculating overlap in nucleotide level.
+\item{by}{"region, "feature" or "base", default = "region". feature means using feature field in the GRanges for calculating overlap, region means using chromosome range for calculating overlap, and base means calculating overlap in nucleotide level.
 }
 \item{ignore.strand}{
-    When set to TRUE, the strand information is ignored in the overlap calculations.
+    Logical: when set to TRUE, the strand information is ignored in the overlap calculations.
   }
 \item{connectedPeaks}{
-  If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as only 1, while set it to "min" will count it as the minimal involved peaks in any concered groups 
+  If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as only 1, while set it to "min" will count it as the minimal involved peaks in any connected peak group. 
 }
+\item{method}{method used for p value calculation. hyperG means hypergeometric test and permutation means \link{peakPermTest}}
+\item{TxDb}{An object of \link[GenomicFeatures:TxDb]{TxDb}}
 \item{\dots}{Additional arguments to be passed to \link[VennDiagram:venn.diagram]{venn.diagram}}
 }
 \details{
  For customized graph options, please see venn.diagram in VennDiagram package.
 }
 \value{
-In addition to a Venn Diagram produced, p.value is obtained from hypergeometric test for determining whether the two peak ranges or features overlap significantly.
+In addition to a Venn Diagram produced, a p.value is calculated by hypergeometric test to determine whether the peaks or features are overlapped significantly.
 }
 \author{
 Lihua Julie Zhu, Jianhong Ou
 }
 
 \seealso{
- \link[ChIPpeakAnno:findOverlappingPeaks]{findOverlappingPeaks}, \link[VennDiagram:venn.diagram]{venn.diagram}
+ \link{findOverlapsOfPeaks}, \link[VennDiagram:venn.diagram]{venn.diagram}, \link{peakPermTest}
 }
 \examples{
 if (interactive()){
@@ -82,6 +85,4 @@ if (interactive()){
                     fill=c(1,2,3,4))
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ graph }

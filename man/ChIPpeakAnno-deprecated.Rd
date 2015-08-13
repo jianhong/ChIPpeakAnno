@@ -15,6 +15,8 @@ and may be defunct as soon as the next release.
                     select=c("all", "first","last","arbitrary"), 
                     annotate = 0, ignore.strand=TRUE, 
                     connectedPeaks=c("min", "merge"), \dots)
+  BED2RangedData(data.BED,header=FALSE, \dots)
+  GFF2RangedData(data.GFF,header=FALSE, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,12 +38,15 @@ Include overlapFeature and shortestDistance in the OverlappingPeaks or not. 1 me
   If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as only 1, while set it to "min" will count it as the minimal involved peaks in any concered groups 
 }
 \item{\dots}{
-    Objects of \link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData}: See also \code{\link{findOverlapsOfPeaks}}.
+    Objects of \link[GenomicRanges:GRanges]{GRanges} or \link[IRanges:RangedData]{RangedData}: See also \code{\link{findOverlapsOfPeaks}}. Or any parameter need to be passed into read.delim function for 2RangedData function.
 }
+\item{header}{TRUE or FALSE, default to FALSE, indicates whether data file has header}
+\item{data.BED}{ BED format data frame or BED filename, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details }
+\item{data.GFF}{ GFF format data frame or GFF file name, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format3 for details }
 }
 \details{
   findOverlappingPeaks is now deprecated wrappers for \code{\link{findOverlapsOfPeaks}}
 }
 \seealso{
-  \code{\link{Deprecated}}, \link{findOverlapsOfPeaks}
+  \code{\link{Deprecated}}, \link{findOverlapsOfPeaks}, \link{toGRanges}
 }

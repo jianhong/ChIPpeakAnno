@@ -1,23 +1,22 @@
 \name{egOrgMap}
 \alias{egOrgMap}
 \title{
-  map organism annotation dataset to specie name or revese. 
+  Convert between the name of the organism annotation package ("OrgDb") and the name of the organism. 
 }
 \description{
-  Give a specie name and return the organism annotation dataset name or 
-  give a organism annotation dataset name then return the specie name.
+  Give a species name and return the organism annotation package name or 
+  give an organism annotation package name then return the species name.
 }
 \usage{
 egOrgMap(name)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{name}{
-  organism annotation dataset or the specie name.
+  The name of the organism annotation package or the species.
 }
 }
 \value{
-  a object of character
+  A object of character
 }
 \author{
   Jianhong Ou

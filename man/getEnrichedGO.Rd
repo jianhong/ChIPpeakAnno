@@ -1,26 +1,24 @@
 \name{getEnrichedGO}
 \alias{getEnrichedGO}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Obtain enriched gene ontology (GO) terms that near the peaks }
 \description{
-  Obtain enriched gene ontology (GO) terms that are near the peaks using GO.db package and GO gene mapping package such as org.Hs.db.eg to obtain the GO annotation and using hypergeometric test (phyper) and  multtest package for adjusting p-values
+  Obtain enriched gene ontology (GO) terms based on the features near the enriched peaks using GO.db package and GO gene mapping package such as org.Hs.db.eg to obtain the GO annotation and using hypergeometric test (phyper) and  multtest package for adjusting p-values
 }
 \usage{
 getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", 
 maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{annotatedPeak}{RangedData or GRanges such as data(annotatedPeak) or a vector of feature IDs }
-  \item{orgAnn}{ organism annotation package such as org.Hs.eg.db for human and org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat, org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish }
- \item{feature_id_type}{the feature type in annotatedPeakRanges such as ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
-  \item{maxP}{ maximum p-value to be considered to be significant}
-  \item{multiAdj}{ Whether apply multiple hypothesis testing adjustment, TURE or FALSE }
-  \item{minGOterm}{ minimum count in a genome for a GO term to be included  }
-  \item{multiAdjMethod}{ multiple testing procedures, for details, see mt.rawp2adjp in multtest package}
+  \item{annotatedPeak}{A GRanges object or a vector of feature IDs}
+  \item{orgAnn}{Organism annotation package such as org.Hs.eg.db for human and org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat, org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish }
+ \item{feature_id_type}{The feature type in annotatedPeak such as ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
+  \item{maxP}{ The maximum p-value to be considered to be significant}
+  \item{multiAdj}{ Logical: whether apply multiple hypothesis testing adjustment, TURE or FALSE }
+  \item{minGOterm}{ The minimum count in a genome for a GO term to be included  }
+  \item{multiAdjMethod}{ The multiple testing procedures, for details, see mt.rawp2adjp in multtest package}
 }
 \value{
-A list of 3
+A list with 3 elements 
  \item{\code{bp}}{ enriched biological process with the following 9 variables
 
 	go.id:GO biological process id
@@ -104,6 +102,4 @@ enriched.GO = getEnrichedGO(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", maxP=0.0
  enriched.GO$cc
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ misc }

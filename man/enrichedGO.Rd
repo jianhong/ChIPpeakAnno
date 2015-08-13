@@ -9,9 +9,9 @@
 }
 \usage{data(enrichedGO)}
 \format{
-  A list of 3 variables.
+  A list of 3 dataframes.
 \describe{
- \item{\code{bp}}{enriched biological process with 9 variables
+ \item{\code{bp}}{dataframe described the enriched biological process with 9 columns
 
 	go.id:GO biological process id
 	
@@ -32,7 +32,7 @@
 	totaltermInGenome: count of all GO terms in the genome
 
 }
- \item{\code{mf}}{enriched molecular function with  the following 9 variables
+ \item{\code{mf}}{dataframe described the enriched molecular function with  the following 9 columnss
 
 	go.id:GO molecular function id
 	
@@ -53,7 +53,7 @@
 	totaltermInGenome: count of all GO terms in the genome
 
 }
- \item{\code{cc}}{enriched cellular component  the following 9 variables
+ \item{\code{cc}}{dataframe described the enriched cellular component  the following 9 columns
 
 	go.id:GO cellular component id
 	

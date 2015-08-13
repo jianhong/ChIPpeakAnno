@@ -1,6 +1,8 @@
 makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, 
                             totalTest, by=c("region", "feature", "base"), 
-                            ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"), ...){
+                            ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"), 
+                            method=c("hyperG", "permutation"), TxDb,
+                            ...){
   ###Functions to be used
   getCountsList<-function(counts){
     CountsList <- list()
@@ -105,7 +107,8 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L,
     cbind(venn_cnt_s[, 1:n, drop=FALSE], pval=p.value)
   }
   ###check inputs
-  if (missing(totalTest))
+  method <- match.arg(method)
+  if (missing(totalTest) && method=="hyperG")
   {
     message("Missing totalTest! totalTest is required for HyperG test. 
 If totalTest is missing, pvalue will be calculated by estimating 
@@ -179,19 +182,47 @@ totalTest = humanGenomeSize * (2%(codingDNA) + 1%(regulationRegion)) / ( 2 * ave
   colnames(venn_cnt)[1:n1] <- NameOfPeaks 
   Counts <- getCountsList(venn_cnt[,"Counts"])
   vennx <- getVennList(venn_cnt, NameOfPeaks, Counts)
-  if(!missing(totalTest)){
-    otherCount <- totalTest - sum(venn_cnt[, "Counts"])
-    venn_cnt[1, "Counts"] <- otherCount
-    p.value <- getPval(venn_cnt, totalTest)
+  if(method=="hyperG"){
+      if(!missing(totalTest)){
+          otherCount <- totalTest - sum(venn_cnt[, "Counts"])
+          venn_cnt[1, "Counts"] <- otherCount
+          p.value <- getPval(venn_cnt, totalTest)
+      }else{
+          otherCount <- venn_cnt[1, "Counts"]
+          if(class(Peaks)=="overlappingPeaks"){
+              averagePeakWidth = median(unlist(lapply(Peaks$peaklist, width)))
+          }else{
+              averagePeakWidth = median(unlist(lapply(Peaks, width))) 
+          }
+          
+          p.value <- getPval(venn_cnt, round(5e+7/averagePeakWidth))
+      }
   }else{
-    otherCount <- venn_cnt[1, "Counts"]
-    if(class(Peaks)=="overlappingPeaks"){
-        averagePeakWidth = median(unlist(lapply(Peaks$peaklist, width)))
-    }else{
-        averagePeakWidth = median(unlist(lapply(Peaks, width))) 
-    }
-    
-    p.value <- getPval(venn_cnt, round(5e+7/averagePeakWidth))
+      ##method=="permutation"
+      p.value <- NA
+      if(olout_flag){
+          warning("Input is an object of overlappingPeaks. Can not do permutation test. Please try ?peakPermTest")
+      }else{
+          if(missing(TxDb)){
+              warning("TxDb is missing. Please try ?peakPermTest later.")
+          }else{
+              n <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
+              s <- apply(venn_cnt[,1:n], 1, sum)
+              venn_cnt_s <- venn_cnt[s==2, , drop=FALSE]
+              p.value <- apply(venn_cnt_s, 1, function(.ele){
+                  AB <- Peaks[as.logical(.ele)]
+                  pt <- peakPermTest(AB[[1]], AB[[2]], TxDb=TxDb, ...)
+                  pt$pval
+              })
+              p.value <- cbind(venn_cnt_s[, 1:n, drop=FALSE], pval=p.value)
+          }
+      }
+      if(!missing(totalTest)){
+          otherCount <- totalTest - sum(venn_cnt[, "Counts"])
+          venn_cnt[1, "Counts"] <- otherCount
+      }else{
+          otherCount <- venn_cnt[1, "Counts"]
+      }
   }
   plotVenn(venn_cnt, vennx, otherCount=otherCount, ...)
   return(list(p.value=p.value, vennCounts=venn_cnt))

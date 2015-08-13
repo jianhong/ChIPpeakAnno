@@ -2,10 +2,10 @@
 \Rdversion{1.1}
 \alias{condenseMatrixByColnames}
 \title{
-condense matrix by colnames
+Condense matrix by colnames
 }
 \description{
-condense matrix by colnames
+Condense matrix by colnames
 }
 \usage{
 condenseMatrixByColnames(mx,iname,sep=";",cnt=FALSE)

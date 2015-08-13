@@ -6,7 +6,7 @@
   TSS annotation data for zebrafish (Zv8) obtained from biomaRt
 }
 \description{
- TSS annotation data for zebrafish (Zv8) obtained from biomaRt
+ A GRanges object to annotate TSS for zebrafish (Zv8) obtained from biomaRt
 }
 \usage{data(TSS.zebrafish.Zv8)}
 \format{
@@ -16,7 +16,7 @@
 }
 \details{
   Annotation data obtained by: 
-
+%- Jianhong, this need to be changed, if you run this, you will get Zv9
 	mart = useMart(biomart = "ensembl", dataset = "drerio_gene_ensembl")
 	
 	getAnnotation(mart, featureType = "TSS")

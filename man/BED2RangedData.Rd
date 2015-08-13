@@ -1,13 +1,12 @@
 \name{BED2RangedData}
 \alias{BED2RangedData}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ convert BED format to RangedData }
+\alias{BED2RangedData-deprecated}
+\title{ Convert BED format to RangedData }
 \description{
-  convert BED format to RangedData}
+  Convert BED format to RangedData. This function will be depreciated. }
 \usage{
 BED2RangedData(data.BED,header=FALSE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data.BED}{ BED format data frame or BED filename, please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details }
   \item{header}{TRUE or FALSE, default to FALSE, indicates whether data.BED file has BED header}
@@ -21,12 +20,12 @@ BED2RangedData(data.BED,header=FALSE, ...)
 \note{ 
 For converting the peakList in BED format to RangedData before calling annotatePeakInBatch function
 }
-\examples{
-	test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),
-	chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
-	test.rangedData = BED2RangedData(test.bed)
-
+\seealso{
+    See also as \code{\link{toGRanges}}.
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ misc }% __ONLY ONE__ keyword per line
+\examples{
+    test.bed = data.frame(cbind(chrom = c("1", "2"), chromStart=c("100", "1000"),
+    chromEnd=c("200", "1100"), name=c("peak1", "peak2")))
+    test.rangedData = BED2RangedData(test.bed)
+}
+\keyword{ misc }

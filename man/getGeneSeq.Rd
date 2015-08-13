@@ -1,13 +1,11 @@
 \name{getGeneSeq}
 \alias{getGeneSeq}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ get gene sequence using biomaRt package  }
+\title{ Get gene sequence using the biomaRt package  }
 \description{
-  get gene sequence using biomaRt package}
+  Get gene sequence using the biomaRt package}
 \usage{
 getGeneSeq(LocationParameters, mart)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{LocationParameters}{ c(ensembl_gene_id, distance from the peak to the transcription start site of the gene with the above ensemblID, upstream offset from the peak, downstream offset from the peak, Gene Start, Gene End) }
   \item{mart}{see useMart of bioMaRt package for details} 
@@ -53,7 +51,5 @@ getGeneSeq(LocationParameters, mart)
 }
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ internal }
-\keyword{ misc }% __ONLY ONE__ keyword per line
+\keyword{ misc }

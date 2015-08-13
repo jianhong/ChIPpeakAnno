@@ -1,3 +1,10 @@
+CHANGES IN VERSION 3.3.4
+-------------------------
+NEW FEATURE
+    o toGRanges from MACS2, narrowPeak.
+    o calculate the p value of overlapping peaks by reagioneR
+    o update documentation
+
 CHANGES IN VERSION 3.3.3
 -------------------------
 NEW FEATURE

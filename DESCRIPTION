@@ -2,16 +2,16 @@ Package: ChIPpeakAnno
 Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
         ChIP-chip experiments or any experiments resulted in large
-        number of chromosome ranges.
-Version: 3.3.3
-Date: 2015-08-03
+        number of chromosome ranges
+Version: 3.3.4
+Date: 2015-08-13
 Author: Lihua Julie Zhu, Jianhong Ou, Herve Pages, Claude Gazin, 
         Nathan Lawson, Ryan Thompson, Simon Lin, David Lapointe and
         Michael Green
 Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>, Jianhong Ou <Jianhong.ou@umassmed.edu>
-Depends: R (>= 2.10), grid, VennDiagram, biomaRt, IRanges, Biostrings, GenomicRanges
-Imports: BiocGenerics (>= 0.1.0), GO.db, BSgenome, GenomicFeatures, matrixStats,
-        AnnotationDbi, limma, multtest, RBGL, graph, BiocInstaller, stats
+Depends: R (>= 2.10), methods, grid, VennDiagram, biomaRt, IRanges, Biostrings, GenomicRanges, S4Vectors
+Imports: BiocGenerics (>= 0.1.0), GO.db, BSgenome, GenomicFeatures, GenomeInfoDb, matrixStats,
+        AnnotationDbi, limma, multtest, RBGL, graph, BiocInstaller, stats, regioneR
 Suggests: reactome.db, BSgenome.Ecoli.NCBI.20080805, 
         org.Ce.eg.db, org.Hs.eg.db, 
         BSgenome.Celegans.UCSC.ce10, BSgenome.Drerio.UCSC.danRer7,
@@ -27,7 +27,7 @@ Description: The package includes functions to retrieve the sequences
         occurrence of motifs in peaks (summarizePatternInPeaks) and for
         adding other IDs to annotated peaks or enrichedGO (addGeneIDs).
         This package leverages the biomaRt, IRanges, Biostrings,
-        BSgenome, GO.db, multtest and stat packages
+        BSgenome, GO.db, multtest and stat packages.
 License: GPL (>= 2)
 LazyLoad: yes
 biocViews: Annotation, ChIPSeq, ChIPchip
