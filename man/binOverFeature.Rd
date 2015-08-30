@@ -20,7 +20,7 @@ binOverFeature(..., annotationData=GRanges(),
     Objects of GRanges to be analyzed
 }
   \item{annotationData}{
-    An object of GRanges for annotation
+    An object of \link[GenomicRanges]{GRanges} or \link{annoGR} for annotation
 }
   \item{select}{
     Logical: annotate the peaks to all features or the nearest one
@@ -35,7 +35,8 @@ binOverFeature(..., annotationData=GRanges(),
     The minimal gene length
 }
   \item{aroundGene}{
-    Logical: count peaks around features or a given site of the features. Default = FALSE
+    Logical: count peaks around features or a given site of the features. 
+    Default = FALSE
 }
   \item{mbins}{
     if aroundGene set as TRUE, the number of bins intra-feature

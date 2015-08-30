@@ -1,6 +1,9 @@
 ##require library graph, RBGL
 
-getVennCounts <- function(..., maxgap = 0L, minoverlap=1L, by=c("region", "feature", "base"), ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll")){
+getVennCounts <- function(..., maxgap = 0L, minoverlap=1L, 
+                          by=c("region", "feature", "base"), 
+                          ignore.strand=TRUE, 
+                          connectedPeaks=c("min", "merge", "keepAll")){
   ###check inputs
   PeaksList <- list(...)
   n <- length(PeaksList)
@@ -26,6 +29,7 @@ getVennCounts <- function(..., maxgap = 0L, minoverlap=1L, by=c("region", "featu
     stop("Same input Peaks detected!")
   venn_cnt <- vennCounts(PeaksList, n=n, names=names, 
                          maxgap=maxgap, minoverlap=minoverlap, by=by,
-                         ignore.strand=ignore.strand, connectedPeaks=connectedPeaks)
+                         ignore.strand=ignore.strand, 
+                         connectedPeaks=connectedPeaks)
   venn_cnt$venn_cnt
 }

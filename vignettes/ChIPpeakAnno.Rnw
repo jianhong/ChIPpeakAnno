@@ -20,6 +20,7 @@ BiocStyle::latex()
 \author{Lihua Julie Zhu\thanks{julie.zhu@umassmed.edu}, 
 Jianhong Ou\thanks{jianhong.ou@umassmed.edu}}
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \title{The ChIPpeakAnno user's guide}
 
 \maketitle
@@ -28,10 +29,11 @@ Jianhong Ou\thanks{jianhong.ou@umassmed.edu}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-Chromatin immunoprecipitation (ChIP) followed by high-throughput tag sequencing (ChIP-seq) and ChIP followed by genome tiling array analysis (ChIP-chip) become more and more prevalent high throughput technologies for identifying the binding sites of DNA-binding proteins in a genome-wide bases. A number of algorithms have been published to facilitate the identification of the binding sites of the DNA-binding proteins of interest. The identified binding sites in the list of peaks are usually converted to BED or WIG file format to be loaded to UCSC genome browser as custom tracks for investigators to view the proximity to various genomic features such as genes, exons and conserved elements. However, clicking through the genome browser could be a daunting task for the biologist if the number of peaks gets large or the peaks spread widely across the genome. 
+Chromatin immunoprecipitation (ChIP) followed by DNA sequencing (ChIP-seq) and ChIP followed by genome tiling array analysis (ChIP-chip) have become prevalent high throughput technologies for identifying the binding sites of DNA-binding proteins genome-wise. A number of algorithms have been published to facilitate the identification of the binding sites of the DNA-binding proteins of interest. The identified binding sites as the list of peaks are usually converted to BED or bigwig files to be loaded to UCSC genome browser as custom tracks for investigators to view the proximity to various genomic features such as genes, exons or conserved elements. However, clicking through the genome browser is a daunting task if the number of peaks gets large or the peaks spread widely across the genome. 
 
-Here we have developed a Bioconducor package called ChIPpeakAnno to facilitate the batch annotation of the peaks identified from either ChIP-seq or ChIP-chip experiments. We have implemented functionality to find the nearest gene, exon, miRNA, gene end or custom features supplied by users such as most conserved elements and other transcription factor binding sites leveraging IRanges. Since the genome annotation gets updated from time to time, we have leveraged the \Biocpkg{biomaRt} package from Bioconductor to retrieve the annotation data on the fly if the annotation of interest is available via the \Biocpkg{biomaRt} package. The users also have the flexibility to pass their own annotation data as GRanges (or RangedData) or pass in annotation data from \Biocpkg{GenomicFeatures}. We have also leveraged \Biocpkg{BSgenome} and \Biocpkg{biomaRt} package on implementing functions to retrieve the sequences around the peak identified for peak validation. To understand whether the identified peaks are enriched around genes with certain GO terms, we have implemented GO enrichment test in \Biocpkg{ChIPpeakAnno} package leveraging the hypergeometric test phyper
-in \Biocpkg{stats} package and integrated with Gene Ontology (GO) annotation from \Biocpkg{GO.db} package and multiplicity adjustment functions from \Biocpkg{multtest} package.
+Here we developed \Biocpkg{ChIPpeakAnno}, a Bioconducor package, to facilitate the batch annotation of the peaks identified from ChIP-seq or ChIP-chip experiments. We implemented functionality to find the nearest gene, exon, miRNA, gene end or custom features supplied by users such as the most conserved elements and other transcription factor binding sites leveraging IRanges. Since the genome annotation gets updated frequently, we have leveraged the \Biocpkg{biomaRt} package to retrieve the annotation data on the fly. The users also have the flexibility to pass their own annotation data or annotation from \Biocpkg{GenomicFeatures} as GRanges. We have also leveraged \Biocpkg{BSgenome} and \Biocpkg{biomaRt} to retrieve the sequences around the peak identified for peak validation or motif discovery. To understand whether the identified peaks are enriched around genes with certain GO terms, we have implemented Gene Ontology (GO) enrichment test in \Biocpkg{ChIPpeakAnno} package leveraging the hypergeometric test phyper
+in \Biocpkg{stats} package and integrated with GO annotation from \Biocpkg{GO.db} package and multiplicity adjustment functions from \Biocpkg{multtest} package.
+
 
 \section{Quick start}
 \begin{scriptsize}
@@ -49,7 +51,6 @@ library(org.Hs.eg.db)
 macs.anno <- addGeneIDs(annotatedPeak=macs.anno, 
                         orgAnn="org.Hs.eg.db", 
                         IDs2Add="symbol")
-head(macs.anno)
 
 if(interactive()){## annotate the peaks with UCSC annotation
     library(GenomicFeatures)
@@ -62,105 +63,127 @@ if(interactive()){## annotate the peaks with UCSC annotation
                             orgAnn="org.Hs.eg.db", 
                             feature_id_type="entrez_id",
                             IDs2Add="symbol")
-    head(macs.anno)
 }
 @
 \end{scriptsize}
 
-\section{Examples of using ChIPpeakAnno}
 
-\subsection{Task 1:  Find the nearest feature such as gene and the distance to 
-the feature such as the transcription start site (TSS) of the nearest gene}
 
-We have a list of peaks identified from ChIP-seq or ChIP-chip experiments and we 
-would like to retrieve the nearest gene and distance to the corresponding gene 
-transcription start site. We have retrieved all the genomic locations of the 
-genes for human genome as TSS.human.NCBI36 data package for repeated use with 
-function \Rfunction{getAnnotation}, now we just pass the annotation to the 
-\Rfunction{annotatePeakInBatch} function.
+\section{A sample workflow using ChIPpeakAnno for ChIP-seq data analysis}
+We illustrate here a common downstream analysis workflow for ChIP-seq experiments. A list of peaks identified from ChIP-seq experiments are the start point of ChIPpeakAnno. Those peaks were represented by GRanges in ChIPpeakAnno. BED and GFF are the common file format that provides a flexible way to define the peaks and annotations. Many publically available Chip-seq or Chip-Chip data deposited at GEO are in BED format. The conversion functions \Rfunction{toGRanges} was implemented to convert UCSC BED format and its variants, such as GFF, or other user defined dataset such as MACS (a popular peak calling program) output file to GRanges. Type ?toGRanges for more information.
 
 \begin{scriptsize}
-<<annotatePeakInBatch1>>=
-library(ChIPpeakAnno)
-data(myPeakList)
-data(TSS.human.NCBI36)
-annotatedPeak <- annotatePeakInBatch(myPeakList[1:6,], 
-                                     AnnotationData=TSS.human.NCBI36)
-annotatedPeak
+<<workflow19,include=FALSE,fig=TRUE,echo=TRUE>>=
+bed <- system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno")
+gr1 <- toGRanges(bed, format="BED", header=FALSE) 
+## one can also try import from rtracklayer
+library(rtracklayer)
+gr1.import <- import(bed, format="BED")
+identical(start(gr1), start(gr1.import))
+gr1[1:2]
+gr1.import[1:2] #note the name slot is different from gr1
+gff <- system.file("extdata", "GFF_peaks.gff", package="ChIPpeakAnno")
+gr2 <- toGRanges(gff, format="GFF", header=FALSE, skip=3)
+ol <- findOverlapsOfPeaks(gr1, gr2)
+makeVennDiagram(ol)
 @
 \end{scriptsize}
+\incfig{ChIPpeakAnno-workflow19}{.5\textwidth}{}{venn diagram of overlaps
+for duplicated experiments}
+\begin{scriptsize}
+<<workflow20,include=FALSE,fig=TRUE,echo=TRUE>>=
+pie(table(ol$overlappingPeaks[["gr1///gr2"]]$overlapFeature))
+@
+\end{scriptsize}
+\incfig{ChIPpeakAnno-workflow20}{.5\textwidth}{}{Pie chart of common peaks among features}
 
-To annotate the peaks with other genomic feature, you will need to call function
-\Rfunction{getAnnotation} with featureType, e.g., ``Exon" for finding the nearest
-exon, and ``miRNA" for finding the nearest miRNA, ``5utr" or ``3utr"for finding 
-the overlapping 5 prime UTR or 3 prime UTR. Please refer to \Rfunction{getAnnotation} 
-function for more details. 
-
-We have presented the examples using human genome as annotation source. To 
-annotate your data with other species, you will need to pass to the function 
-\Rfunction{getAnnotation} the appropriate dataset for example, drerio\_gene\_ensembl 
-for zebrafish genome, mmusculus\_gene\_ensembl for mouse genome and 
-rnorvegicus\_gene\_ensembl for rat genome.
-
-For a list of available biomart and dataset, please refer to the \Biocpkg{biomaRt} 
-package documentation (Durinck S. et al., 2005).  For fast access, in addition to 
-TSS.human.NCBI36, TSS.human.GRCh37, TSS.human.GRCh38, TSS.mouse.NCBIM37, TSS.mouse.GRCm38, 
-TSS.rat.RGSC3.4, TSS.rat.Rnor\_5.0, TSS.zebrafish.Zv8, and TSS.zebrafish.Zv9 
-are included as annotation data packages.
-
-You could also pass your own annotation data into the function \Rfunction{annotatePeakInBatch}. 
-For example, if you have a list of transcription factor biding sites from 
-literature and are interested in obtaining the nearest binding site of the 
-transcription factor and distance to it for the list of peaks.
+Find all features within 5kb away from the overlapping peaks using \Rfunction{annotatePeakInBatch}. From version 3.3.5, we introduce a new function called \Rfunction{annoGR}. 
+\Rfunction{annoGR} can generate a annoGR object from EnsDb or TxDb object.
+annoGR class is an extension of GRanges class. It has slot gr to save the 
+annotation info in GRanges and metadata to save the information related to the
+annotation such as create date, source and so on.
 
 \begin{scriptsize}
-<<annotatePeakInBatch2,include=TRUE,echo=TRUE>>=
-myPeak1 <- GRanges(seqnames=c("1", "2", "3", "4", "5", "6", 
-                              "2", "6", "6", "6", "6", "5"),
-                   ranges=IRanges(start=c(967654, 2010897, 2496704, 3075869, 
-                                          3123260, 3857501, 201089, 1543200, 
-                                          1557200, 1563000, 1569800, 167889600),
-                                  end= c(967754, 2010997, 2496804, 3075969, 
-                                         3123360, 3857601, 201089, 1555199,
-                                         1560599, 1565199, 1573799, 167893599),
-                                  names=paste("Site", 1:12, sep="")))
-
-TFbindingSites <- GRanges(seqnames=c("1", "2", "3", "4", "5", "6", "1", "2", "3", 
-                                     "4", "5", "6", "6", "6", "6", "6", "5"),
-                          ranges=IRanges(start=c(967659, 2010898, 2496700, 
-                                                 3075866, 3123260, 3857500, 
-                                                 96765, 201089, 249670, 307586, 
-                                                 312326, 385750, 1549800, 
-                                                 1554400, 1565000, 1569400,
-                                                 167888600), 
-                                         end=c(967869, 2011108, 2496920, 
-                                               3076166,3123470, 3857780, 
-                                               96985, 201299, 249890, 307796, 
-                                               312586, 385960, 1550599, 1560799,
-                                               1565399, 1571199, 167888999), 
-                                         names=paste("t", 1:17, sep="")),
-                          strand=c("+", "+", "+", "+", "+", "+", "-", "-", "-", 
-                                   "-", "-", "-", "+", "+", "+", "+", "+"))
-
-annotatedPeak2 <- annotatePeakInBatch(myPeak1, AnnotationData=TFbindingSites)
-annotatedPeak2
-@
-<<pie1,fig=TRUE,include=FALSE,width=4.2,height=4.2>>=
-pie(table(as.data.frame(annotatedPeak2)$insideFeature))
+<<workflow21,include=FALSE,echo=TRUE>>=
+overlaps <- ol$peaklist[["gr1///gr2"]]
+## ============== old style ===========
+## data(TSS.human.GRCh37) 
+## overlaps.anno <- annotatePeakInBatch(overlaps, AnnotationData=annoData, 
+##                                      output="overlapping", maxgap=5000L)
+## overlaps.anno <- addGeneIDs(overlaps.anno, "org.Hs.eg.db", "symbol")
+## ============== new style ===========
+library(EnsDb.Hsapiens.v75) ##(hg19)
+## create annotation file from EnsDb or TxDb
+annoData <- annoGR(EnsDb.Hsapiens.v75, feature="gene")
+annoData
+overlaps.anno <- annotatePeakInBatch(overlaps, AnnotationData=annoData, 
+                                         output="overlapping", maxgap=5000L)
+overlaps.anno$gene_name <- 
+    annoData$gr$gene_name[match(overlaps.anno$feature,
+                             names(annoData$gr))]
+head(overlaps.anno)
 @
 \end{scriptsize}
-\incfig{ChIPpeakAnno-pie1}{.5\textwidth}{}{Pie chart of peak distribution among features.}
+Plot the distribution of aggregated peak scores or peak numbers around 
+transcript start sites (Figure \ref{ChIPpeakAnno-workflow22}).
+\begin{scriptsize}
+<<workflow22,include=FALSE,fig=TRUE,echo=TRUE,width=8,height=6>>=
+gr1.copy <- gr1
+gr1.copy$score <- 1
+binOverFeature(gr1, gr1.copy, annotationData=annoData,
+               radius=5000, nbins=10, FUN=c(sum, length),
+               ylab=c("score", "count"), 
+               main=c("Distribution of aggregated peak score around TSS", 
+                      "Distribution of aggregated peak numbers around TSS"))
+@
+\end{scriptsize}
+\incfig{ChIPpeakAnno-workflow22}{.8\textwidth}{}{Distribution of aggregated peak 
+scores or peak numbers around transcript start sites.}
 
-Both BED format and GFF format are common file format that provides a flexible 
-way to define the peaks and annotations as the data lines. Therefore, conversion 
-functions \Rfunction{toGRanges} were implemented for converting these data 
-format to GRanges before calling \Rfunction{annotatePeakInBatch}
+Summarize peak distribution over exon, intron, enhancer, proximal promoter, 
+5 prime UTR and 3 prime UTR in peak centric and nucleotide centric view using 
+function \Rfunction{assignChromosomeRegion}(Figure \ref{ChIPpeakAnno-workflow23}). 
+Setting nucleotideLevel = TRUE will give a nucleotide level distribution over different features.
 
-Once you annotated the peak list, you can plot the distance to nearest feature 
-such as TSS.
+\begin{scriptsize}
+<<workflow23,include=FALSE,fig=TRUE,echo=TRUE,width=10,height=4>>=
+if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
+    aCR<-assignChromosomeRegion(gr1, nucleotideLevel=FALSE, 
+                           precedence=c("Promoters", "immediateDownstream", 
+                                         "fiveUTRs", "threeUTRs", 
+                                         "Exons", "Introns"), 
+                           TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene)
+    barplot(aCR$percentage)
+}
+@
+\end{scriptsize}
+\incfig{ChIPpeakAnno-workflow23}{.8\textwidth}{}{Peak distribution over different genomic features.}
 
-\subsection{Task 2:  Obtain overlapping peaks for potential transcription factor 
-complex and determine the significance of the overlapping and generate Venn Diagram }
+% We can check the position of the peak by \Rfunction{plotRegion} 
+% (Figure \ref{ChIPpeakAnno-workflow23},\ref{ChIPpeakAnno-workflow24}).
+% \begin{scriptsize}
+% <<workflow24,include=FALSE,fig=TRUE,echo=TRUE,width=6,height=3>>=
+% plotRegion(gr1.anno, genome="hg19", features=gr1.anno$feature[3:5])
+% @
+% \end{scriptsize}
+% \incfig{ChIPpeakAnno-workflow23}{.8\textwidth}{}{plot peak position by features.}
+% \begin{scriptsize}
+% <<workflow24,include=FALSE,fig=TRUE,echo=TRUE,width=6,height=3>>=
+% if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
+%     plotRegion(intersection.anno, genome="hg19", 
+%                start=713790, end=743790, chromosome="chr1", 
+%                txdb=TxDb.Hsapiens.UCSC.hg19.knownGene)
+% }
+% @
+% \end{scriptsize}
+% \incfig{ChIPpeakAnno-workflow24}{.8\textwidth}{}{plot peak position by given ranges.}
+
+\section{Details in using ChIPpeakAnno}
+This section describe more datails in using different functions in ChIPpeakAnno for different tasks. As shown in the last section, the common workflow includes: loading peaks from BED or GFF, or other  sources; determining and visualizing the concordance among the biological replicates; combining peaks from replicates; associating peaks with rich genomic annotations; summarizing peak distributions over exon, intron, enhancer, proximal promoter, 5'UTR and 3'UTR regions; retrieving the sequences around the peaks, and analysis of GO and pathway enrichment. We break the workflow into 8 tasks in this section.
+
+\subsection{Determine and visualize overlapped peaks with Venn Diagram}
+
+It is imperative to evaluate the concordance among the peaks of biological replicates. Prior to associating features of interest with the peaks, it is a common practice to combine peaks from replicates. Also, it is biologically interesting to obtaining overlapping peaks from different ChIP peak expereiments to imply potential transcription factor complexes.  ChIPpeakAnno implemented functions to achieve those goals and quatatively determine the significance of the overlapping and generate Venn Diagram. 
 
 Here is an example of obtaining overlapping peaks with maximum gap 1kb for two peak ranges.
 
@@ -309,11 +332,114 @@ makeVennDiagram(list(peaks1, peaks2, peaks3),
 \incfig{ChIPpeakAnno-makeVennDiagram11}{.5\textwidth}{}{venn diagram of overlaps
 for three input peaklists directly}
 
-\subsection{Task 3:  Obtain sequences surrounding the peaks for PCR validation 
-or motif discovery}
+
+\subsection{Find the nearest feature such as gene and the distance to 
+the feature such as the transcription start site (TSS) of the nearest gene}
+
+We have a list of peaks identified from ChIP-seq or ChIP-chip experiments and we 
+would like to retrieve the nearest gene and distance to the corresponding gene 
+transcription start site. We have retrieved all the genomic locations of the 
+genes for human genome as TSS.human.NCBI36 data package for repeated use with 
+function \Rfunction{getAnnotation}, now we just pass the annotation to the 
+\Rfunction{annotatePeakInBatch} function.
+
+\begin{scriptsize}
+<<annotatePeakInBatch1>>=
+library(ChIPpeakAnno)
+data(myPeakList)
+data(TSS.human.NCBI36)
+annotatedPeak <- annotatePeakInBatch(myPeakList[1:6,], 
+                                     AnnotationData=TSS.human.NCBI36)
+annotatedPeak
+@
+\end{scriptsize}
+
+To annotate the peaks with other genomic feature, you will need to call function
+\Rfunction{getAnnotation} with featureType, e.g., ``Exon" for finding the nearest
+exon, and ``miRNA" for finding the nearest miRNA, ``5utr" or ``3utr"for finding 
+the overlapping 5 prime UTR or 3 prime UTR. Please refer to \Rfunction{getAnnotation} 
+function for more details. 
+
+We have presented the examples using human genome as annotation source. To 
+annotate your data with other species, you will need to pass to the function 
+\Rfunction{getAnnotation} the appropriate dataset for example, drerio\_gene\_ensembl 
+for zebrafish genome, mmusculus\_gene\_ensembl for mouse genome and 
+rnorvegicus\_gene\_ensembl for rat genome.
+
+For a list of available biomart and dataset, please refer to the \Biocpkg{biomaRt} 
+package documentation (Durinck S. et al., 2005).  For fast access, in addition to 
+TSS.human.NCBI36, TSS.human.GRCh37, TSS.human.GRCh38, TSS.mouse.NCBIM37, TSS.mouse.GRCm38, 
+TSS.rat.RGSC3.4, TSS.rat.Rnor\_5.0, TSS.zebrafish.Zv8, and TSS.zebrafish.Zv9 
+are included as annotation data packages.
+
+You could also pass your own annotation data into the function \Rfunction{annotatePeakInBatch}. 
+For example, if you have a list of transcription factor biding sites from 
+literature and are interested in obtaining the nearest binding site of the 
+transcription factor and distance to it for the list of peaks.
+
+\begin{scriptsize}
+<<annotatePeakInBatch2,include=TRUE,echo=TRUE>>=
+myPeak1 <- GRanges(seqnames=c("1", "2", "3", "4", "5", "6", 
+                              "2", "6", "6", "6", "6", "5"),
+                   ranges=IRanges(start=c(967654, 2010897, 2496704, 3075869, 
+                                          3123260, 3857501, 201089, 1543200, 
+                                          1557200, 1563000, 1569800, 167889600),
+                                  end= c(967754, 2010997, 2496804, 3075969, 
+                                         3123360, 3857601, 201089, 1555199,
+                                         1560599, 1565199, 1573799, 167893599),
+                                  names=paste("Site", 1:12, sep="")))
+
+TFbindingSites <- GRanges(seqnames=c("1", "2", "3", "4", "5", "6", "1", "2", "3", 
+                                     "4", "5", "6", "6", "6", "6", "6", "5"),
+                          ranges=IRanges(start=c(967659, 2010898, 2496700, 
+                                                 3075866, 3123260, 3857500, 
+                                                 96765, 201089, 249670, 307586, 
+                                                 312326, 385750, 1549800, 
+                                                 1554400, 1565000, 1569400,
+                                                 167888600), 
+                                         end=c(967869, 2011108, 2496920, 
+                                               3076166,3123470, 3857780, 
+                                               96985, 201299, 249890, 307796, 
+                                               312586, 385960, 1550599, 1560799,
+                                               1565399, 1571199, 167888999), 
+                                         names=paste("t", 1:17, sep="")),
+                          strand=c("+", "+", "+", "+", "+", "+", "-", "-", "-", 
+                                   "-", "-", "-", "+", "+", "+", "+", "+"))
+
+annotatedPeak2 <- annotatePeakInBatch(myPeak1, AnnotationData=TFbindingSites)
+annotatedPeak2
+@
+<<pie1,fig=TRUE,include=FALSE,width=4.2,height=4.2>>=
+pie(table(as.data.frame(annotatedPeak2)$insideFeature))
+@
+\end{scriptsize}
+\incfig{ChIPpeakAnno-pie1}{.5\textwidth}{}{Pie chart of peak distribution among features.}
+
+Both BED format and GFF format are common file format that provides a flexible 
+way to define the peaks and annotations as the data lines. Therefore, conversion 
+functions \Rfunction{toGRanges} were implemented for converting these data 
+format to GRanges before calling \Rfunction{annotatePeakInBatch}
+
+Once you annotated the peak list, you can plot the distance to nearest feature such as TSS.
+
+\subsection{Add other feature IDs to the annotated peaks}
+
+Additional annotations such as entrez ID, gene symbol and gene name can be added using function addGeneIDs and the annotated peaks can be saved as an Excel file or plotted for visualizing the peak distribution relative to the genomic features of interest. Here is an example to add gene symbol to annotated peaks .
+
+\begin{scriptsize}
+<<addGeneIDs18>>=
+data(annotatedPeak)
+library(org.Hs.eg.db)
+addGeneIDs(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", IDs2Add=c("symbol"))
+addGeneIDs(annotatedPeak$feature[1:6], orgAnn="org.Hs.eg.db", IDs2Add=c("symbol"))
+@
+\end{scriptsize}
+
+
+\subsection{Obtain sequences surrounding the peaks}
 
 Here is an example of obtaining sequences surrounding the peak intervals 
-including 20 bp upstream and downstream sequence.
+including 20 bp upstream and downstream sequence for PCR validation or motif discovery.
 
 \begin{scriptsize}
 <<getAllPeakSequence12>>=
@@ -336,7 +462,25 @@ write2FASTA(peaksWithSequences,"test.fa")
 @ 
 \end{scriptsize}
 
-\subsection{Task 4:  Obtain enriched gene ontology (GO) terms or KEGG terms near the peaks}
+\subsection{Output a summary of motif occurrence in the peaks.}
+
+Here is an example to search the peaks for the motifs in examplepattern.fa file.
+
+\begin{scriptsize}
+<<summarizePatternInPeaks17>>=
+peaks <- GRanges(seqnames=c("NC_008253", "NC_010468"),
+                 ranges=IRanges(start=c(100, 500), 
+                                end=c(300, 600), 
+                                names=c("peak1", "peak2")))
+filepath <- system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
+library(BSgenome.Ecoli.NCBI.20080805)
+summarizePatternInPeaks(patternFilePath=filepath, format="fasta", skip=0L, 
+                        BSgenomeName=Ecoli, peaks=peaks)
+@
+\end{scriptsize}
+
+
+\subsection{Obtain enriched gene ontology (GO) terms or KEGG terms near the peaks}
 
 Once you have obtained the annotated peak data from the example above, 
 you can also use the function \Rfunction{getEnriched} to obtain a list of 
@@ -379,10 +523,9 @@ egOrgMap("Homo sapiens")
 @
 \end{scriptsize}
 
-\subsection{Task 5:  Find peaks with bi-directional promoters}
+\subsection{Find peaks with bi-directional promoters}
 
-Here is an example to find peaks with bi-directional promoters and output percent 
-of peaks near bi-directional promoters.
+The definition from Wikepedia: Bidirectional promoters are short (<1 kbp), intergenic regions of DNA between the 5' ends of the genes in a bidirectional gene pair.A "bidirectional gene pair" refers to two adjacent genes coded on opposite strands, with their 5' ends oriented toward one another. The two genes are often functionally related, and modification of their shared promoter region allows them to be co-regulated and thus co-expressed. Here is an example to find peaks with bi-directional promoters and output percent of peaks near bi-directional promoters.
 
 \begin{scriptsize}
 <<peaksNearBDP16>>=
@@ -400,132 +543,8 @@ c(annotatedBDP$percentPeaksWithBDP,
 @
 \end{scriptsize}
 
-\subsection{Task 6: Output a summary of motif occurrence in the peaks.}
+\subsection{Perform permutation test to determine if there is an association between two set of peaks}
 
-Here is an example to search the peaks for the motifs in examplepattern.fa file.
-
-\begin{scriptsize}
-<<summarizePatternInPeaks17>>=
-peaks <- GRanges(seqnames=c("NC_008253", "NC_010468"),
-                 ranges=IRanges(start=c(100, 500), 
-                                end=c(300, 600), 
-                                names=c("peak1", "peak2")))
-filepath <- system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
-library(BSgenome.Ecoli.NCBI.20080805)
-summarizePatternInPeaks(patternFilePath=filepath, format="fasta", skip=0L, 
-                        BSgenomeName=Ecoli, peaks=peaks)
-@
-\end{scriptsize}
-
-\subsection{Task 7: Add other IDs to annotated peaks or enrichedGO}
-
-Here is an example to add gene symbol to annotated peaks .
-
-\begin{scriptsize}
-<<addGeneIDs18>>=
-data(annotatedPeak)
-library(org.Hs.eg.db)
-addGeneIDs(annotatedPeak[1:6,], orgAnn="org.Hs.eg.db", IDs2Add=c("symbol"))
-addGeneIDs(annotatedPeak$feature[1:6], orgAnn="org.Hs.eg.db", IDs2Add=c("symbol"))
-@
-\end{scriptsize}
-
-\subsection{Task 8: annotate ChIP results from BED or GFF files or MACS output xls file}
-
-Here is an example to annotate peaks in BED file format and GFF file format.
-
-\begin{scriptsize}
-<<workflow19,include=FALSE,fig=TRUE,echo=TRUE>>=
-bed <- system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno")
-gr1 <- toGRanges(bed, format="BED", header=FALSE) 
-## one can also try import from rtracklayer
-library(rtracklayer)
-gr1.import <- import(bed, format="BED")
-identical(start(gr1), start(gr1.import))
-gr1[1:2]
-gr1.import[1:2] #note the name slot is different from gr1
-gff <- system.file("extdata", "GFF_peaks.gff", package="ChIPpeakAnno")
-gr2 <- toGRanges(gff, format="GFF", header=FALSE, skip=3)
-ol <- findOverlapsOfPeaks(gr1, gr2)
-makeVennDiagram(ol)
-@
-\end{scriptsize}
-\incfig{ChIPpeakAnno-workflow19}{.5\textwidth}{}{venn diagram of overlaps
-for duplicated experiments}
-\begin{scriptsize}
-<<workflow20,include=FALSE,fig=TRUE,echo=TRUE>>=
-pie(table(ol$overlappingPeaks[["gr1///gr2"]]$overlapFeature))
-@
-\end{scriptsize}
-\incfig{ChIPpeakAnno-workflow20}{.5\textwidth}{}{Pie chart of common peaks among features}
-
-Find all features within 5kb away from the overlapping peaks using \Rfunction{annotatePeakInBatch}. 
-
-\begin{scriptsize}
-<<workflow21,include=FALSE,echo=TRUE>>=
-data(TSS.human.GRCh37)
-overlaps <- ol$peaklist[["gr1///gr2"]]
-overlaps.anno <- annotatePeakInBatch(overlaps, AnnotationData=TSS.human.GRCh37, 
-                                         output="overlapping", maxgap=5000L)
-overlaps.anno <- addGeneIDs(overlaps.anno, "org.Hs.eg.db", "symbol")
-head(overlaps.anno)
-@
-\end{scriptsize}
-Plot the distribution of aggregated peak scores or peak numbers around 
-transcript start sites (Figure \ref{ChIPpeakAnno-workflow22}).
-\begin{scriptsize}
-<<workflow22,include=FALSE,fig=TRUE,echo=TRUE,width=8,height=6>>=
-gr1.copy <- gr1
-gr1.copy$score <- 1
-binOverFeature(gr1, gr1.copy, annotationData=TSS.human.GRCh37,
-               radius=5000, nbins=10, FUN=c(sum, length),
-               ylab=c("score", "count"), 
-               main=c("Distribution of aggregated peak score around TSS", 
-                      "Distribution of aggregated peak numbers around TSS"))
-@
-\end{scriptsize}
-\incfig{ChIPpeakAnno-workflow22}{.8\textwidth}{}{Distribution of aggregated peak 
-scores or peak numbers around transcript start sites.}
-
-Summarize peak distribution over exon, intron, enhancer, proximal promoter, 
-5 prime UTR and 3 prime UTR in peak centric and nucleotide centric view using 
-function \Rfunction{assignChromosomeRegion}(Figure \ref{ChIPpeakAnno-workflow23}). 
-Setting nucleotideLevel = TRUE will give a nucleotide level distribution over different features.
-
-\begin{scriptsize}
-<<workflow23,include=FALSE,fig=TRUE,echo=TRUE,width=10,height=4>>=
-if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
-    aCR<-assignChromosomeRegion(gr1, nucleotideLevel=FALSE, 
-                           precedence=c("Promoters", "immediateDownstream", 
-                                         "fiveUTRs", "threeUTRs", 
-                                         "Exons", "Introns"), 
-                           TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene)
-    barplot(aCR$percentage)
-}
-@
-\end{scriptsize}
-\incfig{ChIPpeakAnno-workflow23}{.8\textwidth}{}{Peak distribution over different genomic features.}
-
-% We can check the position of the peak by \Rfunction{plotRegion} 
-% (Figure \ref{ChIPpeakAnno-workflow23},\ref{ChIPpeakAnno-workflow24}).
-% \begin{scriptsize}
-% <<workflow24,include=FALSE,fig=TRUE,echo=TRUE,width=6,height=3>>=
-% plotRegion(gr1.anno, genome="hg19", features=gr1.anno$feature[3:5])
-% @
-% \end{scriptsize}
-% \incfig{ChIPpeakAnno-workflow23}{.8\textwidth}{}{plot peak position by features.}
-% \begin{scriptsize}
-% <<workflow24,include=FALSE,fig=TRUE,echo=TRUE,width=6,height=3>>=
-% if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
-%     plotRegion(intersection.anno, genome="hg19", 
-%                start=713790, end=743790, chromosome="chr1", 
-%                txdb=TxDb.Hsapiens.UCSC.hg19.knownGene)
-% }
-% @
-% \end{scriptsize}
-% \incfig{ChIPpeakAnno-workflow24}{.8\textwidth}{}{plot peak position by given ranges.}
-
-\subsection{Task 9: performs a permutation test to seee if there is an association between two given peak lists}
 If there are two peak lists from two transcript factors (TFs), we want to know whether or not they are related TFs. Previously, most of the tests are based on hyper-geometric distribution. However, to estimate the total potential binding positions for a given TF is not an easy work. With \Rfunction{peakPermTest} and the right biological data, it is possible to answer this question properly. The random peaks in the permutation test are generated by special strategy. First the input peaks1 will be annotated into a given genome to discovery its distribution form a given feature type (transcripts or exons). And then the random peaks will be generated based on this distribution. The width of the peaks also follow the distribution of inputs.
 
 Here we show the samples:
@@ -541,13 +560,15 @@ set.seed(123)
 utr3 <- utr3[sample.int(length(utr3), 1000)]
 pt <- peakPermTest(utr5[sample.int(length(utr5), 1000)], 
              utr3, maxgap=500,
-             TxDb=txdb, seed=1)
+             TxDb=txdb, seed=1,
+             force.parallel=FALSE)
 pt$zscore
 ol <- findOverlaps(cds, utr3, maxgap=1)
 pt1 <- peakPermTest(c(cds[sample.int(length(cds), 500)], 
                       cds[queryHits(ol)][sample.int(length(ol), 500)]), 
              utr3, maxgap=500, 
-             TxDb=txdb, seed=1)
+             TxDb=txdb, seed=1,
+             force.parallel=FALSE)
 pt1$zscore
 @
 \end{scriptsize}
@@ -555,7 +576,6 @@ pt1$zscore
 \begin{scriptsize}
 <<peakPermTest1>>=
 if(interactive()){
-    #JunD, Tead4, and Fosl1
     temp <- tempfile()
     download.file("http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz", temp)
     data <- read.delim(gzfile(temp, "r"), header=FALSE)

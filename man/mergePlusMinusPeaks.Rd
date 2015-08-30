@@ -18,30 +18,38 @@ from both plus and minus strand}
  \item{columns}{Specify the column names in the peak file}
  \item{sep}{Specify column delimiter, default tab-delimited}
 \item{header}{Specify whether the file has a header row, default TRUE}
-\item{distance.threshold}{Specify the maximum gap allowed between the plus stranded and the nagative stranded peak  }
- \item{plus.strand.start.gt.minus.strand.end}{Specify whether plus strand peak start greater than
+\item{distance.threshold}{Specify the maximum gap allowed between the plus 
+stranded and the nagative stranded peak  }
+ \item{plus.strand.start.gt.minus.strand.end}{Specify whether plus strand peak
+ start greater than
  the paired negative strand peak end. Default to TRUE}
  \item{output.bedfile}{Specify the bed output file name}
 }
 \value{
 output the merged peaks in bed file and a data frame of the bed format
 }
-\references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237}
+\references{ Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to 
+annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 
+11:237doi:10.1186/1471-2105-11-237}
 \author{ Lihua Julie Zhu}
 \seealso{annotatePeakInBatch, findOverlappingPeaks, makeVennDiagram }
 \examples{
 
 if (interactive())
 {
-	data(myPeakList)
-	data(TSS.human.NCBI36)
-        library(ChIPpeakAnno)
-	library(matrixStats)
-        peaks <- system.file("extdata", "guide-seq-peaks.txt", package = "ChIPpeakAnno")
+    data(myPeakList)
+    data(TSS.human.NCBI36)
+    library(matrixStats)
+        peaks <- system.file("extdata", "guide-seq-peaks.txt", 
+                              package = "ChIPpeakAnno")
         merged.bed <- mergePlusMinusPeaks(peaks.file = peaks, 
-	   columns=c("name", "chromosome", "start", "end", "strand", "count", "count"), 
-           sep = "\t", header = TRUE,  distance.threshold = 100,  
-           plus.strand.start.gt.minus.strand.end = TRUE, output.bedfile = "T2test100bp.bed")
+                                          columns=c("name", "chromosome", 
+                                                    "start", "end", "strand", 
+                                                    "count", "count"), 
+                                          sep = "\t", header = TRUE,  
+                                          distance.threshold = 100,  
+                                plus.strand.start.gt.minus.strand.end = TRUE, 
+                                          output.bedfile = "T2test100bp.bed")
 }
 }
 \keyword{ misc }

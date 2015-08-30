@@ -18,8 +18,11 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
                 stop("No valid Peaks passed in. It needs to be GRanges object")
             }
             if(any(is.na(names(Peaks))) || any(duplicated(names(Peaks)))) {
-                message("duplicated or NA names found. Rename all the names by numbers.")
-                names(Peaks) <- formatC(1:nrow(data), width=nchar(nrow(data)), flag='0')
+                message("duplicated or NA names found. 
+                        Rename all the names by numbers.")
+                names(Peaks) <- formatC(1:nrow(data), 
+                                        width=nchar(nrow(data)), 
+                                        flag='0')
             }
             Peaks
         })
@@ -40,15 +43,14 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         }
         flagRD <- FALSE
         if((!missing(Peaks1)) || (!missing(Peaks2))){
-  ##          message("option \"Peaks1\", \"Peaks2\", \"NameOfPeaks1\", \"NameOfPeaks2\", \"multiple\", \"select\" and \"annotate\" will be dropped soon. ?findOverlappingPeaks for more details.")
- ##           flush.console()
             if(!missing(Peaks2)){##
                 if(inherits(Peaks2, "RangedData")){
                     Peaks2 <- toGRanges(Peaks2, format="RangedData")
                     flagRD <- TRUE
                 }
                 if (!inherits(Peaks2, "GRanges")) {
-                    stop("No valid Peaks passed in. It needs to be GRanges object")
+                    stop("No valid Peaks passed in. 
+                         It needs to be GRanges object")
                 }
                 if(n!=0) PeaksList <- c(list(Peaks2), PeaksList)
                 else PeaksList <- list(Peaks2)
@@ -62,7 +64,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
                     flagRD <- TRUE
                 }
                 if (!inherits(Peaks1, "GRanges")) {
-                    stop("No valid Peaks passed in. It needs to be GRanges object")
+                    stop("No valid Peaks passed in. 
+                         It needs to be GRanges object")
                 }
                 if(n!=0) PeaksList <- c(list(Peaks1), PeaksList)
                 else PeaksList <- list(Peaks1)
@@ -86,7 +89,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         metacolnames <- Reduce(intersect, metacolnames)
         metacolclass <- do.call(rbind, lapply(PeaksList, function(Peaks)
             sapply(mcols(Peaks)[, metacolnames, drop=FALSE], class)))
-        metacolclass <- apply(metacolclass, 2, function(.ele) length(unique(.ele))==1)
+        metacolclass <- apply(metacolclass, 2, 
+                              function(.ele) length(unique(.ele))==1)
         metacolnames <- metacolnames[metacolclass]
         PeaksList <- lapply(PeaksList, function(Peaks){
             mcols(Peaks) <- mcols(Peaks)[, metacolnames]
@@ -94,14 +98,18 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         })
         ##get all merged peaks
         for(i in 1:n){
-            names(PeaksList[[i]]) <- paste(names[i], names(PeaksList[[i]]), sep=NAME_conn_string)
+            names(PeaksList[[i]]) <- 
+                paste(names[i], names(PeaksList[[i]]), 
+                      sep=NAME_conn_string)
         }
         Peaks <- unlist(GRangesList(PeaksList))
         if(ignore.strand) strand(Peaks) <- "*"
         
-        ol <- as.data.frame(findOverlaps(Peaks, maxgap=maxgap, minoverlap=minoverlap, 
+        ol <- as.data.frame(findOverlaps(Peaks, maxgap=maxgap, 
+                                         minoverlap=minoverlap, 
                                          select="all",
-                                         ignoreSelf=TRUE, ignoreRedundant=TRUE))
+                                         ignoreSelf=TRUE, 
+                                         ignoreRedundant=TRUE))
         olm <- cbind(names(Peaks[ol[,1]]), names(Peaks[ol[,2]]))
         edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))
         nodes <- unique(as.character(olm))
@@ -122,28 +130,37 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         xlist1 <- list()
         for (i in 1:ncontrasts){
             xlist[[i]] <- factor(as.numeric(unlist(lapply(all, function(.ele) 
-                any(grepl(paste("^",names[ncontrasts-i+1], NAME_conn_string, sep=""), .ele))))),
+                any(grepl(paste("^",
+                                names[ncontrasts-i+1], 
+                                NAME_conn_string, sep=""), .ele))))),
                                  levels=c(0,1))
             if(connectedPeaks=="merge"){
                 xlist1[[i]] <- xlist[[i]]
             }else{
-                xlist1[[i]] <- factor(as.numeric(unlist(lapply(all, function(.ele) {
+                xlist1[[i]] <- 
+                    factor(as.numeric(unlist(lapply(all, function(.ele) {
                     ##count involved nodes in each group
                     if(length(.ele)>2){
-                        .ele <- gsub(paste(NAME_conn_string, ".*?$", sep=""), "", .ele)
+                        .ele <- gsub(paste(NAME_conn_string, ".*?$", sep=""), 
+                                     "", .ele)
                         .ele <- table(.ele)
-                        rep(names[ncontrasts-i+1] %in% names(.ele), min(.ele))
+                        rep(names[ncontrasts-i+1] %in% names(.ele), 
+                            min(.ele))
                     }else{
-                        any(grepl(paste("^",names[ncontrasts-i+1], NAME_conn_string, sep=""), .ele))
+                        any(grepl(paste("^",names[ncontrasts-i+1], 
+                                        NAME_conn_string, sep=""), 
+                                  .ele))
                     }
                 }))), levels=c(0,1))
             }
         }
         counts <- as.vector(table(xlist1))
-        venn_cnt <- structure(cbind(outcomes, Counts=counts), class="VennCounts")
+        venn_cnt <- structure(cbind(outcomes, Counts=counts), 
+                              class="VennCounts")
         xlist <- do.call(rbind, xlist)
         xlist <- xlist - 1
-        xlist <- xlist[nrow(xlist):1,,drop=FALSE] ## reverse xlist to match the order of names
+        xlist <- xlist[nrow(xlist):1,,drop=FALSE] 
+        ## reverse xlist to match the order of names
         xlist <- apply(xlist, 2, paste, collapse="")
         all <- do.call(rbind, mapply(function(.ele, .id) cbind(.id, .ele), 
                                      all, 1:length(all), SIMPLIFY=FALSE))
@@ -155,7 +172,9 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         mIndex <- rep(1:length(mapping), m)
         mLists <- unlist(mapping)
         mcols <- mcols(all.peaks[mLists])
-        mcols$peakNames <- gsub(NAME_conn_string, NAME_short_string, names(all.peaks[mLists]))
+        mcols$peakNames <- gsub(NAME_conn_string, 
+                                NAME_short_string, 
+                                names(all.peaks[mLists]))
         mcolsn <- sapply(mcols[1, ], class)
         mapping <- DataFrame(HHH_row___H=1:length(all.peaks.rd))
         for(.name in names(mcolsn)){
@@ -170,20 +189,28 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         }
         mapping$HHH_row___H <- NULL
         mcols(all.peaks.rd) <- mapping
-        names(all.peaks.rd) <- sapply(all.peaks.rd$peakNames, paste, collapse=NAME_short_string)
-        all.peaks.rd$gpForFindOverlapsOfPeaks <- unlist(lapply(all.peaks.rd$gpForFindOverlapsOfPeaks, unique)) 
+        names(all.peaks.rd) <- sapply(all.peaks.rd$peakNames, 
+                                      paste, 
+                                      collapse=NAME_short_string)
+        all.peaks.rd$gpForFindOverlapsOfPeaks <- 
+            unlist(lapply(all.peaks.rd$gpForFindOverlapsOfPeaks, unique)) 
         all <- split(all.peaks.rd, all.peaks.rd$gpForFindOverlapsOfPeaks)
-        all <- all[order(as.numeric(names(all)))] ##important, and length(all)==length(xlist)
+        all <- all[order(as.numeric(names(all)))] 
+        ##important, and length(all)==length(xlist)
         if(length(all)!=length(xlist)) 
-            stop("length of all should be equal to length of xlist. Please report the bug. Thanks.")
-        listname <- apply(outcomes, 1, function(id) paste(names[as.logical(id)], collapse=NAME_long_string))
+            stop("length of all should be equal to length of xlist. 
+                 Please report the bug. Thanks.")
+        listname <- apply(outcomes, 1, 
+                          function(id) paste(names[as.logical(id)], 
+                                             collapse=NAME_long_string))
         listcode <- apply(outcomes, 1, paste, collapse="")
         listname <- listname[-1]
         listcode <- listcode[-1]
         peaklist <- list()
         for(i in 1:length(listcode)){
             sublist <- all[xlist==listcode[i]]
-            if(length(sublist)>0) peaklist[[listname[i]]]<-unlist(sublist, use.names=FALSE)
+            if(length(sublist)>0) 
+                peaklist[[listname[i]]]<-unlist(sublist, use.names=FALSE)
         }
         correlation <- list()
         names(Peaks) <- gsub(NAME_conn_string, NAME_short_string, names(Peaks))
@@ -194,17 +221,32 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
             if(length(npln)==2){
                 pl <- peaklist[[i]]$peakNames
                 pl <- pl[sapply(pl, length)>1]
-                pl1 <- lapply(pl, function(.ele) .ele[grepl(paste("^", npln[1], NAME_short_string, sep=""), .ele)][1])
-                pl2 <- lapply(pl, function(.ele) .ele[grepl(paste("^", npln[2], NAME_short_string, sep=""), .ele)][1])
-                idsel <- mapply(function(.p1, .p2) is.na(.p1)+is.na(.p2)==0, pl1, pl2)
+                pl1 <- lapply(pl, 
+                              function(.ele) 
+                                  .ele[grepl(paste("^", npln[1], 
+                                                   NAME_short_string, 
+                                                   sep=""), 
+                                             .ele)][1])
+                pl2 <- lapply(pl, 
+                              function(.ele) 
+                                  .ele[grepl(paste("^", npln[2], 
+                                                   NAME_short_string, 
+                                                   sep=""), .ele)][1])
+                idsel <- mapply(function(.p1, .p2) is.na(.p1)+is.na(.p2)==0, 
+                                pl1, pl2)
                 pl1 <- Peaks[unlist(pl1[idsel])]
                 pl2 <- Peaks[unlist(pl2[idsel])]
-                cl <- getRelationship(pl1, pl2)[,c("insideFeature", "shortestDistance")]
-                colnames(cl)[grepl("insideFeature", colnames(cl))] <- "overlapFeature"
-                correlation[[npl[i]]] <- cbind(peaks1=names(pl1), as.data.frame(pl1), 
-                                               peaks2=names(pl2), as.data.frame(pl2), 
-                                               cl)
-                rownames(correlation[[npl[i]]]) <- paste(names(pl1), names(pl2), sep="_")
+                cl <- 
+                    getRelationship(pl1, pl2)[,c("insideFeature", 
+                                                 "shortestDistance")]
+                colnames(cl)[grepl("insideFeature", colnames(cl))] <- 
+                    "overlapFeature"
+                correlation[[npl[i]]] <- 
+                    cbind(peaks1=names(pl1), as.data.frame(pl1), 
+                          peaks2=names(pl2), as.data.frame(pl2), 
+                          cl)
+                rownames(correlation[[npl[i]]]) <- 
+                    paste(names(pl1), names(pl2), sep="_")
             }
         }
         for(i in 1:length(peaklist)){
@@ -212,17 +254,27 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         }
         
         if((!missing(Peaks1)) && (!missing(Peaks2))){
-            sampleName <- npl==paste(NameOfPeaks1, NAME_long_string, NameOfPeaks2, sep="")
-            if(!any(sampleName)) sampleName <- npl==paste(NameOfPeaks2, NAME_long_string, NameOfPeaks1, sep="")
+            sampleName <- 
+                npl==paste(NameOfPeaks1, 
+                           NAME_long_string, 
+                           NameOfPeaks2, sep="")
+            if(!any(sampleName)) 
+                sampleName <- npl==paste(NameOfPeaks2, 
+                                         NAME_long_string, 
+                                         NameOfPeaks1, sep="")
             sampleName <- npl[sampleName]
-            Peaks1withOverlaps <- Peaks[names(Peaks) %in% correlation[[sampleName]]$peaks1]
-            names(Peaks1withOverlaps) <- gsub(paste(NameOfPeaks1, NAME_short_string, sep=""), 
-                                              "", 
-                                              names(Peaks1withOverlaps))
-            Peaks2withOverlaps <- Peaks[names(Peaks) %in% correlation[[sampleName]]$peaks2]
-            names(Peaks2withOverlaps) <- gsub(paste(NameOfPeaks2, NAME_short_string, sep=""), 
-                                              "", 
-                                              names(Peaks2withOverlaps))
+            Peaks1withOverlaps <- 
+                Peaks[names(Peaks) %in% correlation[[sampleName]]$peaks1]
+            names(Peaks1withOverlaps) <- 
+                gsub(paste(NameOfPeaks1, NAME_short_string, sep=""), 
+                     "", 
+                     names(Peaks1withOverlaps))
+            Peaks2withOverlaps <- 
+                Peaks[names(Peaks) %in% correlation[[sampleName]]$peaks2]
+            names(Peaks2withOverlaps) <- 
+                gsub(paste(NameOfPeaks2, NAME_short_string, sep=""), 
+                     "", 
+                     names(Peaks2withOverlaps))
             if(flagRD){
                 peaklist <- lapply(peaklist, as, Class="RangedData")
                 correlation <- lapply(correlation, as, Class="RangedData")
@@ -234,7 +286,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
             structure(list(venn_cnt=venn_cnt, 
                            peaklist=peaklist, 
                            overlappingPeaks=correlation,
-                           OverlappingPeaks=correlation[[sampleName]],##To fit old version
+                           OverlappingPeaks=correlation[[sampleName]],
                            MergedPeaks=mergedPeaks,##
                            Peaks1withOverlaps=Peaks1withOverlaps,
                            Peaks2withOverlaps=Peaks2withOverlaps), 

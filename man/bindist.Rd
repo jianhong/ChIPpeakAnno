@@ -23,11 +23,22 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{counts}}{vector of \code{"integer"} The count number in each binding range}
-    \item{\code{mids}}{vector of \code{"integer"} The center of each range relevant to feature}
-    \item{\code{halfBinSize}}{\code{"integer"}, length must be 1. the fixed half-width of each binding range}
-    \item{\code{bindingType}}{a \code{"character"}. could be "TSS", "geneEnd"}
-    \item{\code{featureType}}{a \code{"character"}. could be "transcript", "exon"}
+    \item{\code{counts}}{
+        vector of \code{"integer"} The count number in each binding range
+    }
+    \item{\code{mids}}{
+        vector of \code{"integer"} The center of each range relevant to feature
+    }
+    \item{\code{halfBinSize}}{
+        \code{"integer"}, length must be 1. 
+        the fixed half-width of each binding range
+    }
+    \item{\code{bindingType}}{
+        a \code{"character"}. could be "TSS", "geneEnd"
+    }
+    \item{\code{featureType}}{
+        a \code{"character"}. could be "transcript", "exon"
+    }
   }
 }
 \section{Methods}{

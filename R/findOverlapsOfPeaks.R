@@ -30,21 +30,28 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
     if(any(duplicated(names)))
         stop("Same input Peaks detected!")
     
-    venn_cnt <- vennCounts(PeaksList, n=n, names=names, 
-                           maxgap=maxgap, minoverlap=minoverlap, by="region",
-                           ignore.strand=ignore.strand, connectedPeaks=connectedPeaks)
+    venn_cnt <- 
+        vennCounts(PeaksList, n=n, names=names, 
+                   maxgap=maxgap, minoverlap=minoverlap, by="region",
+                   ignore.strand=ignore.strand, connectedPeaks=connectedPeaks)
     
     outcomes <- venn_cnt$venn_cnt[, 1:n]
     xlist <- do.call(rbind, venn_cnt$xlist)
     xlist <- xlist - 1
-    xlist <- xlist[nrow(xlist):1,,drop=FALSE] ## reverse xlist to match the order of names
+    xlist <- xlist[nrow(xlist):1,,drop=FALSE] 
+    ## reverse xlist to match the order of names
     xlist <- apply(xlist, 2, paste, collapse="")
-    if(length(venn_cnt$all)!=length(xlist)) stop("length of 'xlist' and 'all' should be identical.")
-    all <- do.call(rbind, mapply(function(.ele, .id, .gp) cbind(.id, .ele, .gp), 
-                                 venn_cnt$all, 1:length(venn_cnt$all), xlist, SIMPLIFY=FALSE))
+    if(length(venn_cnt$all)!=length(xlist)) 
+        stop("length of 'xlist' and 'all' should be identical.")
+    all <- do.call(rbind,
+                   mapply(function(.ele, .id, .gp) cbind(.id, .ele, .gp), 
+                          venn_cnt$all, 1:length(venn_cnt$all), 
+                          xlist, SIMPLIFY=FALSE))
     
     all.peaks <- venn_cnt$Peaks[all[,2]]
-    names(all.peaks) <- gsub(NAME_conn_string, NAME_short_string, names(all.peaks))
+    names(all.peaks) <- gsub(NAME_conn_string,
+                             NAME_short_string,
+                             names(all.peaks))
     if(!is.null(all.peaks$old_strand_HH)){
         strand(all.peaks) <- all.peaks$old_strand_HH
         all.peaks$old_strand_HH <- NULL
@@ -52,19 +59,30 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
     all.peaks$gpForFindOverlapsOfPeaks <- all[, 1]
     all.peaks$gpType <- all[, 3]
     all.peaks.split <- split(all.peaks, all.peaks$gpType)
-    listname <- apply(outcomes, 1, function(id) paste(names[as.logical(id)], collapse=NAME_long_string))
+    listname <- apply(outcomes, 1, 
+                      function(id) 
+                          paste(names[as.logical(id)], 
+                                collapse=NAME_long_string))
     listcode <- apply(outcomes, 1, paste, collapse="")
     listname <- listname[-1]
     listcode <- listcode[-1]
     names(listname) <- listcode
     names(all.peaks.split) <- listname[names(all.peaks.split)]
-    peaklist <- lapply(all.peaks.split, reduce, min.gapwidth=maxgap, with.revmap=TRUE, ignore.strand=ignore.strand)
+    peaklist <- lapply(all.peaks.split, reduce, 
+                       min.gapwidth=maxgap, with.revmap=TRUE, 
+                       ignore.strand=ignore.strand)
     peaklist <- mapply(function(peaks, info){
         revmap <- peaks$revmap
-        peakNames <- do.call(rbind, mapply(function(id, gp) cbind(id, gp), revmap, 1:length(revmap), SIMPLIFY=FALSE))
-        peaks$peakNames <- CharacterList(split(names(info)[peakNames[, 1]], peakNames[, 2]), compress=TRUE)
+        peakNames <- do.call(rbind, 
+                             mapply(function(id, gp) cbind(id, gp), 
+                                    revmap, 1:length(revmap), 
+                                    SIMPLIFY=FALSE))
+        peaks$peakNames <- CharacterList(split(names(info)[peakNames[, 1]], 
+                                               peakNames[, 2]), 
+                                         compress=TRUE)
         if(ignore.strand){
-            strand <- split(as.character(strand(info))[peakNames[, 1]], peakNames[, 2])
+            strand <- split(as.character(strand(info))[peakNames[, 1]], 
+                            peakNames[, 2])
             strand <- lapply(strand, unique)
             l <- sapply(strand, length)
             strand[l>=2] <- "*"
@@ -100,9 +118,14 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
                              peaks2=names(s), as.data.frame(unname(s)), 
                              cl)
         rownames(correlation) <- make.names(paste(names(q), names(s), sep="_"))
-        correlation <- correlation[correlation[,"shortestDistance"]<maxgap | correlation[,"overlapFeature"] %in% c("includeFeature", "inside", "overlapEnd", "overlapStart"),]
+        correlation <- correlation[correlation[,"shortestDistance"]<maxgap | 
+                                       correlation[,"overlapFeature"] %in% 
+                                       c("includeFeature", "inside",
+                                         "overlapEnd", "overlapStart"),]
     })
     
-    structure(list(venn_cnt=venn_cnt$venn_cnt, peaklist=peaklist, overlappingPeaks=overlappingPeaks), 
+    structure(list(venn_cnt=venn_cnt$venn_cnt, 
+                   peaklist=peaklist, 
+                   overlappingPeaks=overlappingPeaks), 
               class="overlappingPeaks")
 }

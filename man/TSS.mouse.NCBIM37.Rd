@@ -10,16 +10,20 @@
 }
 \usage{data(TSS.mouse.NCBIM37)}
 \format{
-    GRanges with slot start holding the start position of the gene, slot end holding the end position of the gene, slot names holding ensembl gene id, slot seqnames holding the chromosome location where the gene is located and slot strand holding the strinad information. In addition, the following variables are included.
+    GRanges with slot start holding the start position of the gene, slot end 
+    holding the end position of the gene, slot names holding ensembl gene id, 
+    slot seqnames holding the chromosome location where the gene is located and
+    slot strand holding the strinad information. In addition, the following 
+    variables are included.
   \describe{
     \item{\code{description}}{description of the gene}}}
 
 \details{
  Annotation data obtained by:
-	
-	 mart = useMart(biomart = "ensembl", dataset = "mmusculus_gene_ensembl")
+    
+     mart = useMart(biomart = "ensembl", dataset = "mmusculus_gene_ensembl")
 
- 	getAnnotation(mart, featureType = "TSS")
+     getAnnotation(mart, featureType = "TSS")
 
 }
 \examples{

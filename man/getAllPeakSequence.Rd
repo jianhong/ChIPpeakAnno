@@ -10,19 +10,32 @@ getAllPeakSequence(myPeakList, upstream = 200L, downstream = upstream,
                    genome, AnnotationData)
 }
 \arguments{
-  \item{myPeakList}{ An object of \link[GenomicRanges:GRanges]{GRanges}: See example below}
+  \item{myPeakList}{ An object of \link[GenomicRanges:GRanges]{GRanges}: 
+  See example below}
   \item{upstream}{upstream offset from the peak start, e.g., 200 }
   \item{downstream}{ downstream offset from the peak end, e.g., 200 }
-  \item{genome}{ BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details}
-   \item{AnnotationData}{ RangedData used if mart object is parsed in which can be obtained from getAnnotation with featureType="TSS". For example, data(TSS.human.NCBI36), data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and data(TSS.zebrafish.Zv8).  If not supplied, then annotation will be obtained from biomaRt automatically using the mart object}
+  \item{genome}{ BSgenome object or mart object. Please refer to 
+  available.genomes in BSgenome package and useMart in bioMaRt package 
+  for details}
+   \item{AnnotationData}{ RangedData used if mart object is parsed in which
+   can be obtained from getAnnotation with featureType="TSS". For example, 
+   data(TSS.human.NCBI36), data(TSS.mouse.NCBIM37), data(GO.rat.RGSC3.4) and 
+   data(TSS.zebrafish.Zv8).  If not supplied, then annotation will be
+   obtained from biomaRt automatically using the mart object}
 }
 \value{
- \link[GenomicRanges:GRanges]{GRanges} with slot start holding the start position of the peak, slot end holding the end position of the peak, slot rownames holding the id of the peak and slot seqnames holding the chromosome where the peak is located. In addition, the following variables are included:
+ \link[GenomicRanges:GRanges]{GRanges} with slot start holding the start 
+ position of the peak, slot end holding the end position of the peak, 
+ slot rownames holding the id of the peak and slot seqnames holding the 
+ chromosome where the peak is located. In addition, the following variables 
+ are included:
  \item{upstream}{upstream offset from the peak start}
  \item{downstream}{downstream offset from the peak end}
 \item{sequence}{the sequence obtained}
 }
-\references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful link between biological biomarts and microarray data analysis. Bioinformatics, 21, 3439-3440. }
+\references{ Durinck S. et al. (2005) BioMart and Bioconductor: a powerful 
+link between biological biomarts and microarray data analysis. 
+Bioinformatics, 21, 3439-3440. }
 \author{ Lihua Julie Zhu, Jianhong Ou}
 \examples{
 #### use Annotation data from BSgenome

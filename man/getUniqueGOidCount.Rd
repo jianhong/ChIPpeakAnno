@@ -1,6 +1,5 @@
 \name{getUniqueGOidCount}
 \alias{getUniqueGOidCount}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{ get the count for each unique GO ID }
 \description{
   get the count for each unique GO ID
@@ -8,7 +7,6 @@
 \usage{
 getUniqueGOidCount(goList)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{goList}{a set of GO terms as character vector}
 }
@@ -30,6 +28,4 @@ goList= c("GO:0000075", "GO:0000082","GO:0000082","GO:0000122","GO:0000122",
 getUniqueGOidCount(goList)
 }
 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ internal }

@@ -5,7 +5,10 @@
 Convert other common IDs to entrez gene ID.
 }
 \description{
-Convert other common IDs such as ensemble gene id, gene symbol, refseq id to entrez gene ID leveraging organism annotation dataset. For example, org.Hs.eg.db is the dataset from orgs.Hs.eg.db package for human, while org.Mm.eg.db is the dataset from the org.Mm.eg.db package for mouse.
+Convert other common IDs such as ensemble gene id, gene symbol, 
+refseq id to entrez gene ID leveraging organism annotation dataset. 
+For example, org.Hs.eg.db is the dataset from orgs.Hs.eg.db package for human, 
+while org.Mm.eg.db is the dataset from the org.Mm.eg.db package for mouse.
 }
 \usage{
 convert2EntrezID(IDs, orgAnn, ID_type="ensembl_gene_id")

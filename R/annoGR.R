@@ -1,0 +1,303 @@
+## Annotation class
+## need DBI
+setClass("annoGR", representation(gr="GRanges",
+                                  source="character",
+                                  date="Date",
+                                  feature="character",
+                                  metadata="data.frame"),
+         validity=function(object){
+             re <- TRUE
+             if(is.null(object@gr)) re <- "gr is empty"
+             if(length(object@gr)<1) re <- "gr is empty"
+             if(is.null(names(object@gr))) re <- "gr must have names"
+             if(length(object@gr)<1) re <- "length of gr less than 1"
+             if(!is.null(object@metadata)){
+                 if(!all(colnames(object@metadata)==c("name", "value"))){
+                     re <- "colnames of metadata must be name and value"
+                 }
+             }
+             re
+         })
+
+
+if(!isGeneric("annoGR")){
+    setGeneric("annoGR", function(ranges, ...) standardGeneric("annoGR"))
+}
+
+setMethod("$", "annoGR", function(x, name) slot(x, name))
+setReplaceMethod("$", "annoGR",
+                 function(x, name, value){
+                     slot(x, name, check = TRUE) <- value
+                     x
+                 })
+
+setMethod("metadata", "annoGR", function(x, ...) x@metadata)
+setMethod("show", "annoGR", function(object){
+    cat(class(object), "object;\n")
+    cat("# source: ", object@source, "\n")
+    cat("# create at: ", format(object@date, "%a %b %d %X %Y %Z"), "\n")
+    cat("# feature: ", object@feature, "\n")
+    metadata <- metadata(object)
+    for (i in seq_len(nrow(metadata))) {
+        cat("# ", metadata[i, "name"], ": ", metadata[i, "value"],
+            "\n", sep="")
+    }
+})
+
+
+setMethod("annoGR", "GRanges", 
+          function(ranges, feature="group", date, ...){
+              if(missing("date")) date <- Sys.Date()
+              if(is.null(names(ranges))){
+                  names(ranges) <- make.names(
+                      formatC(1:length(ranges),
+                              width=nchar(length(ranges)),
+                              flag="0"))
+              }
+              new("annoGR", gr=ranges,
+                  date=date, feature=feature,
+                  ...)
+})
+
+setMethod("annoGR", "TxDb", 
+          function(ranges, feature=c("gene", "transcript", "exon",
+                                    "CDS", "fiveUTR", "threeUTR",
+                                    "microRNA", "tRNAs", "geneModel"),
+                   date, source, metadata, OrganismDb){
+              feature <- match.arg(feature)
+              if(missing(metadata)) {
+                  metadata <- 
+                      dbGetQuery(dbconn(ranges), "select * from metadata")
+              }
+              if(missing(source)) 
+                  source <- deparse(substitute(ranges, env=parent.frame()))
+              if(missing(date)) date <- Sys.Date()
+              gr <- 
+                  switch(feature,
+                         geneModel={
+                             exon <- exonsBy(ranges, "tx", use.names=TRUE)
+                             tids <- rep(names(exon), elementLengths(exon))
+                             exon <- unlist(exon)
+                             if(length(exon)){
+                                 exon$tx_name <- tids
+                                 exon$feature_type <- "ncRNA"
+                                 cds <- cdsBy(ranges, "tx", use.names=TRUE)
+                                 tids <- 
+                                     rep(names(cds), elementLengths(cds))
+                                 cds <- unlist(cds)
+                                 if(length(cds)){
+                                     mcols(cds) <- NULL
+                                     cds$tx_name <- tids
+                                     cds$feature_type <- "CDS"
+                                 }
+                                 utr5 <- 
+                                     fiveUTRsByTranscript(ranges,
+                                                          use.names=TRUE)
+                                 tids <- rep(names(utr5), 
+                                             elementLengths(utr5))
+                                 utr5 <- unlist(utr5)
+                                 if(length(utr5)){
+                                     mcols(utr5) <- NULL
+                                     utr5$tx_name <- tids
+                                     utr5$feature_type <- "5UTR"
+                                 }
+                                 utr3 <- 
+                                     threeUTRsByTranscript(ranges,
+                                                           use.names=TRUE)
+                                 tids <- rep(names(utr3), 
+                                             elementLengths(utr3))
+                                 utr3 <- unlist(utr3)
+                                 if(length(utr3)){
+                                     mcols(utr3) <- NULL
+                                     utr3$tx_name <- tids
+                                     utr3$feature_type <- "3UTR"
+                                 }
+                                 anno <- c(cds, utr5, utr3)
+                                 left <- exon[!(exon$tx_name %in% anno$tx_name)]
+                                 ##check logical, anno covered all annotation
+                                 right <- exon[exon$tx_name %in% anno$tx_name]
+                                 rd1 <- reduce(anno)
+                                 rd2 <- reduce(right)
+                                 if(!identical(rd1, rd2)){
+                                     stop("some annotation is missing! bug!")
+                                 }
+                                 mcols(exon) <- 
+                                     mcols(exon)[, 
+                                                 c("tx_name", "feature_type")]
+                                 exon <- c(exon, anno) ## merge ncRNA with anno
+                                 if(!missing(OrganismDb)){
+                                     if(class(OrganismDb)=="OrganismDb"){
+                                         symbol <- tryCatch(
+                                             select(OrganismDb, 
+                                                    keys=unique(exon$tx_name),
+                                                    columns="SYMBOL",
+                                                    keytype="TXNAME"),
+                                             error=NULL)
+                                         if(length(symbol)>0){
+                                             exon$symbol <- 
+                                                 symbol[match(exon$tx_name, 
+                                                              symbol[, 1]),
+                                                        "SYMBOL"]
+                                         }
+                                     }else{
+                                         message("OrganismDb must be an object
+                                                 of OrganismDb.")
+                                     }
+                                 }
+                                 ## sort exon
+                                 exon <- exon[order(exon$tx_name)]
+                                 ### get each tx_name first start pos
+                                 tids <- rle(exon$tx_name)
+                                 tids$values <- 
+                                     tapply(start(exon), exon$tx_name, min)
+                                 tids <- inverse.rle(tids)
+                                 exon <- 
+                                     exon[order(as.character(seqnames(exon)),
+                                                tids, 
+                                                start(exon))]
+                                 names(exon) <- make.names(names(exon), 
+                                                           unique=TRUE)
+                             }
+                             exon
+                         },
+                         gene={
+                             g <- genes(ranges, columns="gene_id")
+                             names(g) <- g$gene_id
+                             g$gene_id <- NULL
+                             g
+                             },
+                         exon={
+                             e <- exons(ranges, 
+                                        columns=c("exon_id", 
+                                                  "tx_name", 
+                                                  "gene_id"))
+                             if(length(e)){
+                                 names(e) <- e$exon_id
+                                 e$exon_id <- NULL
+                             }
+                             e
+                             },
+                         transcript={
+                             t <- transcripts(ranges,
+                                              columns=c("tx_id",
+                                                        "tx_name",
+                                                        "gene_id"))
+                             if(length(t)){
+                                 names(t) <- t$tx_id
+                                 t$tx_id <- NULL
+                             }
+                             t
+                         },
+                         CDS={
+                             c <- cds(ranges, 
+                                      columns=c("cds_id",
+                                                "tx_name",
+                                                "gene_id"))
+                             if(length(c)){
+                                 names(c) <- c$cds_id
+                                 c$cds_id <- NULL
+                             }
+                             c
+                         },
+                         fiveUTR={
+                             u <- fiveUTRsByTranscript(ranges,
+                                                       use.name=TRUE)
+                             tids <- rep(names(u), elementLengths(u))
+                             u <- unlist(u)
+                             if(length(u)){
+                                 u$tx_name <- tids
+                                 names(u) <- make.names(names(u), 
+                                                        unique=TRUE)
+                             }
+                             u
+                         },
+                         threeUTR={
+                             u <- threeUTRsByTranscript(ranges,
+                                                        use.name=TRUE)
+                             tids <- rep(names(u), elementLengths(u))
+                             u <- unlist(u)
+                             if(length(u)){
+                                 u$tx_name <- tids
+                                 names(u) <- make.names(names(u), 
+                                                        unique=TRUE)
+                             }
+                             u
+                         },
+                         microRNA={
+                             m <- microRNAs(ranges)
+                             if(length(m)){
+                                 names(m) <- m$mirna_id
+                                 m$mirna_id <- NULL
+                             }
+                             m
+                         },
+                         tRNA=tRNAs(ranges)
+                  )
+              new("annoGR", gr=gr, source=source,
+                  date=date, feature=feature, 
+                  metadata=metadata)
+          })
+
+setMethod("annoGR", "EnsDb",
+          function(ranges, 
+                   feature=c("gene", "transcript", "exon", "disjointExons"),
+                   date, source, metadata){
+              feature <- match.arg(feature)
+              if(missing(metadata)) {
+                  metadata <- 
+                      dbGetQuery(dbconn(ranges), "select * from metadata")
+              }
+              if(missing(source)) 
+                  source <- deparse(substitute(ranges, env=parent.frame()))
+              if(missing(date)) date <- Sys.Date()
+              gr <- 
+                  switch(feature,
+                         disjointExons={
+                             e <- disjointExons(ranges,
+                                                aggregateGenes=FALSE,
+                                                includeTranscripts=TRUE)
+                             l <- length(e)
+                             names(e) <- make.names(
+                                 formatC(seq_len(l), 
+                                         width=nchar(as.character(l)),
+                                         flag="0"))
+                             e
+                         },
+                         gene={
+                             g <- genes(ranges, columns=c("gene_id",
+                                                         "gene_name"))
+                             names(g) <- g$gene_id
+                             g$gene_id <- NULL
+                             g
+                         },
+                         exon={
+                             e <- exons(ranges, 
+                                        columns=c("exon_id", 
+                                                  "tx_id", 
+                                                  "gene_id",
+                                                  "gene_name"))
+                             if(length(e)){
+                                 names(e) <- make.names(names(e), 
+                                                        unique=TRUE,
+                                                        allow_=TRUE)
+                             }
+                             e
+                         },
+                         transcript={
+                             t <- transcripts(ranges,
+                                              columns=c("tx_id",
+                                                        "gene_id",
+                                                        "gene_name"))
+                             if(length(t)){
+                                 names(t) <- make.names(names(t), 
+                                                        unique=TRUE,
+                                                        allow_=TRUE)
+                             }
+                             t
+                         }
+                  )
+              seqlevelsStyle(gr) <- "UCSC"
+              new("annoGR", gr=gr, source=source,
+                  date=date, feature=feature, 
+                  metadata=metadata)
+          })

@@ -1,7 +1,8 @@
 \name{egOrgMap}
 \alias{egOrgMap}
 \title{
-  Convert between the name of the organism annotation package ("OrgDb") and the name of the organism. 
+  Convert between the name of the organism annotation package ("OrgDb") 
+  and the name of the organism. 
 }
 \description{
   Give a species name and return the organism annotation package name or 

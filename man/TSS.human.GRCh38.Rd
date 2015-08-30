@@ -16,8 +16,8 @@
   Annotation data obtained by:
 
     mart = useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
-		
-	getAnnotation(mart, featureType = "TSS", output="GRanges")
+        
+    getAnnotation(mart, featureType = "TSS")
 
 }
 \examples{

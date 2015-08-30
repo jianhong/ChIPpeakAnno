@@ -4,7 +4,8 @@
     Permutation Test for two given peak lists
 }
 \description{
-    Performs a permutation test to seee if there is an association between two given peak lists.
+    Performs a permutation test to seee if there is an association between 
+    two given peak lists.
 }
 \usage{
 peakPermTest(peaks1, peaks2, ntimes=100, 
@@ -30,7 +31,8 @@ peakPermTest(peaks1, peaks2, ntimes=100,
   The number of cores to use. see \link[parallel]{mclapply}
 }
   \item{maxgap}{
-  See \link[IRanges]{findOverlaps} in the IRanges package for a description of these arguments.
+  See \link[IRanges]{findOverlaps} in the IRanges package for a description 
+  of these arguments.
 }
   \item{pool}{
   an object of \link{permPool}
@@ -48,7 +50,8 @@ peakPermTest(peaks1, peaks2, ntimes=100,
   what annotation type should be used for detecting the binding distribution.
 }
   \item{seqn}{
-  default is NA, which means not filter the universe pool for sampling. Otherwise the universe pool will be filtered by the seqnames in seqn.
+  default is NA, which means not filter the universe pool for sampling. 
+  Otherwise the universe pool will be filtered by the seqnames in seqn.
 }
   \item{\dots}{
   further arguments to be passed to \link[regioneR]{numOverlaps}. 
@@ -62,7 +65,8 @@ A list of class permTestResults. See \link[regioneR]{permTest}
     \link{preparePool}, \link{bindist}
 }
 \references{
-Davison, A. C. and Hinkley, D. V. (1997) Bootstrap methods and their application, Cambridge University Press, United Kingdom, 156-160
+Davison, A. C. and Hinkley, D. V. (1997) Bootstrap methods and their 
+application, Cambridge University Press, United Kingdom, 156-160
 }
 \author{
 Jianhong Ou
@@ -74,10 +78,13 @@ Jianhong Ou
     #peaks2 <- toGRanges(files[2], skip=5)
     #peakPermTest(peaks1, peaks2, TxDb=TxDb.Celegans.UCSC.ce6.ensGene)
     if(interactive()){
-        peaks1 <- toGRanges(file.path(path, "MACS2_peaks.xls"), format="MACS2")
-        peaks2 <- toGRanges(file.path(path, "peaks.narrowPeak"), format="narrowPeak")
+        peaks1 <- toGRanges(file.path(path, "MACS2_peaks.xls"), 
+                            format="MACS2")
+        peaks2 <- toGRanges(file.path(path, "peaks.narrowPeak"), 
+                            format="narrowPeak")
         library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-        peakPermTest(peaks1, peaks2, TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene, min.pctA=10)
+        peakPermTest(peaks1, peaks2, 
+               TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene, min.pctA=10)
     }
 }
 \keyword{ misc }

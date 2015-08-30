@@ -18,8 +18,10 @@
 }
 \section{Slots}{
   \describe{
-    \item{\code{grs}}{object of \code{"GRangesList"} The list of binding ranges}
-    \item{\code{N}}{vector of \code{"integer"}, permutation number for each ranges}
+    \item{\code{grs}}{
+    object of \code{"GRangesList"} The list of binding ranges}
+    \item{\code{N}}{
+    vector of \code{"integer"}, permutation number for each ranges}
   }
 }
 \section{Methods}{

@@ -8,6 +8,8 @@ importClassFrom(graph, "graphNEL")
 importFrom(graph, ugraph)
 importFrom(RBGL, 
            connectedComp)
+importFrom(AnnotationDbi, dbconn, select)
+importFrom(DBI, dbGetQuery)
 importFrom(regioneR, permTest, numOverlaps)
 importFrom(BiocInstaller, biocLite)
 import(IRanges)
@@ -20,11 +22,12 @@ import(GenomicFeatures)
 import(GenomicRanges)
 import(GenomeInfoDb)
 import(S4Vectors)
+import(ensembldb)
 importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
-exportClass("bindist", "permPool")
-exportMethods("$", "$<-")
+exportClass("bindist", "permPool", "annoGR")
+exportMethods("$", "$<-", "metadata", "show", "annoGR")
 export( 
        addAncestors,  
        addGeneIDs,

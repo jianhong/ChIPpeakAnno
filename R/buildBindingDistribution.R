@@ -1,8 +1,14 @@
 buildBindingDistribution <- function(x, AnnotationData,
                                      bindingType=c("TSS", "geneEnd"), 
                                      featureType=c("transcript", "exon")){
+    if(missing(AnnotationData) || missing(x)){
+        stop("x and AnnotationData is required.")
+    }
     if(class(x)!="GRanges"){
         stop("x must be an object of GRanges")
+    }
+    if(class(AnnotationData)=="annoGR"){
+        AnnotationData <- AnnotationData@gr
     }
     if(class(AnnotationData)!="GRanges"){
         stop("AnnotationData must be an object of GRanges")

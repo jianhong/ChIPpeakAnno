@@ -1,8 +1,10 @@
 \name{annotatePeakInBatch}
 \alias{annotatePeakInBatch}
-\title{ Obtain the distance to the nearest TSS, miRNA, and/or exon for a list of peaks}
+\title{ Obtain the distance to the nearest TSS, miRNA, and/or exon for a list 
+of peaks}
 \description{
-  Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
+  Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak 
+  locations leveraging IRanges and biomaRt package
 }
 \usage{
 annotatePeakInBatch(myPeakList, mart, featureType = c("TSS", "miRNA","Exon"), 
@@ -19,49 +21,105 @@ ignore.strand=TRUE)
 }
 \arguments{
  \item{myPeakList}{A \link[GenomicRanges:GRanges]{GRanges} object }
- \item{mart}{A mart object, used if AnnotationData is not supplied, see useMart of bioMaRt package for details }
- \item{featureType}{ A charcter vector used with mart argument if AnnotationData is not supplied; it's value is "TSS"", "miRNA"" or "Exon" }
- \item{AnnotationData}{ A GRanges oject. It can be obtained from function getAnnotation or customized annotation of class GRanges containing additional variable:  strand (1 or + for plus strand and -1 or - for minus strand). Pre-compliled annotations, such as TSS.human.NCBI36, TSS.mouse.NCBIM37, TSS.rat.RGSC3.4 and TSS.zebrafish.Zv8, are provided by this package (attach them with data() function). Another method to provide annotation data is to obtain through biomaRt real time by using the parameters of mart and featureType}
-\item{output}{nearestLocation (default): will output the nearest features calculated as PeakLocForDistance - FeatureLocForDistance;
-	overlapping: will output overlapping features with maximum gap specified as maxgap between peak range and feature range;
+ \item{mart}{A mart object, used if AnnotationData is not supplied, see useMart 
+ of bioMaRt package for details }
+ \item{featureType}{ A charcter vector used with mart argument if 
+ AnnotationData is not supplied; it's value is "TSS"", "miRNA"" or "Exon" }
+ \item{AnnotationData}{ A \link[GenomicRanges]{GRanges} or \link{annoGR} oject. 
+ It can be obtained from function getAnnotation or customized annotation of 
+ class GRanges containing additional variable:  strand (1 or + for plus strand 
+ and -1 or - for minus strand). Pre-compliled annotations, such as 
+ TSS.human.NCBI36, TSS.mouse.NCBIM37, TSS.rat.RGSC3.4 and TSS.zebrafish.Zv8, 
+ are provided by this package (attach them with data() function). Another 
+ method to provide annotation data is to obtain through biomaRt real time by 
+ using the parameters of mart and featureType}
+\item{output}{nearestLocation (default): will output the nearest features 
+calculated as PeakLocForDistance - FeatureLocForDistance;
+    overlapping: will output overlapping features with maximum gap specified 
+    as maxgap between peak range and feature range;
     shortestDistance: will output nearest features;
-	both: will output all the nearest features, in addition, will output any features that overlap the peak that is not the nearest features.
-    upstream&inside: will output all upstream and overlapping features with maximum gap.
-    inside&downstream: will output all downstream and overlapping features with maximum gap.
+    both: will output all the nearest features, in addition, will output any 
+    features that overlap the peak that is not the nearest features.
+    upstream&inside: will output all upstream and overlapping features with 
+    maximum gap.
+    inside&downstream: will output all downstream and overlapping features 
+    with maximum gap.
     upstream: will output all upstream features with maximum gap.
     downstream: will output all downstream features with maximum gap.
-    upstreamORdownstream: will output all upstream features with maximum gap or downstream with maximum gap.
+    upstreamORdownstream: will output all upstream features with maximum gap 
+    or downstream with maximum gap.
 }
-\item{multiple}{Not applicable when output is nearest. TRUE: output multiple overlapping features for each peak. FALSE: output at most one overlapping feature for each peak. This parameter is kept for backward compatibility, please use select.}
-\item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or less are considered to be overlapping}
-\item{PeakLocForDistance}{Specify the location of peak for calculating distance,i.e., middle means using middle of the peak to calculate distance to feature, start means using start of the peak to calculate the distance to feature. To be compatible with previous version, by default using start}
-\item{FeatureLocForDistance}{Specify the location of feature for calculating distance,i.e., middle means using middle of the feature to calculate distance of peak to feature, start means using start of the feature to calculate the distance to feature, TSS means using start of feature when feature is on plus strand and using end of feature when feature is on minus strand, geneEnd means using end of feature when feature is on plus strand and using start of feature when feature is on minus strand. To be compatible with previous version, by default using TSS}
+\item{multiple}{Not applicable when output is nearest. TRUE: output multiple 
+overlapping features for each peak. FALSE: output at most one overlapping 
+feature for each peak. This parameter is kept for backward compatibility, 
+please use select.}
+\item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or 
+less are considered to be overlapping}
+\item{PeakLocForDistance}{Specify the location of peak for calculating 
+distance,i.e., middle means using middle of the peak to calculate distance 
+to feature, start means using start of the peak to calculate the distance 
+to feature. To be compatible with previous version, by default using start}
+\item{FeatureLocForDistance}{Specify the location of feature for calculating 
+distance,i.e., middle means using middle of the feature to calculate distance 
+of peak to feature, start means using start of the feature to calculate the
+distance to feature, TSS means using start of feature when feature is on plus 
+strand and using end of feature when feature is on minus strand, geneEnd means 
+using end of feature when feature is on plus strand and using start of feature
+when feature is on minus strand. To be compatible with previous version, by 
+default using TSS}
 \item{select}{
-"all" may return multiple overlapping peaks, "first" will return the first overlapping peak, "last" will return the last overlapping peak and "arbitrary" will return one of the overlapping peaks.
+"all" may return multiple overlapping peaks, "first" will return the first 
+overlapping peak, "last" will return the last overlapping peak and "arbitrary"
+will return one of the overlapping peaks.
 }
-\item{ignore.strand}{When set to TRUE, the strand information is ignored in the annotation.}
+\item{ignore.strand}{When set to TRUE, the strand information is ignored in 
+the annotation.}
 }
 \value{
-An object of \link[GenomicRanges:GRanges]{GRanges} with slot start holding the start position of the peak, slot end holding the end position of the peak, slot space holding the chromosome location where the peak is located, slot rownames holding the id of the peak. In addition, the following variables are included.
+An object of \link[GenomicRanges:GRanges]{GRanges} with slot start holding 
+the start position of the peak, slot end holding the end position of the peak, 
+slot space holding the chromosome location where the peak is located, slot 
+rownames holding the id of the peak. In addition, the following variables 
+are included.
     \item{\code{feature}}{id of the feature such as ensembl gene ID}
-    \item{\code{insideFeature}}{upstream: peak resides upstream of the feature; downstream: peak resides downstream of the feature; inside: peak resides inside the feature; overlapStart: peak overlaps with the start of the feature; overlapEnd: peak overlaps with the end of the feature; includeFeature: peak include the feature entirely}
-    \item{\code{distancetoFeature}}{distance to the nearest feature such as transcription start site.  By default, the distance is calculated as the distance between the start of the binding site and the TSS that is the gene start for genes located on the forward strand and the gene end for genes located on the reverse strand. The user can specify the location of peak and location of feature for calculating this}
+    \item{\code{insideFeature}}{upstream: peak resides upstream of the 
+    feature; downstream: peak resides downstream of the feature; inside: 
+    peak resides inside the feature; overlapStart: peak overlaps with the 
+    start of the feature; overlapEnd: peak overlaps with the end of the 
+    feature; includeFeature: peak include the feature entirely}
+    \item{\code{distancetoFeature}}{distance to the nearest feature such as 
+    transcription start site.  By default, the distance is calculated as the
+    distance between the start of the binding site and the TSS that is the gene
+    start for genes located on the forward strand and the gene end for genes 
+    located on the reverse strand. The user can specify the location of peak 
+    and location of feature for calculating this}
     \item{\code{start_position}}{start position of the feature such as gene}
     \item{\code{end_position}}{end position of the feature such as the gene}
-    \item{\code{strand}}{1 or + for positive strand and -1 or - for negative strand where the feature is located}
-	\item{\code{shortestDistance}}{The shortest distance from either end of peak to either end the feature.
-	}
-\item{\code{fromOverlappingOrNearest}}{nearest: indicates this feature's start (feature's end for features at minus strand) is closest to the peak start; Overlapping: indicates this feature overlaps with this peak although it is not the nearest feature start
-	}
+    \item{\code{strand}}{1 or + for positive strand and -1 or - for negative 
+    strand where the feature is located}
+    \item{\code{shortestDistance}}{The shortest distance from either end of 
+    peak to either end the feature.
+    }
+\item{\code{fromOverlappingOrNearest}}{nearest: indicates this feature's start 
+(feature's end for features at minus strand) is closest to the peak start;
+Overlapping: indicates this feature overlaps with this peak although it is
+not the nearest feature start
+    }
 }
 \references{ 
-1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237doi:10.1186/1471-2105-11-237
+1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate 
+ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 
+11:237doi:10.1186/1471-2105-11-237
 
-2. Zhu L (2013). "Integrative analysis of ChIP-chip and ChIP-seq dataset." In Lee T and Luk ACS (eds.), Tilling Arrays, volume 1067, chapter 4, pp. -19. Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8
+2. Zhu L (2013). "Integrative analysis of ChIP-chip and ChIP-seq dataset." 
+In Lee T and Luk ACS (eds.), Tilling Arrays, volume 1067, chapter 4, pp. -19. 
+Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8
 } 
 
 \author{ Lihua Julie Zhu, Jianhong Ou}
-\seealso{ \link{getAnnotation}, \link{findOverlappingPeaks}, \link{makeVennDiagram}, \link{addGeneIDs}, \link{peaksNearBDP}, \link{summarizePatternInPeaks}}
+\seealso{ \link{getAnnotation}, \link{findOverlappingPeaks}, 
+\link{makeVennDiagram}, \link{addGeneIDs}, \link{peaksNearBDP}, 
+\link{summarizePatternInPeaks}}
 \examples{
 
 #if (interactive()){

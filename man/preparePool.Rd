@@ -12,7 +12,6 @@ preparePool(TxDb, template, bindingDistribution,
             featureType = c("transcript", "exon"), 
             seqn = NA)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{TxDb}{
 an object of \link[GenomicFeatures]{TxDb}
@@ -30,7 +29,8 @@ the relevant position to features
 feature type, transcript or exon.
 }
   \item{seqn}{
-seqnames. If given, the pool for permutation will be restrict in the given chromosomes.
+seqnames. If given, the pool for permutation will be restrict in the 
+given chromosomes.
 }
 }
 \value{
