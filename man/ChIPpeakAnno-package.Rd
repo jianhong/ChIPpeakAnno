@@ -15,12 +15,12 @@ ChIP-chip experiments.
 }
 \details{
 \tabular{ll}{
-Package: \tab ChIPpeakAnno\cr
-Type: \tab Package\cr
-Version: \tab 3.0.0\cr
-Date: \tab 2014-10-24\cr
-License: \tab LGPL\cr
-LazyLoad: \tab yes\cr
+ Package: \tab ChIPpeakAnno\cr
+ Type: \tab Package\cr
+ Version: \tab 3.0.0\cr
+ Date: \tab 2014-10-24\cr
+ License: \tab LGPL\cr
+ LazyLoad: \tab yes\cr
 }
 
 }
@@ -61,9 +61,11 @@ ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
 \keyword{ package }
 
 \examples{
+ if(interactive()){
   data(myPeakList)
   library(EnsDb.Hsapiens.v75)
   anno <- annoGR(EnsDb.Hsapiens.v75)
   annotatedPeak <- 
     annotatePeakInBatch(myPeakList[1:6], AnnotationData=anno)
+ }
 }

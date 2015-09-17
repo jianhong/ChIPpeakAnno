@@ -27,7 +27,8 @@ runifGR <- function(grNoN, n){
     pos <- as.integer(as.character(pos))
     off <- idx - starts[pos] - 1
     gr <- grNoN[pos]
-    gr <- shift(gr, shift=off)
+    suppressWarnings(gr <- shift(gr, shift=off))
+    gr <- trim(gr)
     width(gr) <- 1
     gr
 }

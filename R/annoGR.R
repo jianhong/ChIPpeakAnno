@@ -1,16 +1,18 @@
 ## Annotation class
 ## need DBI
-setClass("annoGR", representation(gr="GRanges",
-                                  source="character",
-                                  date="Date",
-                                  feature="character",
-                                  metadata="data.frame"),
+setClass("annoGR", 
+         representation(source="character",
+                        date="Date",
+                        feature="character",
+                        metadata="data.frame"),
+         contains="GRanges",
          validity=function(object){
              re <- TRUE
-             if(is.null(object@gr)) re <- "gr is empty"
-             if(length(object@gr)<1) re <- "gr is empty"
-             if(is.null(names(object@gr))) re <- "gr must have names"
-             if(length(object@gr)<1) re <- "length of gr less than 1"
+             if(length(object@seqnames)<1) re <- "annotation is empty"
+             if(is.null(names(object@ranges))) 
+                 re <- "annotation must have names"
+             if(any(duplicated(names(object@ranges))))
+                 re <- "the names has dupoicates"
              if(!is.null(object@metadata)){
                  if(!all(colnames(object@metadata)==c("name", "value"))){
                      re <- "colnames of metadata must be name and value"
@@ -19,31 +21,104 @@ setClass("annoGR", representation(gr="GRanges",
              re
          })
 
+newAnnoGR <- function (seqnames = Rle(), 
+                       ranges = IRanges(), 
+                       strand = Rle("*", length(seqnames)), 
+                       mcols = DataFrame(), 
+                       seqlengths = NULL, 
+                       seqinfo = NULL,
+                       ...) 
+{
+    if (!is(seqnames, "Rle")) 
+        seqnames <- Rle(seqnames)
+    if (!is.factor(runValue(seqnames))) 
+        runValue(seqnames) <- factor(runValue(seqnames), 
+                                     levels = unique(runValue(seqnames)))
+    if (class(ranges) != "IRanges") 
+        ranges <- as(ranges, "IRanges")
+    if (!is(strand, "Rle")) 
+        strand <- Rle(strand)
+    if (!is.factor(runValue(strand)) || !identical(levels(runValue(strand)), 
+                                                   levels(strand()))) 
+        runValue(strand) <- strand(runValue(strand))
+    if (anyMissing(runValue(strand))) {
+        warning("missing values in strand converted to \"*\"")
+        runValue(strand)[is.na(runValue(strand))] <- "*"
+    }
+    lx <- max(length(seqnames), length(ranges), length(strand))
+    if (lx > 1) {
+        if (length(seqnames) == 1) 
+            seqnames <- rep(seqnames, lx)
+        if (length(ranges) == 1) 
+            ranges <- rep(ranges, lx)
+        if (length(strand) == 1) 
+            strand <- rep(strand, lx)
+    }
+    if (is.null(seqlengths)) 
+        seqlengths <- setNames(rep(NA_integer_, length(levels(seqnames))), 
+                               levels(seqnames)) ## stats
+    if (is.null(seqinfo)) 
+        seqinfo <- Seqinfo(names(seqlengths), seqlengths) ##GenomicInfoDb
+    runValue(seqnames) <- factor(runValue(seqnames), seqnames(seqinfo))
+    if (!is(mcols, "DataFrame")) 
+        stop("'mcols' must be a DataFrame object")
+    if (ncol(mcols) == 0L) {
+        mcols <- mcols(ranges)
+        if (is.null(mcols)) 
+            mcols <- new("DataFrame", nrows = length(seqnames))
+    }
+    if (!is.null(mcols(ranges))) 
+        mcols(ranges) <- NULL
+    if (!is.null(rownames(mcols))) {
+        if (is.null(names(ranges))) 
+            names(ranges) <- rownames(mcols)
+        rownames(mcols) <- NULL
+    }
+    new("annoGR", seqnames = seqnames, ranges = ranges, strand = strand, 
+        seqinfo = seqinfo, elementMetadata = mcols, ...)
+}
+
+
+newAGR <- function(gr, ...){
+    newAnnoGR(seqnames = seqnames(gr), 
+              ranges = ranges(gr), 
+              strand = strand(gr), 
+              mcols = mcols(gr), 
+              seqlengths = seqlengths(gr), 
+              seqinfo = seqinfo(gr),
+              ...)
+}
 
 if(!isGeneric("annoGR")){
     setGeneric("annoGR", function(ranges, ...) standardGeneric("annoGR"))
 }
+if(!isGeneric("info")){
+    setGeneric("info", function(object) standardGeneric("info"))
+}
 
-setMethod("$", "annoGR", function(x, name) slot(x, name))
-setReplaceMethod("$", "annoGR",
-                 function(x, name, value){
-                     slot(x, name, check = TRUE) <- value
-                     x
-                 })
+setAs(from="annoGR", to="GRanges", function(from){
+    GRanges(seqnames=seqnames(from), 
+            ranges=ranges(from),
+            strand=strand(from),
+            mcols=mcols(from),
+            seqlengths=seqlengths(from),
+            seqinfo=seqinfo(from))
+})
+setAs(from="GRanges", to="annoGR", function(from){
+    annoGR(from)
+})
 
-setMethod("metadata", "annoGR", function(x, ...) x@metadata)
-setMethod("show", "annoGR", function(object){
+setMethod("info", "annoGR", function(object){
     cat(class(object), "object;\n")
     cat("# source: ", object@source, "\n")
     cat("# create at: ", format(object@date, "%a %b %d %X %Y %Z"), "\n")
     cat("# feature: ", object@feature, "\n")
-    metadata <- metadata(object)
+    metadata <- object@metadata
     for (i in seq_len(nrow(metadata))) {
         cat("# ", metadata[i, "name"], ": ", metadata[i, "value"],
             "\n", sep="")
     }
 })
-
 
 setMethod("annoGR", "GRanges", 
           function(ranges, feature="group", date, ...){
@@ -54,15 +129,15 @@ setMethod("annoGR", "GRanges",
                               width=nchar(length(ranges)),
                               flag="0"))
               }
-              new("annoGR", gr=ranges,
-                  date=date, feature=feature,
-                  ...)
-})
+              newAGR(gr=ranges,
+                     date=date, feature=feature,
+                     ...)
+          })
 
 setMethod("annoGR", "TxDb", 
           function(ranges, feature=c("gene", "transcript", "exon",
-                                    "CDS", "fiveUTR", "threeUTR",
-                                    "microRNA", "tRNAs", "geneModel"),
+                                     "CDS", "fiveUTR", "threeUTR",
+                                     "microRNA", "tRNAs", "geneModel"),
                    date, source, metadata, OrganismDb){
               feature <- match.arg(feature)
               if(missing(metadata)) {
@@ -143,7 +218,7 @@ setMethod("annoGR", "TxDb",
                                          message("OrganismDb must be an object
                                                  of OrganismDb.")
                                      }
-                                 }
+                                     }
                                  ## sort exon
                                  exon <- exon[order(exon$tx_name)]
                                  ### get each tx_name first start pos
@@ -157,7 +232,7 @@ setMethod("annoGR", "TxDb",
                                                 start(exon))]
                                  names(exon) <- make.names(names(exon), 
                                                            unique=TRUE)
-                             }
+                                 }
                              exon
                          },
                          gene={
@@ -165,7 +240,7 @@ setMethod("annoGR", "TxDb",
                              names(g) <- g$gene_id
                              g$gene_id <- NULL
                              g
-                             },
+                         },
                          exon={
                              e <- exons(ranges, 
                                         columns=c("exon_id", 
@@ -176,7 +251,7 @@ setMethod("annoGR", "TxDb",
                                  e$exon_id <- NULL
                              }
                              e
-                             },
+                         },
                          transcript={
                              t <- transcripts(ranges,
                                               columns=c("tx_id",
@@ -233,9 +308,9 @@ setMethod("annoGR", "TxDb",
                          },
                          tRNA=tRNAs(ranges)
                   )
-              new("annoGR", gr=gr, source=source,
-                  date=date, feature=feature, 
-                  metadata=metadata)
+              newAGR(gr=gr, source=source,
+                     date=date, feature=feature, 
+                     metadata=metadata)
           })
 
 setMethod("annoGR", "EnsDb",
@@ -265,7 +340,7 @@ setMethod("annoGR", "EnsDb",
                          },
                          gene={
                              g <- genes(ranges, columns=c("gene_id",
-                                                         "gene_name"))
+                                                          "gene_name"))
                              names(g) <- g$gene_id
                              g$gene_id <- NULL
                              g
@@ -297,7 +372,7 @@ setMethod("annoGR", "EnsDb",
                          }
                   )
               seqlevelsStyle(gr) <- "UCSC"
-              new("annoGR", gr=gr, source=source,
-                  date=date, feature=feature, 
-                  metadata=metadata)
+              newAGR(gr=gr, source=source,
+                     date=date, feature=feature, 
+                     metadata=metadata)
           })

@@ -30,7 +30,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
         stop("No AnnotationData as GRanges or annoGR is passed in.")
     }
     if(class(annotationData)=="annoGR")
-        annotationData <- annotationData@gr
+        annotationData <- as(annotationData, "GRanges")
     annotationData <- unique(annotationData)
     if(class(annotationData)=="RangedData") 
         annotationData <- toGRanges(annotationData)
@@ -42,7 +42,9 @@ binOverFeature <- function(..., annotationData=GRanges(),
     if(!is.list(FUN)) FUN <- list(FUN)
     lapply(FUN, function(fun){
         if(mode(fun)!="function")
-            stop("The mode of FUN must be function. The FUN could be any function such as median, mean, sum, length, ...")
+            stop("The mode of FUN must be function. 
+                 The FUN could be any function such as 
+                 median, mean, sum, length, ...")
     })
     
     annotatedPeaksList<-lapply(PeaksList, function(Peaks){
@@ -50,7 +52,8 @@ binOverFeature <- function(..., annotationData=GRanges(),
             stop("No valid Peaks passed in. It needs to be GRanges object")
         }
         if(is.null(score(Peaks))){
-            message("score of GRanges object is required for calculation. It will be the input of FUN. Setting score as 1.")
+            message("score of GRanges object is required for calculation. 
+                    It will be the input of FUN. Setting score as 1.")
             Peaks$score <- 1
         }
         ## annotate the peaks
@@ -91,7 +94,13 @@ binOverFeature <- function(..., annotationData=GRanges(),
         segments(x-smidge, yplus, x+smidge, yplus)
     }
     
-    if(missing(xlab)) xlab <- paste("Bins from", featureSite)
+    if(missing(xlab)) {
+        xlab <- if(aroundGene){
+            paste("Bins from", featureSite)
+        }else{
+            paste("distance from", featureSite)
+        }
+    }
     if(missing(ylab)) ylab <- "Score" 
     if(missing(main)) main <- paste(names, "binding over", featureSite)
     
@@ -337,13 +346,31 @@ binOverFeature <- function(..., annotationData=GRanges(),
         ylim.min <- min(value[!is.na(value)] - std[!is.na(value)])
         ylim.max <- max(value[!is.na(value)] + std[!is.na(value)])
         ylim.dis <- (ylim.max - ylim.min)/20
-        plot(b, value, 
-             ylim=c(ylim.min-ylim.dis, ylim.max+ylim.dis),
-             xlab=xlab.ele, 
-             ylab=ylab.ele, 
-             main=main.ele)
-        plotErrBar(b, value, std)
-        names(value) <- b
+        blabel <- if(aroundGene){
+            c(seq.int(-radius, -radius/nbins, length.out=nbins)+radius/nbins/2,
+              1:mbins,
+              seq.int(0, radius-radius/nbins, length.out=nbins)+radius/nbins/2)
+        }else{
+            seq.int(-radius, radius-radius/nbins, length.out=2*nbins) +
+                radius/nbins/2
+        }
+        if(aroundGene){
+            plot(b, value, 
+                 ylim=c(ylim.min-ylim.dis, ylim.max+ylim.dis),
+                 xlab=xlab.ele, 
+                 ylab=ylab.ele, 
+                 main=main.ele)
+            plotErrBar(b, value, std)
+        }else{
+            plot(blabel, value, 
+                 ylim=c(ylim.min-ylim.dis, ylim.max+ylim.dis),
+                 xlab=xlab.ele, 
+                 ylab=ylab.ele, 
+                 main=main.ele)
+            plotErrBar(blabel, value, std)
+        }
+        
+        names(value) <- blabel
         value
     }, annotatedPeaksList, FUN, xlab, ylab, main)
     

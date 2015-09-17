@@ -1,3 +1,12 @@
+CHANGES IN VERSION 3.3.6
+-------------------------
+NEW FEATURE
+    o add new function featureAlignedSignal, featureAlignedDistribution,
+      featureAlignedHeatmap, pie1
+    o add new dataset HOT.spots, wgEncodeTfbsV3
+    o update annoGR class
+    o update vignettes
+
 CHANGES IN VERSION 3.3.5
 -------------------------
 NEW FEATURE

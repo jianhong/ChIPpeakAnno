@@ -1,4 +1,5 @@
 import(BiocGenerics)
+import(Biobase)
 import(methods)
 importFrom(biomaRt, useMart, getBM, getSequence)
 importFrom(multtest, mt.rawp2adjp)
@@ -27,7 +28,7 @@ importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
 exportClass("bindist", "permPool", "annoGR")
-exportMethods("$", "$<-", "metadata", "show", "annoGR")
+exportMethods("$", "$<-", "info", "annoGR")
 export( 
        addAncestors,  
        addGeneIDs,
@@ -39,6 +40,9 @@ export(
        convert2EntrezID,
        countPatternInSeqs,
        egOrgMap,
+       featureAlignedDistribution,
+       featureAlignedHeatmap,
+       featureAlignedSignal,
        findOverlappingPeaks,
        findOverlapsOfPeaks,
        getAllPeakSequence, 
@@ -52,6 +56,7 @@ export(
        makeVennDiagram, 
        peakPermTest,
        peaksNearBDP,
+       pie1,
        preparePool,
        summarizePatternInPeaks,
        toGRanges, 

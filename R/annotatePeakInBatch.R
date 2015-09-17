@@ -66,7 +66,7 @@ annotatePeakInBatch <-
         if (inherits(AnnotationData, "RangedData")) {
             TSS.ordered <- RangedData2GRanges(AnnotationData)
         }else if(inherits(AnnotationData, "annoGR")){
-            TSS.ordered <- AnnotationData@gr
+            TSS.ordered <- as(AnnotationData, "GRanges")
         }else{
             TSS.ordered <- AnnotationData
         }

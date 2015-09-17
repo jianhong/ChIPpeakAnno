@@ -81,17 +81,18 @@ Jianhong Ou, Lihua Julie Zhu
     \link[biomaRt:getBM]{getBM}, \link[AnnotationDbi:AnnotationDb]{AnnotationDbi}
 }
 \examples{
-data(annotatedPeak)
-library(org.Hs.eg.db)
-addGeneIDs(annotatedPeak[1:6,],orgAnn="org.Hs.eg.db",
+ data(annotatedPeak)
+ library(org.Hs.eg.db)
+ addGeneIDs(annotatedPeak[1:6,],orgAnn="org.Hs.eg.db",
            IDs2Add=c("symbol","omim"))
-addGeneIDs(annotatedPeak$feature[1:6],orgAnn="org.Hs.eg.db",
-        IDs2Add=c("symbol","genename"))
-if(interactive()){
-mart <- useMart("ENSEMBL_MART_ENSEMBL",host="www.ensembl.org",
+ ##addGeneIDs(annotatedPeak$feature[1:6],orgAnn="org.Hs.eg.db",
+ ##           IDs2Add=c("symbol","genename"))
+ if(interactive()){
+   mart <- useMart("ENSEMBL_MART_ENSEMBL",host="www.ensembl.org",
                 dataset="hsapiens_gene_ensembl")
-##mart <- useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
-addGeneIDs(annotatedPeak[1:6,],mart=mart,IDs2Add=c("hgnc_symbol","entrezgene"))
-}
+   ##mart <- useMart(biomart="ensembl",dataset="hsapiens_gene_ensembl")
+  addGeneIDs(annotatedPeak[1:6,], mart=mart,
+             IDs2Add=c("hgnc_symbol","entrezgene"))
+ }
 }
 \keyword{ misc }

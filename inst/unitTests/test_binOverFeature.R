@@ -21,4 +21,17 @@ test_binOverFeature<-function(){
     bin <- binOverFeature(peaks, annotationData=annotationData, 
                           radius=50L, nbins=50L, minGeneLen=1L)
     checkEqualsNumeric(sum(bin[,1]), sum(1:49)+sum(1:50))
+    
+    ## by simulation data
+    annoGR <- annoGR(EnsDb.Hsapiens.v79)
+    peaks <- as(annoGR, "GRanges")
+    st <- as.character(strand(peaks))=="+"
+    start(peaks)[st] <- start(peaks)[st]-100
+    end(peaks)[st] <- start(peaks)[st]
+    end(peaks)[!st] <- end(peaks)[!st]+100
+    start(peaks)[!st] <- end(peaks)[!st]
+    peaks$score <- 1
+    bin <- binOverFeature(peaks, annotationData=annoGR, 
+                          radius=500L, nbins=50L, minGeneLen=1L)
+    checkTrue(rownames(bin)[which(bin[,1]==max(bin[,1]))]=="-95")
 }

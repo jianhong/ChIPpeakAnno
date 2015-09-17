@@ -8,7 +8,7 @@ buildBindingDistribution <- function(x, AnnotationData,
         stop("x must be an object of GRanges")
     }
     if(class(AnnotationData)=="annoGR"){
-        AnnotationData <- AnnotationData@gr
+        AnnotationData <- as(AnnotationData, "GRanges")
     }
     if(class(AnnotationData)!="GRanges"){
         stop("AnnotationData must be an object of GRanges")

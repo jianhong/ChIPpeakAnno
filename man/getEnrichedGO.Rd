@@ -9,7 +9,7 @@
 }
 \usage{
 getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", 
-maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
+maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="", condense=FALSE)
 }
 \arguments{
   \item{annotatedPeak}{A GRanges object or a vector of feature IDs}
@@ -24,6 +24,9 @@ maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="")
   \item{minGOterm}{ The minimum count in a genome for a GO term to be included}
   \item{multiAdjMethod}{ The multiple testing procedures, for details, see 
   mt.rawp2adjp in multtest package}
+  \item{condense}{
+    condense the results or not.
+  }
 }
 \value{
 A list with 3 elements 

@@ -5,10 +5,10 @@
 \alias{annoGR,GRanges-method}
 \alias{annoGR,TxDb-method}
 \alias{annoGR,EnsDb-method}
-\alias{show,annoGR-method}
-\alias{metadata,annoGR-method}
-\alias{$,annoGR-method}
-\alias{$<-,annoGR-method}
+\alias{info}
+\alias{info,annoGR-method}
+\alias{coerce,GRanges,annoGR-method}
+\alias{coerce,annoGR,GRanges-method}
 \title{
     Class \code{annoGR}
 }
@@ -18,12 +18,14 @@
 }
 \section{Objects from the Class}{
     Objects can be created by calls of the form
-    \code{new("annoGR", gr, source, date, feature, metadata)}
+    \code{new("annoGR", date, elementMetadata, feature, metadata, ranges,
+                        seqinfo, seqnames, source, strand)}
 }
 \section{Slots}{
   \describe{
-    \item{\code{gr}}{an \link[GenomicRanges]{GRanges} object with annotation
-    info. The object must have unique names.}
+    \item{seqnames, ranges, strand, elementMetadata, seqinfo}{
+    slots inherit from \link[GenomicRanges]{GRanges}. 
+    The ranges must have unique names.}
     
     \item{\code{source}}{character, where the annotation comes from}
     
@@ -37,11 +39,19 @@
     \item{\code{metadata}}{data frame, metadata from annotation}
   }
 }
+\section{Coercion}{
+ \describe{
+   \item{}{
+    as(from, "annoGR"): Creates a annoGR object from a GRanges object.
+   }
+   \item{}{
+    as(from, "GRanges"): Create a GRanges object from a annoGR object.
+   }
+ }
+}
 \section{Methods}{
   \describe{
-    \item{$, $<-}{Get or set the slot of annoGR}
-    \item{show}{Print basic info for annoGR object}
-    \item{metadata}{Return metadata object of annoGR object}
+    \item{info}{Print basic info for annoGR object}
     \item{annoGR("TxDb"), annoGR("EnsDb")}{Create a annoGR object from 
     \link[GenomicFeatures]{TxDb} or \link[ensembldb]{EnsDb} object}
   }
@@ -73,10 +83,9 @@
     Jianhong Ou
 }
 \examples{
-    library(EnsDb.Hsapiens.v79)
-    anno <- annoGR(EnsDb.Hsapiens.v79)
     if(interactive()){
-        anno <- annoGR()
+        library(EnsDb.Hsapiens.v79)
+        anno <- annoGR(EnsDb.Hsapiens.v79)
     }
 }
 \keyword{ classes }
