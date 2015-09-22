@@ -613,8 +613,8 @@ write2FASTA(peaksWithSequences,"test.fa")
 \subsection{Heatmap of given peak ranges}
 
 You can easily observe the signals of multiple Chip-Seq peak files by 
-\Rfunction{featureAlignedHeatmap} (Figure \ref{ChIPpeakAnno-heatmap} and
-\Rfunction{featureAlignedDistribution} (Figure \ref{ChIPpeakAnno-Distribution}.
+\Rfunction{featureAlignedHeatmap} (Figure \ref{ChIPpeakAnno-heatmap}) and
+\Rfunction{featureAlignedDistribution} (Figure \ref{ChIPpeakAnno-distribution}).
 
 \begin{scriptsize}
 <<heatmap,include=FALSE,fig=TRUE,echo=TRUE,width=4,height=6>>=
@@ -657,7 +657,7 @@ featureAlignedDistribution(sig, feature.center,
                            type="l")
 @
 \end{scriptsize}
-\incfig{ChIPpeakAnno-Distribution}{.5\textwidth}{}
+\incfig{ChIPpeakAnno-distribution}{.5\textwidth}{}
 {Distribution of aligned features.}
 
 

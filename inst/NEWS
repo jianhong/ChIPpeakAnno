@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.3.7
+-------------------------
+FIX BUGS
+    o fix the problem in creating vignettes in linux platform.
+
 CHANGES IN VERSION 3.3.6
 -------------------------
 NEW FEATURE
