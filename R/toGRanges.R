@@ -43,6 +43,10 @@ Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
                   if(format %in% c("MACS", "MACS2")){
                       header <- TRUE
                       comment.char <- "#"
+                      tab5rows <- read.table(data, header=header, 
+                                             comment.char="#", ..., 
+                                             nrows=5)
+                      classes <- sapply(tab5rows, class)
                   }else{
                       if(header && is.null(colNames)){ ## format=="others"
                           colNames <- colnames(tab5rows)

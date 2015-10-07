@@ -11,8 +11,12 @@ randPeaks <- function(A, grs, N, ...){
     s <- unlist(GRangesList(s))
     
     wid <- width(A)
-    width(s) <- rexp(length(s),1/(mean(wid)-min(wid))) + min(wid)
-    
+    ## how to abvoid warning?
+    wid <- rexp(length(s),1/(mean(wid)-min(wid))) + min(wid)
+    halfwid <- floor(wid/2)
+    suppressWarnings(start(s) <- start(s)-halfwid)
+    suppressWarnings(width(s) <- 2*halfwid)
+    s <- trim(s)
     s
 }
 
