@@ -6,6 +6,9 @@ NEW FEATURE
     o add annoPeaks function
     o add xget function
     o update the peakPermTest algorithm to make more reasonable result.
+    o add oligoSummary function
+    o add IDRfilter function
+    o add reCenterPeaks function
 
 CHANGES IN VERSION 3.3.8
 -------------------------

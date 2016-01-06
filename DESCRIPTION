@@ -11,7 +11,7 @@ Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Herve Pages, Claude Gazin,
 Maintainer: Lihua Julie Zhu <julie.zhu@umassmed.edu>,
     Jianhong Ou <Jianhong.ou@umassmed.edu>
 Depends:
-    R (>= 3.1),
+    R (>= 3.2),
     methods,
     grid,
     IRanges,
