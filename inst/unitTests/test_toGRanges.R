@@ -15,7 +15,13 @@ test_toGRanges<-function(){
     ##BED
     bed <- data.frame(cbind(space = c("1", "2"), start=c("100", "1000"),
                 end=c("200", "1100"), name=c("peak1", "peak2")))
+    gr <- toGRanges(bed, format="BED")
+    checkEquals(start(gr), c(101, 1001))
+    
+    ##data.frame
     gr <- toGRanges(bed)
+    checkEquals(start(gr), c(100, 1000))
+    
     ##GFF
     GFF <- data.frame(cbind(space  = c("chr1", "chr2"), 
                             source=rep("Macs", 2),

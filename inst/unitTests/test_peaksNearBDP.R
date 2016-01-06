@@ -1,5 +1,15 @@
 test_peaksNearBDP<-function(){
     ##GRanges
+    ## myPeak
+    ## 1 2 3 4 5 6 7 8 9 10
+    ##   a a a a a b b   c
+    ## A A B         D D    +
+    ##     F F F   C C      -
+    ##   E E E E E          +
+    ## G G G G G            +
+    ##     H H H H H        +
+    ## I I I I I I I        -
+    
     myPeak = GRanges("1", 
                      IRanges(start=c(2, 7, 10), 
                              end=c(6, 8, 10), 

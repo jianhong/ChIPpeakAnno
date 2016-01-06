@@ -115,7 +115,7 @@ featureAlignedHeatmap <-
     }
     
     if(length(lim)==0){
-        lim <- sapply(cov, range, simplify=FALSE)
+        lim <- sapply(cov, range, na.rm=TRUE, simplify=FALSE)
     }
     if(length(lim)==1){
         lim <- rep(lim, length(cov))

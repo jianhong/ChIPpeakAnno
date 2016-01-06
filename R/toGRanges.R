@@ -7,6 +7,9 @@ toGRanges <- function(data, format=c("BED", "GFF",
   if (missing(data)){
     stop("data is required!")
   }
+  if(inherits(data, "data.frame") & length(format)>1){
+    format <- "others"
+  }
   if(format[1]!="RangedData") format <- match.arg(format)
   if (inherits(data, "character")){
       if(format %in% c("narrowPeak", "broadPeak")){
@@ -90,6 +93,36 @@ Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
       ## space, start, end, width, names, ...
       data$width <- NULL
       colNames <- colnames(data)
+      format <- "RangedData"
+  }
+  if(inherits(data, "connection")){
+      colNames <- switch(format,
+                         BED=c("space", "start", "end", "names", 
+                               "score", "strand", "thickStart", 
+                               "thickEnd", "itemRgb", "blockCount", 
+                               "blockSizes", "blockStarts"),
+                         GFF=c("space", "source", "names", "start", 
+                               "end", "score", "strand", "frame", "group"),
+                         MACS=c("space", "start", "end", "length", 
+                                "summit", "tags", "qvalue", 
+                                "fold_enrichment", "FDR"),
+                         MACS2=c("space", "start", "end", "length", 
+                                 "abs_summit", "pileup", "qvalue", 
+                                 "fold_enrichment", "FDR", "names"),
+                         narrowPeak=c("space", "start", "end", "names", 
+                                      "score", "strand", "signalValue", 
+                                      "pValue", "qValue", "peak"),
+                         broadPeak=c("space", "start", "end", "names", 
+                                     "score", "strand", "signalValue", 
+                                     "pValue", "qValue"),
+                         others=colNames)
+      if(is.null(colNames)) 
+          stop("when a connection object is input, colNames is required.")
+      data <- read.table(data, header=header, ...)
+      nc <- min(length(colNames), ncol(data))
+      data <- data[, 1:nc, drop=FALSE]
+      colNames <- colNames[1:nc]
+      colnames(data) <- colNames
   }
   if ((class(data) != "data.frame") || dim(data)[2] <3)
   {

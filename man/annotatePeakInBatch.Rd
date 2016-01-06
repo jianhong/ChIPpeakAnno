@@ -12,12 +12,17 @@ AnnotationData, output=c("nearestLocation", "overlapping", "both",
                          "shortestDistance", "inside",
                          "upstream&inside", "inside&downstream",
                          "upstream", "downstream", 
-                         "upstreamORdownstream"),
+                         "upstreamORdownstream",
+                         "bindingRegion_startSite",
+                         "bindingRegion_endSite",
+                         "bindingRegion_fullRange",
+                         "bindingRegion_bothSidesNSS",
+                         "bindingRegion_bothSidesNearest"),
 multiple=c(TRUE,FALSE), 
 maxgap=0L, PeakLocForDistance=c("start", "middle", "end"), 
 FeatureLocForDistance=c("TSS", "middle","start", "end","geneEnd"), 
 select=c("all", "first","last","arbitrary"),
-ignore.strand=TRUE)
+ignore.strand=TRUE, ...)
 }
 \arguments{
  \item{myPeakList}{A \link[GenomicRanges:GRanges]{GRanges} object }
@@ -48,6 +53,7 @@ calculated as PeakLocForDistance - FeatureLocForDistance;
     downstream: will output all downstream features with maximum gap.
     upstreamORdownstream: will output all upstream features with maximum gap 
     or downstream with maximum gap.
+    bindingRegion_xxxxx: will use \link{annoPeaks} to annotate peaks. 
 }
 \item{multiple}{Not applicable when output is nearest. TRUE: output multiple 
 overlapping features for each peak. FALSE: output at most one overlapping 
@@ -74,6 +80,7 @@ will return one of the overlapping peaks.
 }
 \item{ignore.strand}{When set to TRUE, the strand information is ignored in 
 the annotation.}
+\item{...}{Parameters could be passed to \link{annoPeaks}}
 }
 \value{
 An object of \link[GenomicRanges:GRanges]{GRanges} with slot start holding 
@@ -119,19 +126,25 @@ Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8
 \author{ Lihua Julie Zhu, Jianhong Ou}
 \seealso{ \link{getAnnotation}, \link{findOverlappingPeaks}, 
 \link{makeVennDiagram}, \link{addGeneIDs}, \link{peaksNearBDP}, 
-\link{summarizePatternInPeaks}}
+\link{summarizePatternInPeaks}, \link{annoGR}, \link{annoPeaks}}
 \examples{
 
 #if (interactive()){
-    ## example 1: annotate myPeakList (GRanges) 
-    ## with TSS.human.NCBI36 (Granges)
+    ## example 1: annotate myPeakList by TxDb or EnsDb.
     data(myPeakList)
+    library(EnsDb.Hsapiens.v75)
+    annoData <- annoGR(EnsDb.Hsapiens.v75)
+    annotatePeak = annotatePeakInBatch(myPeakList[1:6], AnnotationData=annoData)
+    annotatePeak
+    
+    ## example 2: annotate myPeakList (GRanges) 
+    ## with TSS.human.NCBI36 (Granges)
     data(TSS.human.NCBI36)
-    annotatedPeak = annotatePeakInBatch(myPeakList[1:6,], 
+    annotatedPeak = annotatePeakInBatch(myPeakList[1:6], 
                                         AnnotationData=TSS.human.NCBI36)
     annotatedPeak
     
-    ## example 2: you have a list of transcription factor biding sites from 
+    ## example 3: you have a list of transcription factor biding sites from 
     ## literature and are interested in determining the extent of the overlap 
     ## to the list of peaks from your experiment. Prior calling the function 
     ## annotatePeakInBatch, need to represent both dataset as RangedData 

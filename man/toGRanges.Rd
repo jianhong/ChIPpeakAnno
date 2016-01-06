@@ -17,6 +17,7 @@ toGRanges(data, format=c("BED", "GFF",
 \arguments{
   \item{data}{
   BED, GFF, RangedData or any user defined dataset or their file path.
+  Alternatively, data can be a readable txt-mode connection (See ?read.table).
 }
 \item{format}{
   data format.  If the data format is set to BED, GFF, narrowPeak or broadPeak, 

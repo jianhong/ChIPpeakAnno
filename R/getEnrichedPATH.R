@@ -52,6 +52,9 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     }else{
         entrezIDs <- convert2EntrezID(feature_ids, orgAnn, feature_id_type)
     }
+    if(length(entrezIDs)<2){
+        stop("The number of gene is less than 2. Please double check your feature_id_type.")
+    }
     
     extid2path <- get(extid2path)
     mapped_genes <- mappedkeys(extid2path)

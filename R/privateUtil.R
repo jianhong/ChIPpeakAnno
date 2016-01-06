@@ -85,9 +85,12 @@ getRelationship <- function(queryHits, subjectHits){
     insideFeature[as.logical(upstream)] <- "upstream"
     shortestDistance <- apply(cbind(ss, ee, se, es), 1,
                               function(.ele) min(abs(.ele)))
+    shortestDistanceToStart <- apply(cbind(ss, es), 1, 
+                                     function(.ele) min(abs(.ele)))
     data.frame(insideFeature=insideFeature, 
                shortestDistance=shortestDistance, 
-               ss=ss)
+               ss=ss,
+               distanceToStart=shortestDistanceToStart)
 }
 
 vennCounts <- function(PeaksList, n, names,

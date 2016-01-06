@@ -1,3 +1,12 @@
+CHANGES IN VERSION 3.5.1
+-------------------------
+    o update the documentation
+NEW FEATURE
+    o toGRanges can accept connection object
+    o add annoPeaks function
+    o add xget function
+    o update the peakPermTest algorithm to make more reasonable result.
+
 CHANGES IN VERSION 3.3.8
 -------------------------
     o update the documentation

@@ -41,7 +41,10 @@ getAllPeakSequence <- function(myPeakList,
                       seqlengths(genome)[as.character(seqnames(myPeakList))]), 
                 1,
                 min))
-        end(myPeakList) <- unname(ifelse(is.na(ends), end(myPeakList), ends))
+        ends <- unname(ifelse(is.na(ends), end(myPeakList), ends))
+        keep <- start(myPeakList) <= ends
+        end(myPeakList)[keep] <- ends[keep]
+        myPeakList <- myPeakList[keep]
         seq <- getSeq(genome, myPeakList, as.character=TRUE)
         
         myPeakList <- myPeakList.bk

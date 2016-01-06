@@ -23,7 +23,11 @@ import(GenomicFeatures)
 import(GenomicRanges)
 import(GenomeInfoDb)
 import(S4Vectors)
+importFrom(GenomicAlignments, summarizeOverlaps, Union)
+importFrom(SummarizedExperiment, assay, rowRanges)
+importFrom(idr, est.IDR)
 import(ensembldb)
+importFrom(seqinr, s2c, count, words)
 importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
@@ -32,9 +36,11 @@ exportMethods("$", "$<-", "info", "annoGR")
 export( 
        addAncestors,  
        addGeneIDs,
+       annoPeaks,
        annotatePeakInBatch, 
        assignChromosomeRegion, 
-       BED2RangedData, 
+       BED2RangedData,
+       bdp,
        binOverFeature,
        condenseMatrixByColnames, 
        convert2EntrezID,
@@ -53,13 +59,18 @@ export(
        getVennCounts,
        GFF2RangedData, 
        hyperGtest,
+       IDRfilter,
        makeVennDiagram, 
+       mergePlusMinusPeaks,
+       oligoFrequency,
+       oligoSummary,
        peakPermTest,
        peaksNearBDP,
        pie1,
        preparePool,
+       reCenterPeaks,
        summarizePatternInPeaks,
        toGRanges, 
        translatePattern,
        write2FASTA,
-       mergePlusMinusPeaks)
+       xget)

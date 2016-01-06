@@ -69,6 +69,9 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         }
         entrezIDs <- cov2EntrezID(feature_ids, orgAnn, feature_id_type)
     }
+    if(length(entrezIDs)<2){
+        stop("The number of gene is less than 2. Please double check your feature_id_type.")
+    }
     
     goAnn <- get(paste(GOgenome,"GO", sep=""))
     mapped_genes <- mappedkeys(goAnn)

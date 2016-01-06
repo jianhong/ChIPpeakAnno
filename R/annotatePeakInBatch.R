@@ -5,12 +5,17 @@ annotatePeakInBatch <-
                          "shortestDistance", "inside",
                          "upstream&inside", "inside&downstream",
                          "upstream", "downstream", 
-                         "upstreamORdownstream"),
+                         "upstreamORdownstream", 
+                         "bindingRegion_startSite",
+                         "bindingRegion_endSite",
+                         "bindingRegion_fullRange",
+                         "bindingRegion_bothSidesNSS",
+                         "bindingRegion_bothSidesNearest"),
               multiple = c(TRUE,FALSE), maxgap = 0L,
               PeakLocForDistance=c("start","middle","end"),
               FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"),
               select=c("all", "first", "last", "arbitrary"),
-              ignore.strand=TRUE)
+              ignore.strand=TRUE, ...)
     {
         if(output[1]=="nearestStart") output <- "nearestLocation"
         featureType = match.arg(featureType)
@@ -48,16 +53,31 @@ annotatePeakInBatch <-
         if (missing(AnnotationData)) {
             message("No AnnotationData as GRanges is passed in, 
                     so now querying biomart database for AnnotationData ....")
-            if (missing(mart) || class(mart) != "Mart") {
+            if (missing(mart)) {
                 stop("Error in querying biomart database. 
                      No valid mart object is passed in! 
                      Suggest call getAnnotation before calling 
                      annotatePeakInBatch")
             }
-            AnnotationData <- getAnnotation(mart, featureType = featureType)
-            message("Done querying biomart database, start annotating ....
-                    Better way would be calling getAnnotation before 
-                    calling annotatePeakInBatch")
+            if(class(mart) != "Mart"){
+                if(class(mart)=="GRanges"){
+                    warning("AnnotationData is missing, and a GRanges is passed
+                            to mart parameter. Trying to annotate peaks by 
+                            the GRanges you input.")
+                    AnnotationData <- mart
+                    mart <- NULL
+                }else{
+                    stop("Error in querying biomart database. 
+                     No valid mart object is passed in! 
+                     Suggest call getAnnotation before calling 
+                     annotatePeakInBatch")
+                }
+            }else{
+                AnnotationData <- getAnnotation(mart, featureType = featureType)
+                message("Done querying biomart database, start annotating ....
+                        Better way would be calling getAnnotation before 
+                        calling annotatePeakInBatch")
+            }
         }
         if (!inherits(AnnotationData, 
                       c("RangedData", "GRanges", "annoGR"))) {
@@ -74,6 +94,13 @@ annotatePeakInBatch <-
         
         rm(AnnotationData)
         rm(nAnno)
+        
+        if(grepl("^bindingRegion_", output)){
+            warning("Annotate peaks by annoPeaks, see ?annoPeaks for details.")
+            return(annoPeaks(peaks=myPeakList, annoData=TSS.ordered, 
+                             bindingType=gsub("^bindingRegion_", "", output),
+                             ...))
+        }
         
         if (is.null(names(TSS.ordered))){
             names(TSS.ordered) <- formatC(1:length(TSS.ordered),
