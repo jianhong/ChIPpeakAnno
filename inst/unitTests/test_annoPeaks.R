@@ -45,4 +45,14 @@ test_annoPeaks <- function(){
     checkEquals(anno.name[[3]], c("aA", "aB", "aC", "aD", "aE", 
                                   "aF", "aG", "aK", "aM", "aN"))
     checkEquals(anno.name[[4]], c("aA", "aB", "aC", "aD", "aM", "aN"))
+    
+    annoData<- GRanges(seqnames = "chr1", ranges=IRanges(start=c(1,3,12), 
+                                                         end=c(4,6,15),
+                                                         names=letters[1:3]), 
+                       strand = c("-", "+", "+"))
+    peak<- GRanges(seqnames = "chr1", 
+                   ranges=IRanges(start=8, width=2), 
+                   strand = "+")
+    peak.anno <- annoPeaks(peak, annoData)
+    checkEquals(peak.anno$feature, c("a", "c"))
 }

@@ -62,7 +62,7 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
         orgAnn<-sub("\\.db$","",orgAnn,ignore.case=TRUE)
         #get Entrez ID::entrezIDs
         if(feature_id_type=="entrez_id"){
-            m_ent<-as.data.frame(feature_ids)
+            m_ent<-as.data.frame(feature_ids, stringsAsFactors=FALSE)
             colnames(m_ent)<-c("entrez_id")
         }else{
             prefix<-switch(feature_id_type,
@@ -98,7 +98,7 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
                     c(.ele, NA)
                 }
             }))
-            m_ent<-as.data.frame(m_ent)
+            m_ent<-as.data.frame(m_ent, stringsAsFactors=FALSE)
             m_ent<-m_ent[!is.na(m_ent[,1]), , drop=FALSE]
             colnames(m_ent)<-c(feature_id_type, "entrez_id")
             }
@@ -115,7 +115,6 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
         IDs2Add <- IDs2Add[IDs2Add!=feature_id_type]
         IDs <- unique(entrezIDs[!is.na(entrezIDs)])
         for(IDtoAdd in IDs2Add){
-            gc()
             x<-NULL
             if(!silence) message(paste("Adding",IDtoAdd,"... "))
             if(IDtoAdd!="entrez_id"){
@@ -145,7 +144,7 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
                 }
                 x <- AnnotationDbi::mget(IDs, orgDB,ifnotfound=NA)
                 x <- sapply(x,paste,collapse=";")
-                x <- as.data.frame(x)
+                x <- as.data.frame(x, stringsAsFactors=FALSE)
                 m_ent <- merge(m_ent, x, 
                                by.x="entrez_id",
                                by.y="row.names",

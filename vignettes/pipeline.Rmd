@@ -301,10 +301,14 @@ feature.recentered <- reCenterPeaks(features, width=4000)
 ## compare rtracklayer, it will save you time when handle huge dataset.
 library(rtracklayer)
 files <- dir(path, "bigWig")
-cvglists <- sapply(file.path(path, files), import, 
+if(.Platform$OS.type != "windows"){
+    cvglists <- sapply(file.path(path, files), import, 
                        format="BigWig", 
                        which=feature.recentered, 
                        as="RleList")
+}else{## rtracklayer can not import bigWig files on Windows
+    load(file.path(path, "cvglist.rds"))
+}
 names(cvglists) <- gsub(".bigWig", "", files)
 feature.center <- reCenterPeaks(features, width=1)
 sig <- featureAlignedSignal(cvglists, feature.center, 

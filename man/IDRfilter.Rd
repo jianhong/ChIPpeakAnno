@@ -47,6 +47,7 @@ IDRfilter(peaksA, peaksB, bamfileA, bamfileB,
     Jianhong Ou
 }
 \examples{
+  if(interactive()){
     library(MMDiffBamSubset)
     peaksA=toGRanges(WT.AB2.Peaks(), format="MACS")
     peaksB=toGRanges(Resc.AB2.Peaks(), format="MACS")
@@ -54,6 +55,7 @@ IDRfilter(peaksA, peaksB, bamfileA, bamfileB,
     bamfileB=Resc.AB2()
     IDRfilter(peaksA, peaksB,
               bamfileA, bamfileB)
+  }
 }
 
 \keyword{ misc }

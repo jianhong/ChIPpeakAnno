@@ -127,13 +127,13 @@ annoPeaks <- function(peaks, annoData,
         whichismin <- function(.ele){
             as.numeric(names(.ele)[.ele==min(.ele)])
         }
-        if(sum(keep.left)>1){
+        if(sum(keep.left)>=1){
             nearest.left <- tapply(shortestDist[keep.left], 
                                        queryHits(ol)[keep.left],
                                        whichismin, simplify=FALSE)
             keep[unlist(nearest.left)] <- TRUE
         }
-        if(sum(keep.right)>1){
+        if(sum(keep.right)>=1){
             nearest.right <- 
                 tapply(shortestDist[keep.right], 
                        queryHits(ol)[keep.right],

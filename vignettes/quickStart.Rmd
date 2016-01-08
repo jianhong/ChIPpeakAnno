@@ -91,7 +91,7 @@ anno <- annotatePeakInBatch(peaks, AnnotationData=annoData,
                   ouput="bindingRegion_bothSidesNSS", 
                   bindingRegion=c(-5000, 5000))
 anno$symbol <- xget(anno$feature, org.Hs.egSYMBOL)
-anno[names(anno)=="peak12725"]
+anno[anno$peak=="peak12725"]
 ```
 The annotated peaks can be visualized with R/Bioconductor package **trackViewer** developed by our group.
 ```{r trackViewer}
@@ -99,9 +99,27 @@ library(trackViewer)
 gr <- peak <- peaks["peak12725"]
 start(gr) <- start(gr) - 5000
 end(gr) <- end(gr) + 5000
-peak12725 <- importScore(file=system.file("extdata", "Tead4.bigWig", 
+if(.Platform$OS.type != "windows"){
+    peak12725 <- importScore(file=system.file("extdata", "Tead4.bigWig", 
                                       package="ChIPpeakAnno"),
                     ranges=peak, format = "BigWig")
+}else{## rtracklayer can not import bigWig files on Windows
+    load(file.path(path, "cvglist.rds"))
+    peak12725 <- Views(cvglists[["Tead4"]][[as.character(seqnames(peak))]],
+                       start(peak),
+                       end(peak))
+    peak12725 <- viewApply(peak12725, as.numeric)
+    tmp <- rep(peak, width(peak))
+    width(tmp) <- 1
+    tmp <- shift(tmp, shift=0:(width(peak)-1))
+    mcols(tmp) <- peak12725
+    colnames(mcols(tmp)) <- "score"
+    peak12725 <- new("track", dat=tmp, 
+                     name="peak12725", 
+                     type="data", 
+                     format="BED")
+}
+
 trs <- geneModelFromTxdb(TxDb.Hsapiens.UCSC.hg19.knownGene, 
                          org.Hs.eg.db, gr)
 names(trs) <- paste(sapply(trs, function(.ele) .ele@name), names(trs), sep=":")
