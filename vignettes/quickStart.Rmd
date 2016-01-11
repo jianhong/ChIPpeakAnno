@@ -104,7 +104,7 @@ if(.Platform$OS.type != "windows"){
                                       package="ChIPpeakAnno"),
                     ranges=peak, format = "BigWig")
 }else{## rtracklayer can not import bigWig files on Windows
-    load(file.path(path, "cvglist.rds"))
+    load(file.path(dirname(path), "cvglist.rds"))
     peak12725 <- Views(cvglists[["Tead4"]][[as.character(seqnames(peak))]],
                        start(peak),
                        end(peak))
