@@ -39,7 +39,7 @@ ignore.strand=TRUE, ...)
  method to provide annotation data is to obtain through biomaRt real time by 
  using the parameters of mart and featureType}
 \item{output}{nearestLocation (default): will output the nearest features 
-calculated as PeakLocForDistance - FeatureLocForDistance;
+calculated as PeakLoc - FeatureLocForDistance;
     overlapping: will output overlapping features with maximum gap specified 
     as maxgap between peak range and feature range;
     shortestDistance: will output nearest features;

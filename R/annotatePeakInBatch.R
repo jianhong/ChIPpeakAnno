@@ -96,7 +96,7 @@ annotatePeakInBatch <-
         rm(nAnno)
         
         if(grepl("^bindingRegion_", output)){
-            warning("Annotate peaks by annoPeaks, see ?annoPeaks for details.")
+            message("Annotate peaks by annoPeaks, see ?annoPeaks for details.")
             return(annoPeaks(peaks=myPeakList, annoData=TSS.ordered, 
                              bindingType=gsub("^bindingRegion_", "", output),
                              ...))

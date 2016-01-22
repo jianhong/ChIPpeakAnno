@@ -11,7 +11,7 @@ annoPeaks (peaks, annoData,
           bindingType=c("bothSidesNSS",
                         "startSite", "endSite", "fullRange", 
                         "bothSidesNearest"), 
-          bindingRegion=c(-5000, 500), 
+          bindingRegion=c(-5000, 5000), 
           ignore.peak.strand=TRUE,
           ...)
 }
@@ -37,7 +37,12 @@ annoPeaks (peaks, annoData,
     number toward the 3'end, relative to the annotation data. The first one must
     be no bigger than 0. And the second one must be no less than 1. for 
     bindingType equal to startSite or endSite, the downstream site will be 
-    restricted in the feature range.
+    restricted in the feature range, that is to say the binding will only happens
+    in the gene or upstreams for startSite, or downstreams for endSite. 
+    For bindingType equal to bothSidesNSS or
+    bothSidesNearest, the numbers toward to 5' or 3' end are extension range 
+    for peaks. If the there are overlaps in the peaks and their extension range,
+    the nearest or nearest start site in both sides will be reported.
   }
   \item{ignore.peak.strand}{
     ignore the peaks strand or not.

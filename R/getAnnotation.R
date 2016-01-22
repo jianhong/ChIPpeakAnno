@@ -7,60 +7,54 @@ getAnnotation <- function(mart,
     {
         stop("No valid mart object is passed in!")
     }
-    if (featureType == "TSS")
-    {
-        TSS = getBM(c("ensembl_gene_id", "chromosome_name", "start_position", 
-                      "end_position", "strand", "description"), mart = mart)
-    }
-    else if (featureType == "miRNA")
-    {
+    if(featureType=="miRNA"){
         TSS = getBM(c("ensembl_gene_id","chromosome_name", "start_position", 
                       "end_position",  "strand", "description", "gene_biotype"), 
                     filters=c("biotype"),values="miRNA", mart = mart)
+    }else{
+        seqnames <- getBM(c("chromosome_name"), mart = mart)
+        seqnames <- as.character(seqnames[, "chromosome_name"])
+        TSS <- lapply(seqnames, function(.ele){
+            attr <- switch(featureType, 
+                           TSS=c("ensembl_gene_id", "chromosome_name", 
+                                 "start_position", "end_position", 
+                                 "strand", "description"),
+                           Exon=c("ensembl_exon_id","chromosome_name", 
+                                  "exon_chrom_start", "exon_chrom_end", 
+                                  "strand", "description"),
+                           "5utr"=c("ensembl_transcript_id", "chromosome_name", 
+                                    "5_utr_start", "5_utr_end", "strand", 
+                                    "description"),
+                           "3utr"=c("ensembl_transcript_id", "chromosome_name", 
+                                    "3_utr_start", "3_utr_end", "strand", 
+                                    "description"),
+                           ExonPlusUtr=c('ensembl_exon_id','chromosome_name', 
+                                         'exon_chrom_start','exon_chrom_end', 
+                                         'strand', 'ensembl_gene_id', 
+                                         '5_utr_start', '5_utr_end',
+                                         '3_utr_start','3_utr_end', 
+                                         'description'),
+                           transcript=c("ensembl_transcript_id", 
+                                        "chromosome_name", 
+                                        "transcript_start", "transcript_end", 
+                                        'strand', 'description', 
+                                        'ensembl_gene_id')
+            )
+            getBM(attributes=attr, filters="chromosome_name",
+                  values=.ele, mart=mart)
+        })
+        TSS <- do.call(rbind, TSS)
     }
-    else if (featureType == "Exon")
-    {
-        TSS = getBM(c("ensembl_exon_id","chromosome_name", "exon_chrom_start", 
-                      "exon_chrom_end", "strand", "description"), mart = mart)
-    }
-    else if (featureType == "5utr")
-    {
-        TSS = getBM(c("ensembl_transcript_id", "chromosome_name", 
-                      "5_utr_start", "5_utr_end", "strand", "description"), 
-                    mart = mart)
-        TSS = TSS[!is.na(TSS[,3]),]
-    }
-    else if (featureType == "3utr")
-    {
-        TSS = getBM(c("ensembl_transcript_id", "chromosome_name", 
-                      "3_utr_start", "3_utr_end", "strand", "description"), 
-                    mart = mart)
-        
-        TSS = TSS[!is.na(TSS[,3]),]
-    }
-    else if (featureType == "ExonPlusUtr")
-    {
-        TSS = getBM(c('ensembl_exon_id','chromosome_name', 
-                      'exon_chrom_start','exon_chrom_end', 
-                      'strand', 'ensembl_gene_id', '5_utr_start', 
-                      '5_utr_end','3_utr_start','3_utr_end', 'description'), 
-                    mart=mart)
-    }
-    else if (featureType == "transcript")
-    {
-        TSS =getBM(attributes = c("ensembl_transcript_id", "chromosome_name", 
-                                  "transcript_start", "transcript_end", 
-                                  'strand', 'description', 'ensembl_gene_id'),
-                   mart=mart)
-    }
+    
+    TSS <- TSS[!is.na(TSS[, 3]), ]
     TSS = unique(TSS)
     TSS = TSS[order(TSS[,3]),]        
     duplicatedID = TSS[duplicated(TSS[,1]),1]
     TSS = TSS[!duplicated(TSS[,1]),]
     if (length(duplicatedID) >0 && 
-            featureType != "3utr" && 
-            featureType != "5utr" && 
-            featureType != "ExonPlusUtr")
+        featureType != "3utr" && 
+        featureType != "5utr" && 
+        featureType != "ExonPlusUtr")
     {
         warning("Following duplicated IDs found, 
                 only one of entries of the duplicated id will be returned!")

@@ -2,7 +2,7 @@ annoPeaks <- function(peaks, annoData,
                       bindingType=c("bothSidesNSS",
                                     "startSite", "endSite", "fullRange",
                                     "bothSidesNearest"), 
-                      bindingRegion=c(-5000, 500), 
+                      bindingRegion=c(-5000, 5000), 
                       ignore.peak.strand=TRUE,
                       ...){
     bindingType <- match.arg(bindingType)
@@ -146,6 +146,7 @@ annoPeaks <- function(peaks, annoData,
     if(!is.null(names(anno))){
         peaks$feature <- names(anno)
     }
+    peaks$peak <- names(peaks)
     peaks$feature.ranges <- unname(ranges(anno))
     peaks$feature.strand <- strand(anno)
     peaks$distance <- distance(peaks, anno, ignore.strand=FALSE)

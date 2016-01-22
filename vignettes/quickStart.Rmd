@@ -88,7 +88,7 @@ This section demonstrates the flexibility of the annotaition functions in the Ch
 
 ```{r, fig.height=3, fig.width=8}
 anno <- annotatePeakInBatch(peaks, AnnotationData=annoData, 
-                  ouput="bindingRegion_bothSidesNSS", 
+                  output="bindingRegion_bothSidesNSS", 
                   bindingRegion=c(-5000, 5000))
 anno$symbol <- xget(anno$feature, org.Hs.egSYMBOL)
 anno[anno$peak=="peak12725"]
