@@ -57,6 +57,6 @@ http://metatracks.encodenets.gersteinlab.org/
 }
 \examples{
  data(HOT.spots)
- elementLengths(HOT.spots)
+ elementNROWS(HOT.spots)
 }
 \keyword{datasets}

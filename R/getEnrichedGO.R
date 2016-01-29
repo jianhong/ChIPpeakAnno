@@ -81,7 +81,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     
     xx <- mget(mapped_genes, goAnn, ifnotfound=NA)
     all.GO <- cbind(matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE),
-                    rep(names(xx), elementLengths(xx)))
+                    rep(names(xx), elementNROWS(xx)))
     
     this.GO <- all.GO[all.GO[, 4] %in% entrezIDs, , drop=FALSE]
     
@@ -116,7 +116,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                                        GOMFOFFSPRING, 
                                        ifnotfound = NA))
             Ancestors <- cbind(Ancestor=rep(names(Ancestors),
-                                           elementLengths(Ancestors)),
+                                           elementNROWS(Ancestors)),
                               child=unlist(Ancestors))
             Ancestors <- 
                 Ancestors[Ancestors[, "child"] %in% names(children.s), 
@@ -126,7 +126,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             Ancestors <- unique(Ancestors)
             Ancestors.ezid <- children.s[Ancestors[, "child"]]
             temp <- cbind(rep(Ancestors[, "Ancestor"], 
-                                    elementLengths(Ancestors.ezid)),
+                                    elementNROWS(Ancestors.ezid)),
                           unlist(Ancestors.ezid))
             temp <- unique(temp) #time....
             if (length(temp) <3){

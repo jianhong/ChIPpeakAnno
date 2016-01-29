@@ -151,14 +151,14 @@ setMethod("annoGR", "TxDb",
                   switch(feature,
                          geneModel={
                              exon <- exonsBy(ranges, "tx", use.names=TRUE)
-                             tids <- rep(names(exon), elementLengths(exon))
+                             tids <- rep(names(exon), elementNROWS(exon))
                              exon <- unlist(exon)
                              if(length(exon)){
                                  exon$tx_name <- tids
                                  exon$feature_type <- "ncRNA"
                                  cds <- cdsBy(ranges, "tx", use.names=TRUE)
                                  tids <- 
-                                     rep(names(cds), elementLengths(cds))
+                                     rep(names(cds), elementNROWS(cds))
                                  cds <- unlist(cds)
                                  if(length(cds)){
                                      mcols(cds) <- NULL
@@ -169,7 +169,7 @@ setMethod("annoGR", "TxDb",
                                      fiveUTRsByTranscript(ranges,
                                                           use.names=TRUE)
                                  tids <- rep(names(utr5), 
-                                             elementLengths(utr5))
+                                             elementNROWS(utr5))
                                  utr5 <- unlist(utr5)
                                  if(length(utr5)){
                                      mcols(utr5) <- NULL
@@ -180,7 +180,7 @@ setMethod("annoGR", "TxDb",
                                      threeUTRsByTranscript(ranges,
                                                            use.names=TRUE)
                                  tids <- rep(names(utr3), 
-                                             elementLengths(utr3))
+                                             elementNROWS(utr3))
                                  utr3 <- unlist(utr3)
                                  if(length(utr3)){
                                      mcols(utr3) <- NULL
@@ -277,7 +277,7 @@ setMethod("annoGR", "TxDb",
                          fiveUTR={
                              u <- fiveUTRsByTranscript(ranges,
                                                        use.name=TRUE)
-                             tids <- rep(names(u), elementLengths(u))
+                             tids <- rep(names(u), elementNROWS(u))
                              u <- unlist(u)
                              if(length(u)){
                                  u$tx_name <- tids
@@ -289,7 +289,7 @@ setMethod("annoGR", "TxDb",
                          threeUTR={
                              u <- threeUTRsByTranscript(ranges,
                                                         use.name=TRUE)
-                             tids <- rep(names(u), elementLengths(u))
+                             tids <- rep(names(u), elementNROWS(u))
                              u <- unlist(u)
                              if(length(u)){
                                  u$tx_name <- tids

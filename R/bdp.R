@@ -13,7 +13,7 @@ bdp <- function(peaks, annoData, maxgap=2000L, ...){
         return(NA)
     }
     anno.s <- split(anno, anno$bdp_idx)
-    len <- elementLengths(anno.s)
+    len <- elementNROWS(anno.s)
     anno.s <- anno.s[len>=2]
     len <- sapply(anno.s, function(.ele){
         std <- .ele$feature.strand
