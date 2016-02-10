@@ -659,8 +659,7 @@ In the following sample code we used a subset of the annotatedPeak (the first 50
 ```{r getEnriched14}
 library(org.Hs.eg.db)
 over <- getEnrichedGO(annotatedPeak[1:500], orgAnn="org.Hs.eg.db", 
-                    maxP=0.01, multiAdj=FALSE, minGOterm=10, 
-                    multiAdjMethod="", condense=FALSE)
+                    maxP=0.01, minGOterm=10, condense=FALSE)
 head(over[["bp"]][, -3])
 head(over[["cc"]][, -3])
 head(over[["mf"]][, -3])

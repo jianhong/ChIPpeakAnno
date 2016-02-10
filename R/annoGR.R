@@ -4,7 +4,7 @@ setClass("annoGR",
          representation(source="character",
                         date="Date",
                         feature="character",
-                        metadata="data.frame"),
+                        mdata="data.frame"),
          contains="GRanges",
          validity=function(object){
              re <- TRUE
@@ -13,9 +13,9 @@ setClass("annoGR",
                  re <- "annotation must have names"
              if(any(duplicated(names(object@ranges))))
                  re <- "the names has dupoicates"
-             if(!is.null(object@metadata)){
-                 if(!all(colnames(object@metadata)==c("name", "value"))){
-                     re <- "colnames of metadata must be name and value"
+             if(!is.null(object@mdata)){
+                 if(!all(colnames(object@mdata)==c("name", "value"))){
+                     re <- "colnames of mdata must be name and value"
                  }
              }
              re
@@ -97,12 +97,12 @@ if(!isGeneric("info")){
 }
 
 setAs(from="annoGR", to="GRanges", function(from){
-    GRanges(seqnames=seqnames(from), 
-            ranges=ranges(from),
-            strand=strand(from),
-            mcols=mcols(from),
-            seqlengths=seqlengths(from),
-            seqinfo=seqinfo(from))
+    do.call(GRanges, args=append(list(seqnames=seqnames(from), 
+                                      ranges=ranges(from),
+                                      strand=strand(from),
+                                      seqlengths=seqlengths(from),
+                                      seqinfo=seqinfo(from)),
+                                 as.list(mcols(from))))
 })
 setAs(from="GRanges", to="annoGR", function(from){
     annoGR(from)
@@ -113,9 +113,9 @@ setMethod("info", "annoGR", function(object){
     cat("# source: ", object@source, "\n")
     cat("# create at: ", format(object@date, "%a %b %d %X %Y %Z"), "\n")
     cat("# feature: ", object@feature, "\n")
-    metadata <- object@metadata
-    for (i in seq_len(nrow(metadata))) {
-        cat("# ", metadata[i, "name"], ": ", metadata[i, "value"],
+    mdata <- object@mdata
+    for (i in seq_len(nrow(mdata))) {
+        cat("# ", mdata[i, "name"], ": ", mdata[i, "value"],
             "\n", sep="")
     }
 })
@@ -138,10 +138,10 @@ setMethod("annoGR", "TxDb",
           function(ranges, feature=c("gene", "transcript", "exon",
                                      "CDS", "fiveUTR", "threeUTR",
                                      "microRNA", "tRNAs", "geneModel"),
-                   date, source, metadata, OrganismDb){
+                   date, source, mdata, OrganismDb){
               feature <- match.arg(feature)
-              if(missing(metadata)) {
-                  metadata <- 
+              if(missing(mdata)) {
+                  mdata <- 
                       dbGetQuery(dbconn(ranges), "select * from metadata")
               }
               if(missing(source)) 
@@ -310,16 +310,16 @@ setMethod("annoGR", "TxDb",
                   )
               newAGR(gr=gr, source=source,
                      date=date, feature=feature, 
-                     metadata=metadata)
+                     mdata=mdata)
           })
 
 setMethod("annoGR", "EnsDb",
           function(ranges, 
                    feature=c("gene", "transcript", "exon", "disjointExons"),
-                   date, source, metadata){
+                   date, source, mdata){
               feature <- match.arg(feature)
-              if(missing(metadata)) {
-                  metadata <- 
+              if(missing(mdata)) {
+                  mdata <- 
                       dbGetQuery(dbconn(ranges), "select * from metadata")
               }
               if(missing(source)) 
@@ -374,5 +374,5 @@ setMethod("annoGR", "EnsDb",
               seqlevelsStyle(gr) <- "UCSC"
               newAGR(gr=gr, source=source,
                      date=date, feature=feature, 
-                     metadata=metadata)
+                     mdata=mdata)
           })

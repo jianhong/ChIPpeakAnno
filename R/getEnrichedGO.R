@@ -1,11 +1,14 @@
 getEnrichedGO <- function(annotatedPeak, orgAnn, 
                           feature_id_type="ensembl_gene_id", 
-                          maxP=0.01, multiAdj=FALSE, 
-                          minGOterm=10, multiAdjMethod="",
+                          maxP=0.01,
+                          minGOterm=10, multiAdjMethod=NULL,
                           condense=FALSE){    
     if (missing(annotatedPeak))
     {
         stop("Missing required argument annotatedPeak!")    
+    }
+    if(length(multiAdjMethod)>0){
+        multiAdjMethod <- match.arg(multiAdjMethod, c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"))
     }
     if (missing(orgAnn))
     {
@@ -200,7 +203,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                              total.cc, 
                              this.cc)
     
-    if (multiAdj == FALSE | multiAdjMethod == "")
+    if (length(multiAdjMethod)<1)
     {
         bp.s = 
             bp.selected[

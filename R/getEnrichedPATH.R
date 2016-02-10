@@ -5,6 +5,9 @@ getEnrichedPATH <- function(annotatedPeak, orgAnn, pathAnn,
     if (missing(annotatedPeak)){
         stop("Missing required argument annotatedPeak!")	
     }
+    if(length(multiAdjMethod)>0){
+        multiAdjMethod <- match.arg(multiAdjMethod, c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"))
+    }
     if (!grepl("^org\\...\\.eg\\.db",orgAnn)){
         message("No valid organism specific PATH gene mapping package as 
                 parameter orgAnn is passed in!")

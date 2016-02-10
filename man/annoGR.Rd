@@ -18,7 +18,7 @@
 }
 \section{Objects from the Class}{
     Objects can be created by calls of the form
-    \code{new("annoGR", date, elementMetadata, feature, metadata, ranges,
+    \code{new("annoGR", date, elementMetadata, feature, mdata, ranges,
                         seqinfo, seqnames, source, strand)}
 }
 \section{Slots}{
@@ -36,7 +36,7 @@
     "geneModel" for \link[GenomicFeatures]{TxDb} object, or "gene", 
     "exon" "transcript" for \link[ensembldb]{EnsDb} object}
     
-    \item{\code{metadata}}{data frame, metadata from annotation}
+    \item{\code{mdata}}{data frame, metadata from annotation}
   }
 }
 \section{Coercion}{
@@ -62,10 +62,10 @@
                             "gene", "transcript", "exon",
                             "CDS", "fiveUTR", "threeUTR",
                             "microRNA", "tRNAs", "geneModel"),
-                   date, source, metadata, OrganismDb)
+                   date, source, mdata, OrganismDb)
     \S4method{annoGR}{EnsDb}(ranges, 
                    feature=c("gene", "transcript", "exon", "disjointExons"),
-                   date, source, metadata)
+                   date, source, mdata)
 }
 \arguments{
     \item{ranges}{an object of \link[GenomicRanges]{GRanges}, 
@@ -74,7 +74,7 @@
     \item{date}{a \link{Date} object}
     \item{...}{could be following parameters}
     \item{source}{character, where the annotation comes from}
-    \item{metadata}{data frame, metadata from annotation}
+    \item{mdata}{data frame, metadata from annotation}
     \item{OrganismDb}{an object of \link[OrganismDbi]{OrganismDb}. It is used 
         for extracting gene symbol for geneModel group for 
         \link[GenomicFeatures]{TxDb}}

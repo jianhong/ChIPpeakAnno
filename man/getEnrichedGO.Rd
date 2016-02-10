@@ -9,7 +9,7 @@
 }
 \usage{
 getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", 
-maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="", condense=FALSE)
+maxP=0.01, minGOterm=10, multiAdjMethod=NULL, condense=FALSE)
 }
 \arguments{
   \item{annotatedPeak}{A GRanges object or a vector of feature IDs}
@@ -19,8 +19,6 @@ maxP=0.01, multiAdj=FALSE, minGOterm=10, multiAdjMethod="", condense=FALSE)
  \item{feature_id_type}{The feature type in annotatedPeak such as 
  ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
   \item{maxP}{ The maximum p-value to be considered to be significant}
-  \item{multiAdj}{ Logical: whether apply multiple hypothesis testing 
-  adjustment, TURE or FALSE }
   \item{minGOterm}{ The minimum count in a genome for a GO term to be included}
   \item{multiAdjMethod}{ The multiple testing procedures, for details, see 
   mt.rawp2adjp in multtest package}

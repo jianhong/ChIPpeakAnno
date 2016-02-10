@@ -1,3 +1,10 @@
+CHANGES IN VERSION 3.5.5
+-------------------------
+    o update the documentation to fix the typo in quickStart.
+    o change the default value of annoPeaks.
+    o update annoGR class to fix the error: 
+      identical(colnames(classinfo), colnames(out)) is not TRUE
+
 CHANGES IN VERSION 3.5.2
 -------------------------
     o update the documentation to fix the error on windows (import bigwig error)
