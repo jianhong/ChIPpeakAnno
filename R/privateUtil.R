@@ -209,8 +209,8 @@ vennCounts <- function(PeaksList, n, names,
             ol <- as.data.frame(findOverlaps(Peaks, maxgap=maxgap, 
                                              minoverlap=minoverlap, 
                                              select="all",
-                                             ignoreSelf=TRUE, 
-                                             ignoreRedundant=TRUE))
+                                             drop.self=TRUE, 
+                                             drop.redundant=TRUE))
             ##all connected peaks
             olm <- cbind(names(Peaks[ol[,1]]), names(Peaks[ol[,2]]))
             edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))
@@ -224,7 +224,7 @@ vennCounts <- function(PeaksList, n, names,
                 .ol <- findOverlaps(.peaks.list,
                                     maxgap=maxgap, minoverlap=minoverlap, 
                                     select="all",
-                                    ignoreSelf=TRUE, ignoreRedundant=TRUE)
+                                    drop.self=TRUE, drop.redundant=TRUE)
                 olm <- cbind(names(.peaks.list[queryHits(.ol)]), 
                              names(.peaks.list[subjectHits(.ol)]))
                 edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))

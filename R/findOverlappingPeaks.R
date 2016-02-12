@@ -108,8 +108,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
         ol <- as.data.frame(findOverlaps(Peaks, maxgap=maxgap, 
                                          minoverlap=minoverlap, 
                                          select="all",
-                                         ignoreSelf=TRUE, 
-                                         ignoreRedundant=TRUE))
+                                         drop.self=TRUE, 
+                                         drop.redundant=TRUE))
         olm <- cbind(names(Peaks[ol[,1]]), names(Peaks[ol[,2]]))
         edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))
         nodes <- unique(as.character(olm))

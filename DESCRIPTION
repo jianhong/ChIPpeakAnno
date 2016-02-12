@@ -3,8 +3,8 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.5.5
-Date: 2016-02-10
+Version: 3.5.6
+Date: 2016-02-11
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Herve Pages, Claude Gazin,
     Nathan Lawson, Ryan Thompson, Simon Lin, David Lapointe and
     Michael Green
@@ -14,9 +14,9 @@ Depends:
     R (>= 3.2),
     methods,
     grid,
-    IRanges,
+    IRanges (>= 2.5.27),
     Biostrings,
-    GenomicRanges,
+    GenomicRanges (>= 1.23.16),
     S4Vectors (>= 0.9.25),
     VennDiagram
 Imports:
