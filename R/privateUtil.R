@@ -93,45 +93,48 @@ getRelationship <- function(queryHits, subjectHits){
                distanceToStart=shortestDistanceToStart)
 }
 
+trimPeakList <- function(Peaks, ignore.strand, by, keepMetadata=FALSE){
+    if (inherits(Peaks, "RangedData"))
+        Peaks <- toGRanges(Peaks, format="RangedData")
+    if (!inherits(Peaks, "GRanges")) {
+        stop("No valid Peaks passed in. It needs to be GRanges object")
+    }
+    if(ignore.strand) {
+        .gr <- paste(seqnames(Peaks), start(Peaks), end(Peaks))
+    }else{
+        .gr <- paste(seqnames(Peaks), start(Peaks), 
+                     end(Peaks), strand(Peaks))
+    }
+    if(any(duplicated(.gr)))
+        stop("Inputs contains duplicated ranges. 
+             please recheck your inputs.")
+    if(any(is.null(names(Peaks))) || 
+       any(is.na(names(Peaks))) || 
+       any(duplicated(names(Peaks)))) {
+        message("duplicated or NA names found. 
+                Rename all the names by numbers.")
+        names(Peaks) <- formatC(1:length(Peaks), 
+                                width=nchar(length(Peaks)), 
+                                flag='0')
+    }
+    feature <- mcols(Peaks)$feature
+    if(!keepMetadata) mcols(Peaks) <- NULL
+    if(by=="feature") {
+        if(is.null(feature)) 
+            stop("Need feature metadata for each inputs")
+        mcols(Peaks)$feature <- feature
+    }
+    Peaks
+}
+
 vennCounts <- function(PeaksList, n, names,
                        maxgap=0L, minoverlap=1L, 
                        by=c("region", "feature", "base"), 
                        ignore.strand=TRUE, 
                        connectedPeaks=c("min", "merge", "keepAll")){
     NAME_conn_string <- "___conn___"
-    PeaksList<-lapply(PeaksList, function(Peaks){
-        if (inherits(Peaks, "RangedData"))
-            Peaks <- toGRanges(Peaks, format="RangedData")
-        if (!inherits(Peaks, "GRanges")) {
-            stop("No valid Peaks passed in. It needs to be GRanges object")
-        }
-        if(ignore.strand) {
-            .gr <- paste(seqnames(Peaks), start(Peaks), end(Peaks))
-        }else{
-            .gr <- paste(seqnames(Peaks), start(Peaks), 
-                         end(Peaks), strand(Peaks))
-        }
-        if(any(duplicated(.gr)))
-            stop("Inputs contains duplicated ranges. 
-                 please recheck your inputs.")
-        if(any(is.null(names(Peaks))) || 
-               any(is.na(names(Peaks))) || 
-               any(duplicated(names(Peaks)))) {
-            message("duplicated or NA names found. 
-                    Rename all the names by numbers.")
-            names(Peaks) <- formatC(1:length(Peaks), 
-                                    width=nchar(length(Peaks)), 
-                                    flag='0')
-        }
-        feature <- mcols(Peaks)$feature
-        mcols(Peaks) <- NULL
-        if(by=="feature") {
-            if(is.null(feature)) 
-                stop("Need feature metadata for each inputs")
-            mcols(Peaks)$feature <- feature
-        }
-        Peaks
-    })
+    PeaksList<-lapply(PeaksList, trimPeakList, by=by, 
+                      ignore.strand=ignore.strand, keepMetadata=FALSE)
     if(by=="base"){
         # try coverage and then split
         # problem for coverage: can not seperate for different source

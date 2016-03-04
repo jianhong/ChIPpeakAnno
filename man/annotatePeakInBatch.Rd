@@ -13,16 +13,12 @@ AnnotationData, output=c("nearestLocation", "overlapping", "both",
                          "upstream&inside", "inside&downstream",
                          "upstream", "downstream", 
                          "upstreamORdownstream",
-                         "bindingRegion_startSite",
-                         "bindingRegion_endSite",
-                         "bindingRegion_fullRange",
-                         "bindingRegion_bothSidesNSS",
-                         "bindingRegion_bothSidesNearest"),
+                         "nearestBiDirectionalPromoters"),
 multiple=c(TRUE,FALSE), 
 maxgap=0L, PeakLocForDistance=c("start", "middle", "end"), 
 FeatureLocForDistance=c("TSS", "middle","start", "end","geneEnd"), 
 select=c("all", "first","last","arbitrary"),
-ignore.strand=TRUE, ...)
+ignore.strand=TRUE, bindingRegion=NULL, ...)
 }
 \arguments{
  \item{myPeakList}{A \link[GenomicRanges:GRanges]{GRanges} object }
@@ -38,22 +34,20 @@ ignore.strand=TRUE, ...)
  are provided by this package (attach them with data() function). Another 
  method to provide annotation data is to obtain through biomaRt real time by 
  using the parameters of mart and featureType}
-\item{output}{nearestLocation (default): will output the nearest features 
-calculated as PeakLoc - FeatureLocForDistance;
-    overlapping: will output overlapping features with maximum gap specified 
-    as maxgap between peak range and feature range;
-    shortestDistance: will output nearest features;
-    both: will output all the nearest features, in addition, will output any 
-    features that overlap the peak that is not the nearest features.
-    upstream&inside: will output all upstream and overlapping features with 
-    maximum gap.
-    inside&downstream: will output all downstream and overlapping features 
-    with maximum gap.
-    upstream: will output all upstream features with maximum gap.
-    downstream: will output all downstream features with maximum gap.
-    upstreamORdownstream: will output all upstream features with maximum gap 
-    or downstream with maximum gap.
-    bindingRegion_xxxxx: will use \link{annoPeaks} to annotate peaks. 
+\item{output}{
+    \describe{
+        \item{nearestLocation (default)}{will output the nearest features calculated as PeakLoc - FeatureLocForDistance}
+        \item{overlapping}{will output overlapping features with maximum gap specified as maxgap between peak range and feature range}
+        \item{shortestDistance}{will output nearest features}
+        \item{both}{will output all the nearest features, in addition, will output any  features that overlap the peak that is not the nearest features}
+        \item{upstream&inside}{will output all upstream and overlapping features with maximum gap}
+        \item{inside&downstream}{will output all downstream and overlapping features 
+with maximum gap}
+        \item{upstream}{will output all upstream features with maximum gap.}
+        \item{downstream}{will output all downstream features with maximum gap.}
+        \item{upstreamORdownstream}{will output all upstream features with maximum gap or downstream with maximum gap}
+        \item{nearestBiDirectionalPromoters}{will use \link{annoPeaks} to annotate peaks. Nearest promoters from both direction of the peaks (strand is considered). It will report bidirectional promoters if there are promoters in both directions in the given region (defined by bindingRegion). Otherwise, it will report the closest promoter in one direction.}
+    }
 }
 \item{multiple}{Not applicable when output is nearest. TRUE: output multiple 
 overlapping features for each peak. FALSE: output at most one overlapping 
@@ -80,6 +74,14 @@ will return one of the overlapping peaks.
 }
 \item{ignore.strand}{When set to TRUE, the strand information is ignored in 
 the annotation.}
+\item{bindingRegion}{Annotation range used for \link{annoPeaks}, which is a vector with two integer values, default to c (-5000, 5000). The first one must be no bigger than 0. And the sec ond one must be no less than 1. Once bindingRegion is defined,
+annotation will based on \link{annoPeaks}. Here is how to use it together with the parameter output and FeatureLocForDistance.
+    \itemize{
+        \item To obtain peaks with nearest bi-directional promoters within 5kb upstream and 3kb downstream of TSS, set  output = "nearestBiDirectionalPromoters" and bindingRegion = c(-5000, 3000)
+        \item To obtain peaks within 5kb upstream and up to 3kb downstream of TSS within the gene body, set output="overlapping", FeatureLocForDistance="TSS" and bindingRegion = c(-5000, 3000)
+        \item To obtain  peaks  up to 5kb upstream within the gene body and 3kb downstream of gene/Exon End, set output="overlapping", FeatureLocForDistance="geneEnd" and bindingRegion = c(-5000, 3000)
+    }
+For details, see \link{annoPeaks}.}
 \item{...}{Parameters could be passed to \link{annoPeaks}}
 }
 \value{

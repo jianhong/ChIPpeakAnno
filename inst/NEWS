@@ -1,3 +1,15 @@
+CHANGES IN VERSION 3.5.7
+-------------------------
+    o change test from RUnit to testthat
+    o add new function addMetadata
+    o change the output and parameters of annoPeaks
+    o simple the parameter output of annotatePeakInBatch
+    o allow bdp function to accept GRanges annotation
+    o add error bar function for binOverFeature function
+    o remove the log file after plot for makeVennDiagram function
+    o add private function trimPeakList
+    o update the documentation of annoPeaks and annotatePeakInBatch
+    
 CHANGES IN VERSION 3.5.5
 -------------------------
     o update the documentation to fix the typo in quickStart.

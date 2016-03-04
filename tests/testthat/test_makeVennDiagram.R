@@ -1,4 +1,4 @@
-test_makeVennDiagram<-function(){
+test_that("makeVennDiagram works not correct", {
     peaks1 = GRanges(seqnames = c("1", "2", "3"), 
                      IRanges(start = c(967654, 2010897, 2496704),
                              end = c(967754, 2010997, 2496804), 
@@ -16,28 +16,28 @@ test_makeVennDiagram<-function(){
     x<-makeVennDiagram(GRangesList(peaks1, peaks2), 
                        NameOfPeaks=c("TF1", "TF2"),
                        totalTest=100)
-    checkEqualsNumeric(x$p.value[1,"pval"], 6.184292e-05, tolerance=1e-05)
-    checkEqualsNumeric(x$vennCounts[,"Counts"], c(95, 2, 0, 3))
+    expect_true(x$p.value[1,"pval"] - 6.184292e-05 < 1e-05)
+    expect_equal(x$vennCounts[,"Counts"], c(95, 2, 0, 3))
     
     y<-makeVennDiagram(GRangesList(peaks1, peaks2, peaks1, peaks2), 
                        NameOfPeaks=c("TF1", "TF2","TF3", "TF4"),
                        totalTest=100, by="feature")
-    checkEqualsNumeric(y$p.value[y$p.value[, "TF1"]==1 & 
-                                     y$p.value[, "TF2"]==1,"pval"], 
-                       0.003586889, tolerance=0.001)
-    checkEqualsNumeric(y$p.value[y$p.value[, "TF1"]==1 & 
-                                     y$p.value[, "TF3"]==1,"pval"], 
-                       6.184292e-06, tolerance=1e-06)
-    checkEqualsNumeric(y$p.value[y$p.value[, "TF2"]==1 & 
-                                     y$p.value[, "TF3"]==1,"pval"], 
-                       0.003586889, tolerance=0.001)
-    checkEqualsNumeric(y$p.value[y$p.value[, "TF1"]==1 & 
-                                     y$p.value[, "TF4"]==1,"pval"], 
-                       0.003586889, tolerance=0.001)
-    checkEqualsNumeric(y$p.value[y$p.value[, "TF3"]==1 & 
-                                     y$p.value[, "TF4"]==1,"pval"], 
-                       0.003586889, tolerance=0.001)
-    checkEqualsNumeric(y$vennCounts[,"Counts"], 
+    expect_true(y$p.value[y$p.value[, "TF1"]==1 & 
+                                     y$p.value[, "TF2"]==1,"pval"] - 
+                       0.003586889 < 0.001)
+    expect_true(y$p.value[y$p.value[, "TF1"]==1 & 
+                                     y$p.value[, "TF3"]==1,"pval"] - 
+                       6.184292e-06 < 1e-06)
+    expect_true(y$p.value[y$p.value[, "TF2"]==1 & 
+                                     y$p.value[, "TF3"]==1,"pval"] -
+                       0.003586889 < 0.001)
+    expect_true(y$p.value[y$p.value[, "TF1"]==1 & 
+                                     y$p.value[, "TF4"]==1,"pval"] - 
+                       0.003586889 < 0.001)
+    expect_true(y$p.value[y$p.value[, "TF3"]==1 & 
+                                     y$p.value[, "TF4"]==1,"pval"] -
+                       0.003586889 < 0.001)
+    expect_equal(y$vennCounts[,"Counts"], 
                        c(95, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2))
     ##test 0 overlaps
     peaks1 = GRanges(seqnames = c("1", "1", "1"), 
@@ -142,4 +142,4 @@ test_makeVennDiagram<-function(){
     suppressWarnings(makeVennDiagram(GRangesList(peaks1,peaks2,peaks3,peaks4),
                                      NameOfPeaks=c("TF1", "TF2","TF3","TF4"),
                                      totalTest=100,scaled=F, euler.d=F))
-}
+})

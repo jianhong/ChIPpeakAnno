@@ -36,6 +36,7 @@ exportMethods("$", "$<-", "info", "annoGR")
 export( 
        addAncestors,  
        addGeneIDs,
+       addMetadata,
        annoPeaks,
        annotatePeakInBatch, 
        assignChromosomeRegion, 

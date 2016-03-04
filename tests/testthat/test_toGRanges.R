@@ -1,4 +1,4 @@
-test_toGRanges<-function(){
+test_that("toGRanges works not correct", {
     ##test format=c("BED", "GFF", "RangedData", "others")
     ##RangedData
     if(exists("RangedData")){
@@ -8,19 +8,19 @@ test_toGRanges<-function(){
                          space = c("1", "2", "3"), strand=as.integer(1),
                          feature=c("a","b","f"))
         gr <- toGRanges(rd, format="RangedData")
-        checkEquals(start(rd), start(gr))
-        checkEquals(end(rd), end(gr))
+        expect_equal(start(rd), start(gr))
+        expect_equal(end(rd), end(gr))
     }
     
     ##BED
     bed <- data.frame(cbind(space = c("1", "2"), start=c("100", "1000"),
                 end=c("200", "1100"), name=c("peak1", "peak2")))
     gr <- toGRanges(bed, format="BED")
-    checkEquals(start(gr), c(101, 1001))
+    expect_equal(start(gr), c(101, 1001))
     
     ##data.frame
     gr <- toGRanges(bed)
-    checkEquals(start(gr), c(100, 1000))
+    expect_equal(start(gr), c(100, 1000))
     
     ##GFF
     GFF <- data.frame(cbind(space  = c("chr1", "chr2"), 
@@ -33,4 +33,4 @@ test_toGRanges<-function(){
                             frame=c(".", 2), 
                             group=c("peak1", "peak2")))
     gr <- toGRanges(GFF, format="GFF")
-}
+})

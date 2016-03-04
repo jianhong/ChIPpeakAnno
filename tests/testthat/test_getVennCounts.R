@@ -1,4 +1,4 @@
-test_getVennCounts<-function(){
+test_that("getVennCounts works not correct", {
     ##2 way
     p1 <- GRanges("1", 
                   IRanges(start=c(1, 3, 5, 8, 10), 
@@ -13,7 +13,7 @@ test_getVennCounts<-function(){
                   strand="*", 
                   feature=c("a","b", "c"))
     venn_cnt <- getVennCounts(p1, p2, maxgap=0, by="region")
-    checkEquals(venn_cnt[,"Counts"], c(0,0,0,3))
+    expect_equal(venn_cnt[,"Counts"], c(0,0,0,3))
     venn_cnt <- getVennCounts(p1, p2, maxgap=0, by="feature")
     venn_cnt <- getVennCounts(p1, p2, maxgap=0, by="base")
     ##3 way
@@ -22,7 +22,7 @@ test_getVennCounts<-function(){
                   strand="*", 
                   feature=c("a"))
     venn_cnt <- getVennCounts(p1, p2, p3, maxgap=0, by="region")
-    checkEquals(venn_cnt[,"Counts"], c(0,0,0,0,0,0,1,1))
+    expect_equal(venn_cnt[,"Counts"], c(0,0,0,0,0,0,1,1))
     venn_cnt <- getVennCounts(p1, p2, p3, maxgap=0, by="feature")
     ##4 way
     p4 <- GRanges("1", 
@@ -30,7 +30,7 @@ test_getVennCounts<-function(){
                   strand="*", 
                   feature=c("a"))
     venn_cnt <- getVennCounts(p1, p2, p3, p4, maxgap=0, by="region")
-    checkEquals(venn_cnt[,"Counts"], 
+    expect_equal(venn_cnt[,"Counts"], 
                 c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0))
     venn_cnt <- getVennCounts(p1, p2, p3, p4, maxgap=0, by="feature")
-}
+})

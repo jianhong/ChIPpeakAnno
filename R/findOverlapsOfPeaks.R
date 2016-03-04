@@ -123,9 +123,17 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
                                        c("includeFeature", "inside",
                                          "overlapEnd", "overlapStart"),]
     })
-    
+    PeaksList <- sapply(PeaksList, trimPeakList, by="region",
+           ignore.strand=ignore.strand,
+           keepMetadata=TRUE)
+    for(i in 1:n){
+        names(PeaksList[[i]]) <- 
+            paste(names[i], names(PeaksList[[i]]), sep=NAME_short_string)
+    }
+    names(PeaksList) <- NULL
     structure(list(venn_cnt=venn_cnt$venn_cnt, 
                    peaklist=peaklist, 
-                   overlappingPeaks=overlappingPeaks), 
+                   overlappingPeaks=overlappingPeaks,
+                   all.peaks=PeaksList), 
               class="overlappingPeaks")
 }

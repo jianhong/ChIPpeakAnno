@@ -55,7 +55,11 @@ gr1[1:2]
 gr1.import[1:2] #note the name slot is different from gr1
 gff <- system.file("extdata", "GFF_peaks.gff", package="ChIPpeakAnno")
 gr2 <- toGRanges(gff, format="GFF", header=FALSE, skip=3)
+gr2$score <- as.numeric(gr2$score) ## keep the class same as gr1$score
 ol <- findOverlapsOfPeaks(gr1, gr2)
+## add metadata (mean of score) to the overlapping peaks
+ol <- addMetadata(ol, colNames="score", FUN=mean) 
+ol$peaklist[["gr1///gr2"]][1:2]
 makeVennDiagram(ol)
 ```
 
@@ -86,7 +90,7 @@ The sample code here plots the distribution of the aggregated peak numbers aroun
 ```{r workflow2,fig.cap="Distribution of aggregated peak numbers around transcript start sites.",fig.width=8,fig.height=6}
 overlaps <- ol$peaklist[["gr1///gr2"]]
 binOverFeature(overlaps, annotationData=annoData,
-               radius=5000, nbins=20, FUN=length,
+               radius=5000, nbins=20, FUN=length, errFun=0,
                ylab="count", 
                main="Distribution of aggregated peak numbers around TSS")
 ```
@@ -115,13 +119,13 @@ most of the peaks locate at around TSS. Then you can use `annotatePeakInBatch` o
 to annotate the peaks by promoter regions of Hg19 genes. 
 The range of promoter could be defined as upstream 2000 and downstream 2000 
 from TSS if you follow the peak aggregated distribution. 
-Here we use stringent promoter regions (upstream 2000 and downstream 500 from TSS) to annotate the peaks.
+Here we use stringent promoter regions (upstream 2000 and downstream 2000 from TSS) to annotate the peaks.
 
 ```{r workflow3}
 overlaps.anno <- annotatePeakInBatch(overlaps, 
                                      AnnotationData=annoData, 
-                                     output="bindingRegion_bothSidesNSS",
-                                     bindingRegion=c(-2000, 500))
+                                     output="nearestBiDirectionalPromoters",
+                                     bindingRegion=c(-2000, 2000))
 library(org.Hs.eg.db)
 overlaps.anno <- addGeneIDs(overlaps.anno,
                             "org.Hs.eg.db",
@@ -146,9 +150,7 @@ Here is an example to get the sequences of the peaks plus 20 bp upstream and dow
 
 ```{r fasta}
 library(BSgenome.Hsapiens.UCSC.hg19)
-overlaps.uniq <- unique(overlaps.anno)
-strand(overlaps.uniq) <- overlaps.uniq$feature.strand
-seq <- getAllPeakSequence(overlaps.uniq, upstream=20, downstream=20, genome=Hsapiens)
+seq <- getAllPeakSequence(overlaps, upstream=20, downstream=20, genome=Hsapiens)
 write2FASTA(seq, "test.fa")
 ```
 

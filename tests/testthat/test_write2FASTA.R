@@ -1,4 +1,4 @@
-test_write2FASTA<-function(){
+test_that("write2FASTA works not correct", {
     ##GRanges
     peaksWithSequences = GRanges("chr1", 
                                  IRanges(start=c(1000, 2000), 
@@ -7,4 +7,4 @@ test_write2FASTA<-function(){
                                  sequence= c("CCCCCCCCGGGGG", 
                                              "TTTTTTTAAAAAA"))
     write2FASTA(peaksWithSequences, "testWrite2FASTA.fa")
-}
+})

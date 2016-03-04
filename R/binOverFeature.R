@@ -6,7 +6,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
                                          "bothEnd"),
                            PeakLocForDistance=c("all", "end", 
                                                 "start", "middle"), 
-                           FUN=sum, xlab, ylab, main)
+                           FUN=sum, errFun=sd, xlab, ylab, main)
 {
     ###check inputs
     PeaksList <- list(...)
@@ -40,11 +40,17 @@ binOverFeature <- function(..., annotationData=GRanges(),
     featureSite <- match.arg(featureSite)
     PeakLocForDistance <- match.arg(PeakLocForDistance)
     if(!is.list(FUN)) FUN <- list(FUN)
+    if(!is.list(errFun)) errFun <- list(errFun)
     lapply(FUN, function(fun){
         if(mode(fun)!="function")
             stop("The mode of FUN must be function. 
                  The FUN could be any function such as 
                  median, mean, sum, length, ...")
+    })
+    lapply(errFun, function(fun){
+        if(mode(fun)!="function" & !is.numeric(fun))
+            stop("The mode of errFun must be function. 
+                 The errFun could be any function such as sd")
     })
     
     annotatedPeaksList<-lapply(PeaksList, function(Peaks){
@@ -104,7 +110,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
     if(missing(ylab)) ylab <- "Score" 
     if(missing(main)) main <- paste(names, "binding over", featureSite)
     
-    binValue <- mapply(function(annotatedPeaks, fun, 
+    binValue <- mapply(function(annotatedPeaks, fun, errfun,
                                 xlab.ele, ylab.ele, main.ele){
         ##genelength
         genelen <- 
@@ -340,7 +346,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
                 }
             })
         value <- unlist(lapply(gps, fun))
-        std <- unlist(lapply(gps, sd))
+        std <- if(mode(errfun)=="function") unlist(lapply(gps, errfun)) else rep(errfun, length(gps))
         std[is.na(std)] <- 0
         ##plot the figure
         ylim.min <- min(value[!is.na(value)] - std[!is.na(value)])
@@ -360,19 +366,19 @@ binOverFeature <- function(..., annotationData=GRanges(),
                  xlab=xlab.ele, 
                  ylab=ylab.ele, 
                  main=main.ele)
-            plotErrBar(b, value, std)
+            if(!all(std==0)) plotErrBar(b, value, std)
         }else{
             plot(blabel, value, 
                  ylim=c(ylim.min-ylim.dis, ylim.max+ylim.dis),
                  xlab=xlab.ele, 
                  ylab=ylab.ele, 
                  main=main.ele)
-            plotErrBar(blabel, value, std)
+            if(!all(std==0)) plotErrBar(blabel, value, std)
         }
         
         names(value) <- blabel
         value
-    }, annotatedPeaksList, FUN, xlab, ylab, main)
+    }, annotatedPeaksList, FUN, errFun, xlab, ylab, main)
     
     colnames(binValue) <- names
     ###output statistics

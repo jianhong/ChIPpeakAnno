@@ -8,9 +8,8 @@
 }
 \usage{
 annoPeaks (peaks, annoData, 
-          bindingType=c("bothSidesNSS",
-                        "startSite", "endSite", "fullRange", 
-                        "bothSidesNearest"), 
+          bindingType=c("nearestBiDirectionalPromoters",
+                        "startSite", "endSite", "fullRange"), 
           bindingRegion=c(-5000, 5000), 
           ignore.peak.strand=TRUE,
           ...)
@@ -23,26 +22,22 @@ annoPeaks (peaks, annoData,
     annotation data, \link{annoGR} or \link[GenomicRanges]{GRanges} object
   }
   \item{bindingType}{
-    binding relative position. startSite, start position of the feature; endSite,
-    end position of the feature; fullRange, whole range of the feature. 
-    The strand is considered for startSite and endSite.
-    Or if the bindingType is set to bothSidesNSS or bothSidesNearest, 
-    annoPeaks will return the nearest start sites or any annotations 
-    from both direction of the peak. 
-    It will also include all the annotations have overlappings.
+    Specifying the criteria to associate peaks with annotation. Here is how to use it together with the parameter bindingRegion
+    \itemize{
+        \item To obtain peaks within 5kb upstream and up to 3kb downstream of TSS within the gene body, set bindingType = "startSite" and bindingRegion = c(-5000, 3000)
+        \item To obtain  peaks  up to 5kb upstream within the gene body and 3kb downstream of gene/Exon End, set bindingType = "endSite" and bindingRegion = c(-5000, 3000)
+        \item To obtain peaks from 5kb upstream to 3kb downstream of genes/Exons , set  bindingType = "fullRange" and bindingRegion = c(-5000, 3000)
+        \item To obtain peaks with nearest bi-directional promoters within 5kb upstream and 3kb downstream of TSS, set  bindingType = "nearestBiDirectionalPromoters" and bindingRegion = c(-5000, 3000)
+    }
+    \describe{
+        \item{startSite}{start position of the feature (strand is considered)} 
+        \item{endSite}{end position of the feature (strand is considered)} 
+        \item{fullRange}{whole range of the feature} 
+        \item{nearestBiDirectionalPromoters}{nearest promoters from both direction of the peaks (strand is considered). It will report bidirectional promoters if there are promoters in both directions in the given region (defined by bindingRegion). Otherwise, it will report the closest promoter in one direction.}
+    }
   }
   \item{bindingRegion}{
-    region range to the annotation. Two integer values. The first one defines 
-    the number of nucleotides toward the 5'end and the second value defines the 
-    number toward the 3'end, relative to the annotation data. The first one must
-    be no bigger than 0. And the second one must be no less than 1. for 
-    bindingType equal to startSite or endSite, the downstream site will be 
-    restricted in the feature range, that is to say the binding will only happens
-    in the gene or upstreams for startSite, or downstreams for endSite. 
-    For bindingType equal to bothSidesNSS or
-    bothSidesNearest, the numbers toward to 5' or 3' end are extension range 
-    for peaks. If the there are overlaps in the peaks and their extension range,
-    the nearest or nearest start site in both sides will be reported.
+    Annotation range used together with bindingType, which is a vector with two integer values, default to c (-5000, 5000). The first one must be no bigger than 0. And the sec ond one must be no less than 1.  For details, see bindingType.
   }
   \item{ignore.peak.strand}{
     ignore the peaks strand or not.

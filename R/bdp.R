@@ -1,13 +1,13 @@
 bdp <- function(peaks, annoData, maxgap=2000L, ...){
     stopifnot(inherits(peaks, "GRanges"))
-    stopifnot(inherits(annoData, "annoGR"))
+    stopifnot(inherits(annoData, c("annoGR", "GRanges")))
     stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(annoData))
     stopifnot(is.numeric(maxgap))
     maxgap <- round(maxgap[1])
     peaks <- unique(peaks)
     peaks$bdp_idx <- 1:length(peaks)
     anno <- annoPeaks(peaks, annoData, 
-                      bindingType = "bothSidesNSS",
+                      bindingType = "nearestBiDirectionalPromoters",
                       bindingRegion = c(-1*maxgap, maxgap))
     if(length(anno)<1){
         return(NA)

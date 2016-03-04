@@ -13,7 +13,7 @@ binOverFeature(..., annotationData=GRanges(),
                     minGeneLen=1L, aroundGene=FALSE, mbins=nbins, 
                     featureSite=c("FeatureStart", "FeatureEnd", "bothEnd"),
                     PeakLocForDistance=c("all", "end","start","middle"), 
-                    FUN=sum, xlab, ylab, main)
+                    FUN=sum, errFun=sd, xlab, ylab, main)
 }
 \arguments{
   \item{\dots}{
@@ -50,6 +50,9 @@ binOverFeature(..., annotationData=GRanges(),
   \item{FUN}{
     the function to be used for score calculation
 }
+  \item{errFun}{
+    the function to be used for errorbar calculation or values for the errorbar.
+}
   \item{xlab}{
     titles for each x axis
 }
@@ -71,6 +74,6 @@ bed <- system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno")
 gr1 <- toGRanges(bed, format="BED", header=FALSE)
 data(TSS.human.GRCh37)
 binOverFeature(gr1, annotationData=TSS.human.GRCh37,
-               radius=5000, nbins=10, FUN=length)
+               radius=5000, nbins=10, FUN=length, errFun=0)
 }
 \keyword{ misc }

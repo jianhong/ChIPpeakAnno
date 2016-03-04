@@ -1,4 +1,4 @@
-test_peaksNearBDP<-function(){
+test_that("peaksNearBDP works not correct", {
     ##GRanges
     ## myPeak
     ## 1 2 3 4 5 6 7 8 9 10
@@ -23,7 +23,7 @@ test_peaksNearBDP<-function(){
     annotatedBDP = peaksNearBDP(myPeak, AnnotationData=feature,
                                 MaxDistance=2,PeakLocForDistance =  "middle", 
                                 FeatureLocForDistance = "TSS")
-    checkEquals(annotatedBDP$n.peaksWithBDP, 2)
+    expect_equal(annotatedBDP$n.peaksWithBDP, 2)
     ##0 bdp
     strand(feature) <- "+"
     suppressWarnings(annotatedBDP <- 
@@ -32,5 +32,5 @@ test_peaksNearBDP<-function(){
                                       MaxDistance=2,
                                       PeakLocForDistance =  "middle", 
                                       FeatureLocForDistance = "TSS"))
-    checkEquals(annotatedBDP$n.peaksWithBDP, 0)
-}
+    expect_equal(annotatedBDP$n.peaksWithBDP, 0)
+})

@@ -1,5 +1,7 @@
 \name{findOverlapsOfPeaks}
 \alias{findOverlapsOfPeaks}
+\alias{overlappingPeaks}
+\alias{overlappingPeaks-class}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Find the overlapped peaks among two or more set of peaks.
@@ -37,6 +39,7 @@ Efficiently perform overlap queries with an interval tree implemented with GRang
   \item{venn_cnt}{an object of VennCounts}
   \item{peaklist}{a list consists of all overlapping peaks or unique peaks}
   \item{overlappingPeaks}{a list of data frame consists of the annotation of all the overlapped peaks}
+  \item{all.peaks}{a list of GRanges object which contain the input peaks with formated rownames.}
 }
 \references{
 1.Interval tree algorithm from: Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford. Introduction to Algorithms, second edition, MIT Press and McGraw-Hill. ISBN 0-262-53196-8
@@ -67,6 +70,4 @@ makeVennDiagram(t1)
 t1$venn_cnt
 t1$peaklist
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ misc }

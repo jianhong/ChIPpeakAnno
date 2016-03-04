@@ -34,6 +34,7 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L,
     venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = cat.cex,
                              cat.col = cat.col, cat.fontface = cat.fontface, 
                              cat.fontfamily = cat.fontfamily, ...)
+    unlink(dir(pattern="^VennDiagram[0-9_\\-]+.log$")) ## delete the log file
     if(grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)]) && 
            connectedPeaks=="keepAll"){
         n <- which(colnames(venn_cnt)=="Counts")-1

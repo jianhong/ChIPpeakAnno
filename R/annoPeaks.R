@@ -1,11 +1,18 @@
 annoPeaks <- function(peaks, annoData, 
-                      bindingType=c("bothSidesNSS",
-                                    "startSite", "endSite", "fullRange",
-                                    "bothSidesNearest"), 
+                      bindingType=c("nearestBiDirectionalPromoters",
+                                    "startSite", "endSite", "fullRange"), 
                       bindingRegion=c(-5000, 5000), 
                       ignore.peak.strand=TRUE,
                       ...){
-    bindingType <- match.arg(bindingType)
+    if(bindingType[1] %in% 
+       c("bothSidesNearest", "nearestBiDirectionalPromoters", "bothSidesNSS")){
+        bindingType <- bindingType[1]
+        if(bindingType=="bothSidesNSS"){
+            bindingType <- "nearestBiDirectionalPromoters"
+        }
+    }else{
+        bindingType <- match.arg(bindingType)
+    }
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
     stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(annoData))
@@ -31,23 +38,34 @@ annoPeaks <- function(peaks, annoData,
                          },
                          fullRange=annoData,
                          bothSidesNearest=annoData,
-                         bothSidesNSS=annoData,
+                         nearestBiDirectionalPromoters=annoData,
                          annoData)
     rm(tmp)
-    if(bindingType %in% c("bothSidesNearest", "bothSidesNSS")){
-        extGR <- function(a, b){
-            str_a <- as.character(strand(a))!="-"
-            s1 <- ifelse(str_a, start(a)+b[1], start(a)-b[2])
-            s1[s1<1] <- 1
-            start(a) <- s1
-            end(a) <- ifelse(str_a, end(a)+b[2], end(a)-b[1])
-            a
+    if(bindingType %in% c("bothSidesNearest", "nearestBiDirectionalPromoters")){
+        if(bindingType=="bothSidesNearest"){
+            extGR <- function(a, b){
+                str_a <- as.character(strand(a))!="-"
+                s1 <- ifelse(str_a, start(a)+b[1], start(a)-b[2])
+                s1[s1<1] <- 1
+                start(a) <- s1
+                end(a) <- ifelse(str_a, end(a)+b[2], end(a)-b[1])
+                a
+            }
+            peaks.tmp <- extGR(peaks, bindingRegion)
+            ol <- findOverlaps(query=peaks.tmp, subject=annotation,
+                               maxgap=0L, minoverlap=1L,
+                               type="any", select="all",
+                               ignore.strand=FALSE)
+        }else{
+            ##bindingType=="nearestBiDirectionalPromoters"
+            annotation <- promoters(annotation, 
+                                    upstream=-1*bindingRegion[1],
+                                    downstream=bindingRegion[2])
+            ol <- findOverlaps(query=peaks, subject=annotation,
+                               maxgap=0L, minoverlap=1L,
+                               type="any", select="all",
+                               ignore.strand=FALSE)
         }
-        peaks.tmp <- extGR(peaks, bindingRegion)
-        ol <- findOverlaps(query=peaks.tmp, subject=annotation,
-                           maxgap=0L, minoverlap=1L,
-                           type="any", select="all",
-                           ignore.strand=FALSE)
     }else{
         idx <- as.character(strand(annotation))!="-"
         s1 <- ifelse(idx, start(annotation)+bindingRegion[1], 
@@ -96,12 +114,12 @@ annoPeaks <- function(peaks, annoData,
     }
     peaks <- peaks[queryHits(ol)]
     anno <- annoData[subjectHits(ol)]
-    if(bindingType %in% c("bothSidesNearest", "bothSidesNSS")){
-        relations <- getRelationship(peaks, anno)
+    if(bindingType %in% c("bothSidesNearest", "nearestBiDirectionalPromoters")){
+        relations <- if(bindingType=="bothSidesNearest") getRelationship(peaks, anno) else getRelationship(peaks, promoters(unname(as(anno, "GRanges")), upstream=0, downstream=1))
         ##filter resutls and save the nearest
         keep <- rep(FALSE, length(peaks))
         anno.strand <- as.character(strand(anno))!="-"
-        if(bindingType=="bothSidesNSS"){
+        if(bindingType=="nearestBiDirectionalPromoters"){
             keep[relations$insideFeature %in% 
                      c("includeFeature", "overlap")] <- TRUE
             keep.left <- (relations$insideFeature %in% 

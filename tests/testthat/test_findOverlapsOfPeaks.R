@@ -1,4 +1,4 @@
-test_findOverlapsOfPeaks<-function(){
+test_that("findOverlapsOfPeaks works not correct", {
     ##2 way
     p1 <- GRanges("1", 
                   IRanges(start=c(1, 3, 5, 8, 10), 
@@ -11,19 +11,19 @@ test_findOverlapsOfPeaks<-function(){
                           names=letters[1:3]), 
                   strand="*")
     ol <- findOverlapsOfPeaks(p1, p2, maxgap=0)
-    checkEquals(ol$venn_cnt[,"Counts"], c(0,0,0,3))
+    expect_equal(ol$venn_cnt[,"Counts"], c(0,0,0,3))
     ##3 way
     p3 <- GRanges("1", 
                   IRanges(start=c(3), end=c(4), names=letters[1]), 
                   strand="*")
     ol <- findOverlapsOfPeaks(p1, p2, p3, maxgap=0)
-    checkEquals(ol$venn_cnt[,"Counts"], c(0,0,0,0,0,0,1,1))
+    expect_equal(ol$venn_cnt[,"Counts"], c(0,0,0,0,0,0,1,1))
     ##4 way
     p4 <- GRanges("1", 
                   IRanges(start=c(13), end=c(14), names=letters[1]), 
                   strand="*")
     ol <- findOverlapsOfPeaks(p1, p2, p3, p4, maxgap=0)
-    checkEquals(ol$venn_cnt[,"Counts"], 
+    expect_equal(ol$venn_cnt[,"Counts"], 
                 c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0))
     ##5 way
     p5 <- GRanges("1", 
@@ -40,13 +40,13 @@ test_findOverlapsOfPeaks<-function(){
                           names=letters[1:16]), 
                   strand="*", id=LETTERS[1:16])
     ol <- findOverlapsOfPeaks(p1, p2, maxgap=0, minoverlap=3)
-    checkEquals(p1[gsub("p1__", "", 
+    expect_equal(p1[gsub("p1__", "", 
                         unlist(ol$peaklist$p1$peakNames))]$id, 
                 LETTERS[1:8*3-1])
     d <- ol$peaklist$`p1///p2`$peakNames
     d <- do.call(rbind, lapply(d, function(.ele) .ele[order(.ele)]))
     d <- cbind(p1[gsub("p1__", "", d[,1])]$id, p2[gsub("p2__", "", d[,2])]$id)
     d <- apply(d, 1, sort)
-    checkEquals(paste(d[1,], d[2,]), 
+    expect_equal(paste(d[1,], d[2,]), 
                 paste(LETTERS[1:16], LETTERS[1:24][-(1:8*3-1)]))
-}
+})
