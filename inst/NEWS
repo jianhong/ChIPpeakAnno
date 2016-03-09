@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.5.8
+-------------------------
+    o change toGRanges from function to method
+    o update the documentations.
+
 CHANGES IN VERSION 3.5.7
 -------------------------
     o change test from RUnit to testthat

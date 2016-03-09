@@ -22,7 +22,7 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 The purpose of this quick start is to introduce the four newly implemented functions, `toRanges`, `annoGO`, `annotatePeakInBatch`, and `addGeneIDs` in the new version of the **ChIPpeakAnno**. With those wrapper functions, the annotation of ChIP-Seq peaks becomes streamlined into four major steps:
 
 1 Read peak data with `toGRanges`
-2 Generate annotation data with `annoGR`
+2 Generate annotation data with `toGRanges`
 3 Annotate peaks with `annotatePeakInBatch`
 4 Add additional informations with `addGeneIDs`
 
@@ -41,10 +41,10 @@ path <- system.file("extdata", "Tead4.broadPeak", package="ChIPpeakAnno")
 peaks <- toGRanges(path, format="broadPeak")
 peaks[1:2]
 ```
-## Step 2: Prepare annotation data with `annoGR`
+## Step 2: Prepare annotation data with `toGRanges`
 ```{r annotationData}
 library(EnsDb.Hsapiens.v75)
-annoData <- annoGR(EnsDb.Hsapiens.v75)
+annoData <- toGRanges(EnsDb.Hsapiens.v75)
 annoData[1:2]
 ```
 ## Step 3: Annotate the peaks with `annotatePeakInBatch`
@@ -67,11 +67,11 @@ head(anno)
 ```
 # Use case 2: Annotate the peaks with promoters provided by **TxDb**
 
-This section demonstrates how to annotate the same peak data as in quick start 1 using a new annotation based on **TxDb** with `annoGR`.
+This section demonstrates how to annotate the same peak data as in quick start 1 using a new annotation based on **TxDb** with `toGRanges`.
 
 ```{r}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-annoData <- annoGR(TxDb.Hsapiens.UCSC.hg19.knownGene)
+annoData <- toGRanges(TxDb.Hsapiens.UCSC.hg19.knownGene)
 annoData[1:2]
 seqlevelsStyle(peaks) <- seqlevelsStyle(annoData)
 ```

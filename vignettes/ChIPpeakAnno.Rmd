@@ -7,7 +7,7 @@ package: "`r pkg_ver('ChIPpeakAnno')`"
 bibliography: bibliography.bib
 csl: nature.csl
 abstract: >
-  The package is to facilitate the downstream analysis for ChIP-seq experiments. 
+  The package is for facilitating the downstream analysis for ChIP-seq experiments. 
   It includes functions to find  the nearest gene, exon, miRNA or custom features such as the most
   conserved elements and other transcription factor binding sites
   supplied by users, retrieve the sequences
@@ -17,10 +17,7 @@ abstract: >
   summary statistics (peaksNearBDP), for summarizing the
   occurrence of motifs in peaks (summarizePatternInPeaks) and for
   adding other IDs to annotated peaks or enrichedGO (addGeneIDs). Starting 3.4, 
-  we also implement functions for permutation test to determine the association 
-  between two sets of peaks, and to plot heatmaps for given feature/peak ranges. 
-  This package leverages the biomaRt, IRanges, Biostrings, BSgenome, GO.db, 
-  multtest and stat packages.
+  permutation test has been added to determine whether there is a significant overlap between two sets of peaks. In addition, binding patterns of multiple transcription factors (TFs) or distributions of multiple epigenetic markers around genomic features could be visualized and compared easily using a side-by-side heatmap and density plot.
 vignette: >
   %\VignetteIndexEntry{ChIPpeakAnno Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -72,8 +69,7 @@ annotation from the **GO.db** package and multiplicity adjustment functions
 from the **multtest** package[@Benjamini1995; @benjamini2001; @johnson2005; @Holm1979; @Hochberg1988; @dudoit2003]. 
 The pathway analysis using reactome or KEGG is also supported. Starting 3.4, 
 we also implement the functions for permutation test
-to determine the association between two sets of peaks, and to plot heatmaps for
-given feature/peak ranges. 
+to determine whether there is a significant overlap between two sets of peaks. In addition, binding patterns of multiple transcription factors (TFs) or distributions of multiple epigenetic markers around genomic features could be visualized and compared easily using a side-by-side heatmap and density plot.  
 
 
 # Quick start
@@ -84,8 +80,7 @@ macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
 macsOutput <- toGRanges(macs, format="MACS")
 ## annotate the peaks with precompiled ensembl annotation
 data(TSS.human.GRCh38)
-macs.anno <- annotatePeakInBatch(macsOutput, AnnotationData=TSS.human.GRCh38, 
-                                output="overlapping", maxgap=5000L)
+macs.anno <- annotatePeakInBatch(macsOutput, AnnotationData=TSS.human.GRCh38)
 ## add gene symbols
 library(org.Hs.eg.db)
 macs.anno <- addGeneIDs(annotatedPeak=macs.anno, 
@@ -97,8 +92,7 @@ if(interactive()){## annotate the peaks with UCSC annotation
     library(TxDb.Hsapiens.UCSC.hg38.knownGene)
     ucsc.hg38.knownGene <- genes(TxDb.Hsapiens.UCSC.hg38.knownGene)
     macs.anno <- annotatePeakInBatch(macsOutput, 
-                                     AnnotationData=ucsc.hg38.knownGene, 
-                                     output="overlapping", maxgap=5000L)
+                                     AnnotationData=ucsc.hg38.knownGene)
     macs.anno <- addGeneIDs(annotatedPeak=macs.anno, 
                             orgAnn="org.Hs.eg.db", 
                             feature_id_type="entrez_id",
@@ -108,14 +102,14 @@ if(interactive()){## annotate the peaks with UCSC annotation
 
 
 
-# An example ChIP-seq analysis workflow using ChIPpeakAnno
+# An example of ChIP-seq analysis workflow using ChIPpeakAnno
 We illustrate here a common downstream analysis workflow for ChIP-seq 
 experiments. The input of **ChIPpeakAnno** is a list of called peaks identified 
-from ChIP-seq experiments. The peaks are represented by by GRanges
+from ChIP-seq experiments. The peaks are represented by GRanges
 in **ChIPpeakAnno**. We implemented a conversion functions `toGRanges` 
 to convert commonly used peak file formats, such as 
 BED, GFF, or other user defined formats such as MACS (a popular peak calling 
-program) output file to GRanges. Type ?`toGRanges` for more information.
+program) output file to GRanges. Please type ?`toGRanges` for more information.
 
 The workflow here exemplifies converting the BED and GFF files to GRanges,
 finding the overlapping peaks between the two peak sets, and visualizing the 
@@ -142,9 +136,7 @@ A pie chart is used to demonstrate the overlap features of the common peaks.
 pie1(table(ol$overlappingPeaks[["gr1///gr2"]]$overlapFeature))
 ```
 
-After finding the overlapping peaks, you can use `annotatePeakInBatch` i
-to annotate all the genomic features in the _AnnotationData_ within 5kb from 
-those peaks. 
+After finding the overlapping peaks, you can use `annotatePeakInBatch` to annotate the overlapping peaks with the genomic features in the _AnnotationData_ within certain distance away specified by maxgap, which is 5kb in the following example. 
 
 
 ```{r workflow21}
@@ -157,8 +149,7 @@ overlaps <- ol$peaklist[["gr1///gr2"]]
 ## ============== new style ===========
 library(EnsDb.Hsapiens.v75) ##(hg19)
 ## create annotation file from EnsDb or TxDb
-annoData <- annoGR(EnsDb.Hsapiens.v75, feature="gene")
-info(annoData)
+annoData <- toGRanges(EnsDb.Hsapiens.v75, feature="gene")
 annoData[1:2]
 overlaps.anno <- annotatePeakInBatch(overlaps, AnnotationData=annoData, 
                                     output="overlapping", maxgap=5000L)
@@ -186,7 +177,7 @@ binOverFeature(gr1, gr1.copy, annotationData=annoData,
 The distribution of the peaks over exon, intron, enhancer, proximal promoter, 
 5' UTR and 3' UTR can be summarized in peak centric or nucleotide centric view using 
 the function `assignChromosomeRegion`. 
-Note: setting nucleotideLevel = TRUE will give a nucleotide level distribution over 
+Please note that setting nucleotideLevel = TRUE will give a nucleotide level distribution over 
 different features.
 
 ```{r workflow23,fig.cap="Peak distribution over different genomic features.",fig.width=10,fig.height=4}
@@ -210,15 +201,12 @@ replicates; preparing genomic annotation(s) as GRanges; associating/annotating
 peaks with the annotation(s); summarizing peak 
 distributions over exon, intron, enhancer, proximal promoter, 5'UTR and 3'UTR 
 regions; retrieving the sequences around the peaks; and enrichment analysis of GO and 
-biological pathway. We also implement the functions to plot the heatmap of given
-peak ranges, and perform permutation test to determine if there is an association
-between two sets of peaks.
+biological pathway. We also implemented the functions to plot the heatmap of given
+peak ranges, and perform permutation test to determine if there is a significant overlap between two sets of peaks.
 
 ## Determine the overlapping peaks and visualize the overlaps with Venn diagram
 
-It is important to evaluate the concordance among the peaks of biological 
-replicates. Prior to associating features of interest with the peaks, it is a 
-common practice to combine the peaks from biological replicates. Also, it is biologically 
+Prior to associating features of interest with the peaks, it is a common practice to evaluate the concordance among the peaks from biological replicates and combine the peaks from biological replicates. Also, it is biologically 
 interesting to obtain overlapping peaks from different ChIP-seq experiments
 to imply the potential formation of transcription factor complexes. `ChIPpeakAnno` implemented 
 functions to achieve those goals and quantitatively determine the significance of 
@@ -261,7 +249,7 @@ peaklist <- ol$peaklist
 ```
 
 The function `findOverlapsOfPeaks` returns an object of **overlappingPeaks**, 
-which contains there elements: venn_cnt, peaklist (a list consists of all 
+which contains there elements: venn_cnt, peaklist (a list of  
 overlapping peaks or unique peaks), and overlappingPeaks (a list of data frame 
 consists of the annotation of all the overlapping peaks). 
 
@@ -351,30 +339,28 @@ ol <- findOverlapsOfPeaks(peaks1, peaks2, peaks3, maxgap=1000,
 makeVennDiagram(ol, totalTest=1e+2)
 ```
 
-The parameter _totalTest_ in the function `makeVennDiagram` indicates how many 
-potential peaks in total will be used in the hypergeometric test. It should be 
+The parameter _totalTest_ in the function `makeVennDiagram` indicates the total number of potential peaks used in the hypergeometric test. It should be 
 larger than the largest number of peaks in the replicates. The smaller it is 
 set, the more stringent the test is. The time used to calculate p-value does not
 depend on the value of the totalTest. For practical guidance on how to choose _totalTest_, 
-please refer to the [post](https://stat.ethz.ch/pipermail/bioconductor/2010-November/036540.html).
-We also implement a `permTest` function, in which the number of totalTest is not required. 
+please refer to the [post](https://stat.ethz.ch/pipermail/bioconductor/2010-November/036540.html). 
+Hypergeometric test requires users to input an estimate of the total potential binding sites (peaks) for a given TF. To circumvent this requirement, we implemented a permutation test called `permTest`. 
 For more details about the `permTest`, go to section [**4.11**](#section410). 
 
 
 ## Generate annotation data
-One main function of the **ChIPpeakAnno** package is to annotate the positional 
-relationship between the peaks and the known genomic features, such as TSS, 5'UTR, 3'UTR etc. 
+One main function of the **ChIPpeakAnno** package is to annotate peaks to known genomic features, such as TSS, 5'UTR, 3'UTR etc. 
 Constructing and choosing the appropriate annotation data is crucial for this 
 process. 
 
-To simplify this process, we precompiled the annotation data for the 
+To simplify this process, we precompiled a list of annotation data for the 
 transcriptional starting sites (TSS) of various species (with 
-different genome assembly versions). Those TSS annotations include 
+different genome assembly versions), such as
 TSS.human.NCBI36, TSS.human.GRCh37, TSS.human.GRCh38, TSS.mouse.NCBIM37, 
 TSS.mouse.GRCm38, TSS.rat.RGSC3.4, TSS.rat.Rnor\_5.0, TSS.zebrafish.Zv8, and 
-TSS.zebrafish.Zv9. Those precompiled annotations can be loaded by R `data()` function.
+TSS.zebrafish.Zv9. The precompiled annotations can be loaded by R `data()` function, e.g., data(TSS.human.GRCh38).
 
-To annotate the peaks with other genomic features, we provide the function
+To annotate the peaks with other genomic features, please use function
 `getAnnotation` with the argument _featureType_, e.g., "Exon" to obtain 
  the nearest exon, "miRNA" to find the nearest miRNA, and "5utr" or
  "3utr" to locate the overlapping "5'UTR" or "3'UTR". Another parameter for 
@@ -382,32 +368,22 @@ To annotate the peaks with other genomic features, we provide the function
 drerio\_gene\_ensembl for zebrafish genome, mmusculus\_gene\_ensembl for mouse 
 genome and rnorvegicus\_gene\_ensembl for rat genome. For a list of available 
 biomaRt and dataset, please refer to the **biomaRt** package documentation[@Durinck2005].
-For the detailed usage of `getAnnotation`, you can
+For the detailed usage of `getAnnotation`, please 
 type ?`getAnnotation` in R.
 
-You can also determine to use the biologically appropriate database that is 
-related with your biological questions. For example, if you have a list of 
+In addition, a custom annotation dataset as GRanges, can be used in `annotatePeakInBatch`.  We implemented `toGRanges` function for  converting custom annotation dataset in other formats, such as UCSC BED/GFF format, or any user defined dataset such as RangedDate, to GRanges. 
+For example, if you have a list of 
 transcription factor binding sites from literatures and are interested in 
-locating the nearest TSS and the distance to it for the peak lists. 
-You can pass the custom annotation dataset into the function 
-`annotatePeakInBatch` as GRanges. Use `toGRanges` function for conversion if necessary. 
+locating the nearest TSS and the distance to it for the peak lists.
 
-To facilitate the creation and documentation of the annotation data, 
-we implement an `annoGR` class, which is an extension of GRanges class, to represent 
-the annotation data. An `annoGR` object can be constructed from EnsDb, TxDb, or the user defined 
-GRanges object by calling the `annoGR` function. 
-The advantage of this class is that it contains the meta data 
-such as the source and the timestamp (date) of the data source. 
-Use ?`annoGR` for more information.
+An GRanges object can be also constructed from EnsDb or TxDb object by calling the `toGRanges` method. Use ?`toGRanges` for more information.
 
-One sample use case is that you want to annotate only the known genes, not other transcript 
-products, such as pseudo genes.  A code snippet to build this annotation data using _TranscriptDb_
-TxDb.Hsapiens.UCSC.hg19.knownGene with annoGR is: 
+Here is the code snippet to build annotation data containing only the known genes, i.e., excluding other transcript products such as pseudo genes using _TranscriptDb_
+TxDb.Hsapiens.UCSC.hg19.knownGene with `toGRanges` is: 
 
 ```{r annoGRgene}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-annoData <- annoGR(TxDb.Hsapiens.UCSC.hg19.knownGene, feature="gene")
-info(annoData)
+annoData <- toGRanges(TxDb.Hsapiens.UCSC.hg19.knownGene, feature="gene")
 annoData
 ```
 
@@ -417,8 +393,8 @@ With the annotation data, you can annotate the peaks identified from
 ChIP-seq or ChIP-chip experiments to retrieve the nearest gene and distance to 
 the corresponding TSS of the gene. 
 
-For example, using the `annoGR` object generated
-in previous section as AnnotationData, the first 6 peaks in the myPeakList are 
+For example, using the GRanges object generated
+in the previous section as AnnotationData, the first 6 peaks in the myPeakList are 
 annotated with the following code:
 
 ```{r annotatePeakInBatchByannoGR}
@@ -482,7 +458,7 @@ annotatedPeak2[1:3]
 pie1(table(as.data.frame(annotatedPeak2)$insideFeature))
 ```
 
-Another example of user specific _AnnotationData_ is to annotate peaks by promoters, defined
+Another example of using user defined _AnnotationData_ is to annotate peaks by promoters, defined
 as upstream 5K to downstream 500bp from TSS. 
 The sample code here demonstrates using the `GenomicFeatures::promoters` function to build a 
 custom annotation dataset and annotate the peaks with this user defined promoter annotations.
@@ -524,7 +500,7 @@ other options see ?annotatePeakInBatch.
 
 ## Find the overlapping and flanking features
 
-In addition to annotate peaks to nearest genes, **ChIPpeakAnno** can also reports all 
+In addition to annotating peaks to nearest genes, **ChIPpeakAnno** can also reports all 
 overlapping and flanking genes by setting output="both" and maxgap in `annotatePeakInBatch`. 
 For example, it outputs all overlapping and flanking genes within 5kb plus nearest genes 
 if set maxgap = 5000 and output ="both".
@@ -542,7 +518,7 @@ Additional annotations features such as entrez ID, gene symbol and gene name can
 with the function `addGeneIDs`. The annotated peaks can be saved as an Excel file 
 or plotted for visualizing the peak distribution relative to the genomic 
 features of interest. Here is an example to add gene symbol to the annotated peaks.
-Use ?`addGeneIDs` for more information.
+Please type ?`addGeneIDs` in a R session for more information.
 
 
 ```{r addGeneIDs18}
@@ -581,7 +557,7 @@ write2FASTA(peaksWithSequences,"test.fa")
 ``` 
 
 
-## Heatmap for given feature/peak ranges
+## Create heatmap for given feature/peak ranges
 
 You can easily visualize and compare the binding patterns of raw signals of multiple ChIP-Seq experiments using function 
 `featureAlignedHeatmap` and `featureAlignedDistribution`.
@@ -655,7 +631,7 @@ With the annotated peak data, you can call the function `getEnrichedGO` to obtai
 enriched GO terms. 
 For pathway analysis, you can call function `getEnrichedPATH` using reactome or KEGG database.
 
-In the following sample code we used a subset of the annotatedPeak (the first 500 peaks) for demonstration. All annotated peaks should be used in the real situation. 
+In the following sample code, we used a subset of the annotatedPeak (the first 500 peaks) for demonstration. All annotated peaks should be used in the real situation. 
 ```{r getEnriched14}
 library(org.Hs.eg.db)
 over <- getEnrichedGO(annotatedPeak[1:500], orgAnn="org.Hs.eg.db", 
@@ -665,12 +641,11 @@ head(over[["cc"]][, -3])
 head(over[["mf"]][, -3])
 ``` 
 Please note that the default setting of _feature\_id\_type_ is "ensembl\_gene\_id". 
-If you are using TxDb as annotation data, please try to change it to "entrez_id".
+If you are using TxDb as annotation data, please set feature id type to "entrez_id".
 
 Please also note that **org.Hs.eg.db** is the GO gene mapping for Human, for other 
 organisms, please refer to [released organism annotations](http://www.bioconductor.org/packages/release/data/annotation/),
-or call function `egOrgMap` to get the name of annotation database.
-
+or call function `egOrgMap` to get the name of annotation database. For example, here is how to obtain the GO gene mapping for mouse and human.
 
 ```{r egOrgMap15}
 egOrgMap("Mus musculus")
@@ -680,11 +655,8 @@ egOrgMap("Homo sapiens")
 
 ## Find peaks with bi-directional promoters
 
-Bidirectional promoters are the DNA regions located between the 5' ends 
-of two adjacent genes coded on opposite strands. 
-The two adjacent genes are transcribed to the opposite directions, 
-and often co-regulated by this shared promoter region[@robertson2007]. 
-Here is an example to find peaks with bi-directional promoters and 
+Bidirectional promoters are the DNA regions located between the transcription start sites (TSS) of two adjacent genes that are transcribed on the opposite directions and often co-regulated by this shared promoter region[@robertson2007]. 
+Here is an example to find peaks near bi-directional promoters and 
 output the percentage of the peaks near bi-directional promoters.
 
 ```{r peaksNearBDP16}
@@ -702,21 +674,12 @@ c(annotatedBDP$percentPeaksWithBDP,
 ```
 
 
-## Perform permutation test to determine if there is an association between two sets of peaks
+## Perform permutation test to determine if there is a significant overlap between two sets of peaks
 <a name="section410"></a>
 
-Given two peak lists from two transcript factors (TFs), one can ask whether 
-DNA binding sites of the two TFs are correlated. Most tests are based on hypergeometric distribution, 
-which require user to input an estimate of the total potential binding sites 
-for a given TF. In contrast, `peakPermTest` implemented here is based on permutation test, which 
-does not require user to supply an estimate of the total potential binding 
-sites. The random peaks in the permutation test are generated using the 
-distribution discovered from the input peaks for a given feature type 
-(transcripts or exons) and relevant binding positions to the features 
-("TSS", "geneEnd"). The width of the random peaks also follows 
-the distribution of that of the input peaks.
+Given two peak lists from two transcript factors (TFs), one common question is whether there is a significant overlap between DNA binding sites of the two TFs, which can be determined using hypergeometric test. As we have discussed in section 4.1, the hypergeometric test requires users to input an estimate of the total potential binding sites for a given TF. To circumvent this requirement, we implemented a permutation test called `peakPermTest`. Before performing a permutation test, users need to generate a random peak list using the distribution discovered from the input peaks for a given feature type (transcripts or exons), to make sure the binding positions relative to features, such as TSS and geneEnd, and the width of the random peaks follow the distribution of that of the input peaks.
 
-Following are the sample codes to do the `permTest`:
+Following are the sample codes to do the `peakPermTest`:
 
 
 ```{r peakPermTest}
@@ -746,17 +709,7 @@ plot(pt1)
 }
 ```
 
-Alternatively, users can create a pool of peaks representing all potential 
-binding sites with associated binding probabilities for random peak sampling 
-(see ?`preparePool`). Here is an example to build a human pool of peaks using 
-the transcription factor binding site clusters (V3) (see ?`wgEncodeTfbsV3`) 
-downloaded from [ENCODE](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz) with the HOT spots (?`HOT.spots`) removed. HOT spots are the genomic 
-regions with high probability of being bound by many TFs in ChIP-seq experiments[@yip2012]. 
-We suggest removing those HOT spots from the peak lists before performing 
-permutation test to avoid the overestimation of the association between the two input 
-peak lists. Users can also obtain the [ENCODE blacklist](https://sites.google.com/site/anshulkundaje/projects/blacklists) for a given species.
-The blacklists were constructed by identifying consistently problematic regions over independent of cell line and type of experiment for each species in the ENCODE and modENCODE datasets[@encode2012integrated]. 
-Please note that some of those blacklist may need to be liftover-ed to the correct genome assembly.
+Alternatively, a peak pool representing all potential binding sites can be created with associated binding probabilities using random peak sampling using `preparePool`. Here is an example to build a peak pool for human genome using the transcription factor binding site clusters (V3) (see ?`wgEncodeTfbsV3`) downloaded from [ENCODE](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz) with the HOT spots (?`HOT.spots`) removed. HOT spots are the genomic regions with high probability of being bound by many TFs in ChIP-seq experiments[@yip2012]. We suggest remove those HOT spots from the peak lists before performing permutation test to avoid the overestimation of the association between two input peak lists. Users can also choose to remove [ENCODE blacklist](https://sites.google.com/site/anshulkundaje/projects/blacklists) for a given species. The blacklists were constructed by identifying consistently problematic regions over independent cell lines and types of experiments for each species in the ENCODE and modENCODE datasets[@encode2012integrated]. Please note that some of the blacklists may need to be converted to the correct genome assembly using liftover utility. Following are the sample codes to do the permutation test using `peakPermTest`:
 
 ```{r peakPermTest1}
 if(interactive()){

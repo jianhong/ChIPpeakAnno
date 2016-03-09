@@ -33,4 +33,9 @@ test_that("toGRanges works not correct", {
                             frame=c(".", 2), 
                             group=c("peak1", "peak2")))
     gr <- toGRanges(GFF, format="GFF")
+    
+    ## EnsDb
+    gr <- toGRanges(EnsDb.Hsapiens.v79, feature="gene")
+    ## TxDb
+    gr <- toGRanges(TxDb.Hsapiens.UCSC.hg38.knownGene, feature="gene")
 })
