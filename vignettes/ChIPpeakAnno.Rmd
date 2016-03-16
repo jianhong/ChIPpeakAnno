@@ -662,11 +662,10 @@ output the percentage of the peaks near bi-directional promoters.
 ```{r peaksNearBDP16}
 data(myPeakList)
 data(TSS.human.NCBI36)
+seqlevelsStyle(TSS.human.NCBI36) <- seqlevelsStyle(myPeakList)
 annotatedBDP <- peaksNearBDP(myPeakList[1:10,], 
                              AnnotationData=TSS.human.NCBI36, 
-                             MaxDistance=5000,
-                             PeakLocForDistance="middle", 
-                             FeatureLocForDistance="TSS")
+                             MaxDistance=5000)
 annotatedBDP$peaksWithBDP
 c(annotatedBDP$percentPeaksWithBDP, 
   annotatedBDP$n.peaks, 

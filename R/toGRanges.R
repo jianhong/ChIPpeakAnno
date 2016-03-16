@@ -82,8 +82,43 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     }
     rm(data)
     #  gc(verbose=FALSE, reset=TRUE)
-    if(format=="BED"){ ## bed file is (start, end]
-        start(gr) <- start(gr) + 1
+    if(format=="BED"){ 
+        start(gr) <- start(gr) + 1 ## bed file is (start, end]
+        if(length(gr$thickStart)>0 &
+           length(gr$thickEnd)>0){
+            gr$thick <- IRanges(gr$thickStart+1, gr$thickEnd)
+            gr$thickStart <- NULL
+            gr$thickEnd <- NULL
+        }
+        if(length(gr$itemRgb)>0) {## itemRgb, 255,0,0
+            itemRgb <- do.call(rbind, strsplit(as.character(gr$itemRgb), ","))
+            gr$itemRgb <- NULL
+            if(ncol(itemRgb)==3){
+                itemRgb <- apply(itemRgb, 1, function(.ele){
+                    .ele <- as.numeric(.ele)
+                    rgb(.ele[1], .ele[2], .ele[3], maxColorValue = 255)
+                })
+                gr$itemRgb <- itemRgb
+            }else{
+                gr$itemRgb <- NA
+            }
+        }
+        if(length(gr$blockCount)>0 & 
+           length(gr$blockSizes)>0 &
+           length(gr$blockStarts)>0){
+            blocksizes <- strsplit(as.character(gr$blockSizes), ",")
+            blockstarts <- strsplit(as.character(gr$blockStarts), ",")
+            blocks <- mapply(function(num, sizes, starts){
+                sizes <- as.integer(sizes)[1:num]
+                starts <- as.integer(starts)[1:num]
+                ir <- IRanges(starts+1, width=sizes)
+                return(ir)
+            }, gr$blockCount, blocksizes, blockstarts, SIMPLIFY=FALSE)
+            gr$blocks <- IRangesList(blocks)
+            gr$blockCount <- NULL
+            gr$blockSizes <- NULL
+            gr$blockStarts <- NULL
+        }
     }
     return(gr)
 }

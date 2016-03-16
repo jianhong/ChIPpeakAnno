@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.5.9
+-------------------------
+    o merge peaksNearBDP and bdp function.
+    o improve oligoSummary.
+    o update the documentations.
+    
 CHANGES IN VERSION 3.5.8
 -------------------------
     o change toGRanges from function to method

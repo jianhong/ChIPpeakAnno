@@ -41,7 +41,6 @@ export(
        annotatePeakInBatch, 
        assignChromosomeRegion, 
        BED2RangedData,
-       bdp,
        binOverFeature,
        condenseMatrixByColnames, 
        convert2EntrezID,

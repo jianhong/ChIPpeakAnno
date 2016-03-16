@@ -1,7 +1,9 @@
 ---
 title: "Common Downstream ChIP-seq Analysis Workflows using ChIPpeakAnno"
 author: "Jianhong Ou, Jun Yu, Lihua Julie Zhu"
-output: BiocStyle::html_document
+output: 
+    BiocStyle::html_document:
+        css: custom.css
 date: "`r doc_date()`"
 package: "`r pkg_ver('ChIPpeakAnno')`"
 bibliography: bibliography.bib
@@ -25,7 +27,7 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 i <- 0
 generateFigureCaption <- function(cap){
     i <<- i+1
-    return(paste0("<center><div align='left'>Figure ", i, ".", cap, "</div></center>"))
+    return(paste0("Figure ", i, ". ", cap))
 }
 ```
 
@@ -75,7 +77,7 @@ annoData[1:2]
 After finding the overlapping peaks, the distribution of the distance of overlapped peaks to the nearest feature such as the transcription start sites (TSS) can be plotted by `binOverFeature` function. 
 The sample code here plots the distribution of peaks around the TSS.
 
-```{r workflow2,fig.cap="Distribution of peaks around transcript start sites.",fig.width=8,fig.height=6}
+```{r workflow2,fig.cap=generateFigureCaption("Distribution of peaks around transcript start sites."),fig.width=8,fig.height=6}
 overlaps <- ol$peaklist[["gr1///gr2"]]
 binOverFeature(overlaps, annotationData=annoData,
                radius=5000, nbins=20, FUN=length, errFun=0,
@@ -88,7 +90,7 @@ This distribution can be summarized in peak centric or nucleotide centric view u
 the function `assignChromosomeRegion`. 
 Please note that one peak might span multiple type of features, leading to the number of annotated features greater than the total number of input peaks. At the peak centric view, precedence will dictate the annotation order when peaks span multiple type of features.
 
-```{r workflow4,fig.cap="Peak distribution over different genomic features.",fig.width=10,fig.height=4}
+```{r workflow4,fig.cap=generateFigureCaption("Peak distribution over different genomic features."),fig.width=10,fig.height=4}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 aCR<-assignChromosomeRegion(overlaps, nucleotideLevel=FALSE, 
                            precedence=c("Promoters", "immediateDownstream", 
@@ -120,7 +122,7 @@ write.csv(as.data.frame(unname(overlaps.anno)), "anno.csv")
 
 The distribution of the common peaks around features can be visualized using a pie chart.
 
-```{r workflow20,fig.cap="Pie chart of the distribution of common peaks around features."}
+```{r workflow20,fig.cap=generateFigureCaption("Pie chart of the distribution of common peaks around features.")}
 pie1(table(overlaps.anno$insideFeature))
 ```
 
@@ -147,7 +149,7 @@ write2FASTA(seq, "test.fa")
 
 ## Output a summary of consensus in the peaks
 Here is an example to get the z-scores for short oligos[@leung1996over,@van2000statistical].
-```{r consensus, fig.height=6,fig.width=6}
+```{r consensus,fig.cap=generateFigureCaption("Histogram of zscore of 6-mer"),fig.height=6,fig.width=6}
 ## summary of the short oligos
 freqs <- oligoFrequency(Hsapiens$chr1, MarkovOrder=3)
 os <- oligoSummary(seq, oligoLength=6, MarkovOrder=3, 
@@ -158,7 +160,7 @@ h <- hist(zscore, breaks=100, xlim=c(-50, 50))
 text(zscore[length(zscore)], max(h$counts)/10, 
      labels=names(zscore[length(zscore)]), adj=1)
 ```
-```{r simulation, fig.width=6, fig.height=6}
+```{r simulation, fig.cap=generateFigureCaption("Histogram of zscore of simulation data"), fig.width=6, fig.height=6}
 ## We can also try simulation data
 seq.sim.motif <- c("t", "g", "c", "a", "t", "g")
 set.seed(1)
@@ -179,6 +181,8 @@ zscore <- sort(os$zscore)
 h <- hist(zscore, breaks=100)
 text(zscore[length(zscore)], max(h$counts)/10, 
      labels=names(zscore[length(zscore)]), adj=1)
+```
+```{r simulation.motif, fig.cap=generateFigureCaption("Motif of simulation data"), fig.width=6, fig.height=6}
 ## generate the motifs
 library(motifStack)
 pfms <- mapply(function(.ele, id)
@@ -194,8 +198,11 @@ of two adjacent genes that are transcribed on opposite directions
 and often co-regulated by this shared promoter region[@robertson2007]. 
 Here is an example to find peaks near bi-directional promoters.
 ```{r peaksNearBDP16}
-bdp <- bdp(overlaps, annoData, maxgap=5000)
-bdp
+bdp <- peaksNearBDP(overlaps, annoData, maxgap=5000)
+c(bdp$percentPeaksWithBDP, 
+  bdp$n.peaks, 
+  bdp$n.peaksWithBDP)
+bdp$peaksWithBDP[1:2]
 ```
 
 # Workflow for comparing binding profiles from multiple transcription factors (TFs)
@@ -225,7 +232,7 @@ please refer to the [post](https://stat.ethz.ch/pipermail/bioconductor/2010-Nove
 The following example makes an assumption that there are 3% of coding region plus promoter region. Because the sample data is only a subset of chromosome 2, 
 we estimate that the total binding sites is 1/24 of possible binding region in the genome.
 
-```{r vennDiagram, fig.width=6, fig.height=6}
+```{r vennDiagram, fig.cap=generateFigureCaption("Venn diagram of overlaps."), fig.width=6, fig.height=6}
 ol <- findOverlapsOfPeaks(data, connectedPeaks="keepAll")
 averagePeakWidth <- mean(width(unlist(GRangesList(ol$peaklist))))
 tot <- ceiling(3.3e+9 * .03 / averagePeakWidth / 24)
@@ -248,7 +255,7 @@ Please note that some of the blacklists may need to be converted to the correct 
 
 Following are the sample codes to do the permutation test using `permTest`:
 
-```{r peakPermTest1}
+```{r peakPermTest1, fig.cap=generateFigureCaption("permutation test for YY1 and TEAD4")}
     data(HOT.spots)
     data(wgEncodeTfbsV3)
     hotGR <- reduce(unlist(HOT.spots))
@@ -265,6 +272,8 @@ Following are the sample codes to do the permutation test using `permTest`:
     pt1 <- peakPermTest(YY1, TEAD4, pool=pool, 
                         ntimes=100, seed=1, force.parallel=FALSE)
     plot(pt1)
+```
+```{r peakPermTest2, fig.cap=generateFigureCaption("permutation test for YY1 and TAF")}
     pt2 <- peakPermTest(YY1, TAF, pool=pool, 
                         ntimes=100, seed=1, force.parallel=FALSE)
     plot(pt2)
@@ -273,7 +282,7 @@ Following are the sample codes to do the permutation test using `permTest`:
 
 ## Visualize and compare the binding pattern
 The binding pattern around a genome feature could be visualized and compared using a side-by-side heatmap and density plot using the binding ranges of overlapping peaks.
-```{r heatmap,fig.cap="Heatmap of aligned features",fig.width=4,fig.height=6}
+```{r heatmap,fig.cap=generateFigureCaption("Heatmap of aligned features"),fig.width=4,fig.height=6}
 features <- ol$peaklist[[length(ol$peaklist)]]
 feature.recentered <- reCenterPeaks(features, width=4000)
 ## here we also suggest importData function in bioconductor trackViewer package 
@@ -302,7 +311,7 @@ heatmap <- featureAlignedHeatmap(sig, feature.center[keep],
                                  upper.extreme=c(3,.5,4))
 ```
 
-```{r distribution,fig.cap="Distribution of aligned features",fig.width=6,fig.height=6}
+```{r distribution,fig.cap=generateFigureCaption("Distribution of aligned features"),fig.width=6,fig.height=6}
 featureAlignedDistribution(sig, feature.center, 
                            upstream=2000, downstream=2000,
                            type="l")

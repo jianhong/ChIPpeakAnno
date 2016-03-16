@@ -55,10 +55,10 @@ oligoSummary <- function(sequence, oligoLength=6L,
         }
     }
     
-    cnt <- t(sapply(sequence, function(.seq){
-        .seq <- tolower(.seq)
-        count(s2c(.seq), wordsize=oligoLength, alphabet=c("a", "c", "g", "t"))
-    }, USE.NAMES = FALSE))
+    sequence <- tolower(sequence)
+    oligoWords <- words(oligoLength)
+    cnt <- sapply(oligoWords, vcountPattern, subject=DNAStringSet(sequence),
+                  max.mismatch=0, min.mismatch=0, with.indels=FALSE, fixed=TRUE)
     mergeRevcomp <- function(mat){
         coln <- colnames(mat)
         map <- c(a="t", c="g", g="c", t="a")

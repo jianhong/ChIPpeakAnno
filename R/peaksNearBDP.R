@@ -1,18 +1,14 @@
-peaksNearBDP <- function(myPeakList, mart, AnnotationData, 
-                         MaxDistance=5000,
-                         PeakLocForDistance = c("start", "middle", "end"), 
-                         FeatureLocForDistance = c("TSS", "middle","start", 
-                                                   "end","geneEnd")){
+peaksNearBDP <- function(myPeakList, AnnotationData,
+                         MaxDistance=5000L, ...){
     if (missing(myPeakList)) {
         stop("Missing required argument myPeakList!")
     }
     if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
         stop("myPeakList needs to be GRanges object")
+        if(class(myPeakList)=="RangedData")
+            myPeakList <- toGRanges(myPeakList, format="RangedData")
     }
-    PeakLocForDistance = match.arg(PeakLocForDistance)
-    FeatureLocForDistance = match.arg(FeatureLocForDistance)
-    if (!missing(AnnotationData))
-    {        
+    if (!missing(AnnotationData)){        
         if (!inherits(AnnotationData, c("RangedData", "GRanges", "annoGR"))) {
             stop("AnnotationData needs to be GRanges or annoGR object")
         }
@@ -20,49 +16,34 @@ peaksNearBDP <- function(myPeakList, mart, AnnotationData,
             AnnotationData <- AnnotationData@gr
         if(class(AnnotationData)=="RangedData") 
             AnnotationData <- toGRanges(AnnotationData, format="RangedData")
+    }else{
+        stop("Missing required argument AnnotationData!")
     }
-    else if (missing(mart) || class(mart) != "Mart") {
-        stop("Error in querying biomart database. 
-             No valid mart object is passed in! 
-             Suggest call getAnnotation before calling PeaksNearBDP")
+    stopifnot(seqlevelsStyle(myPeakList)==seqlevelsStyle(AnnotationData))
+    stopifnot(is.numeric(MaxDistance))
+    
+    MaxDistance <- round(MaxDistance[1])
+    myPeakList <- unique(myPeakList)
+    myPeakList$bdp_idx <- 1:length(myPeakList)
+    anno <- annoPeaks(myPeakList, AnnotationData, 
+                      bindingType = "nearestBiDirectionalPromoters",
+                      bindingRegion = c(-1*MaxDistance, MaxDistance))
+    if(length(anno)<1){
+        return(list(peaksWithBDP=anno,
+                    percentPeaksWithBDP=0,
+                    n.peaks=length(myPeakList),
+                    n.peaksWithBDP=0))
     }
-    else
-    {
-        AnnotationData <- getAnnotation(mart, featureType = "TSS")
-        message("Done querying biomart database, start annotating ....
-                Better way would be calling getAnnotation before 
-                calling peaksNearBDP")
-    }
-    AnnoPlus = AnnotationData[strand(AnnotationData) =="+" | 
-                                  strand(AnnotationData) ==1]
-    AnnoMinus =AnnotationData[strand(AnnotationData) =="-" | 
-                                  strand(AnnotationData) ==-1]
-    if(class(myPeakList)=="RangedData") 
-        myPeakList <- toGRanges(myPeakList, format="RangedData")
-    plus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoPlus,
-                               PeakLocForDistance=PeakLocForDistance, 
-                               FeatureLocForDistance=FeatureLocForDistance)
-    minus = annotatePeakInBatch(myPeakList, AnnotationData = AnnoMinus, 
-                                PeakLocForDistance=PeakLocForDistance, 
-                                FeatureLocForDistance=FeatureLocForDistance)
-    plus.passed = plus[!is.na(plus$shortestDistance) & 
-                           plus$shortestDistance<=MaxDistance]
-    minus.passed = minus[!is.na(minus$shortestDistance) & 
-                             minus$shortestDistance <=MaxDistance]
-    passed = c(plus.passed, minus.passed)
-    summary = 
-        table(as.data.frame(mcols(passed)[, c("peak", "feature_strand")]))
-    if(nrow(summary)<1) return(NULL)
-    isBDP <- apply(summary, 1, function(.ele) sum(.ele>0)) > 1
-    BDP = summary[isBDP, , drop=FALSE]
-    peaksWithBDP = passed[passed$peak %in% rownames(BDP)]
-    peaksWithBDP <- peaksWithBDP[order(as.character(seqnames(peaksWithBDP)), 
-                                       peaksWithBDP$peak, 
-                                       peaksWithBDP$feature_strand)]
-    temp = nrow(BDP)
-    percentPeaksWithBDP  = temp/length(myPeakList)
-    list(peaksWithBDP = peaksWithBDP, 
-         percentPeaksWithBDP = percentPeaksWithBDP, 
-         n.peaks=length(myPeakList), 
-         n.peaksWithBDP=temp)
+    anno.s <- split(anno, anno$bdp_idx)
+    len <- elementNROWS(anno.s)
+    anno.s <- anno.s[len>=2]
+    len <- sapply(anno.s, function(.ele){
+        std <- .ele$feature.strand
+        all(c("+", "-") %in% as.character(.ele$feature.strand))
+    })
+    anno.s <- anno.s[len]
+    list(peaksWithBDP=anno.s,
+         percentPeaksWithBDP = length(anno.s)/length(myPeakList),
+         n.peaks=length(myPeakList),
+         n.peaksWithBDP=length(anno.s))
 }
