@@ -19,7 +19,7 @@ annoPeaks (peaks, annoData,
     peak list, \link[GenomicRanges]{GRanges} object
   }
   \item{annoData}{
-    annotation data, \link{annoGR} or \link[GenomicRanges]{GRanges} object
+    annotation data, \link[GenomicRanges]{GRanges} object
   }
   \item{bindingType}{
     Specifying the criteria to associate peaks with annotation. Here is how to use it together with the parameter bindingRegion
@@ -53,12 +53,12 @@ annoPeaks (peaks, annoData,
 Jianhong Ou
 }
 \seealso{
-    See Also as \code{\link{annotatePeakInBatch}}, \code{\link{annoGR}}
+    See Also as \code{\link{annotatePeakInBatch}}
 }
 \examples{
     library(EnsDb.Hsapiens.v75)
     data("myPeakList")
-    annoGR <- annoGR(EnsDb.Hsapiens.v75)
+    annoGR <- toGRanges(EnsDb.Hsapiens.v75)
     seqlevelsStyle(myPeakList) <- seqlevelsStyle(annoGR)
     annoPeaks(myPeakList, annoGR)
 }

@@ -229,3 +229,5 @@ chr1	bed2gff	region_224	9772780	9773404	0	+	.	region_224;
 chr1	bed2gff	region_225	9778650	9779883	0	+	.	region_225;
 chr1	bed2gff	region_226	9884235	9884661	0	+	.	region_226;
 chr1	bed2gff	region_227	9922947	9923471	0	+	.	region_227;
+chr1	bed2gff	region_228	151591700	151591800	0	+	.	region_228;
+chr1	bed2gff	region_229	151630186	151630286	0	+	.	region_229;

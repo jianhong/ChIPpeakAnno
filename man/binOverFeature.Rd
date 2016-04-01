@@ -39,7 +39,8 @@ binOverFeature(..., annotationData=GRanges(),
     Default = FALSE
 }
   \item{mbins}{
-    if aroundGene set as TRUE, the number of bins intra-feature
+    if aroundGene set as TRUE, the number of bins intra-feature.
+    The value will be normalized by value * (radius/genelen) * (mbins/nbins) 
 }
   \item{featureSite}{
     which site of features should be used for distance calculation

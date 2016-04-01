@@ -89,11 +89,30 @@ featureAlignedHeatmap <-
                     factor(as.character(sortMatrix[,i]), 
                            levels=rev(unique(as.character(sortMatrix[, i]))))
             }
-            sortMatrix <- 
-                cbind(sortMatrix,
-                      data.frame(covTotalCoverage[, sortBy, drop=FALSE]))
+            if(all(sortBy %in% colnames(mcols(feature.gr)))){
+                sortMatrix <- 
+                    cbind(sortMatrix, 
+                          as.data.frame(mcols(feature.gr)[, sortBy, drop=FALSE]))
+            }else{
+                if(all(sortBy %in% colnames(covTotalCoverage))){
+                    sortMatrix <- 
+                        cbind(sortMatrix,
+                              data.frame(covTotalCoverage[, sortBy, drop=FALSE]))
+                }else{
+                    stop("sortBy is incorrect.")
+                }
+            }
         }else{
-            sortMatrix <- data.frame(covTotalCoverage[, sortBy, drop=FALSE])
+            if(all(sortBy %in% colnames(mcols(feature.gr)))){
+                sortMatrix <- 
+                    as.data.frame(mcols(feature.gr)[, sortBy, drop=FALSE])
+            }else{
+                if(all(sortBy %in% colnames(covTotalCoverage))){
+                    sortMatrix <- data.frame(covTotalCoverage[, sortBy, drop=FALSE])
+                }else{
+                    stop("sortBy is incorrect.")
+                }
+            }
         }
         names(sortMatrix) <- paste("V", 1:ncol(sortMatrix))
         soid <- do.call(order, c(as.list(sortMatrix), decreasing = TRUE))

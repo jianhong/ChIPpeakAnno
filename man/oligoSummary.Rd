@@ -9,7 +9,8 @@
 }
 \usage{
 oligoSummary(sequence, oligoLength = 6L, freqs = NULL, 
-             MarkovOrder = 3L, quickMotif = FALSE, revcomp=FALSE)
+             MarkovOrder = 3L, quickMotif = FALSE, revcomp=FALSE,
+             maxsize=100000)
 }
 \arguments{
   \item{sequence}{
@@ -31,6 +32,9 @@ oligoSummary(sequence, oligoLength = 6L, freqs = NULL,
   \item{revcomp}{
     Consider both the given strand and the reverse complement strand when searching for motifs in a complementable alphabet (ie DNA). Default, FALSE.
 }
+  \item{maxsize}{
+    Maximum allowed dataset size (in length of sequences).
+  }
 }
 \value{
 A list is returned.

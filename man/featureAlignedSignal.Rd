@@ -22,7 +22,8 @@ featureAlignedSignal(cvglists, feature.gr,
     If the width not equal to 1, you can use zeroAt to set the zero point
     of the heatmap.
   }
-  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.}
+  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.
+  It must keep same as \link{featureAlignedSignal}. It is used for x-axis label.}
   \item{n.tile}{The number of tiles to generate for each element of feature.gr, 
     default is 100}
   \item{...}{Not used.}

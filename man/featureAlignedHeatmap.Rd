@@ -28,14 +28,15 @@ featureAlignedHeatmap(cvglists, feature.gr, upstream, downstream,
     If the width not equal to 1, you can use zeroAt to set the zero point
     of the heatmap.
   }
-  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.}
+  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.
+  It must keep same as \link{featureAlignedSignal}. It is used for x-axis label.}
   \item{zeroAt}{zero point position of feature.gr}
   \item{n.tile}{The number of tiles to generate for each element of feature.gr, 
     default is 100}
   \item{annoMcols}{The columns of metadata of feature.gr that specifies the
   annotations shown of the right side of the heatmap.}
   \item{sortBy}{Sort the feature.gr by columns by annoMcols and then the signals
-  of the given samples. Default is the first sample.
+  of the given samples. Default is the first sample. Set to NULL to disable sort.
   }
   \item{color}{vector of colors used in heatmap}
   \item{lower.extreme, upper.extreme}{The lower and upper boundary value of 

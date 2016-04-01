@@ -49,6 +49,7 @@ export(
        featureAlignedDistribution,
        featureAlignedHeatmap,
        featureAlignedSignal,
+       findEnhancers,
        findOverlappingPeaks,
        findOverlapsOfPeaks,
        getAllPeakSequence, 

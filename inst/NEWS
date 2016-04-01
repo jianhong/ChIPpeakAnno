@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.5.10
+-------------------------
+    o add new function findEnhancers
+    o normalize the output of gene region for binOverFeature
+    o change the documentation to avoid time-out error
+    
 CHANGES IN VERSION 3.5.9
 -------------------------
     o merge peaksNearBDP and bdp function.

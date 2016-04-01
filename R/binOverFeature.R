@@ -10,9 +10,20 @@ binOverFeature <- function(..., annotationData=GRanges(),
 {
     ###check inputs
     PeaksList <- list(...)
+    isGRangesList <- FALSE
+    if(length(PeaksList)==1){
+        if(class(PeaksList[[1]])=="GRangesList"){
+            PeaksList <- PeaksList[[1]]
+            names <- names(PeaksList)
+            isGRangesList <- TRUE
+        }
+    }
     ##save dots arguments names
-    dots <- substitute(list(...))[-1]
-    names <- unlist(sapply(dots, deparse))
+    if(!isGRangesList){
+        dots <- substitute(list(...))[-1]
+        names <- unlist(sapply(dots, deparse))
+    }
+    
     n <- length(PeaksList)
     if(!n){
         stop("Missing required argument Peaks!")
@@ -115,6 +126,11 @@ binOverFeature <- function(..., annotationData=GRanges(),
         ##genelength
         genelen <- 
             annotatedPeaks$end_position - annotatedPeaks$start_position + 1
+        ## change the function if it is length
+        if(identical(fun, length)){
+            fun <- sum
+            annotatedPeaks$score <- 1
+        }
         ###step 1 calculate the distance,
         strand <- annotatedPeaks$feature_strand=="-"
         if(PeakLocForDistance=="all"){
@@ -143,6 +159,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
                                 FeatureLoc-PeakLoc.start, 
                                 PeakLoc.end-FeatureLoc)
                 score <- score(annotatedPeaks)
+                weight <- (radius * mbins)/(genelen * nbins)
                 if(aroundGene){
                     if(featureSite=="FeatureStart"){
                         ibin1 <- 
@@ -188,6 +205,9 @@ binOverFeature <- function(..., annotationData=GRanges(),
                         distance1 <- radius
                     }
                     numbins <- 2*nbins + mbins
+                    b.type <- c(rep(FALSE, nbins), 
+                                rep(TRUE, mbins), 
+                                rep(FALSE, nbins))
                 }else{
                     ibin1 <- round(nbins+floor(dist1*nbins/radius))
                     ibin2 <- round(nbins+floor(dist2*nbins/radius))
@@ -197,18 +217,25 @@ binOverFeature <- function(..., annotationData=GRanges(),
                     distance1 <- radius
                     genelen <- 0
                     minGeneLen <- -1
+                    b.type <- rep(FALSE, 2*nbins)
                 }
                 ids <- dist2>=distance2 & 
                     dist1<distance1 & 
                     genelen > minGeneLen
                 score <- score[ids]
+                weight <- weight[ids]
                 ibin1 <- ibin1[ids]
                 ibin2 <- ibin2[ids]
                 ibin1[ibin1<0] <- 0
                 ibin2[ibin2>numbins] <- numbins
                 gps <- lapply(0:(numbins-1), function(.id){
                     ##split the scores
-                    score[ibin1<=.id & ibin2>=.id]
+                    .idx <- ibin1<=.id & ibin2>=.id
+                    if(b.type[.id+1]){
+                        score[.idx] * weight[.idx]
+                    }else{
+                        score[.idx]
+                    }
                 })
                 names(gps) <- formatC(1:numbins, 
                                       width=nchar(numbins), 
@@ -248,6 +275,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
                     ibin2 <- ibin2[ibin2>=nbins & ibin2<2*nbins]
                     numbins <- 2*nbins
                     b <- c(-1*c(nbins:1), 0:(nbins-1))
+                    b.type <- rep(FALSE, length(b))
                     ##insert the empty bins
                     ibin1 <- formatC(ibin1, width=nchar(numbins), flag="0")
                     ibin2 <- formatC(ibin2, width=nchar(numbins), flag="0")
@@ -280,6 +308,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
                 dist1 <- ifelse(strand, 
                                 FeatureLoc - PeakLoc, 
                                 PeakLoc - FeatureLoc)
+                weight <- (radius * mbins)/(genelen * nbins)
                 if(aroundGene){
                     if(featureSite=="FeatureStart"){
                         ibin1 <- 
@@ -308,6 +337,9 @@ binOverFeature <- function(..., annotationData=GRanges(),
                         distance2 <- -1*(radius+genelen)
                     }
                     numbins <- 2*nbins + mbins
+                    b.type <- c(rep(FALSE, nbins), 
+                                rep(TRUE, mbins), 
+                                rep(FALSE, nbins))
                 }else{
                     ibin1 <- round(nbins+floor(dist1*nbins/radius))
                     numbins <- 2*nbins
@@ -316,14 +348,18 @@ binOverFeature <- function(..., annotationData=GRanges(),
                     minGeneLen <- -1
                     distance1 <- radius
                     distance2 <- -1*radius
+                    b.type <- rep(FALSE, 2 * nbins)
                 }
                 ids <- dist1>=distance2 & 
                     dist1<distance1 & 
                     genelen > minGeneLen
                 score <- score(annotatedPeaks)[ids]
+                weight <- weight[ids]
                 ibin1 <- ibin1[ids]
                 ibin1[ibin1<0] <- 0
                 ibin1[ibin1>numbins] <- numbins
+                score[b.type[ibin1+1]] <- 
+                    score[b.type[ibin1+1]] * weight[b.type[ibin1+1]]
                 ibin1 <- formatC(ibin1, 
                                  width=nchar(numbins), 
                                  flag="0")
@@ -365,7 +401,15 @@ binOverFeature <- function(..., annotationData=GRanges(),
                  ylim=c(ylim.min-ylim.dis, ylim.max+ylim.dis),
                  xlab=xlab.ele, 
                  ylab=ylab.ele, 
-                 main=main.ele)
+                 main=main.ele,
+                 xaxt="n")
+            b.type.at <- b[which(b.type)]
+            b.type.at <- 
+                b.type.at[c(1, length(b.type.at))] + c(-.5, .5)
+            abline(v=b.type.at, lty=2)
+            b.at <- c(b[1]-.5, b[nbins]+.5, b[nbins+mbins]+.5, b[length(b)]+.5)
+            b.label <- c(-1 * radius, "Feature Start", "Feature End", radius)
+            axis(1, at=b.at, labels=b.label)
             if(!all(std==0)) plotErrBar(b, value, std)
         }else{
             plot(blabel, value, 

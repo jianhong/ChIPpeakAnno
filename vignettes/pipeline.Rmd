@@ -162,25 +162,26 @@ text(zscore[length(zscore)], max(h$counts)/10,
 ```
 ```{r simulation, fig.cap=generateFigureCaption("Histogram of zscore of simulation data"), fig.width=6, fig.height=6}
 ## We can also try simulation data
-seq.sim.motif <- c("t", "g", "c", "a", "t", "g")
+seq.sim.motif <- list(c("t", "g", "c", "a", "t", "g"), 
+                      c("g", "c", "a", "t", "g", "c"))
 set.seed(1)
-seq.sim <- sapply(sample(c(TRUE, FALSE), 1000, replace=TRUE, prob=c(0.3, 0.7)), 
+seq.sim <- sapply(sample(c(2, 1, 0), 1000, replace=TRUE, prob=c(0.07, 0.1, 0.83)), 
                   function(x){
     s <- sample(c("a", "c", "g", "t"), 
                 sample(100:1000, 1), replace=TRUE)
-    if(x){
+    if(x>0){
         si <- sample.int(length(s), 1)
         if(si>length(s)-6) si <- length(s)-6
-        s[si:(si+5)] <- seq.sim.motif
+        s[si:(si+5)] <- seq.sim.motif[[x]]
     }
     paste(s, collapse="")
 })
 os <- oligoSummary(seq.sim, oligoLength=6, MarkovOrder=3, 
                    quickMotif=TRUE)
-zscore <- sort(os$zscore)
+zscore <- sort(os$zscore, decreasing=TRUE)
 h <- hist(zscore, breaks=100)
-text(zscore[length(zscore)], max(h$counts)/10, 
-     labels=names(zscore[length(zscore)]), adj=1)
+text(zscore[1:2], rep(5, 2), 
+     labels=names(zscore[1:2]), adj=0, srt=90)
 ```
 ```{r simulation.motif, fig.cap=generateFigureCaption("Motif of simulation data"), fig.width=6, fig.height=6}
 ## generate the motifs
@@ -197,12 +198,25 @@ Bidirectional promoters are the DNA regions located between TSS
 of two adjacent genes that are transcribed on opposite directions 
 and often co-regulated by this shared promoter region[@robertson2007]. 
 Here is an example to find peaks near bi-directional promoters.
+
 ```{r peaksNearBDP16}
 bdp <- peaksNearBDP(overlaps, annoData, maxgap=5000)
 c(bdp$percentPeaksWithBDP, 
   bdp$n.peaks, 
   bdp$n.peaksWithBDP)
 bdp$peaksWithBDP[1:2]
+```
+
+## Find possible enhancers with DNA interaction data
+
+There are several techniques available to determine the spatial organization of chromosomes at high resolution such as 3C, 5C and HiC[@lieberman2009comprehensive]. These techniques make it possible to search peaks binding to the potential enhancer regions. Here is an example to find peaks binding to the potential enhancer regions. 
+
+```{r findEnhancers}
+DNA5C <- system.file("extdata", 
+                     "wgEncodeUmassDekker5CGm12878PkV2.bed.gz",
+                     package="ChIPpeakAnno")
+DNAinteractiveData <- toGRanges(gzfile(DNA5C))
+findEnhancers(overlaps, annoData, DNAinteractiveData)
 ```
 
 # Workflow for comparing binding profiles from multiple transcription factors (TFs)
@@ -267,22 +281,23 @@ Following are the sample codes to do the permutation test using `permTest`:
     TAF <- removeOl(data[["TAF"]])
     TEAD4 <- removeOl(data[["Tead4"]])
     YY1 <- removeOl(data[["YY1"]])
-    pool <- new("permPool", grs=GRangesList(wgEncodeTfbsV3), N=length(YY1))
-    # we set ntimes=100 to save demo time.
-    pt1 <- peakPermTest(YY1, TEAD4, pool=pool, 
-                        ntimes=100, seed=1, force.parallel=FALSE)
+    # we subset the pool to save demo time
+    set.seed(1)
+    wgEncodeTfbsV3.subset <- 
+        wgEncodeTfbsV3[sample.int(length(wgEncodeTfbsV3), 2000)]
+    pool <- new("permPool", grs=GRangesList(wgEncodeTfbsV3.subset), N=length(YY1))
+    pt1 <- peakPermTest(YY1, TEAD4, pool=pool, seed=1, force.parallel=FALSE)
     plot(pt1)
 ```
 ```{r peakPermTest2, fig.cap=generateFigureCaption("permutation test for YY1 and TAF")}
-    pt2 <- peakPermTest(YY1, TAF, pool=pool, 
-                        ntimes=100, seed=1, force.parallel=FALSE)
+    pt2 <- peakPermTest(YY1, TAF, pool=pool, seed=1, force.parallel=FALSE)
     plot(pt2)
 ```
 
 
 ## Visualize and compare the binding pattern
 The binding pattern around a genome feature could be visualized and compared using a side-by-side heatmap and density plot using the binding ranges of overlapping peaks.
-```{r heatmap,fig.cap=generateFigureCaption("Heatmap of aligned features"),fig.width=4,fig.height=6}
+```{r heatmap,fig.cap=generateFigureCaption("Heatmap of aligned features sorted by signal of TAF"),fig.width=4,fig.height=6}
 features <- ol$peaklist[[length(ol$peaklist)]]
 feature.recentered <- reCenterPeaks(features, width=4000)
 ## here we also suggest importData function in bioconductor trackViewer package 
@@ -306,11 +321,21 @@ sig <- featureAlignedSignal(cvglists, feature.center,
 ##the signals are not exists for every peak.
 keep <- rowSums(sig[[2]]) > 0
 sig <- sapply(sig, function(.ele) .ele[keep, ], simplify = FALSE)
-heatmap <- featureAlignedHeatmap(sig, feature.center[keep], 
+feature.center <- feature.center[keep]
+heatmap <- featureAlignedHeatmap(sig, feature.center, 
                                  upstream=2000, downstream=2000,
                                  upper.extreme=c(3,.5,4))
 ```
-
+```{r sortHeatmapByHcluster,fig.cap=generateFigureCaption("Heatmap of aligned features sorted by hclut"),fig.width=4,fig.height=6}
+sig.rowsums <- sapply(sig, rowSums, na.rm=TRUE)
+d <- dist(sig.rowsums)
+hc <- hclust(d)
+feature.center$order <- hc$order
+heatmap <- featureAlignedHeatmap(sig, feature.center, 
+                                 upstream=2000, downstream=2000,
+                                 upper.extreme=c(3,.5,4),
+                                 sortBy="order")
+```
 ```{r distribution,fig.cap=generateFigureCaption("Distribution of aligned features"),fig.width=6,fig.height=6}
 featureAlignedDistribution(sig, feature.center, 
                            upstream=2000, downstream=2000,
