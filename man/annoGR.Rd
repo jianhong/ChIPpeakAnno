@@ -75,7 +75,7 @@
     \item{...}{could be following parameters}
     \item{source}{character, where the annotation comes from}
     \item{mdata}{data frame, metadata from annotation}
-    \item{OrganismDb}{an object of \link[OrganismDbi]{OrganismDb}. It is used 
+    \item{OrganismDb}{an object of OrganismDb. It is used 
         for extracting gene symbol for geneModel group for 
         \link[GenomicFeatures]{TxDb}}
 }

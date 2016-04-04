@@ -14,7 +14,8 @@ pie1(x, labels = names(x), edges = 200,
                   col = NULL, border = NULL, lty = NULL, 
                   main = NULL, percentage=TRUE, rawNumber=FALSE, 
                   digits=3, cutoff=0.01, 
-                  legend=FALSE, legendpos="topright", legendcol=2, ...)
+                  legend=FALSE, legendpos="topright", legendcol=2, 
+                  radius.innerlabel = radius, ...)
 }
 \arguments{
   \item{x}{
@@ -83,6 +84,9 @@ pie1(x, labels = names(x), edges = 200,
   }
   \item{legendpos, legendcol}{
     legend position and legend columns. see \link[graphics]{legend}
+  }
+  \item{radius.innerlabel}{
+    position of percentage or raw number label relative to the circle.
   }
   \item{...}{	
   graphical parameters can be given as arguments to pie. They will affect the main title and labels only.

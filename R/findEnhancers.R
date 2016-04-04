@@ -307,5 +307,17 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
     enhancer <- enhancer[order(peak.gpid, enhancer$distance)]
     enhancer <- enhancer[!duplicated(paste(enhancer$feature, enhancer$peak))]
     enhancer$peak.oid.to.be.deleted <- NULL
+    enhancer$DNAinteractive.ranges <- 
+        ranges(DNAinteractiveData[enhancer$DNAinteractive.idx])
+    enhancer$DNAinteractive.blocks <- 
+        DNAinteractiveData[enhancer$DNAinteractive.idx]$blocks
+    enhancer$DNAinteractive_point_A <- NULL
+    enhancer$DNAinteractive_point_B <- NULL
+    enhancer$DNAinteractive_point_C <- NULL
+    enhancer$DNAinteractive_point_D <- NULL
+    enhancer$cross.link.region <- NULL
+    enhancer$raw.annotation.region <- NULL
+    enhancer$peak.annotation.region <- NULL
+    enhancer$DNAinteractive.idx <- NULL
     enhancer
 }

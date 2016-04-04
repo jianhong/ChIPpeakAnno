@@ -5,7 +5,8 @@ pie1 <- function (x, labels = names(x), edges = 200,
                   col = NULL, border = NULL, lty = NULL, 
                   main = NULL, percentage=TRUE, rawNumber=FALSE, 
                   digits=3, cutoff=0.01, 
-                  legend=FALSE, legendpos="topright", legendcol=2, ...) 
+                  legend=FALSE, legendpos="topright", legendcol=2, 
+                  radius.innerlabel = radius, ...) 
 {
     if (!is.numeric(x) || any(is.na(x) | x < 0)) 
         stop("'x' values must be positive.")
@@ -65,7 +66,7 @@ pie1 <- function (x, labels = names(x), edges = 200,
         for (i in 1L:nx){
             if(dx[i]>cutoff){
                 P <- t2xy(mean(x[i + 0:1]))
-                text(.8 * P$x, .8 * P$y, 
+                text(radius.innerlabel * P$x, radius.innerlabel * P$y, 
                      paste(formatC(dx[i]*100, digits=digits), "%", sep=""), 
                      xpd = TRUE, 
                      adj = .5, ...)
@@ -76,7 +77,8 @@ pie1 <- function (x, labels = names(x), edges = 200,
             for (i in 1L:nx){
                 if(dx[i]>cutoff){
                     P <- t2xy(mean(x[i + 0:1]))
-                    text(.8 * P$x, .8 * P$y, rawX[i], xpd = TRUE, 
+                    text(radius.innerlabel * P$x, radius.innerlabel * P$y, 
+                         rawX[i], xpd = TRUE, 
                          adj = .5, ...)
                 }
             }
