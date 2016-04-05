@@ -24,7 +24,7 @@ import(GenomicRanges)
 import(GenomeInfoDb)
 import(S4Vectors)
 importFrom(GenomicAlignments, summarizeOverlaps, Union)
-importFrom(SummarizedExperiment, assay, rowRanges)
+importFrom(SummarizedExperiment, assay, rowRanges, SummarizedExperiment, colData)
 importFrom(idr, est.IDR)
 import(ensembldb)
 importFrom(seqinr, s2c, count, words)
@@ -70,6 +70,7 @@ export(
        pie1,
        preparePool,
        reCenterPeaks,
+       summarizeOverlapsByBins,
        summarizePatternInPeaks,
        toGRanges, 
        translatePattern,
