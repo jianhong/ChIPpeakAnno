@@ -50,6 +50,10 @@ featureAlignedSignal <- function(cvglists, feature.gr,
         do.call(rbind, 
                 mapply(function(x, n){
                     .d <- .dat[[n]]
+                    if(length(.d)==0){
+                        message(n, " is not in cvglists. seqlevels of cvglist is ", names(.dat))
+                        return(NULL)
+                    }
                     do.call(rbind, lapply(x, function(.ele){
                         log2(viewMeans(Views(.d, ranges(.ele)))+1)
                     }))

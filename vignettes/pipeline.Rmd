@@ -130,8 +130,9 @@ pie1(table(overlaps.anno$insideFeature))
 ## Obtain enriched GO terms and Pathways
 The following example shows how to use `getEnrichedGO` to obtain a list of enriched GO terms with annotated peaks. For pathway analysis, please use function `getEnrichedPATH` with reactome or KEGG database. Please note that by default  _feature\_id\_type_ is set as “ensembl\_gene\_id”. If you are using **TxDb** as annotation data, please set it to “entrez\_id”.
 ```{r enrichment}
-over <- getEnrichedGO(overlaps.anno, orgAnn="org.Hs.eg.db",
-                     maxP=.05, condense=TRUE)
+over <- getEnrichedGO(overlaps.anno, orgAnn="org.Hs.eg.db", 
+                     maxP=.05, minGOterm=10, 
+                     multiAdjMethod="BH", condense=TRUE)
 head(over[["bp"]][, -c(3, 10)])
 library(reactome.db)
 path <- getEnrichedPATH(overlaps.anno, "org.Hs.eg.db", "reactome.db", maxP=.05)
