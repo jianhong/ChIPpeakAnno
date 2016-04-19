@@ -55,17 +55,16 @@ featureAlignedSignal <- function(cvglists, feature.gr,
                         return(NULL)
                     }
                     if(any(is.na(runValue(.d)))){
-                        warning("cvglists contain NA values. ", 
-                                "NA value will be converted to 0.")
-                        runValue(.d)[is.na(runValue(.d))] <- 0
+                        warning("cvglists contain NA values. ")
                     }
                     if(any(is.infinite(runValue(.d)))){
                         warning("cvglists contain infinite values. ", 
-                                "infinite value will be converted to 0.")
-                        runValue(.d)[is.infinite(runValue(.d))] <- 0
+                                "infinite value will be converted to NA.")
+                        runValue(.d)[is.infinite(runValue(.d))] <- NA
                     }
                     do.call(rbind, lapply(x, function(.ele){
-                        log2(viewMeans(Views(.d, ranges(.ele)))+1)
+                        log2(viewMeans(Views(.d, ranges(.ele)), 
+                                       na.rm=TRUE)+1)
                     }))
                 }, grL, names(grL), SIMPLIFY=FALSE))
     })
