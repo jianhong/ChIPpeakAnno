@@ -54,6 +54,16 @@ featureAlignedSignal <- function(cvglists, feature.gr,
                         message(n, " is not in cvglists. seqlevels of cvglist is ", names(.dat))
                         return(NULL)
                     }
+                    if(any(is.na(runValue(.d)))){
+                        warning("cvglists contain NA values. ", 
+                                "NA value will be converted to 0.")
+                        runValue(.d)[is.na(runValue(.d))] <- 0
+                    }
+                    if(any(is.infinite(runValue(.d)))){
+                        warning("cvglists contain infinite values. ", 
+                                "infinite value will be converted to 0.")
+                        runValue(.d)[is.infinite(runValue(.d))] <- 0
+                    }
                     do.call(rbind, lapply(x, function(.ele){
                         log2(viewMeans(Views(.d, ranges(.ele)))+1)
                     }))

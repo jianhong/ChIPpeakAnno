@@ -64,13 +64,20 @@ featureAlignedDistribution <- function(cvglists, feature.gr,
         cov <- featureAlignedSignal(cvglists, feature.gr, n.tile=n.tile)
     }
     ## normalized read density
-    density <- sapply(cov, colMeans)
-    matplot(density, ..., xaxt="n")
-    axis(1, at = grWidAt, labels = grWidLab)
-    lty <- if(!is.null(dots$lty)) dots$lty else 1:5
-    lwd <- if(!is.null(dots$lwd)) dots$lwd else 1
-    col <- if(!is.null(dots$col)) dots$col else 1:6
-    legend("topright", legend=colnames(density), col=col,
-           lty=lty, lwd=lwd)
+    if(any(sapply(cov, function(.ele) any(is.na(.ele))))){
+        warning("cvglists contain NA values. ", 
+                "NA value will be omit.")
+    }
+    density <- sapply(cov, colMeans, na.rm=TRUE)
+    try({
+        matplot(density, ..., xaxt="n")
+        axis(1, at = grWidAt, labels = grWidLab)
+        lty <- if(!is.null(dots$lty)) dots$lty else 1:5
+        lwd <- if(!is.null(dots$lwd)) dots$lwd else 1
+        col <- if(!is.null(dots$col)) dots$col else 1:6
+        legend("topright", legend=colnames(density), col=col,
+               lty=lty, lwd=lwd)
+    })
+    
     return(invisible(density))
 }

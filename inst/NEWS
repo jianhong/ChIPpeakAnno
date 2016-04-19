@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.5.14
+-------------------------
+    o remove NA for featureAlignedDistribution
+    o handle NA and infinite value for featureAlignedSingal
+    
 CHANGES IN VERSION 3.5.13
 -------------------------
     o throw message when seqlevels are not identical 
