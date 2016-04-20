@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.5.15
+-------------------------
+    o not do log2 transform for featureAlignedSingal
+    
 CHANGES IN VERSION 3.5.14
 -------------------------
     o remove NA for featureAlignedDistribution

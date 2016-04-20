@@ -22,10 +22,13 @@ featureAlignedDistribution <- function(cvglists, feature.gr,
         }
         upstream <- as.integer(upstream)
         downstream <- as.integer(downstream)
-        if(length(grWidr)!=1){
-            start(feature.gr) <- start(feature.gr)+floor(grWidr/2)
+        if(length(grWidr)!=1 || any(grWidr!=1)){
+            start(feature.gr) <- start(feature.gr)+floor(width(feature.gr)/2)
             width(feature.gr) <- 1
             warning("feature.gr is set to the center of feature.gr")
+        }
+        if(!missing(zeroAt)){
+            warning("zeroAt will be ignored.")
         }
         zeroAt <- upstream/(upstream + downstream)
         end(feature.gr) <- start(feature.gr) + downstream
