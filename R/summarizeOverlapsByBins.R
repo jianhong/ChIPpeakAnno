@@ -27,16 +27,15 @@ summarizeOverlapsByBins <- function(targetRegions, reads,
     targetRegions <- targetRegions[width(targetRegions)>=windowSize]
     targetRegions <- targetRegions[width(targetRegions)>=step]
     tileTargetRanges <- tile(x=ranges(targetRegions), width=step)
-    tileTargetRanges <- mapply(function(.ele, .end){
-        width(.ele) <- windowSize
-        .ele[end(.ele)<=.end] ## drop the tiles of over the end
-    }, tileTargetRanges, end(targetRegions))
-    tileTargetRanges <- IRangesList(tileTargetRanges)
     nt <- elementNROWS(tileTargetRanges)
+    tileTargetRanges.end <- rep(end(targetRegions), nt)
+    tileTargetRanges <- unlist(tileTargetRanges)
+    width(tileTargetRanges) <- windowSize
     tileTargetRegions <- GRanges(rep(seqnames(targetRegions), nt), 
-                                 unlist(tileTargetRanges),
+                                 tileTargetRanges,
                                  rep(strand(targetRegions), nt),
                                  oid=rep(1:length(targetRegions), nt))
+    tileTargetRegions <- tileTargetRegions[end(tileTargetRanges) <= tileTargetRanges.end]
     se <- summarizeOverlaps(features=tileTargetRegions, reads=reads, 
                             mode=mode, ...)
     cnts <- aggregate(x=assay(se), 

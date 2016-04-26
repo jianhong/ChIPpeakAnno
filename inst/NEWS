@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.5.16
+-------------------------
+    o fix the warning in windows for replacing previous import 
+
 CHANGES IN VERSION 3.5.15
 -------------------------
     o not do log2 transform for featureAlignedSingal
