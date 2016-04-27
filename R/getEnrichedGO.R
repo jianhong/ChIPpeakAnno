@@ -85,7 +85,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     xx <- mget(mapped_genes, goAnn, ifnotfound=NA)
     all.GO <- cbind(matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE),
                     rep(names(xx), elementNROWS(xx)))
-    
+    all.GO <- unique(all.GO)## incalse the database is not unique
     this.GO <- all.GO[all.GO[, 4] %in% entrezIDs, , drop=FALSE]
     
     addAnc <- function(go.ids,

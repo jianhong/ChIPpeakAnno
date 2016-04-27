@@ -88,6 +88,9 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         }
     }))
     
+    all.PATH <- unique(all.PATH)## incalse the database is not unique
+    this.PATH <- unique(this.PATH)
+    
     colnames(all.PATH)<-c("path.id","EntrezID")
     colnames(this.PATH)<-c("path.id","EntrezID")
     

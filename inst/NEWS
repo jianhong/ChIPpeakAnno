@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.5.17
+-------------------------
+    o Fix the bugs for getEnrichedGO/PATH when recodes in 
+    database such as reactome database is not unique.
+    
+    
 CHANGES IN VERSION 3.5.16
 -------------------------
     o fix the warning in windows for replacing previous import 
