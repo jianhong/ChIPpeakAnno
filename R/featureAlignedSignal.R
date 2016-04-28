@@ -44,7 +44,13 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     n.tile <- round(n.tile)
     grL <- lapply(feature.gr, function(.ele){
         .gr <- tile(.ele, n=n.tile)
-        .gr <- unlist(.gr)
+        .gr <- lapply(.gr, function(.e){
+            if(as.character(strand(.e))[1]=="-"){
+                .e <- rev(.e)
+            }
+            .e
+        })
+        .gr <- unlist(GRangesList(.gr))
         .gr$oid <- rep(.ele$oid, each=n.tile)
         .gr
         })
