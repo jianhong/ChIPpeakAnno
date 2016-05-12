@@ -43,11 +43,13 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
     xlist <- apply(xlist, 2, paste, collapse="")
     if(length(venn_cnt$all)!=length(xlist)) 
         stop("length of 'xlist' and 'all' should be identical.")
-    all <- do.call(rbind,
-                   mapply(function(.ele, .id, .gp) cbind(.id, .ele, .gp), 
-                          venn_cnt$all, 1:length(venn_cnt$all), 
-                          xlist, SIMPLIFY=FALSE))
-    
+#     all <- do.call(rbind,
+#                    mapply(function(.ele, .id, .gp) cbind(.id, .ele, .gp), 
+#                           venn_cnt$all, 1:length(venn_cnt$all), 
+#                           xlist, SIMPLIFY=FALSE))
+    all <- cbind(.id=rep(1:length(venn_cnt$all), sapply(venn_cnt$all, length)), 
+                 .ele=unlist(venn_cnt$all), 
+                 .gp=rep(xlist, sapply(venn_cnt$all, length)))
     all.peaks <- venn_cnt$Peaks[all[,2]]
     names(all.peaks) <- gsub(NAME_conn_string,
                              NAME_short_string,
@@ -73,10 +75,12 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
                        ignore.strand=ignore.strand)
     peaklist <- mapply(function(peaks, info){
         revmap <- peaks$revmap
-        peakNames <- do.call(rbind, 
-                             mapply(function(id, gp) cbind(id, gp), 
-                                    revmap, 1:length(revmap), 
-                                    SIMPLIFY=FALSE))
+#         peakNames <- do.call(rbind, 
+#                              mapply(function(id, gp) cbind(id, gp), 
+#                                     revmap, 1:length(revmap), 
+#                                     SIMPLIFY=FALSE))
+        peakNames <- cbind(id=unlist(revmap),
+                           gp=rep(1:length(revmap), sapply(revmap, length)))
         peaks$peakNames <- CharacterList(split(names(info)[peakNames[, 1]], 
                                                peakNames[, 2]), 
                                          compress=TRUE)

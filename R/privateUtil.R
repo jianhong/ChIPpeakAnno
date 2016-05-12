@@ -257,24 +257,38 @@ vennCounts <- function(PeaksList, n, names,
     ## time consuming step, FIXME!!
     ## Fixed by paste connection string before lapply 
     NAME_conn_string_wild <- paste(NAME_conn_string, ".*?$", sep="")
+    all.df <- data.frame(rnames=unlist(all), 
+                    groupID=rep(1:length(all), sapply(all, length)))
+    all.df$tfname <- gsub(NAME_conn_string_wild, "", all.df$rnames)
+    all.df.tbl <- table(all.df[, -1])
     for (i in 1:ncontrasts){
-        NAME_conn_string_contrasts_wild <- paste("^", 
-                                                 names[ncontrasts-i+1], 
-                                                 NAME_conn_string,
-                                                 sep="")
-        xlist[[i]] <- factor(as.numeric(unlist(lapply(all, function(.ele) 
-            any(grepl(NAME_conn_string_contrasts_wild, .ele))))),
-            levels=c(0,1))
+#         NAME_conn_string_contrasts_wild <- paste("^", 
+#                                                  names[ncontrasts-i+1], 
+#                                                  NAME_conn_string,
+#                                                  sep="")
+#         xlist[[i]] <- factor(as.numeric(unlist(lapply(all, function(.ele) 
+#             any(grepl(NAME_conn_string_contrasts_wild, .ele))))),
+#             levels=c(0,1))
+        xlist[[i]] <- 
+            factor(as.numeric(all.df.tbl[, names[ncontrasts-i+1]]>0), 
+                   levels=c(0, 1))
         if(connectedPeaks=="merge"){
+#             xlist1[[i]] <- factor(as.numeric(unlist(lapply(all, function(.ele) 
+#                 any(grepl(NAME_conn_string_contrasts_wild, .ele))))),
+#                 levels=c(0,1))
             xlist1[[i]] <- xlist[[i]]
-        }else{
+        }else{ ## increase the efficency be change list to dataframe
+#             xlist1[[i]] <- 
+#                 factor(as.numeric(unlist(lapply(all, function(.ele) {
+#                 ##count involved nodes in each group
+#                 .ele <- gsub(NAME_conn_string_wild, "", .ele)
+#                 .ele <- table(.ele)
+#                 rep(names[ncontrasts-i+1] %in% names(.ele), min(.ele))
+#             }))), levels=c(0,1))
             xlist1[[i]] <- 
-                factor(as.numeric(unlist(lapply(all, function(.ele) {
-                ##count involved nodes in each group
-                .ele <- gsub(NAME_conn_string_wild, "", .ele)
-                .ele <- table(.ele)
-                rep(names[ncontrasts-i+1] %in% names(.ele), min(.ele))
-            }))), levels=c(0,1))
+                factor(as.numeric(rep(all.df.tbl[, names[ncontrasts-i+1]]>0, 
+                                      apply(all.df.tbl, 1, function(.e) min(.e[.e>0])))), 
+                       levels=c(0, 1))
         }
     }
     

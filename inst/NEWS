@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.7.2
+-------------------------
+    o Correct typo in documentation for Z-score.
+    o Improve the efficiency of findOverlapsOfPeaks.
+
 CHANGES IN VERSION 3.5.18
 -------------------------
     o Fix the bugs for featureAlignedSignal when features 

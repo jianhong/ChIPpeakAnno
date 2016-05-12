@@ -149,19 +149,19 @@ write2FASTA(seq, "test.fa")
 ```
 
 ## Output a summary of consensus in the peaks
-Here is an example to get the z-scores for short oligos[@leung1996over,@van2000statistical].
-```{r consensus,fig.cap=generateFigureCaption("Histogram of zscore of 6-mer"),fig.height=6,fig.width=6}
+Here is an example to get the Z-scores for short oligos[@leung1996over,@van2000statistical].
+```{r consensus,fig.cap=generateFigureCaption("Histogram of Z-score of 6-mer"),fig.height=6,fig.width=6}
 ## summary of the short oligos
 freqs <- oligoFrequency(Hsapiens$chr1, MarkovOrder=3)
 os <- oligoSummary(seq, oligoLength=6, MarkovOrder=3, 
                    quickMotif=FALSE, freqs=freqs)
 ## plot the results
 zscore <- sort(os$zscore)
-h <- hist(zscore, breaks=100, xlim=c(-50, 50))
+h <- hist(zscore, breaks=100, xlim=c(-50, 50), main="Histogram of Z-score")
 text(zscore[length(zscore)], max(h$counts)/10, 
      labels=names(zscore[length(zscore)]), adj=1)
 ```
-```{r simulation, fig.cap=generateFigureCaption("Histogram of zscore of simulation data"), fig.width=6, fig.height=6}
+```{r simulation, fig.cap=generateFigureCaption("Histogram of Z-score of simulation data"), fig.width=6, fig.height=6}
 ## We can also try simulation data
 seq.sim.motif <- list(c("t", "g", "c", "a", "t", "g"), 
                       c("g", "c", "a", "t", "g", "c"))
@@ -180,7 +180,7 @@ seq.sim <- sapply(sample(c(2, 1, 0), 1000, replace=TRUE, prob=c(0.07, 0.1, 0.83)
 os <- oligoSummary(seq.sim, oligoLength=6, MarkovOrder=3, 
                    quickMotif=TRUE)
 zscore <- sort(os$zscore, decreasing=TRUE)
-h <- hist(zscore, breaks=100)
+h <- hist(zscore, breaks=100, main="Histogram of Z-score")
 text(zscore[1:2], rep(5, 2), 
      labels=names(zscore[1:2]), adj=0, srt=90)
 ```
