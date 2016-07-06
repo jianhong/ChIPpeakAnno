@@ -146,7 +146,11 @@ featureAlignedHeatmap <-
         stop("each limit should be a numeric vector with length 2")
     }
     cov <- mapply(function(.ele, .lim){
-        .lim <- seq(min(.lim), max(.lim), length.out=length(color)+1)
+        if(min(.lim)==max(.lim)){
+            .lim <- seq(min(.lim), max(.lim)+1, length.out=length(color)+1)
+        }else{
+            .lim <- seq(min(.lim), max(.lim), length.out=length(color)+1)
+        }
         .lim[1] <- min(.lim[1], 0)
         .lim[length(.lim)] <- max(max(.lim), .Machine$integer.max)
         t(apply(.ele, 1, 
@@ -442,6 +446,7 @@ featureAlignedHeatmap <-
             .lim <- lim[[i]]
             label <- grid.pretty(.lim)
             ll <- length(label)
+            xaxis.legned.sub <- NULL
             if(ll>=2){
                 if(ll%%2==0){
                     label <- label[c(1, ll)]

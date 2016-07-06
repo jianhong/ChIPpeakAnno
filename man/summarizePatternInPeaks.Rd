@@ -38,7 +38,8 @@ TRUE or FALSE, default FALSE
 \value{
  A data frame with 3 columns as n.peaksWithPattern (number of peaks with the 
  pattern),  n.totalPeaks (total number of peaks in the input) and Pattern 
- (the corresponding pattern).
+ (the corresponding pattern). The summary will consider both strand 
+ (including reverse complement).
 }
 \author{
 Lihua Julie Zhu

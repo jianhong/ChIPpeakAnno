@@ -16,14 +16,9 @@ featureAlignedSignal(cvglists, feature.gr,
     List of \link[IRanges]{SimpleRleList} or \link[IRanges]{RleList}
   }
   \item{feature.gr}{
-    An object of \link[GenomicRanges]{GRanges} with identical width. 
-    If the width equal to 1, you can use upstream and downstream to set
-    the range for plot.
-    If the width not equal to 1, you can use zeroAt to set the zero point
-    of the heatmap.
+    An object of \link[GenomicRanges]{GRanges} with identical width.
   }
-  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.
-  It must keep same as \link{featureAlignedSignal}. It is used for x-axis label.}
+  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.}
   \item{n.tile}{The number of tiles to generate for each element of feature.gr, 
     default is 100}
   \item{...}{Not used.}

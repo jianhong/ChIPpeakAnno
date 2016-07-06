@@ -24,13 +24,14 @@ import(GenomicFeatures)
 import(GenomicRanges)
 import(GenomeInfoDb)
 import(S4Vectors)
-importFrom(GenomicAlignments, summarizeOverlaps, Union)
+importFrom(GenomicAlignments, summarizeOverlaps, Union, readGAlignments, readGAlignmentPairs, isProperPair)
 importFrom(SummarizedExperiment, assay, rowRanges, SummarizedExperiment, colData)
 importFrom(idr, est.IDR)
 importFrom(seqinr, s2c, count, words)
 importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
+importFrom(Rsamtools, countBam, testPairedEndBam, ScanBamParam, scanBamFlag, scanBamWhat)
 exportClass("bindist", "permPool", "annoGR")
 exportMethods("$", "$<-", "info", "annoGR")
 export( 
@@ -46,6 +47,9 @@ export(
        convert2EntrezID,
        countPatternInSeqs,
        egOrgMap,
+       estFragmentLength,
+       estLibSize,
+       featureAlignedExtendSignal,
        featureAlignedDistribution,
        featureAlignedHeatmap,
        featureAlignedSignal,
