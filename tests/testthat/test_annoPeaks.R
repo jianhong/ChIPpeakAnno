@@ -101,4 +101,45 @@ test_that("annoPeaks works not correct", {
                            bindingRegion=c(-3, 6), 
                            ignore.peak.strand=TRUE)
     expect_equal(peak.anno$feature, "c")
+    ## check bestOne
+    #               a
+    #      12345678901234567890
+    #            -AABB
+    #              +CC
+    #             +DD
+    #              +E
+    myPeak = GRanges("chr1", 
+                     IRanges(start=10, 
+                             end=10, 
+                             names="a"), 
+                     strand="*")
+    feature = GRanges("chr1", 
+                      IRanges(start=c(8, 10, 10, 9, 10),
+                              end=c(9, 11, 11, 10, 10),
+                              names=LETTERS[1:5]), 
+                      strand=c("-", "-", "+", "+", "+"))
+    peak.anno <- annoPeaks(myPeak, feature,
+                           bindingType="fullRange",
+                           bindingRegion=c(0, 1),
+                           ignore.peak.strand=TRUE)
+    expect_equal(length(peak.anno), 4)
+    peak.anno <- annoPeaks(myPeak, feature,
+                           bindingType="fullRange",
+                           bindingRegion=c(0, 1),
+                           select="bestOne",
+                           ignore.peak.strand=TRUE)
+    expect_equal(peak.anno$feature, "E")
+    feature1 <- feature[1:4]
+    peak.anno <- annoPeaks(myPeak, feature1,
+                           bindingType="endSite",
+                           bindingRegion=c(0, 1),
+                           select="all",
+                           ignore.peak.strand=TRUE)
+    expect_equal(length(peak.anno), 2)
+    peak.anno <- annoPeaks(myPeak, feature1,
+                           bindingType="endSite",
+                           bindingRegion=c(0, 1),
+                           select="bestOne",
+                           ignore.peak.strand=TRUE)
+    expect_equal(peak.anno$feature, "B")
 })

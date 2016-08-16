@@ -92,7 +92,18 @@ getRelationship <- function(queryHits, subjectHits){
                ss=ss,
                distanceToStart=shortestDistanceToStart)
 }
-
+annoScore <- function(queryHits, subjectHits){
+    if(!inherits(queryHits, "GRanges")) 
+        stop("queryHits must be an object of GRanges")
+    if(!inherits(subjectHits, "GRanges")) 
+        stop("subjectHits must be an object of GRanges")
+    stopifnot(length(queryHits)==length(subjectHits))
+    ## jaccard index of two range
+    intersection <- pintersect(queryHits, subjectHits)
+    totalSize <- punion(queryHits, subjectHits, fill.gap=TRUE)
+    JaccardIndex <- width(intersection)/width(totalSize)
+    JaccardIndex
+}
 trimPeakList <- function(Peaks, ignore.strand, by, keepMetadata=FALSE){
     if (inherits(Peaks, "RangedData"))
         Peaks <- toGRanges(Peaks, format="RangedData")

@@ -3,12 +3,18 @@ annoPeaks <- function(peaks, annoData,
                                     "startSite", "endSite", "fullRange"), 
                       bindingRegion=c(-5000, 5000), 
                       ignore.peak.strand=TRUE,
+                      select=c("all", "bestOne"), # bestOne will output the one with best score
                       ...){
+    select <- match.arg(select)
     if(bindingType[1] %in% 
        c("bothSidesNearest", "nearestBiDirectionalPromoters", "bothSidesNSS")){
         bindingType <- bindingType[1]
         if(bindingType=="bothSidesNSS"){
             bindingType <- "nearestBiDirectionalPromoters"
+        }
+        if(select!="all"){
+            select <- "all"
+            message("nearestbiDirectionalPromoters do not support select=bestOne")
         }
     }else{
         bindingType <- match.arg(bindingType)
@@ -21,6 +27,9 @@ annoPeaks <- function(peaks, annoData,
     if(ignore.peak.strand){
         peaks$peakstrand <- strand(peaks)
         strand(peaks) <- "*"
+    }
+    if(is.null(names(peaks))){
+        names(peaks) <- paste0("X", 1:length(peaks))
     }
     tmp <- annoData
     annotation <- switch(bindingType,
@@ -40,6 +49,7 @@ annoPeaks <- function(peaks, annoData,
                          bothSidesNearest=annoData,
                          nearestBiDirectionalPromoters=annoData,
                          annoData)
+    annotation.bck <- annotation
     rm(tmp)
     if(bindingType %in% c("bothSidesNearest", "nearestBiDirectionalPromoters")){
         if(bindingType=="bothSidesNearest"){
@@ -114,6 +124,7 @@ annoPeaks <- function(peaks, annoData,
     }
     peaks <- peaks[queryHits(ol)]
     anno <- annoData[subjectHits(ol)]
+    annotation.bck.hits <- annotation.bck[subjectHits(ol)]
     if(bindingType %in% c("bothSidesNearest", "nearestBiDirectionalPromoters")){
         relations <- if(bindingType=="bothSidesNearest") getRelationship(peaks, anno) else getRelationship(peaks, promoters(unname(as(anno, "GRanges")), upstream=0, downstream=1))
         ##filter resutls and save the nearest
@@ -160,22 +171,33 @@ annoPeaks <- function(peaks, annoData,
         }
         peaks <- peaks[keep]
         anno <- anno[keep]
+        annotation.bck.hits <- annotation.bck.hits[keep]
     }
+    peaks$peak <- names(peaks)
     if(!is.null(names(anno))){
         peaks$feature <- names(anno)
     }
-    peaks$peak <- names(peaks)
     peaks$feature.ranges <- unname(ranges(anno))
     peaks$feature.strand <- strand(anno)
     peaks$distance <- distance(peaks, anno, ignore.strand=FALSE)
     relations <- getRelationship(peaks, anno)
     #peaks$binding.site <- relations$insideFeature
     peaks$insideFeature <- relations$insideFeature
-    peaks$distanceToStart <- relations$distanceToStart
+    peaks$distanceToSite <- distance(peaks, annotation.bck.hits, 
+                                     ignore.strand=ignore.peak.strand)
     if(ignore.peak.strand){
         strand(peaks) <- peaks$peakstrand
         peaks$peakstrand <- NULL
     }
     mcols(peaks) <- cbind(mcols(peaks), mcols(anno))
+    if(select=="bestOne"){
+        if(length(peaks)==0) return(peaks)
+        annoscore <- -1 * annoScore(peaks, anno)
+        peaks$ANNOPEAKS__peak.oid <- 1:length(peaks)
+        peaks <- peaks[order(peaks$peak, peaks$distanceToSite, annoscore)]
+        peaks <- peaks[!duplicated(peaks$peak)]
+        peaks <- peaks[order(peaks$ANNOPEAKS__peak.oid)]
+        peaks$ANNOPEAKS__peak.oid <- NULL
+    }
     peaks
 }

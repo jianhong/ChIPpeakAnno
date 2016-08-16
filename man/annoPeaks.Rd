@@ -12,6 +12,7 @@ annoPeaks (peaks, annoData,
                         "startSite", "endSite", "fullRange"), 
           bindingRegion=c(-5000, 5000), 
           ignore.peak.strand=TRUE,
+          select=c("all", "bestOne"),
           ...)
 }
 \arguments{
@@ -37,10 +38,16 @@ annoPeaks (peaks, annoData,
     }
   }
   \item{bindingRegion}{
-    Annotation range used together with bindingType, which is a vector with two integer values, default to c (-5000, 5000). The first one must be no bigger than 0. And the sec ond one must be no less than 1.  For details, see bindingType.
+    Annotation range used together with bindingType, which is a vector with two integer values, default to c (-5000, 5000). The first one must be no bigger than 0, which means upstream. And the sec ond one must be no less than 1, which means downstream (1 is the site position, 2 is the next base of the site position). For details, see bindingType.
   }
   \item{ignore.peak.strand}{
     ignore the peaks strand or not.
+  }
+  \item{select}{
+    "all" or "bestOne". Return the annotation containing all or the best one.
+    The "bestOne" is selected by the shortest distance to the sites and 
+    then similarity between peak and annotations.
+    Ignored if bindingType is nearestBiDirectionalPromoters.
   }
   \item{...}{
     Not used.
