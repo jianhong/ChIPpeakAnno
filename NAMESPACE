@@ -76,6 +76,8 @@ export(
        reCenterPeaks,
        summarizeOverlapsByBins,
        summarizePatternInPeaks,
+       tileGRanges,
+       tileCount,
        toGRanges, 
        translatePattern,
        write2FASTA,

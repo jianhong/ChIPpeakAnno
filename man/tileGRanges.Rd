@@ -1,0 +1,49 @@
+\name{tileGRanges}
+\alias{tileGRanges}
+\title{
+    Slide windows on a given \link[GenomicRanges]{GRanges} object
+}
+\description{
+    tileGRanges returns a set of genomic regions by sliding the windows in
+    a given step. Each window is called a "tile".
+}
+\usage{
+tileGRanges(targetRegions, windowSize, step, keepPartialWindow=FALSE, ...)
+}
+\arguments{
+  \item{targetRegions}{
+    A \link[GenomicRanges]{GRanges} object of genomic regions of interest.
+}
+  \item{windowSize}{
+    Size of windows
+  }
+  \item{step}{
+    Step of windows
+  }
+  \item{keepPartialWindow}{
+    Keep last partial window or not.
+  }
+  \item{...}{
+    Not used. 
+  }
+}
+
+\value{
+A \link[GenomicRanges]{GRanges} object.
+}
+
+\author{
+    Jianhong Ou
+}
+
+\examples{
+    genes <- GRanges(
+        seqnames = c(rep("chr2L", 4), rep("chr2R", 5), rep("chr3L", 2)),
+        ranges = IRanges(c(1000, 3000, 4000, 7000, 2000, 3000, 3600, 
+                           4000, 7500, 5000, 5400), 
+                         width=c(rep(500, 3), 600, 900, 500, 300, 900, 
+                                 300, 500, 500),
+                         names=letters[1:11])) 
+    se <- tileGRanges(genes, windowSize=50, step=10)
+}
+\keyword{ misc }

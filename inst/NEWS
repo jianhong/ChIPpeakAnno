@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.7.6
+-------------------------
+    o add new functions tileGRanges, tileCount
+    
 CHANGES IN VERSION 3.7.5
 -------------------------
     o add parameter select to annoPeaks 
