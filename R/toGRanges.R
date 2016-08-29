@@ -124,7 +124,7 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
 }
 
 switchColNames <- function(format=c("BED", "GFF",  
-                                    "MACS", "MACS2", 
+                                    "MACS", "MACS2", "MACS2.broad",
                                     "narrowPeak", "broadPeak",
                                     "others"), colNames=NULL){
     format <- match.arg(format)
@@ -141,6 +141,9 @@ switchColNames <- function(format=c("BED", "GFF",
            MACS2=c("space", "start", "end", "length", 
                    "abs_summit", "pileup", "qvalue", 
                    "fold_enrichment", "FDR", "names"),
+           MACS2.broad=c("space", "start", "end", "length", 
+                         "pileup", "-log10(pvalue)", 
+                         "fold_enrichment", "-log10(qvalue)", "names"),
            narrowPeak=c("space", "start", "end", "names", 
                         "score", "strand", "signalValue", 
                         "pValue", "qValue", "peak"),
@@ -176,7 +179,7 @@ setMethod("toGRanges", "RangedData",
 
 setMethod("toGRanges", "connection", 
           function(data, format=c("BED", "GFF",  
-                                  "MACS", "MACS2", 
+                                  "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...){
@@ -195,7 +198,7 @@ setMethod("toGRanges", "connection",
                       class(data[, i]) <- mode(data[, i]) <- classes[i]
                   }
               }else{
-                  if(format %in% c("MACS", "MACS2")){
+                  if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                       header <- TRUE
                       comment.char <- "#"
                   }
@@ -234,7 +237,7 @@ setMethod("toGRanges", "EnsDb",
 
 setMethod("toGRanges", "character", 
           function(data, format=c("BED", "GFF",  
-                                  "MACS", "MACS2", 
+                                  "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...){
@@ -250,7 +253,7 @@ setMethod("toGRanges", "character",
                       class(data[, i]) <- mode(data[, i]) <- classes[i]
                   }
               }else{
-                  if(format %in% c("MACS", "MACS2")){
+                  if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                       header <- TRUE
                       comment.char <- "#"
                   }
@@ -276,7 +279,7 @@ setMethod("toGRanges", "character",
                                    Column 4 and 5 must be integer.
                                    Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
                       }else{
-                          if(format %in% c("MACS", "MACS2")){
+                          if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                               ## do nothing
                           }else{
                               if(header && is.null(colNames)){ ## format=="others"

@@ -16,12 +16,12 @@
 }
 \usage{
     \S4method{toGRanges}{character}(data, format=c("BED", "GFF",  
-                                  "MACS", "MACS2", 
+                                  "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...)
     \S4method{toGRanges}{connection}(data, format=c("BED", "GFF",  
-                                  "MACS", "MACS2", 
+                                  "MACS", "MACS2", "MACS2.broad",
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...)

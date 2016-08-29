@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.7.7
+-------------------------
+    o fix bugs for toGRanges to import MACS2 broad calls.
+    
 CHANGES IN VERSION 3.7.6
 -------------------------
     o add new functions tileGRanges, tileCount
