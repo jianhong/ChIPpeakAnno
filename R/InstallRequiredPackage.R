@@ -10,5 +10,4 @@ InstallRequiredPackage <- function() {
   source("http://bioconductor.org/biocLite.R")
   biocLite("GenomicRanges")
   devtools::install_github("nsheff/LOLA")
-
 }
