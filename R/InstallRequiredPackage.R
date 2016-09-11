@@ -10,4 +10,8 @@ InstallRequiredPackage <- function() {
   source("http://bioconductor.org/biocLite.R")
   biocLite("GenomicRanges")
   devtools::install_github("nsheff/LOLA")
+  biocLite("ChIPseeker")
+  biocLite("regioneR")
+  library(BiocInstaller)
+  biocLite("BSgenome.Hsapiens.UCSC.hg19")
 }
