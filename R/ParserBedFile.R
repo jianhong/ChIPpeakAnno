@@ -15,6 +15,9 @@
 #'
 #' ParserBedFile(dir.name,input.file.pattern,out.dir.name,output.test.file)
 #'
+#' save.image(file=paste0(out.dir.name,"re_save_2.RData"))
+#' savehistory(file=paste0(out.dir.name,"re_save_2.Rhistory"))
+#'
 ParserBedFile<-function(dir.name,input.file.pattern,out.dir.name,output.test.file){
 
   file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
