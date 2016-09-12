@@ -47,20 +47,32 @@ ParserBedFile<-function(dir.name,input.file.pattern,out.dir.name,output.test.fil
     re
   })
 
-  A=re.out[[2]]
-  B=re.out[[4]]
+  A=re.out[[2]] #SMC1
+  B=re.out[[4]] #Rad21
+  C=re.out[[1]] #ASXL1
 
   #A <- createRandomRegions(nregions=50, length.mean=5000000, length.sd=3000000)
   #B <- c(A[1:25], createRandomRegions(nregions=25, length.mean=500000, length.sd=30000))
   #class(A)
   #class(B)
 
-  NumOverLap<-numOverlaps(A, B, count.once=TRUE)
-  pt <- overlapPermTest(A=A, B=B, ntimes=50)
 
-  png(filename=paste0(out.dir.name,output.test.file,".png"))
-  plot(pt)
-  dev.off()
+  TestOverlap <- function(A, B, out.dir.name, output.test.file) {
+    NumOverLap<-numOverlaps(A, B, count.once=TRUE)
+    pt <- overlapPermTest(A=A, B=B, ntimes=50)
+    png(filename=paste0(out.dir.name,output.test.file,".png"))
+    plot(pt)
+    dev.off()
+
+    lz <- localZScore(pt=pt, A=A, B=B)
+    png(filename=paste0(out.dir.name,output.test.file,"_localZScore.png"))
+    plot(lz)
+    dev.off()
+  }
+
+  TestOverlap(A,B,out.dir.name,output.test.file)
+  TestOverlap(A,C,out.dir.name,output.test.file)
+  TestOverlap(B,C,out.dir.name,output.test.file)
 
  # temp.name<-strsplit(names(file.name.2),split="\\.")
 
