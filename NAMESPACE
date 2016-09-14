@@ -3,3 +3,6 @@
 export(InstallRequiredPackage)
 export(LoadRequiredPackage)
 export(ParserBedFile)
+export(ParserBedFile4Peng)
+export(ParserBedFile4PengDiffBind)
+export(ParserBedFile4PengVenn)

@@ -12,6 +12,8 @@ InstallRequiredPackage <- function() {
   devtools::install_github("nsheff/LOLA")
   biocLite("ChIPseeker")
   biocLite("regioneR")
+  biocLite("DiffBind")
   library(BiocInstaller)
   biocLite("BSgenome.Hsapiens.UCSC.hg19")
+  library(DiffBind)
 }

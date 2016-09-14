@@ -4,7 +4,7 @@
 \alias{ParserBedFile}
 \title{Title}
 \usage{
-ParserBedFile(dir.name, input.file.pattern, out.dir.name, output.test.file)
+ParserBedFile(dir.name, input.file.pattern, out.dir.name)
 }
 \arguments{
 \item{input.file.pattern}{}
@@ -15,9 +15,8 @@ Title
 \examples{
 
 dir.name="/media/H_driver/2016/Yang/BedFromPeakCall/"
-
-
 input.file.pattern="*bam_mm_summits_from_PeakCall4Yang.bed"
+
 out.dir.name="/media/H_driver/2016/Yang/Results/"
 output.test.file= "SMC1A_RAD21_overlap_test"
 
@@ -28,9 +27,9 @@ input.file.pattern.2="*_bam_mm_1_from_PeakCall4Yang.bed"
 out.dir.name.2="/media/H_driver/2016/Yang/Results/"
 output.test.file.2= "SMC1A_RAD21_mm_100e-07_peaks_overlap_test"
 
-ParserBedFile(dir.name,input.file.pattern,out.dir.name,output.test.file)
+ParserBedFile(dir.name,input.file.pattern,out.dir.name)
 
-re.mm.100e.07<-ParserBedFile(dir.name.2,input.file.pattern.2,out.dir.name.2,output.test.file.2)
+re.mm.100e.07<-ParserBedFile(dir.name.2,input.file.pattern.2,out.dir.name)
 
 
 save.image(file=paste0(out.dir.name,"re_save_2.RData"))
