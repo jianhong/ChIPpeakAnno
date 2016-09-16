@@ -15,5 +15,6 @@ InstallRequiredPackage <- function() {
   biocLite("DiffBind")
   library(BiocInstaller)
   biocLite("BSgenome.Hsapiens.UCSC.hg19")
+  library(ChIPseeker)
   library(DiffBind)
 }
