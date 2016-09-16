@@ -10,11 +10,6 @@
 #'
 #' dir.name="/media/H_driver/2016/Yang/BedFromPeng/"
 #' input.file.pattern="*peaks_from_PeakCall4Yang.bed"
-#'
-#'
-#'
-#'
-#'
 #' out.dir.name="/media/H_driver/2016/Yang/Results/"
 
 #'
@@ -38,6 +33,22 @@ ParserBedFile4PengDiffBind<-function(dir.name,input.file.pattern,out.dir.name){
   sample.name<-sapply(strsplit(names(file.name.3),split="_peaks_"),"[[",1)
 
   names(file.name.3)=sample.name
+
+
+  test <- dba.peakset(NULL,peaks="/media/H_driver/2016/Yang/Test/A.bed",
+                      peak.caller="bed", sampID="A",tissue="brain",
+                      factor="ER",condition="A",replicate=1)
+
+  test <- dba.peakset(test,peaks="/media/H_driver/2016/Yang/Test/B.bed",
+                      peak.caller="bed", sampID="B",tissue="brain",
+                      factor="ER",condition="B",replicate=1)
+
+  test<-dba.peakset(test,consensus=DBA_FACTOR, minOverlap=2)
+
+  test.OL <- dba.overlap(test,test$masks$Consensus)
+
+  dba.plotVenn(test,c(1,2))
+
 
   mcf7 <- dba.peakset(NULL,peaks=file.name.3[[1]],
                     peak.caller="bed", sampID=names(file.name.3)[1],tissue="MCF7",
@@ -73,19 +84,53 @@ ParserBedFile4PengDiffBind<-function(dir.name,input.file.pattern,out.dir.name){
 
   #dba.plotVenn(mcf7,c(2,3,5))
 
+  mcf7.consensus.3.5 <- dba.peakset(mcf7,c(3,5), minOverlap=2, bRetrieve=TRUE)
+
+  mcf7<- dba.peakset(mcf7,c(3,5), minOverlap=2, sampID = "WT_SMC1A_RAD21")
+
+  mcf7<- dba.peakset(mcf7,c(4,6), minOverlap=2, sampID = "KO_SMC1A_RAD21")
+
+  dba.plotVenn(mcf7,c(9,10))
+
+
   dba.plotVenn(mcf7,c(3,5,2))
 
   dba.plotVenn(mcf7,c(3,5))
 
   dba.plotVenn(mcf7,c(4,6))
 
-  ctb<-matrix(c(13289, 13289, 7899, 1244),nrow = 2,dimnames =list(c("KO_BM_SMC1", "KO_BM_Rad21"),c("Overlaped", "Not overlaped")))
+  ctb<-matrix(c(13289,1244, 7899,0),nrow = 2,dimnames =list(c("InKO_BM_SMC1", "NotKO_BM_SMC1"),c("In_KO_BM_Rad21", "Not_KO_BM_Rad21")))
 
-  ctb.2<-matrix(c(13289,7899,13289,1244),nrow = 2,dimnames =list(c("Overlaped", "Not overlaped"),c("KO_BM_SMC1", "KO_BM_Rad21")))
+  #ctb.2<-matrix(c(13289,7899,13289,1244),nrow = 2,dimnames =list(c("Overlaped", "Not overlaped"),c("KO_BM_SMC1", "KO_BM_Rad21")))
 
   re<-fisher.test(ctb)
 
   re.2<-fisher.test(ctb.2)
+
+
+  WT.triple <- dba.peakset(NULL,peaks=file.name.3[[2]],
+                      peak.caller="bed", sampID=names(file.name.3)[2],tissue="Yang",
+                      factor="ER",condition="WT",replicate=1)
+
+  WT.triple <- dba.peakset(WT.triple,peaks=file.name.3[[3]],
+                      peak.caller="bed", sampID=names(file.name.3)[3],tissue="Yang",
+                      factor="ER",condition="WT",replicate=1)
+
+  WT.triple <- dba.peakset(WT.triple,peaks=file.name.3[[5]],
+                      peak.caller="bed", sampID=names(file.name.3)[5],tissue="Yang",
+                      factor="ER",condition="WT",replicate=1)
+
+  Binding.ASXL1<-WT.triple$binding[which(WT.triple$binding[,4]==1),]
+
+  WT.triple.binding<-WT.triple$binding[which(WT.triple$binding[,4]==1&WT.triple$binding[,5]==1&WT.triple$binding[,6]==1),]
+
+  dba.plotVenn(WT.triple,c(2,3,1))
+
+  WT.triple.binding[,1]<-paste0("chr",WT.triple.binding[,1])
+
+  write.table(WT.triple.binding[,1:3],file=paste0(out.dir.name,"WT_triple_overlap.bed"),sep="\t",
+              quote = FALSE,row.names = FALSE,col.names = FALSE)
+
   # sample.name<-sapply(strsplit(names(re.out),split="_peaks_"),"[[",1)
   ##
   # names(re.out)=sample.name
