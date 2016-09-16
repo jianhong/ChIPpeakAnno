@@ -16,11 +16,6 @@ ParserBedFile4PengDiffBind
 
 dir.name="/media/H_driver/2016/Yang/BedFromPeng/"
 input.file.pattern="*peaks_from_PeakCall4Yang.bed"
-
-
-
-
-
 out.dir.name="/media/H_driver/2016/Yang/Results/"
 
 re.from.bed.peng.4.venn<-ParserBedFile4PengVenn(dir.name,input.file.pattern,out.dir.name)
