@@ -22,11 +22,11 @@ InstallRequiredPackage <- function() {
   biocLite("ChIPpeakAnno")
   biocLite("BSgenome.Mmusculus.UCSC.mm9")
   biocLite("motifStack")
-  biocLite(BSgenome.Ecoli.NCBI.20080805)
+  biocLite("BSgenome.Ecoli.NCBI.20080805")
   biocLite("EnsDb.Mmusculus.v75")
   biocLite("EnsDb.Mmusculus.v79")
   biocLite("BSgenome.Mmusculus.UCSC.mm10")
-
+  biocLite("org.Mm.eg.db")
   #loading
   library(BiocInstaller)
   library(BiocInstaller)
