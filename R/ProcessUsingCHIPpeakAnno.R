@@ -45,13 +45,56 @@ ProcessUsingCHIPpeakAnno <- function() {
 
   overlaps<-ol$peaklist$`11_2470IUPUI_WT_BM_SMC1_peaks.bed///13_2470IUPUI_WT_BM_Rad21_peaks.bed///10_WT_BM_ASXL1_peaks.bed`
 
+  re<-makeVennDiagram(re.out[c(2,4,1)],NameOfPeaks=c("SMC1A", "RAD21","ASXL1"),totalTest=35000)
+
+  #fisher exact test
+
+  UseFisher <- function(temp.ct,index.A,index.B,totalN) {
+    total.peaks=totalN
+    A=sum(temp.ct[which(temp.ct[,index.A]==1&temp.ct[,index.B]==1),4])
+    B=sum(temp.ct[which(temp.ct[,index.A]==1&temp.ct[,index.B]==0),4])
+    C=sum(temp.ct[which(temp.ct[,index.A]==0&temp.ct[,index.B]==1),4])
+    D=total.peaks-(A+B+C)
+    ctb<-matrix(c(A,B,C,D),nrow = 2,dimnames =list(c("In", "Not"),c("In", "Not")))
+
+    #re<-fisher.test(ctb)
+    print(ctb)
+    re.fisher<-fisher.test(ctb, alternative='greater')[c("p.value","estimate")]
+    re.fisher
+  }
 
 
+  temp.ct<-ol$venn_cnt
 
+  #A vs B
+  index.A<-grep("SMC1",colnames(temp.ct))
+  index.B<-grep("Rad21",colnames(temp.ct))
+  tempRe<-UseFisher(temp.ct,index.A,index.B,35000)
+  pVal.fisher.AB=tempRe$p.value
+  OR.fisher.AB=tempRe$estimate
 
+  #A vs C
+  index.A<-grep("SMC1",colnames(temp.ct))
+  index.B<-grep("ASXL1",colnames(temp.ct))
+  tempRe<-UseFisher(temp.ct,index.A,index.B,35000)
+  pVal.fisher.AC=tempRe$p.value
+  OR.fisher.AC=tempRe$estimate
 
+  #B vs C
+  index.A<-grep("Rad21",colnames(temp.ct))
+  index.B<-grep("ASXL1",colnames(temp.ct))
+  tempRe<-UseFisher(temp.ct,index.A,index.B,35000)
+  pVal.fisher.BC=tempRe$p.value
+  OR.fisher.BC=tempRe$estimate
 
+  pVal.fisher.AB
+  OR.fisher.AB
 
+  pVal.fisher.AC
+  OR.fisher.AC
+
+  pVal.fisher.BC
+  OR.fisher.BC
 
   library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 
@@ -237,6 +280,5 @@ ProcessUsingCHIPpeakAnno <- function() {
   motifStack(pfms[[2]])
   motifStack(pfms[[3]])
   motifStack(pfms[[4]])
-
 
 }
