@@ -2,17 +2,20 @@
 % Please edit documentation in R/DrawVenn.R
 \name{DrawVenn}
 \alias{DrawVenn}
-\title{Title}
+\title{DrawVenn}
 \usage{
-DrawVenn(devtools, install_github, Vennerable, venneuler, VennDiagram)
+DrawVenn(out.dir.name)
 }
 \arguments{
 \item{VennDiagram}{}
 }
 \description{
-Title
+DrawVenn
 }
 \examples{
+
+out.dir.name="/media/H_driver/2016/Yang/Results/"
+DrawVenn(out.dir.name)
 
 }
 

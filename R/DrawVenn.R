@@ -11,7 +11,10 @@
 #'
 #' @examples
 #'
-DrawVenn <- function(devtools, install_github, Vennerable, venneuler, VennDiagram) {
+#' out.dir.name="/media/H_driver/2016/Yang/Results/"
+#' DrawVenn(out.dir.name)
+#'
+DrawVenn <- function(out.dir.name) {
 
   devtools::install_github("js229/Vennerable");
   library(Vennerable)
@@ -86,7 +89,10 @@ DrawVenn <- function(devtools, install_github, Vennerable, venneuler, VennDiagra
   Cstem3@IndicatorWeight[which(row.names(Cstem3@IndicatorWeight)=="000"),4]=35000-c.3.set
 
   grid.newpage()
+
+  pdf(paste0(out.dir.name,"venn.pdf"))
   plot(Cstem3)
+  dev.off()
 
 }
 
