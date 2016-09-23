@@ -48,13 +48,17 @@ IDRfilter(peaksA, peaksB, bamfileA, bamfileB,
 }
 \examples{
   if(interactive()){
-    library(MMDiffBamSubset)
-    peaksA=toGRanges(WT.AB2.Peaks(), format="MACS")
-    peaksB=toGRanges(Resc.AB2.Peaks(), format="MACS")
-    bamfileA=WT.AB2()
-    bamfileB=Resc.AB2()
-    IDRfilter(peaksA, peaksB,
-              bamfileA, bamfileB)
+    path <- system.file("extdata", "reads", package="MMDiffBamSubset")
+    if(file.exists(path)){
+            bamfileA <- file.path(path, "reads", "WT_2.bam")
+            bamfileB <- file.path(path, "reads", "Resc_2.bam")
+            WT.AB2.Peaks <- file.path(path, "peaks", "WT_2_Macs_peaks.xls")
+            Resc.AB2.Peaks <- file.path(path, "peaks", "Resc_2_Macs_peaks.xls")
+            peaksA=toGRanges(WT.AB2.Peaks, format="MACS")
+            peaksB=toGRanges(Resc.AB2.Peaks, format="MACS")
+            IDRfilter(peaksA, peaksB,
+                        bamfileA, bamfileB)
+    }
   }
 }
 

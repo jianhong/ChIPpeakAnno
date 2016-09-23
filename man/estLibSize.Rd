@@ -29,11 +29,13 @@ estLibSize(bamfiles, index = bamfiles, ...)
 }
 \examples{
     if(interactive()){
-        library(MMDiffBamSubset)
-        WT.AB2 <- WT.AB2()
-        Null.AB2 <- Null.AB2()
-        Resc.AB2 <- Resc.AB2()
-        estLibSize(c(WT.AB2, Null.AB2, Resc.AB2))
+        path <- system.file("extdata", "reads", package="MMDiffBamSubset")
+        if(file.exists(path)){
+            WT.AB2 <- file.path(path, "WT_2.bam")
+            Null.AB2 <- file.path(path, "Null_2.bam")
+            Resc.AB2 <- file.path(path, "Resc_2.bam")
+            estLibSize(c(WT.AB2, Null.AB2, Resc.AB2))
+        }
     }
 }
 

@@ -48,24 +48,27 @@ See Also as \code{\link{featureAlignedSignal}}, \code{\link{estLibSize}}, \code{
 }
 \examples{
     if(interactive()){
-    library(MMDiffBamSubset)
-    WT.AB2 <- WT.AB2()
-    Null.AB2 <- Null.AB2()
-    Resc.AB2 <- Resc.AB2()
-    peaks <- WT.AB2.Peaks()
-    feature.gr <- toGRanges(peaks, format="MACS")
-    feature.gr <- feature.gr[feature.gr$seqnames=="chr1" & 
+    path <- system.file("extdata", package="MMDiffBamSubset")
+    if(file.exists(path)){
+        WT.AB2 <- file.path(path, "reads", "WT_2.bam")
+        Null.AB2 <- file.path(path, "reads", "Null_2.bam")
+        Resc.AB2 <- file.path(path, "reads", "Resc_2.bam")
+        peaks <- file.path(path, "peaks", "WT_2_Macs_peaks.xls")
+        estLibSize(c(WT.AB2, Null.AB2, Resc.AB2))
+        feature.gr <- toGRanges(peaks, format="MACS")
+        feature.gr <- feature.gr[feature.gr$seqnames=="chr1" & 
                              start(feature.gr)>3000000 & 
                              end(feature.gr)<75000000]
-    sig <- featureAlignedExtendSignal(c(WT.AB2, Null.AB2, Resc.AB2), 
+        sig <- featureAlignedExtendSignal(c(WT.AB2, Null.AB2, Resc.AB2), 
                                feature.gr=reCenterPeaks(feature.gr, width=1), 
                                upstream = 505,
                                downstream = 505,
                                n.tile=101, 
                                fragmentLength=250,
                                librarySize=1e9)
-    featureAlignedHeatmap(sig, reCenterPeaks(feature.gr, width=1010), 
+        featureAlignedHeatmap(sig, reCenterPeaks(feature.gr, width=1010), 
                           zeroAt=.5, n.tile=101)
+    }
     }
 }
 \keyword{ misc }

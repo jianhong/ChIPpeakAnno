@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.7.8
+-------------------------
+    o remove the dependence of MMDiffBamSubset in documentation becuase it is
+    not availble now.
+    
 CHANGES IN VERSION 3.7.7
 -------------------------
     o fix bugs for toGRanges to import MACS2 broad calls.
