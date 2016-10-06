@@ -1,3 +1,12 @@
+importFrom("grDevices", "as.graphicsAnnot", "boxplot.stats", "col2rgb",
+             "colorRampPalette", "dev.flush", "dev.hold", "rgb")
+importFrom("graphics", "abline", "axis", "hist", "legend", "lines",
+             "matplot", "par", "plot", "plot.new", "plot.window",
+             "polygon", "segments", "text", "title")
+importFrom("stats", "as.dendrogram", "cor.test", "hclust", "kmeans",
+             "loess.smooth", "nobs", "rexp", "setNames", "ts")
+importFrom("utils", "adist", "combn", "data", "installed.packages",
+             "read.delim", "read.table", "write.table")
 import(BiocGenerics)
 import(Biobase)
 import(methods)
@@ -31,7 +40,7 @@ importFrom(seqinr, s2c, count, words)
 importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
-importFrom(Rsamtools, countBam, testPairedEndBam, ScanBamParam, scanBamFlag, scanBamWhat)
+importFrom(Rsamtools, countBam, testPairedEndBam, ScanBamParam, scanBamFlag, scanBamWhat, scanBam, scanBamHeader)
 exportClass("bindist", "permPool", "annoGR")
 exportMethods("$", "$<-", "info", "annoGR")
 export( 

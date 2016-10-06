@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.7.9
+-------------------------
+    o fix the problem in the test when there are names for target but not 
+    for current.
+    
 CHANGES IN VERSION 3.7.8
 -------------------------
     o remove the dependence of MMDiffBamSubset in documentation becuase it is
