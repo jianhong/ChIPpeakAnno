@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.9.1
+-------------------------
+    o fix the bug for pair end reads for featureAlignedExtendSignal.
+
 CHANGES IN VERSION 3.7.9
 -------------------------
     o fix the problem in the test when there are names for target but not 

@@ -57,7 +57,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
                           what=scanBamWhat())
     
     bams.gr <- mapply(function(f, i, p, .fLen) {
-        if(p){
+        if(!p){
             .ele <- granges(readGAlignments(f, index=i, param=param))
             start(.ele[strand(.ele)=="-"]) <- 
                 end(.ele[strand(.ele)=="-"]) - .fLen + 1
