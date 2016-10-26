@@ -55,7 +55,11 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
                           flag=scanBamFlag(isSecondaryAlignment=FALSE,
                                           isNotPassingQualityControls=FALSE),
                           what=scanBamWhat())
-    
+    paramp <- ScanBamParam(which=reduce(feature.gr.expand), 
+                           flag=scanBamFlag(isProperPair=TRUE,
+                                            isSecondaryAlignment=FALSE,
+                                            isNotPassingQualityControls=FALSE),
+                           what=scanBamWhat())
     bams.gr <- mapply(function(f, i, p, .fLen) {
         if(!p){
             .ele <- granges(readGAlignments(f, index=i, param=param))
@@ -64,12 +68,8 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
             width(.ele) <- .fLen
             .ele
         }else{
-            .ele <- readGAlignmentPairs(f, index=i, param=param)
-            .ele.se <- !isProperPair(.ele)
+            .ele <- readGAlignmentPairs(f, index=i, param=paramp)
             .ele <- granges(.ele)
-            start(.ele[strand(.ele)=="-" & .ele.se]) <- 
-                end(.ele[strand(.ele)=="-" & .ele.se]) - .fLen + 1
-            width(.ele[.ele.se]) <- .fLen
             .ele
         }
     }, bamfiles, index, pe, fragmentLength, SIMPLIFY=FALSE)
