@@ -64,6 +64,8 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     if(!is.numeric(start[1])) start <- as.numeric(as.character(start))
     if(!is.numeric(end[1])) end <- as.numeric(as.character(end))
     if(!is.character(seqnames[1])) seqnames <- as.character(data$space)
+    ## trim seqnames
+    seqnames <- gsub("^\\s+|\\s+$", "", seqnames)
     
     gr <- GRanges(seqnames=seqnames, 
                   ranges=IRanges(start=start, 

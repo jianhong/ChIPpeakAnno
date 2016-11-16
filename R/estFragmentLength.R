@@ -1,5 +1,5 @@
 estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000, ...){
-    message("The fragment size is calculated for DNA-seq.")
+    message("The fragment size is being calculated for DNA-seq.")
     res <- mapply(function(f, i) {
         if(suppressMessages(testPairedEndBam(f, index=i))){
             isize <- 

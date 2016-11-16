@@ -4,10 +4,16 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
                                        n.tile=100, 
                                        fragmentLength,
                                        librarySize,
+                                       pe=c("auto", "PE", "SE"),
+                                       adjustFragmentLength,
                                        ...){
-    message("The signal is calculated for DNA-seq.")
+    message("The signal is being calculated for DNA-seq.")
     if(missing(fragmentLength)){
         stop("fragmentLength is missing")
+    }
+    if(!missing(adjustFragmentLength)){
+      stopifnot(inherits(adjustFragmentLength, c("numeric", "integer")))
+      stopifnot(length(adjustFragmentLength)==1)
     }
     stopifnot(class(bamfiles)=="character")
     stopifnot(class(feature.gr)=="GRanges")
@@ -19,6 +25,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     stopifnot(inherits(n.tile, c("numeric", "integer")))
     stopifnot(inherits(fragmentLength, c("numeric", "integer")))
     stopifnot(inherits(librarySize, c("numeric", "integer")))
+    pe <- match.arg(pe)
     upstream <- as.integer(upstream)
     downstream <- as.integer(downstream)
     n.tile <- as.integer(n.tile)
@@ -49,8 +56,17 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     grs <- unlist(GRangesList(grL))
     grs$oid <- rep(feature.gr$oid, grL.eleLen)
     
-    pe <- mapply(function(file, id) suppressMessages(testPairedEndBam(file, index=id)), 
+    if(pe=="auto") {
+      pe <- mapply(function(file, id) 
+        suppressMessages(testPairedEndBam(file, index=id)), 
                  bamfiles, index)
+    }else{
+      if(pe=="PE"){
+        pe <- TRUE
+      }else{
+        pe <- FALSE
+      }
+    }
     param <- ScanBamParam(which=reduce(feature.gr.expand), 
                           flag=scanBamFlag(isSecondaryAlignment=FALSE,
                                           isNotPassingQualityControls=FALSE),
@@ -73,7 +89,10 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
             .ele
         }
     }, bamfiles, index, pe, fragmentLength, SIMPLIFY=FALSE)
-    
+    if(!missing(adjustFragmentLength)){
+      bams.gr <- lapply(bams.gr, reCenterPeaks, width=adjustFragmentLength)
+      fragmentLength <- adjustFragmentLength
+    }
     ## count overlaps
     co <- lapply(bams.gr, countOverlaps, 
                  query=grs, ignore.strand=TRUE)

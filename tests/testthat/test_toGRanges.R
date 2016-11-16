@@ -18,6 +18,14 @@ test_that("toGRanges works not correct", {
     gr <- toGRanges(bed, format="BED")
     expect_equal(start(gr), c(101, 1001))
     
+    ##trim space
+    bed$space <- paste(" ", 1:2)
+    gr <- toGRanges(bed, format="BED")
+    expect_equal(seqlevels(gr), c("1", "2"))
+    bed$space <- paste(1:2, " ")
+    gr <- toGRanges(bed, format="BED")
+    expect_equal(seqlevels(gr), c("1", "2"))
+    
     ##data.frame
     gr <- toGRanges(bed)
     expect_equal(start(gr), c(100, 1000))

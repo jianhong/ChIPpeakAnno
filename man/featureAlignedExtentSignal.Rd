@@ -10,7 +10,9 @@
 \usage{
 featureAlignedExtendSignal(bamfiles, index = bamfiles, feature.gr, 
                            upstream, downstream, n.tile = 100, 
-                           fragmentLength, librarySize, ...)
+                           fragmentLength, librarySize, 
+                           pe=c("auto", "PE", "SE"),
+                           adjustFragmentLength, ...)
 }
 \arguments{
   \item{bamfiles}{
@@ -31,6 +33,12 @@ featureAlignedExtendSignal(bamfiles, index = bamfiles, feature.gr,
 }
   \item{librarySize}{
     Estimated library size.
+}
+  \item{pe}{
+    Pair-end or not. Default auto.
+}
+  \item{adjustFragmentLength}{
+    A numberic vector with length 1. Adjust the fragments/reads length to. 
 }
   \item{\dots}{
    Not used.
