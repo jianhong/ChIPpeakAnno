@@ -1,4 +1,6 @@
 import(ChIPpeakAnno)
+
+export(CallPeak)
 export(DrawVenn)
 export(InstallRequiredPackage)
 export(LoadRequiredPackage)
