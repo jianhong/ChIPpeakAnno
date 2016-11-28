@@ -1,12 +1,24 @@
-ProcessUsingCHIPpeakAnno <- function() {
+#' ProcessUsingCHIPpeakAnno
+#'
+#' @param dir.name
+#' @param input.file.pattern
+#' @param out.dir.name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'  dir.name="/media/H_driver/2016/Yang/MACS/MACS/"
+#'  input.file.pattern="*.bed"
+#'  out.dir.name="/media/H_driver/2016/Yang/Results/"
+#'
+#'
+ProcessUsingCHIPpeakAnno <- function(dir.name,input.file.pattern,out.dir.name) {
+
   library(ChIPpeakAnno)
-
-  dir.name="/media/H_driver/2016/Yang/MACS/MACS/"
-  input.file.pattern="*.bed"
-
   dir.name=reformatPath(dir.name)
   out.dir.name=reformatPath(out.dir.name)
-  
+
   file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
   file.name.2<-as.list(file.name)
 
