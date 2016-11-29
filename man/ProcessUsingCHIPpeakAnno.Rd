@@ -4,19 +4,20 @@
 \alias{ProcessUsingCHIPpeakAnno}
 \title{ProcessUsingCHIPpeakAnno}
 \usage{
-ProcessUsingCHIPpeakAnno(dir.name, input.file.pattern, out.dir.name)
+ProcessUsingCHIPpeakAnno(input.file.dir, input.file.pattern, output.file.dir)
 }
 \arguments{
-\item{out.dir.name}{}
+\item{output.file.dir}{}
 }
 \description{
 ProcessUsingCHIPpeakAnno
 }
 \examples{
- dir.name="/media/H_driver/2016/Yang/MACS/MACS/"
- input.file.pattern="*.bed"
- out.dir.name="/media/H_driver/2016/Yang/Results/"
+input.file.dir="/media/H_driver/2016/Yang/MACS/MACS/"
+input.file.pattern="*.bed"
+output.file.dir="/media/H_driver/2016/Yang/MACS/MACS/"
 
+ProcessUsingCHIPpeakAnno(input.file.dir,input.file.pattern,output.file.dir)
 
 }
 

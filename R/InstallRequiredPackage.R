@@ -17,6 +17,7 @@ InstallRequiredPackage <- function() {
   biocLite("DiffBind")
   biocLite("BSgenome.Hsapiens.UCSC.hg19")
   biocLite("TxDb.Mmusculus.UCSC.mm9.knownGene")
+  biocLite("EnsDb.Hsapiens.v75")
   devtools::install_github("sheffien/simpleCache")
   biocLite("LOLA")
   biocLite("ChIPpeakAnno")
@@ -45,5 +46,6 @@ InstallRequiredPackage <- function() {
   library(BSgenome.Mmusculus.UCSC.mm9)
   library(EnsDb.Mmusculus.v75)
   library(EnsDb.Mmusculus.v79)
+  
   library(ggplot2)
 }

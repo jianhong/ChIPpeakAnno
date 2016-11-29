@@ -1,9 +1,14 @@
 Package: ChipSeq
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: An R Package for Performing ChipSeq Analysis In One Step
+Version: 0.0.1
+Authors:Aimin Yan
+Maintainer: Aimin Yan <jlfmssm@gmail.com>
+Depends: R (>= 3.3.0)
+Description: ChipSeq is used to perform chipseq analysis in one step.
+Imports:ChIPpeakAnno	
+Suggests: testthat,knitr,rmarkdown
+VignetteBuilder: knitr
+License: LGPL(>=2)
 LazyData: TRUE
 RoxygenNote: 5.0.1
