@@ -1,7 +1,7 @@
 import(ChIPpeakAnno)
 
 export(AnnotatePeak2)
-export(CallPeak)
+export(PeakCallAndAnnotation)
 export(SortBamFile)
 export(DrawVenn)
 export(InstallRequiredPackage)

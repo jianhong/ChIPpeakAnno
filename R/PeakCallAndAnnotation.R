@@ -1,5 +1,7 @@
-#' CallPeak
+#' PeakCallAndAnnotation
 #'
+#' Call peak for bam files using macs14 and perform peak annotation using ChIPpeakAnno
+#' 
 #' @param input.file.dir 
 #' @param input.file.pattern 
 #' @param index.file 
@@ -17,9 +19,9 @@
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/
 #' genome="Hs"
 #' 
-#' SortBamFile(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+#' PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
 #' 
-CallPeak <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
+PeakCallAndAnnotation <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
   
   #library(ChIPpeakAnno)
   
