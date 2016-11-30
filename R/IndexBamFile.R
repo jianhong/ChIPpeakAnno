@@ -1,4 +1,4 @@
-#' CallPeak
+#' IndexBamFile
 #'
 #' @param input.file.dir 
 #' @param input.file.pattern 
@@ -17,9 +17,9 @@
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/
 #' genome="Hs"
 #' 
-#' SortBamFile(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+#' IndexBamFile(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
 #' 
-CallPeak <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
+IndexBamFile <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
   
   #library(ChIPpeakAnno)
   
@@ -33,7 +33,7 @@ CallPeak <- function(input.file.dir,input.file.pattern,index.file,output.file.di
   temp=Sys.time()
   temp1=gsub(":","-",Sys.time())
   temp2=gsub(" ","-",temp1)
-  temp3=paste0(output.dir.name,"PeakCall_at_",temp2)
+  temp3=paste0(output.dir.name,"AnalysisResults_at_",temp2)
   
   dir.create(temp3)
   
@@ -46,29 +46,19 @@ CallPeak <- function(input.file.dir,input.file.pattern,index.file,output.file.di
   
   re.out<-file.name.2
   
-  # cmd9="macs14 -t "$DIR""$trt_file_name" -f BAM -g hs -n "$results_dir""$trt_file_name"_hs_1.00e-05_macs142 -m 6,18 --bw=200 -B -p 0.00001
-   cmd9="macs14 -t "
-   cmd10="-f BAM -g hs -n "
-   cmd11=" -m 6,18 --bw=200 -p 0.00001"
+  cmd1="samtools index "
 
-   lapply(1:length(re.out),function(u,re.out,temp3){
-     
-     x=re.out[[u]]
-     x_name=names(re.out)[u]
-     
-     cmd12=paste(cmd9,x,cmd10,paste0(temp3,"/",paste0(x_name,"_hs_1.00e-05_macs142")),cmd11,sep=" ")
-     
-     print(cmd12)
-     system(cmd12, intern = TRUE, ignore.stderr = TRUE)
-     
-     #re=read.table(u,header=FALSE)
-     #  re<-as.character(re[,1])
-     #  #colnames(re)=c("Count","GeneName")
-     #  re
-   },re.out,temp3)
-   
-   AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
-   
+  lapply(1:length(re.out),function(u,re.out,temp3){
+    
+           x=re.out[[u]]
+           x_name=names(re.out)[u]
+           cmd2=paste0(cmd1," ",x," ",paste0(temp3,"/",x_name,"_sorted"))
+           
+          #print(cmd2)
+          system(cmd2)
+              
+         },re.out,temp3)
+  
   #sample.name<-sapply(strsplit(names(file.name.3),split="_peaks_"),"[[",1)
   
   #names(file.name.3)=sample.name
@@ -171,3 +161,5 @@ CallPeak <- function(input.file.dir,input.file.pattern,index.file,output.file.di
 #   }
   
 }
+
+

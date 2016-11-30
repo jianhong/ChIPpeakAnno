@@ -1,51 +1,53 @@
 <center> <h1>The tutorial to use ChipSeq</h1> </center>
 
+
+##Set up environment
+
+Install the following softares firstly:
+
++ ngsplt(https://github.com/shenlab-sinai/ngsplot)
+
++ MACS(https://github.com/taoliu/MACS)
+
+##
+```{r eval=FALSE
+
+
+}
+
+
+
 + Run ChipSeq to perform one-setp analysis for ChipSeq related data 
 
 ```{r eval=FALSE}
-dir.name="/media/H_driver/Aimin_project/"
 
-file.sample="decoder.bySample.Mut_WT_2.rtf"
-file.gff="Homo_sapiens.GRCh38.84.processed.sorted.4.JunctionSeq.flat.gff"
-
-file.count="/QC.spliceJunctionAndExonCounts.forJunctionSeq.txt"
-
-Re.example<-GetResultsFromJunctionSeq(dir.name,file.sample,file.count,file.gff)
  
 ```
 
 + Convert the results of differential usage analysis into gene based resutls
 
 ```{r eval=FALSE}
-re.example.gene.based<-makeGeneWiseTable(Re.example,gene.list=unique(as.character(fData(Re.example)$geneID)))
+
 ```
 
 + Apply logistic regression model to identify bias factor
 ```{r eval=TRUE}
-library(PathwaySplice)
-data(mds)
-re<-LRtestBias(mds)
+
 ```
 
 + Perform pathwaysplice in one step
 ```{r eval=TRUE}
-library(PathwaySplice)
-data(mds)
-Example.Go.adjusted.by.exon<-Run_pathwaysplice(mds,ad="exon_SJ",sub_feature="E",0.05,genomeID="hg19",geneID="ensGene",gene_model=hg19.gene.model,method="Wallenius")
-Example.Go.adjusted.by.exon<-Run_pathwaysplice(mds,ad="exon_SJ",sub_feature="E",0.05,genomeID="hg19",geneID="ensGene",gene_model=hg19.gene.model,method="Sampling")
-Example.Go.unadjusted<-Run_pathwaysplice(mds,ad="exon_SJ",sub_feature="E",0.05,genomeID="hg19",geneID="ensGene",gene_model=hg19.gene.model,method="Hypergeometric")
+
 
 ```
 
 + If you are interested in other gene sets such as Canonical Pathways(CP),Transcription Factor Targets(TFT) and hallmark gene sets from http://software.broadinstitute.org/gsea/msigdb/collections.jsp, download these .gmt files, then perform the following steps:
 ```{r eval=TRUE}
-gene.2.cat.hallmark.hg<-Gmt2GeneCat("/media/H_driver/Annotation/hg38/h.all.v5.1.symbols-1.gmt","/media/H_driver/Annotation/hg38/genes_table_02092016.csv")
+
 ```
 
 + Build up network based on the overlap between gene sets and visualize this network
 
 ```{r eval=TRUE}
-data(mds)
-Example.Go.adjusted.by.exon<-Run_pathwaysplice(mds,ad="exon_SJ",sub_feature="E",0.05,genomeID="hg19",geneID="ensGene",gene_model=hg19.gene.model,method="Wallenius")
-re.w.adjusted<-enrichmentMap(Example.Go.adjusted.by.exon,n=5,SimilarityThreshold=0)
+
 ```
