@@ -1,6 +1,5 @@
 <center> <h1>The tutorial to use ChipSeq</h1> </center>
 
-
 ##Set up environment
 
 Install the following softares firstly:
