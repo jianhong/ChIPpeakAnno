@@ -1,4 +1,4 @@
-#' SortBamFile
+#' BamFileSortIndexVisualization 
 #'
 #' @param input.file.dir 
 #' @param input.file.pattern 
@@ -17,9 +17,9 @@
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/
 #' genome="Hs"
 #' 
-#' SortBamFile(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+#' BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
 #' 
-SortBamFile <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
+BamFileSortIndexVisualization <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
   
   #library(ChIPpeakAnno)
   
@@ -99,27 +99,27 @@ SortBamFile <- function(input.file.dir,input.file.pattern,index.file,output.file
   },re.out,temp3)
   
   
-  # cmd9="macs14 -t "$DIR""$trt_file_name" -f BAM -g hs -n "$results_dir""$trt_file_name"_hs_1.00e-05_macs142 -m 6,18 --bw=200 -B -p 0.00001
-   cmd9="macs14 -t "
-   cmd10="-f BAM -g hs -n "
-   cmd11=" -m 6,18 --bw=200 -B -p 0.00001"
-
-   lapply(1:length(re.out),function(u,re.out,temp3){
-     
-     x=re.out[[u]]
-     x_name=names(re.out)[u]
-     
-     cmd12=paste(cmd9,x,cmd10,paste0(x,"_hs_1.00e-05_macs142"),cmd11,sep=" ")
-     
-     print(cmd12)
-     system(cmd12, intern = TRUE, ignore.stderr = TRUE)
-     
-     #re=read.table(u,header=FALSE)
-     #  re<-as.character(re[,1])
-     #  #colnames(re)=c("Count","GeneName")
-     #  re
-   },re.out,temp3)
-   
+  # # cmd9="macs14 -t "$DIR""$trt_file_name" -f BAM -g hs -n "$results_dir""$trt_file_name"_hs_1.00e-05_macs142 -m 6,18 --bw=200 -B -p 0.00001
+  #  cmd9="macs14 -t "
+  #  cmd10="-f BAM -g hs -n "
+  #  cmd11=" -m 6,18 --bw=200 -B -p 0.00001"
+  # 
+  #  lapply(1:length(re.out),function(u,re.out,temp3){
+  #    
+  #    x=re.out[[u]]
+  #    x_name=names(re.out)[u]
+  #    
+  #    cmd12=paste(cmd9,x,cmd10,paste0(x,"_hs_1.00e-05_macs142"),cmd11,sep=" ")
+  #    
+  #    print(cmd12)
+  #    system(cmd12, intern = TRUE, ignore.stderr = TRUE)
+  #    
+  #    #re=read.table(u,header=FALSE)
+  #    #  re<-as.character(re[,1])
+  #    #  #colnames(re)=c("Count","GeneName")
+  #    #  re
+  #  },re.out,temp3)
+  #  
    
   #sample.name<-sapply(strsplit(names(file.name.3),split="_peaks_"),"[[",1)
   

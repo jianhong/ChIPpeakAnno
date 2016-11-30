@@ -5,49 +5,53 @@
 
 Install the following softares firstly:
 
-+ ngsplt(https://github.com/shenlab-sinai/ngsplot)
+1. ngsplt(https://github.com/shenlab-sinai/ngsplot)
 
-+ MACS(https://github.com/taoliu/MACS)
+2. MACS(https://github.com/taoliu/MACS)
 
-##
-```{r eval=FALSE
+3. ChipSeq(https://github.com/aiminy/ChipSeq)
 
+     To install from source, peform the following steps:
+     R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
 
-}
+##Peak Call and Annotation
+```{r eval=FALSE}
 
+input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
+input.file.pattern="*.bam"
+index.file=9
+output.file.dir="/scratch/projects/bbc/aiminy_project/
+genome="Hs"
+ 
+PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+```
 
+##Bam files sorting, index and Visualization
 
 + Run ChipSeq to perform one-setp analysis for ChipSeq related data 
 
 ```{r eval=FALSE}
-
+input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
+input.file.pattern="*.bam"
+index.file=9
+output.file.dir="/scratch/projects/bbc/aiminy_project/
+genome="Hs"
+ 
+BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
  
 ```
 
-+ Convert the results of differential usage analysis into gene based resutls
+## Perform the above steps in streamlined procedure
 
+If you run based on bash
+```{bash eval=FALSE}
+sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
+```
+
+If you run based on R
 ```{r eval=FALSE}
 
-```
-
-+ Apply logistic regression model to identify bias factor
-```{r eval=TRUE}
-
-```
-
-+ Perform pathwaysplice in one step
-```{r eval=TRUE}
-
-
-```
-
-+ If you are interested in other gene sets such as Canonical Pathways(CP),Transcription Factor Targets(TFT) and hallmark gene sets from http://software.broadinstitute.org/gsea/msigdb/collections.jsp, download these .gmt files, then perform the following steps:
-```{r eval=TRUE}
-
-```
-
-+ Build up network based on the overlap between gene sets and visualize this network
-
-```{r eval=TRUE}
+Rscript R_code/Set_up_R.R
+Rscript R_code/Run_Chip_Seq.R $DIR $INDEX $pattern $results_dir $out 
 
 ```
