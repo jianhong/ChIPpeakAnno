@@ -4,19 +4,18 @@
 \alias{PeakCallAndAnnotation}
 \title{PeakCallAndAnnotation}
 \usage{
-PeakCallAndAnnotation(input.file.dir, input.file.pattern, index.file,
-  output.file.dir, genome)
+PeakCallAndAnnotation(input.file.dir, output.file.dir, genome)
 }
 \arguments{
 \item{input.file.dir}{}
 
-\item{input.file.pattern}{}
-
-\item{index.file}{}
-
 \item{output.file.dir}{}
 
 \item{genome}{}
+
+\item{input.file.pattern}{}
+
+\item{index.file}{}
 }
 \description{
 Call peak for bam files using macs14 and perform peak annotation using ChIPpeakAnno

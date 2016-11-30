@@ -19,32 +19,41 @@
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/
 #' genome="Hs"
 #' 
-#' PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+#' PeakCallAndAnnotation(input.file.dir,output.file.dir,genome)
 #' 
-PeakCallAndAnnotation <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
+PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
   
   #library(ChIPpeakAnno)
   
-  dir.name=input.file.dir
-  input.file.pattern=input.file.pattern
+  #dir.name=input.file.dir
+  #input.file.pattern=input.file.pattern
   
-  dir.name=reformatPath(dir.name)
-  output.dir.name=reformatPath(output.file.dir)
+  #dir.name=reformatPath(dir.name)
+  
+  #output.dir.name=reformatPath(output.file.dir)
   
   #print(output.dir.name)
+  
+  #file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
+  
+  #file.name.2<-as.list(file.name)
+  
+  #names(file.name.2)=sapply(strsplit(file.name,split="\\/"),"[[",index.file)
+  
+  re<-ParserReadFiles(input.file.dir,output.file.dir)
+  
+  #print(file.name.2)
+  
+  file.name.2<-re$input
+  output.dir.name=re$output
+  
   temp=Sys.time()
-  temp1=gsub(":","-",Sys.time())
+  temp1=gsub(":","-",temp)
   temp2=gsub(" ","-",temp1)
   temp3=paste0(output.dir.name,"PeakCall_at_",temp2)
   
+  #temp3<-re$output
   dir.create(temp3)
-  
-  file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
-  file.name.2<-as.list(file.name)
-  
-  names(file.name.2)=sapply(strsplit(file.name,split="\\/"),"[[",index.file)
-  
-  #print(file.name.2)
   
   re.out<-file.name.2
   

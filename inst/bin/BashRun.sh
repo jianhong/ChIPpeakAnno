@@ -1,33 +1,32 @@
 #!/bin/bash
 
-#Usage: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq.sh input_file_dir out_file_dir
+#Usage: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh input_file_dir out_file_dir
 
-#Example: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /scratch/projects/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/
+#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/
 
-#Example: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /scratch/projects/bbc/aiminy_project/Bam_sorted/ 7 ".sorted.bam$" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/ test.txt  
+#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/Bam_sorted/ 7 ".sorted.bam$" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/ test.txt  
 
-#Example: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
+#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
 
-#Example: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
+#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
 
-#Example: sh ~R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
 
 #Example  sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
 
+#Example  sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ /scratch/projects/bbc/aiminy_project/ "Hs" 
 
 DIR="$1"
-INDEX="$2"
-pattern="$3"
-results_dir="$4"
-out="$5"
-
+#INDEX="$2"
+#pattern="$3"
+results_dir="$2"
+out="$3"
 
 if [ -e $results_dir ]; then echo "already exists";
 else
     mkdir $results_dir
 
 fi
-
 
 cat >  ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh <<EOF
 
@@ -42,12 +41,11 @@ cat >  ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh <<EOF
 #BSUB -q general
 #BSUB -u aimin.yan@med.miami.edu              
 
-Rscript ~/R/lib64/R/library/ChipSeq/bin/ R_code/Set_up_R.R
+Rscript ~/R/lib64/R/library/ChipSeq/bin/Set_up_R.r
 wait
 
-Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.R $DIR $INDEX $pattern $results_dir $out 
+Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.r $DIR $results_dir $out 
 
 EOF
 
 bsub -P bbc < ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh
-

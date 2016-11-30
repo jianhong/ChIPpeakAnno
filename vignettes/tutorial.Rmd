@@ -56,9 +56,8 @@ BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,outpu
 
 If you run based on bash
 ```{bash eval=FALSE}
-sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
 
- sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
  
 ```
 

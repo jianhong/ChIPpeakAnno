@@ -14,10 +14,12 @@ reformatPath <- function(dir.name){
   
   if(CheckOPS=="Darwin"){
     
+    if(length(grep('H_driver',dir.name))!=0){
     temp=unlist(strsplit(dir.name,split="\\/"))
     temp[2]="Volumes"
     temp[3]="Bioinformatics$"
     dir.name=paste0(paste0(temp,collapse = "/"),"/")
+    }
   }
   
   return(dir.name)

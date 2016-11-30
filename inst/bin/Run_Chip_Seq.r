@@ -9,13 +9,13 @@ if (length(args)==0) {
 } else if (length(args)>1) {
 
 input.file.dir=args[1]
-index.file=args[2]
-input.file.pattern=args[3]
-out.file.dir=args[4]
-genome=args[5]
+#index.file=args[2]
+#input.file.pattern=args[3]
+out.file.dir=args[2]
+genome=args[3]
 }
 
-cat(input.file.dir,"\t",index.file,"\t",input.file.pattern,"\t",out.file.dir,"\t",genome,"\n")
+cat(input.file.dir,"\t",out.file.dir,"\t",genome,"\n")
 
 library(ChipSeq)
 
