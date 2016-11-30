@@ -11,8 +11,19 @@ Install the following softares firstly:
 
 3. ChipSeq(https://github.com/aiminy/ChipSeq)
 
-     To install from source, peform the following steps:
-     R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
+```{r eval=FALSE}
+
+#To download
+
+git clone https://github.com/aiminy/ChipSeq
+
+#To build 
+
+R CMD build --resave-data ChipSeq
+
+#To Install
+R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
+```
 
 ##Peak Call and Annotation
 ```{r eval=FALSE}
@@ -23,6 +34,7 @@ index.file=9
 output.file.dir="/scratch/projects/bbc/aiminy_project/
 genome="Hs"
  
+library(ChipSeq)
 PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
 ```
 
@@ -41,7 +53,7 @@ BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,outpu
  
 ```
 
-## Perform the above steps in streamlined procedure
+## Perform the above steps in one streamlined procedure
 
 If you run based on bash
 ```{bash eval=FALSE}
