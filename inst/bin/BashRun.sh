@@ -29,7 +29,7 @@ else
 fi
 
 
-cat >  ~/Code/code_tmp/Run_Rscript.sh <<EOF
+cat >  ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh <<EOF
 
 #LSBATCH: User input                                                                                                                                                                 
 #!/bin/bash                                                                                                                                                                          
@@ -42,11 +42,12 @@ cat >  ~/Code/code_tmp/Run_Rscript.sh <<EOF
 #BSUB -q general
 #BSUB -u aimin.yan@med.miami.edu              
 
-Rscript R_code/Set_up_R.R
+Rscript ~/R/lib64/R/library/ChipSeq/bin/ R_code/Set_up_R.R
 wait
 
-Rscript R_code/Run_Chip_Seq.R $DIR $INDEX $pattern $results_dir $out 
+Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.R $DIR $INDEX $pattern $results_dir $out 
 
 EOF
 
-bsub -P bbc < ~/Code/code_tmp/Run_Rscript.sh
+bsub -P bbc < ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh
+
