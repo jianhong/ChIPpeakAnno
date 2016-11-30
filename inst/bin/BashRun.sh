@@ -10,6 +10,11 @@
 
 #Example: sh ~/Code/BashRunMACS1-4-2_4_Danny_chip_seq3.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
 
+#Example: sh ~R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+
+#Example  sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+
+
 DIR="$1"
 INDEX="$2"
 pattern="$3"
