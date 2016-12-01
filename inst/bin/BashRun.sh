@@ -34,22 +34,9 @@ cat >  ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh <<EOF
 Rscript ~/R/lib64/R/library/ChipSeq/bin/Set_up_R.r
 wait
 
-#rm -rf ChipSeq
-
-#R -e 'install.packages("rgl", dependencies = TRUE,repos = "http://cran.rstudio.org",lib="/nethome/axy148/R/lib64/R/library")'")
-
-#R -e 'install.packages("knitr", dependencies = TRUE,repos = "http://cran.rstudio.org",lib="/nethome/axy148/R/lib64/R/library")'
-
-#git clone https://github.com/aiminy/ChipSeq
-
-#R CMD build --resave-data ChipSeq
-
-#R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
-
-wait
-
 Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.r $DIR $results_dir $out 
 
 EOF
 
 bsub -P bbc < ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh
+
