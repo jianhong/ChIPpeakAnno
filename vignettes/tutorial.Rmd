@@ -28,13 +28,11 @@ R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
 ```{r eval=FALSE}
 
 input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
-input.file.pattern="*.bam"
-index.file=9
 output.file.dir="/scratch/projects/bbc/aiminy_project/
 genome="Hs"
  
 library(ChipSeq)
-PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+PeakCallAndAnnotation(input.file.dir,output.file.dir,genome)
 ```
 
 ##Bam files sorting, index and Visualization
@@ -43,12 +41,10 @@ PeakCallAndAnnotation(input.file.dir,input.file.pattern,index.file,output.file.d
 
 ```{r eval=FALSE}
 input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
-input.file.pattern="*.bam"
-index.file=9
 output.file.dir="/scratch/projects/bbc/aiminy_project/
 genome="Hs"
  
-BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
  
 ```
 
@@ -57,14 +53,14 @@ BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,outpu
 If you run based on bash
 ```{bash eval=FALSE}
 
-sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ /scratch/projects/bbc/aiminy_project/ "Hs" 
  
 ```
 
 If you run based on R
 ```{r eval=FALSE}
 
-Rscript R_code/Set_up_R.R
-Rscript R_code/Run_Chip_Seq.R $DIR $INDEX $pattern $results_dir $out 
+Rscript ~/R/lib64/R/library/ChipSeq/bin/Set_up_R.r
+Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.r input.file.dir out.file.dir 
 
 ```
