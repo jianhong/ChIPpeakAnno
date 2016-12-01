@@ -19,7 +19,7 @@ cat(input.file.dir,"\t",out.file.dir,"\t",genome,"\n")
 
 library(ChipSeq)
 
-PeakCallAndAnnotation(input.file.dir,input.file.pattern,as.numeric(index.file),out.file.dir,genome)
+PeakCallAndAnnotation(input.file.dir,out.file.dir,genome)
 
 #AnnotatePeak(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
 
