@@ -26,7 +26,7 @@ AnnotatePeak3<- function(input.file.dir,output.file.dir,genome) {
   #print(file.name.2)
   
   file.name.2<-re$input
-  output.dir.name=re$output
+  output.dir.name=output.file.dir
   
   #dir.name=input.file.dir
   #input.file.pattern=input.file.pattern

@@ -47,12 +47,12 @@ PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
   file.name.2<-re$input
   output.dir.name=re$output
   
-  temp=Sys.time()
-  temp1=gsub(":","-",temp)
-  temp2=gsub(" ","-",temp1)
-  temp3=paste0(output.dir.name,"PeakCall_at_",temp2)
+  #temp=Sys.time()
+  #temp1=gsub(":","-",temp)
+  #temp2=gsub(" ","-",temp1)
   
-  #temp3<-re$output
+  temp3=paste0(output.dir.name,"_PeakCall")
+  
   dir.create(temp3)
   
   re.out<-file.name.2
@@ -80,7 +80,7 @@ PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
 
 #AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
 
-AnnotatePeak3(paste0(temp3,"/"),paste0(output.dir.name,"PeakAnnotation_at_",temp2),
+AnnotatePeak3(paste0(temp3,"/"),paste0(output.dir.name,"_PeakAnnotation"),
                 genome="Hs")
    
   #sample.name<-sapply(strsplit(names(file.name.3),split="_peaks_"),"[[",1)

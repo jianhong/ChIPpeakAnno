@@ -4,15 +4,10 @@
 \alias{BamFileSortIndexVisualization}
 \title{BamFileSortIndexVisualization}
 \usage{
-BamFileSortIndexVisualization(input.file.dir, input.file.pattern, index.file,
-  output.file.dir, genome)
+BamFileSortIndexVisualization(input.file.dir, output.file.dir, genome)
 }
 \arguments{
 \item{input.file.dir}{}
-
-\item{input.file.pattern}{}
-
-\item{index.file}{}
 
 \item{output.file.dir}{}
 

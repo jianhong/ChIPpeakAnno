@@ -1,8 +1,6 @@
 #' BamFileSortIndexVisualization 
 #'
 #' @param input.file.dir 
-#' @param input.file.pattern 
-#' @param index.file 
 #' @param output.file.dir 
 #' @param genome 
 #'
@@ -12,40 +10,25 @@
 #' @examples
 #' 
 #' input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
-#' input.file.pattern="*.bam"
-#' index.file=9
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/
 #' genome="Hs"
 #' 
-#' BamFileSortIndexVisualization(input.file.dir,input.file.pattern,index.file,output.file.dir,genome)
+#' BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
 #' 
-BamFileSortIndexVisualization <- function(input.file.dir,input.file.pattern,index.file,output.file.dir,genome) {
+BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,genome) {
   
   #library(ChIPpeakAnno)
   
-  dir.name=input.file.dir
-  input.file.pattern=input.file.pattern
+  re<-ParserReadFiles(input.file.dir,"bam",output.file.dir)
   
-  dir.name=reformatPath(dir.name)
-  output.dir.name=reformatPath(output.file.dir)
+  file.name.2<-re$input
+  output.dir.name=re$output
   
-  #print(output.dir.name)
-  temp=Sys.time()
-  temp1=gsub(":","-",Sys.time())
-  temp2=gsub(" ","-",temp1)
-  temp3=paste0(output.dir.name,"AnalysisResults_at_",temp2)
+  temp3=paste0(output.dir.name,"_visualization")
   
   dir.create(temp3)
   
-  file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
-  file.name.2<-as.list(file.name)
-  
-  names(file.name.2)=sapply(strsplit(file.name,split="\\/"),"[[",index.file)
-  
-  #print(file.name.2)
-  
   re.out<-file.name.2
-  
   
   cmd1="samtools sort"
   
@@ -100,5 +83,3 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.file.pattern,inde
   
   
 }
-
-
