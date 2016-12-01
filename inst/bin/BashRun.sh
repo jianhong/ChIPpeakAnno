@@ -34,11 +34,9 @@ cat >  ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh <<EOF
 Rscript ~/R/lib64/R/library/ChipSeq/bin/Set_up_R.r
 wait
 
-
-wait
-
 Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.r $DIR $results_dir $out 
 
 EOF
 
 bsub -P bbc < ~/R/lib64/R/library/ChipSeq/bin/Run_Rscript.sh
+
