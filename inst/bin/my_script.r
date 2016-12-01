@@ -14,11 +14,11 @@ option_list <- list(
               help="Print extra output [default]"),
   make_option(c("-q", "--quietly"), action="store_false",
               dest="verbose", help="Print little output"),
-  make_option(c("-i", "--input.file.dir"), type="character", default="",
-              help="Files to read in [default %default]",
-              metavar="number"),
-  make_option("-o", "--output.file.dir", default="",
-              help = "Results to output [default \%default\"]"),
+  make_option(c("-i","--input"), type="character", default="~",
+              help="Files to read in",
+              metavar="character"),
+  make_option("-o","--output", default="~",
+              help = "Results to output"),
   make_option("-t","--orginaism", default="Hs",help="which organisim")
 )
 
