@@ -40,7 +40,7 @@ PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
   
   #names(file.name.2)=sapply(strsplit(file.name,split="\\/"),"[[",index.file)
   
-  re<-ParserReadFiles(input.file.dir,output.file.dir)
+  re<-ParserReadFiles(input.file.dir,"bam",output.file.dir)
   
   #print(file.name.2)
   
@@ -77,8 +77,11 @@ PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
      #  #colnames(re)=c("Count","GeneName")
      #  re
    },re.out,temp3)
-   
-   AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
+
+#AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
+
+AnnotatePeak3(paste0(temp3,"/"),paste0(output.dir.name,"PeakAnnotation_at_",temp2),
+                genome="Hs")
    
   #sample.name<-sapply(strsplit(names(file.name.3),split="_peaks_"),"[[",1)
   

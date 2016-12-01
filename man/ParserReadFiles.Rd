@@ -4,7 +4,7 @@
 \alias{ParserReadFiles}
 \title{ParserReadFiles}
 \usage{
-ParserReadFiles(input.file.dir, output.file.dir)
+ParserReadFiles(input.file.dir, input.file.type, output.file.dir)
 }
 \arguments{
 \item{input.file.dir}{}

@@ -13,7 +13,7 @@
 #' testR<-ParserReadFiles(input.file.dir,out.file.dir) 
 #' 
 #' 
-ParserReadFiles <- function(input.file.dir,output.file.dir) {
+ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
   
   #For input
   dir.name=input.file.dir
@@ -31,7 +31,7 @@ ParserReadFiles <- function(input.file.dir,output.file.dir) {
     path_name=dirname(x)
     file_name=basename(x)
     
-    if(file_ext(file_name)=="bam"){
+    if(file_ext(file_name)==input.file.type){
     re<-paste0(path_name,"/",file_name)
     #names(re)[u]<-file_name
     }else

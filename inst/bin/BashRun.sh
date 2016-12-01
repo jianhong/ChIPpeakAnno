@@ -1,20 +1,10 @@
 #!/bin/bash
 
-#Usage: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh input_file_dir out_file_dir
-
-#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/
-
-#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/Bam_sorted/ 7 ".sorted.bam$" /scratch/projects/bbc/aiminy_project/Bam_marked_sorted/ test.txt  
-
-#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ 9 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
-
-#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs"
-
-#Example: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
-
-#Example  sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ 7 ".bam" /scratch/projects/bbc/aiminy_project/ "Hs" 
+#Usage: sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh input_file_dir out_file_dir genome
 
 #Example  sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ /scratch/projects/bbc/aiminy_project/ "Hs" 
+
+#Example sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ /scratch/projects/bbc/aiminy_project/ "Hs"
 
 DIR="$1"
 #INDEX="$2"
