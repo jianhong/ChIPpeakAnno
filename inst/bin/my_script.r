@@ -7,24 +7,14 @@ suppressPackageStartupMessages(library("stats"))
 # make_option(c("-h", "--help"), action="store_true", default=FALSE,
 #               help="Show this help message and exit")
 
-#Example: Rscript ~/ChipSeq/inst/bin/my_script.r --generator "runif" --mean 0.5 --sd 0.1
+#Example: Rscript ~/ChipSeq/inst/bin/my_script.r --help
 
 option_list <- list(
-  make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
-              help="Print extra output [default]"),
-  make_option(c("-q", "--quietly"), action="store_false",
-              dest="verbose", help="Print little output"),
-  make_option(c("-i","--input"), type="character", default="~",
-              help="Files to read in",
-              metavar="character"),
-  make_option("-o","--output", default="~",
-              help = "Results to output"),
-  make_option("-t","--orginaism", default="Hs",help="which organisim")
+  make_option(c("-t","--orginaism"),action="store_true",default=TRUE,help="which organisim")
 )
 
 # get command line options, if help option encountered print help and exit,
 # otherwise if options not found on command line then set defaults,
 opt <- parse_args(OptionParser(option_list=option_list))
-
 
 cat("\n")
