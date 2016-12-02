@@ -59,7 +59,22 @@ If you run based on bash
 ```{bash eval=FALSE}
 
 sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ /scratch/projects/bbc/aiminy_project/ "Hs" 
+
+#To check output 
+ls -lrth /scratch/projects/bbc/aiminy_project/
+
+You will find the follwing latest directories that was created with a timestamp
+
+#For example,
+
+#Peak call is located in  
+/scratch/projects/bbc/aiminy_project/ReadBam_at_2016-12-01-18-58-57_PeakCall/
  
+#Peak call is located in  
+/scratch/projects/bbc/aiminy_project/ReadBam_at_2016-12-01-18-58-57_PeakAnnotation/
+
+#Peak call is located in  
+/scratch/projects/bbc/aiminy_project/ReadBam_at_2016-12-01-18-58-57_visualization/
 ```
 
 If you run based on R
