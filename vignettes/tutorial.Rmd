@@ -60,6 +60,8 @@ If you run based on bash
 
 sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /scratch/projects/bbc/aiminy_project/test_bam/ /scratch/projects/bbc/aiminy_project/ "Hs" 
 
+sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ /scratch/projects/bbc/aiminy_project/ "Hs" 
+
 #To check output 
 ls -lrth /scratch/projects/bbc/aiminy_project/
 
