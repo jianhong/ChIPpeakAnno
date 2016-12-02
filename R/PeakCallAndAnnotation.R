@@ -23,33 +23,13 @@
 #' 
 PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
   
-  #library(ChIPpeakAnno)
-  
-  #dir.name=input.file.dir
-  #input.file.pattern=input.file.pattern
-  
-  #dir.name=reformatPath(dir.name)
-  
-  #output.dir.name=reformatPath(output.file.dir)
-  
-  #print(output.dir.name)
-  
-  #file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
-  
-  #file.name.2<-as.list(file.name)
-  
-  #names(file.name.2)=sapply(strsplit(file.name,split="\\/"),"[[",index.file)
-  
+
   re<-ParserReadFiles(input.file.dir,"bam",output.file.dir)
   
-  #print(file.name.2)
   
   file.name.2<-re$input
   output.dir.name=re$output
   
-  #temp=Sys.time()
-  #temp1=gsub(":","-",temp)
-  #temp2=gsub(" ","-",temp1)
   
   temp3=paste0(output.dir.name,"_PeakCall")
   
@@ -57,7 +37,6 @@ PeakCallAndAnnotation <- function(input.file.dir,output.file.dir,genome) {
   
   re.out<-file.name.2
   
-  # cmd9="macs14 -t "$DIR""$trt_file_name" -f BAM -g hs -n "$results_dir""$trt_file_name"_hs_1.00e-05_macs142 -m 6,18 --bw=200 -B -p 0.00001
    cmd9="macs14 -t "
    cmd10="-f BAM -g hs -n "
    cmd11=" -m 6,18 --bw=200 -p 0.00001"
