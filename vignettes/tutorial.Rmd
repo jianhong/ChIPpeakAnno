@@ -55,7 +55,8 @@ BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
 
 ## Perform the above steps in one streamlined procedure
 
-If you run based on bash
+You run this job on the linux cluster(pegasus)
+
 ```{bash eval=FALSE}
 
 sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ /scratch/projects/bbc/aiminy_project/ "Hs" 
@@ -75,12 +76,4 @@ You will find the follwing latest directories that was created with a timestamp
 
 #Peak call is located in  
 /scratch/projects/bbc/aiminy_project/ReadBam_at_2016-12-01-18-58-57_visualization/
-```
-
-If you run based on R
-```{r eval=FALSE}
-
-Rscript ~/R/lib64/R/library/ChipSeq/bin/Set_up_R.r
-Rscript ~/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq.r input.file.dir out.file.dir 
-
 ```
