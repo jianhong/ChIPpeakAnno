@@ -107,9 +107,8 @@ Univariate Discrete Distributions, Second Edition. New York: Wiley }
      enriched.GO = getEnrichedGO(annotatedPeak[1:6,], 
                                  orgAnn="org.Hs.eg.db", 
                                  maxP=0.01,
-                                 multiAdj=FALSE, 
-                                 minGOterm=10, 
-                                 multiAdjMethod="")
+                                 minGOterm=10,
+                                 multiAdjMethod= NULL)
      dim(enriched.GO$mf)
      colnames(enriched.GO$mf)
      dim(enriched.GO$bp)

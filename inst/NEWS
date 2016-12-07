@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.9.4
+-------------------------
+    o update the documents of getEnrichedGO
+    o add more output for findOverlapsOfPeaks.
+    
 CHANGES IN VERSION 3.9.3
 -------------------------
     o trim seqnames when using toGRanges
