@@ -3,8 +3,8 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.9.4
-Date: 2016-12-07
+Version: 3.9.5
+Date: 2016-12-08
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Herve Pages, Claude Gazin,
     Nathan Lawson, Ryan Thompson, Simon Lin, David Lapointe and
     Michael Green

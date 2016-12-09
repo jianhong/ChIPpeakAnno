@@ -38,6 +38,9 @@ Efficiently perform overlap queries with an interval tree implemented with GRang
   return value is An object of overlappingPeaks. 
   \item{venn_cnt}{an object of VennCounts}
   \item{peaklist}{a list consists of all overlapping peaks or unique peaks}
+  \item{uniquePeaks}{an object of \link[GenomicRanges]{GRanges} consists of all unique peaks}
+  \item{mergedPeaks}{an object of \link[GenomicRanges]{GRanges} consists of all merged overlapping peaks}
+  \item{peaksInMergedPeaks}{an object of \link[GenomicRanges]{GRanges} consists of all peaks in each samples involved in the overlapping peaks}
   \item{overlappingPeaks}{a list of data frame consists of the annotation of all the overlapped peaks}
   \item{all.peaks}{a list of GRanges object which contain the input peaks with formated rownames.}
 }
