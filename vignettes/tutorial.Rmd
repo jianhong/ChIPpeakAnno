@@ -59,6 +59,7 @@ You run this job on the linux cluster(pegasus)
 
 ```{bash eval=FALSE}
 
+
 sh ~/R/lib64/R/library/ChipSeq/bin/BashRun.sh /projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/ /scratch/projects/bbc/aiminy_project/ "Hs" 
 
 #To check output 
