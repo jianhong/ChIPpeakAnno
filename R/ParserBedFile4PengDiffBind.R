@@ -19,6 +19,7 @@
 #' save.image(file=paste0(out.dir.name,"re_save_peng.RData"))
 #' savehistory(file=paste0(out.dir.name,"re_save_peng.Rhistory"))
 #'
+
 ParserBedFile4PengDiffBind<-function(dir.name,input.file.pattern,out.dir.name){
 
   file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
@@ -35,19 +36,19 @@ ParserBedFile4PengDiffBind<-function(dir.name,input.file.pattern,out.dir.name){
   names(file.name.3)=sample.name
 
 
-  test <- dba.peakset(NULL,peaks="/media/H_driver/2016/Yang/Test/A.bed",
-                      peak.caller="bed", sampID="A",tissue="brain",
-                      factor="ER",condition="A",replicate=1)
-
-  test <- dba.peakset(test,peaks="/media/H_driver/2016/Yang/Test/B.bed",
-                      peak.caller="bed", sampID="B",tissue="brain",
-                      factor="ER",condition="B",replicate=1)
-
-  test<-dba.peakset(test,consensus=DBA_FACTOR, minOverlap=2)
-
-  test.OL <- dba.overlap(test,test$masks$Consensus)
-
-  dba.plotVenn(test,c(1,2))
+  # test <- dba.peakset(NULL,peaks="/media/H_driver/2016/Yang/Test/A.bed",
+  #                     peak.caller="bed", sampID="A",tissue="brain",
+  #                     factor="ER",condition="A",replicate=1)
+  # 
+  # test <- dba.peakset(test,peaks="/media/H_driver/2016/Yang/Test/B.bed",
+  #                     peak.caller="bed", sampID="B",tissue="brain",
+  #                     factor="ER",condition="B",replicate=1)
+  # 
+  # test<-dba.peakset(test,consensus=DBA_FACTOR, minOverlap=2)
+  # 
+  # test.OL <- dba.overlap(test,test$masks$Consensus)
+  # 
+  # dba.plotVenn(test,c(1,2))
 
 
   mcf7 <- dba.peakset(NULL,peaks=file.name.3[[1]],
