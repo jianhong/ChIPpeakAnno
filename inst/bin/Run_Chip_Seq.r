@@ -9,8 +9,6 @@ if (length(args)==0) {
 } else if (length(args)>1) {
 
 input.file.dir=args[1]
-#index.file=args[2]
-#input.file.pattern=args[3]
 out.file.dir=args[2]
 genome=args[3]
 }
