@@ -1,0 +1,75 @@
+#!/usr/bin/Rscript
+
+#Usage: 
+
+#Rscript  Rscript ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
+
+  cat("Do you want to perform peak calling, annotation, and coverage visualization?\n")
+  
+  input<-file('stdin', 'r')
+  row <- readLines(input, n=1)
+  
+  print(row)
+  
+  if(row=="Yes") {
+    
+    cat("please defne the input file directory:\n")
+    
+    input<-file('stdin', 'r')
+    input.file.dir <- readLines(input, n=1)
+    
+    #input.file.dir=row
+    
+    cat("please defne the output file directory:\n")
+    
+    input<-file('stdin', 'r')
+    output.file.dir <- readLines(input, n=1)
+    
+    #out.file.dir=row
+    
+    cat("please defne genome name:\n")
+    
+    input<-file('stdin', 'r')
+    genome <- readLines(input, n=1)
+    
+    R_lib=.libPaths()[1]
+    
+    cmd1="bsub -P bbc -J \"RunR\" -o %J.RunR.log -e %J.RunR.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
+    cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Chip_Seq.r ",input.file.dir," ",output.file.dir," ",genome)
+    
+    system(paste0(cmd1," ",cmd2))
+    
+#    cmd2=paste0()
+
+#    system(cmd2)
+    
+    cat("Finished peak calling, annotation, and coverage visualizatio...\n")
+    
+  }else{
+    
+    cat("Do you want to perform peak merge, overlap, produing Venn diagram?\n")
+    
+    input<-file('stdin', 'r')
+    row <- readLines(input, n=1)
+    
+    if(row=="Yes") {
+      
+      cat("please defne the input file directory for bed files:\n")
+      
+      input<-file('stdin', 'r')
+      dir.name <- readLines(input, n=1)
+      
+      cat("please defne the input file pattern:\n")
+      input<-file('stdin', 'r')
+      input.file.pattern <- readLines(input, n=1)
+      
+      cat("please defne the output file directory:\n")
+      input<-file('stdin', 'r')
+      out.dir.name <- readLines(input, n=1)
+      ParserBedFile4PengDiffBind(dir.name,input.file.pattern,out.dir.name)
+      
+      cat("Finished peak merge, overlap, produing Venn diagram?\n")
+    }else
+    {quit()}
+    
+  }
