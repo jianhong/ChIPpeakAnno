@@ -30,7 +30,8 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
   connectedPeaks <- match.arg(connectedPeaks)
   if(any(duplicated(names)))
     stop("Same input Peaks detected!")
-  
+  PeaksList<-lapply(PeaksList, trimPeakList, by="region", 
+                    ignore.strand=ignore.strand, keepMetadata=TRUE)
   venn_cnt <- 
     vennCounts(PeaksList, n=n, names=names, 
                maxgap=maxgap, minoverlap=minoverlap, by="region",
