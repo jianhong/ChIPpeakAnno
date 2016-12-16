@@ -23,7 +23,7 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
   
   file.name.2<-as.list(file.name)
 
-  file.name.3<-lapply(1:length(file.name.2),function(u,file.name.2){
+  file.name.3<-lapply(1:length(file.name.2),function(u,input.file.type,file.name.2){
     
     tmp=file.name.2
     
@@ -38,7 +38,7 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
     {re<-NULL}
     re
     
-  },file.name.2)
+  },input.file.type,file.name.2)
 
   file.name.4<-file.name.3[lapply(file.name.3, length) > 0]
 
