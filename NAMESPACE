@@ -1,5 +1,6 @@
 import(ChIPpeakAnno)
 import(DiffBind)
+import(LOLA)
 
 importFrom(tools,file_ext)
 
@@ -9,6 +10,7 @@ export(PeakCallAndAnnotation)
 export(BamFileSortIndexVisualization)
 export(ParserReadFiles)
 export(GetSampleInfo)
+export(GetResultsFromDiffBind)
 
 export(DrawVenn)
 export(InstallRequiredPackage)
