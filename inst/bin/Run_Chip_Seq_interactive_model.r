@@ -54,10 +54,18 @@
     
     if(row=="Yes") {
       
+      cat("please defne the input file for sample information:\n")
+      
+      input<-file('stdin', 'r')
+      input.file.sample <- readLines(input, n=1)
+      
+      cat("Finished to get sample information\n")
+      
+      
       cat("please defne the input file directory for bed files:\n")
       
       input<-file('stdin', 'r')
-      dir.name <- readLines(input, n=1)
+      input.file.dir <- readLines(input, n=1)
       
       cat("please defne the input file pattern:\n")
       input<-file('stdin', 'r')
@@ -65,8 +73,15 @@
       
       cat("please defne the output file directory:\n")
       input<-file('stdin', 'r')
-      out.dir.name <- readLines(input, n=1)
-      ParserBedFile4PengDiffBind(dir.name,input.file.pattern,out.dir.name)
+      output.file.dir <- readLines(input, n=1)
+      
+      R_lib=.libPaths()[1]
+      
+      cmd1="bsub -P bbc -J \"RunR\" -o %J.RunR.log -e %J.RunR.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
+      cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Merge_peak.r ",input.file.dir," ",output.file.dir," ",
+                  input.file.pattern," ",input.file.sample)
+      
+      system(paste0(cmd1," ",cmd2))
       
       cat("Finished peak merge, overlap, produing Venn diagram?\n")
     }else
