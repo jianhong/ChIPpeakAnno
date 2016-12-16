@@ -4,7 +4,8 @@
 \alias{ParserBedFile4PengDiffBind}
 \title{ParserBedFile4PengDiffBind}
 \usage{
-ParserBedFile4PengDiffBind(dir.name, input.file.pattern, out.dir.name)
+ParserBedFile4PengDiffBind(input.sample.file, dir.name, input.file.pattern,
+  out.dir.name)
 }
 \arguments{
 \item{input.file.pattern}{}
