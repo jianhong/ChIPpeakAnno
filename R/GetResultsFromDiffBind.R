@@ -37,7 +37,9 @@ GetResultsFromDiffBind<-function(mcf7,output.file.dir){
   temp$class[1,]<-sampID.v.2
   
   #Check the correlation between peaks
+  png(paste0(output.file.dir,"CorrelationHeatmap.png"))
   dba.plotHeatmap(temp,margin=15)
+  dev.off()
   
   #Merge the replicates of each set
   temp2<-dba.peakset(temp,consensus = -DBA_REPLICATE)
