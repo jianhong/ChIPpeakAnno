@@ -110,7 +110,8 @@ ParserBedFile4PengDiffBind<-function(input.sample.file,dir.name,input.file.patte
   plot(mcf7)
   dev.off()
   
-  
+  GetResultsFromDiffBind(mcf7,paste0(temp3,"/"))
+
   # file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
   # file.name.2<-as.list(file.name)
   # 
