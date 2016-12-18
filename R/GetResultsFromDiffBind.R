@@ -99,7 +99,70 @@ GetResultsFromDiffBind<-function(mcf7,output.file.dir){
     write.table(overlaps.anno,file=paste0(output.file.dir,x_name,"_annotation_2.txt"),row.names = FALSE,quote=FALSE,sep="\t")
   },p.common,dd.hs,output.file.dir)
   
+  
+  overlap1.2<-dba.overlap(temp22,mask=c(1,2))
+  
+  
+  temp22$class[1,1]
+  temp22$class[2,2]
+  
+  count.A=length(overlap1.2$onlyA@ranges@start)
+  count.B=length(overlap1.2$onlyB@ranges@start)
+  count.All=length(overlap1.2$inAll@ranges@start)
+  
+  cat(count.A," ",count.B," ",count.All,"\n")
+  
+  .Weight<-c(0,count.A,count.B,count.All)
+  A=c(0,1,0,1)
+  B=c(0,0,1,1)
+  tt<-as.matrix(cbind(A,B,.Weight))
+  
+  row.names(tt)=c("00","10","01","11")
+  colnames(tt)[1:2]=c(temp22$class[1,1],temp22$class[1,2])
+  
+  Vstem.test <- Venn()
+  Vstem.test@IndicatorWeight<-tt
+  Cstem3.test <- compute.Venn(Vstem.test,doWeights=TRUE)
+  c.3.set=sum(Cstem3.test@IndicatorWeight[,3])
+  Cstem3.test@IndicatorWeight[which(row.names(Cstem3.test@IndicatorWeight)=="00"),3]=6000-c.3.set
+  
+  #SetLabels <- VennGetSetLabels(Cstem3.test)
+  #FaceLabels <- VennGetFaceLabels(Cstem3.test)
+  
+  UseFisher <- function(temp.ct,index.A,index.B,totalN) {
+    total.peaks=totalN
+    A=sum(temp.ct[which(temp.ct[,index.A]==1&temp.ct[,index.B]==1),3])
+    B=sum(temp.ct[which(temp.ct[,index.A]==1&temp.ct[,index.B]==0),3])
+    C=sum(temp.ct[which(temp.ct[,index.A]==0&temp.ct[,index.B]==1),3])
+    D=total.peaks-(A+B+C)
+    ctb<-matrix(c(A,B,C,D),nrow = 2,dimnames =list(c("In", "Not"),c("In", "Not")))
+    
+    #re<-fisher.test(ctb)
+    print(ctb)
+    re.fisher<-fisher.test(ctb, alternative='greater')[c("p.value","estimate")]
+    re.fisher
+  }
+  
+  index.A<-grep(temp22$class[1,1],colnames(tt))
+  index.B<-grep(temp22$class[1,2],colnames(tt))
+  tempRe<-UseFisher(tt,index.A,index.B,6000)
+  
+  cat(tempRe$p.value," ",tempRe$estimate)
+  
+  #Visualization of peak sets overlapping using Area-Proportional Venn diagrams
+  
+  png(paste0(output.file.dir,"APVenn.png"))
+  
+  plot(Cstem3.test)
+  x <- 0.35
+  y <- 0.15
+  rot <- 0
+  grid.text(paste0("fisher.test p value: ",tempRe$p.value), x=x, y=y, rot=rot,gp=gpar(fontsize=15, col="blue"))
 
+  dev.off()
+  
+  #Vstem.test@IndicatorWeight<-Vstem@IndicatorWeight
+  #Vstem.test@IntersectionSets<-Vstem.test@IntersectionSets
   # temp3<-dba.peakset(temp2,bRetrieve = TRUE)
   # temp.no.replicate<-dba(dba.peakset(temp2,c(9,16),bRetrieve=TRUE,DataTyp=DBA_DATA_FRAME))
   # temp.replicate<-dba.peakset(temp2,17:23,bRetrieve=TRUE,DataTyp=DBA_DATA_FRAME)
