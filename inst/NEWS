@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.9.7
+-------------------------
+    o fix the bug of findOverlapsOfPeaks when the peaks are exactly same
+
 CHANGES IN VERSION 3.9.6
 -------------------------
     o fix the bug of findOverlapsOfPeaks when there is no peak names for peaklist

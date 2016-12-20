@@ -118,7 +118,8 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
     correlation <- correlation[correlation[,"shortestDistance"]<maxgap | 
                                  correlation[,"overlapFeature"] %in% 
                                  c("includeFeature", "inside",
-                                   "overlapEnd", "overlapStart"),]
+                                   "overlapEnd", "overlapStart",
+                                   "overlap"),]
   }, simplify = FALSE)
   PeaksList <- sapply(PeaksList, trimPeakList, by="region",
                       ignore.strand=ignore.strand,
