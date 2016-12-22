@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.9.8
+-------------------------
+    o update the colnames of toGRanges
+    
 CHANGES IN VERSION 3.9.7
 -------------------------
     o fix the bug of findOverlapsOfPeaks when the peaks are exactly same
