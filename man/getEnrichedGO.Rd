@@ -8,8 +8,13 @@
   (phyper) and  multtest package for adjusting p-values
 }
 \usage{
-getEnrichedGO(annotatedPeak, orgAnn, feature_id_type="ensembl_gene_id", 
-maxP=0.01, minGOterm=10, multiAdjMethod=NULL, condense=FALSE)
+getEnrichedGO(annotatedPeak, orgAnn, 
+              feature_id_type="ensembl_gene_id", 
+              maxP=0.01,
+              minGOterm=10, multiAdjMethod=NULL,
+              condense=FALSE,
+              removeAncestorByPval=NULL,
+              keepByLevel=NULL)
 }
 \arguments{
   \item{annotatedPeak}{A GRanges object or a vector of feature IDs}
@@ -23,7 +28,16 @@ maxP=0.01, minGOterm=10, multiAdjMethod=NULL, condense=FALSE)
   \item{multiAdjMethod}{ The multiple testing procedures, for details, see 
   mt.rawp2adjp in multtest package}
   \item{condense}{
-    condense the results or not.
+    Condense the results or not.
+  }
+  \item{removeAncestorByPval}{
+    Remove ancestor by p-value. P-value is calculated by fisher exact test. If 
+    gene number in all of the children is significant greater than it in parent
+    term, the parent term will be removed from the list.
+  }
+  \item{keepByLevel}{
+    If the shortest path from the go term to 'all' is greater than the 
+    given level, the term will be removed.
   }
 }
 \value{

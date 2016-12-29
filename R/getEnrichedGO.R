@@ -2,7 +2,9 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                           feature_id_type="ensembl_gene_id", 
                           maxP=0.01,
                           minGOterm=10, multiAdjMethod=NULL,
-                          condense=FALSE){    
+                          condense=FALSE,
+                          removeAncestorByPval=NULL,
+                          keepByLevel=NULL){    
     if (missing(annotatedPeak))
     {
         stop("Missing required argument annotatedPeak!")    
@@ -291,5 +293,24 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     mf.selected = merge(mf.selected1, mf.go.this.withEntrez)
     cc.selected = merge(cc.selected1, cc.go.this.withEntrez)
     
+    if(length(removeAncestorByPval)>0){
+      if(is.numeric(removeAncestorByPval[1]) || 
+         is.integer(removeAncestorByPval[1])){
+        bp.selected <- removeAncestor(bp.selected, onto="BP", 
+                                      cutoffPvalue=removeAncestorByPval)
+        mf.selected <- removeAncestor(mf.selected, onto="MF", 
+                                      cutoffPvalue=removeAncestorByPval)
+        cc.selected <- removeAncestor(cc.selected, onto="CC", 
+                                      cutoffPvalue=removeAncestorByPval)
+      }
+    }
+    
+    if(length(keepByLevel)>0){
+      if(is.numeric(keepByLevel[1]) || is.integer(keepByLevel[1])){
+        bp.selected <- filterByLevel(bp.selected, onto="BP", level=keepByLevel)
+        mf.selected <- filterByLevel(mf.selected, onto="MF", level=keepByLevel)
+        cc.selected <- filterByLevel(cc.selected, onto="CC", level=keepByLevel)
+      }
+    }
     list(bp=bp.selected, mf=mf.selected, cc=cc.selected)
 }

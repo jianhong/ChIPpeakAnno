@@ -70,7 +70,7 @@ The values could be any conbinations of "Promoters", "immediateDownstream",
   \item{TxDb}{an object of \code{\link[GenomicFeatures]{TxDb}}}
 }
 \value{
-A list of two named vectors: percentage and jacard (Jacard Index). The 
+A list of two named vectors: percentage and jaccard (Jaccard Index). The 
 information in the vectors:  
  \item{\code{Exons}}{Percent or the picard index of the peaks resided in 
  exon regions.}

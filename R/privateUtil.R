@@ -556,3 +556,56 @@ EnsDb2GR <- function(ranges, feature){
     seqlevelsStyle(gr) <- "UCSC"
     return(gr)
 }
+
+removeAncestor <- function(goenrichments, onto, cutoffPvalue){
+  stopifnot(colnames(goenrichments)[1] %in% c("go.id")) ## confirm the result is from getEnrichedGO
+  stopifnot(onto %in% c("BP", "MF", "CC"))
+  if(nrow(goenrichments)<2){
+    return(goenrichments)
+  }
+  offsprings <- mget(as.character(goenrichments$go.id), 
+                     get(paste0("GO", onto, "CHILDREN")),
+                     ifnotfound = NA)
+  offsprings <- lapply(offsprings, function(.ele){
+    .ele <- .ele[!is.na(.ele)]
+    .ele[.ele %in% as.character(goenrichments$go.id)]
+  })
+  keep <- mapply(function(.ele, offspring){
+    if(length(offspring)<1){
+      return(TRUE)
+    }
+    all(sapply(offspring, function(.e){
+      cnt <- goenrichments[goenrichments$go.id %in% c(.ele, .e), 
+                           c("count.InDataset", "count.InGenome")]
+      cnt[, 2] <- cnt[, 2] - cnt[, 1]
+      fisher.test(cnt, alternative = "less")$p.value < cutoffPvalue
+    }))
+  }, names(offsprings), offsprings)
+  goenrichments[keep, , drop=FALSE]
+}
+
+getGOLevel <- function(goid, onto, level=0){
+  if(any(goid=="all")){
+    return(level)
+  }
+  parent <- mget(goid, get(paste0("GO", onto, "PARENTS")))
+  parent <- unique(unlist(parent))
+  level <- level + 1
+  if(any(parent=="all")){
+    return(level)
+  }else{
+    return(getGOLevel(parent, onto, level))
+  }
+}
+
+filterByLevel <- function(goenrichments, onto, level=4){
+  if(level<2){
+    warning("keepByLevel must be a number lager than 1.
+            Not used parameter keepByLevel")
+    return(goenrichments)
+  }
+  stopifnot(colnames(goenrichments)[1] %in% c("go.id")) ## confirm the result is from getEnrichedGO
+  stopifnot(onto %in% c("BP", "MF", "CC"))
+  levels <- sapply(as.character(goenrichments$go.id), getGOLevel, onto=onto)
+  goenrichments[levels <= level, , drop=FALSE]
+}
