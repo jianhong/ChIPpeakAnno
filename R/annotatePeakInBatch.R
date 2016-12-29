@@ -452,6 +452,8 @@ annotatePeakInBatch <-
                           "oid")){
                 mcols(myPeakList.NA)[, ncol] <- NA
             }
+            ## in case duplicated colnames
+            colnames(mcols(myPeakList.NA)) <- colnames(mcols(myPeakList.Hit))
             myPeakList <- c(myPeakList.Hit, myPeakList.NA)
         }else{
             myPeakList <- myPeakList.Hit
