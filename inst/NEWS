@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.9.10
+-------------------------
+    o fix the bug of featureAlignedSignal when there are seqnames in featues but
+    not in cvglists.
+
 CHANGES IN VERSION 3.9.9
 -------------------------
     o add 2 more parameters to getEnrichedGO

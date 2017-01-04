@@ -55,15 +55,27 @@ featureAlignedSignal <- function(cvglists, feature.gr,
         .gr
         })
     seqn <- names(grL)
+    trimChar <- function(x, width){
+      len <- nchar(x)
+      if(len <= width) return(x)
+      return(paste0(strtrim(x, width=width), "..."))
+    }
     cov <- lapply(cvglists, function(.dat){
-        .dat <- .dat[seqn]
-        .dat.eleLen <- elementNROWS(.dat)
-        if(any(.dat.eleLen==0)){
-            warning(paste(names(.dat)[.dat.eleLen], collapse=", "), 
-                    " is not in cvglists. seqlevels of cvglist is ", 
-                    names(.dat))
-            .dat <- .dat[.dat.eleLen!=0]
-        }
+      .dat <- .dat[seqn[seqn %in% names(.dat)]]
+      if(length(.dat)!=length(seqn)){
+        warning(paste(seqn[!seqn %in% names(.dat)], collapse=", "), 
+                ifelse(length(seqn[!seqn %in% names(.dat)])>1, " are", " is"), 
+                " not in cvglists. seqlevels of cvglist are ", 
+                trimChar(paste(names(.dat), collapse=", "), width=60))
+      }
+      .dat.eleLen <- elementNROWS(.dat)
+      if(any(.dat.eleLen==0)){
+        warning(paste(names(.dat)[.dat.eleLen==0], collapse=", "), 
+                ifelse(length(names(.dat)[.dat.eleLen==0])>1, " are", " is"),
+                " is not in cvglists. seqlevels of cvglist are ", 
+                trimChar(paste(names(.dat), collapse=", "), width=60))
+        .dat <- .dat[.dat.eleLen!=0]
+      }
         warn <- sapply(.dat, function(.ele){
             any(is.na(runValue(.ele)))
         })
