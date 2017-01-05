@@ -18,7 +18,8 @@ featureAlignedSignal(cvglists, feature.gr,
   \item{feature.gr}{
     An object of \link[GenomicRanges]{GRanges} with identical width.
   }
-  \item{upstream, downstream}{upstream or dwonstream from the feature.gr.}
+  \item{upstream, downstream}{Set the feature.gr to upstream and dwonstream 
+  from the center of the feature.gr if they are set.}
   \item{n.tile}{The number of tiles to generate for each element of feature.gr, 
     default is 100}
   \item{...}{Not used.}
@@ -39,6 +40,6 @@ featureAlignedSignal(cvglists, feature.gr,
                    B=RleList(chr1=Rle(sample.int(5000, 100), 
                                       sample.int(300, 100))))
   feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
-  featureAlignedSignal(cvglists, feature.gr, zeroAt=50, type="l")
+  featureAlignedSignal(cvglists, feature.gr)
 }
 \keyword{ misc }
