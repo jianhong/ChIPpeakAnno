@@ -12,6 +12,9 @@
 #' 
 #' data(mcf7)
 #' output.file.dir="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
+#' 
+#' output.file.dir="/Users/axy148/Aimin_project/Danny/"
+#' 
 #' GetResultsFromDiffBind(mcf7,output.file.dir)
 #' 
 #' 
@@ -33,9 +36,10 @@ GetResultsFromDiffBind<-function(mcf7,output.file.dir){
   #sampID.v.2<-substr(sampID.v,27,nchar(sampID.v)-3)
  
   colnames(temp$class)<-sampID.v.2
-  colnames(temp$class)<-sampID.v.2
+  #colnames(temp$class)<-sampID.v.2
   temp$class[1,]<-sampID.v.2
   
+
   #Check the correlation between peaks
   png(paste0(output.file.dir,"CorrelationHeatmap.png"))
   dba.plotHeatmap(temp,margin=15)
@@ -88,15 +92,81 @@ GetResultsFromDiffBind<-function(mcf7,output.file.dir){
   library(EnsDb.Hsapiens.v75)
   dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
   
+  
+  #Tx <- transcripts(EnsDb.Hsapiens.v75)
+  #dddd.hs<-Tx    # can not match
+
+  # annotate each peak to genes
+  
+  n.peaks<-length(temp$peaks)
+  lapply(1:n.peaks,function(u,temp,dd.hs,output.file.dir){
+    x_name=colnames(temp$class)[u]
+    x=toGRanges(temp$peaks[[u]])
+    
+    seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
+    seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
+    re.out.trimmed<-trim(x, use.names=TRUE)
+    overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
+    
+    write.table(overlaps.anno,file=paste0(output.file.dir,x_name,"_annotation_3_tr.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+  },temp,dd.hs,output.file.dir)
+  
+  if(!dir.exists(paste0(output.file.dir,"ucsc/")))
+  {
+  dir.create(paste0(output.file.dir,"ucsc/"))
+  }
+  
+  if(!dir.exists(paste0(output.file.dir,"igv/")))
+  {
+  dir.create(paste0(output.file.dir,"igv/"))
+  }
+  
+  #annotate common peaks
   lapply(1:length(p.common),function(u,p.common,dd.hs,output.file.dir){
     x=p.common[[u]]
+    
     x_name=names(p.common)[u]
     seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
     seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
     re.out.trimmed<-trim(x, use.names=TRUE)
     overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
     
-    write.table(overlaps.anno,file=paste0(output.file.dir,x_name,"_annotation_2.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+    df <- data.frame(seqnames=seqnames(x),
+                     #starts=start(x)-1,
+                     starts=start(x),
+                     ends=end(x),
+                     names=c(rep(".", length(x))),
+                     scores=elementMetadata(x)[,1],
+                     strands=strand(x))
+    
+    #assign strand 
+    df.str <- data.frame(seqnames=seqnames(x),
+                     #starts=start(x)-1,
+                     starts=start(x),
+                     ends=end(x),
+                     names=c(rep(".", length(x))),
+                     scores=elementMetadata(x)[,1],
+                     strands=c(rep(".", length(x))))
+    
+    df.str.1<-df.str[-grep("random",df.str$seqnames),]
+  
+    #df.str.2<-df.str.1[-which(as.character(df.str.1$starts)=="-1"),]
+    
+    df.str.2<-df.str.1
+    
+    df.str.3<-df.str.2[-grep("chrUn",df.str.2$seqnames),]
+    
+    write.table(df,file=paste0(output.file.dir,x_name,"_cp_with_header.bed"),col.names=TRUE,row.names = FALSE,quote=FALSE,sep="\t")
+    
+    write.table(df.str.3,file=paste0(paste0(output.file.dir,"/","ucsc/"),x_name,"_4_ucsc.bed"),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    
+    write.table(df,file=paste0(output.file.dir,x_name,"_common_peaks.bed"),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    
+    write.table(df,file=paste0(paste0(output.file.dir,"/","igv/"),x_name,"_4_igv.bed"),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    
+    #write.table(x,file=paste0(output.file.dir,x_name,"_common_peaks.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+    
+    write.table(overlaps.anno,file=paste0(output.file.dir,x_name,"_annotation_2_tr.txt"),row.names = FALSE,quote=FALSE,sep="\t")
   },p.common,dd.hs,output.file.dir)
   
   
