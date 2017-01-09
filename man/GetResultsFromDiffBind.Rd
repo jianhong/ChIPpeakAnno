@@ -20,6 +20,9 @@ GetResultsFromDiffBind
 
 data(mcf7)
 output.file.dir="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
+
+output.file.dir="/Users/axy148/Aimin_project/Danny/"
+
 GetResultsFromDiffBind(mcf7,output.file.dir)
 
 
