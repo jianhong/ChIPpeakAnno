@@ -8,10 +8,10 @@
 #'
 InstallRequiredPackage <- function() {
 
-  #installing
+  #install from bioc
+  
   source("http://bioconductor.org/biocLite.R")
   biocLite("GenomicRanges")
-  devtools::install_github("nsheff/LOLA")
   biocLite("ChIPseeker")
   biocLite("regioneR")
   biocLite("DiffBind")
@@ -28,6 +28,11 @@ InstallRequiredPackage <- function() {
   biocLite("EnsDb.Mmusculus.v79")
   biocLite("BSgenome.Mmusculus.UCSC.mm10")
   biocLite("org.Mm.eg.db")
+  
+  #install from git
+  devtools::install_github("nsheff/LOLA")
+  
+  
   #loading
   library(BiocInstaller)
   library(BiocInstaller)
