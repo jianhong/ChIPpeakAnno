@@ -6,7 +6,7 @@ Authors:Aimin Yan
 Maintainer: Aimin Yan <jlfmssm@gmail.com>
 Depends: R (>= 3.3.0)
 Description: ChipSeq is used to perform chipseq analysis in one step.
-Imports:ChIPpeakAnno,DiffBind,LOLA,knitr
+Imports:ChIPseeker,ChIPpeakAnno,DiffBind,LOLA,Vennerable,TxDb.Hsapiens.UCSC.hg19.knownGene,grid,gtools
 Suggests: testthat,knitr,rmarkdown
 VignetteBuilder: knitr
 License: LGPL(>=2)
