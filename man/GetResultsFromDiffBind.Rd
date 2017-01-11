@@ -6,7 +6,8 @@
  
  Use DiffBind to process peak profiles}
 \usage{
-GetResultsFromDiffBind(mcf7, output.file.dir)
+GetResultsFromDiffBind(mcf7, Mergereplicates = c("yes", "no"),
+  output.file.dir)
 }
 \arguments{
 \item{output.file.dir}{}
@@ -23,7 +24,7 @@ output.file.dir="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
 
 output.file.dir="/Users/axy148/Aimin_project/Danny/"
 
-GetResultsFromDiffBind(mcf7,output.file.dir)
+re<-GetResultsFromDiffBind(mcf7,"no",output.file.dir)
 
 
 }

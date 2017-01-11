@@ -26,6 +26,13 @@
 #' out.dir.name="/Users/axy148/Aimin_project/Danny/"
 #' DD=5000
 #' 
+#' 
+#' dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/common_peaks_bed/"
+#' 
+#' input.file.pattern="bed"
+#' 
+#' out.dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
+#' DD=5000
 #' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
 #' 
 #'
