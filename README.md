@@ -2,6 +2,12 @@
 
 ```{r eval=TRUE}
 #In R console
+# you need to have devtools
+# it is ideal to have R installed in your directory:
+# For example: 
+#> .libPaths()
+#[1] "/nethome/axy148/R/lib64/R/library"
+
 library(devtools)
 install_github("aiminy/ChipSeq")
 
