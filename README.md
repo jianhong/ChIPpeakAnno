@@ -9,7 +9,7 @@
 #[1] "/nethome/axy148/R/lib64/R/library"
 
 library(devtools)
-install_github("aiminy/ChipSeq")
+install_github("aiminy/ChipSeq",dependencies = T , force = T)
 
 #If you use command line in pegasus terminal
 R -e 'library(devtools);install_github("aiminy/ChipSeq")'
