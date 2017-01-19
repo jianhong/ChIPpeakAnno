@@ -30,7 +30,7 @@ R -e 'library(devtools);install_github("aiminy/ChipSeq")'
 Rscript ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
 ```
 
-# Download source, then install
+## Download source, then install
 ```{r eval=FALSE}
 
 #To download
@@ -50,7 +50,7 @@ R -e 'install.packages("knitr", dependencies = TRUE,repos = "http://cran.rstudio
 R CMD INSTALL ChipSeq_0.0.1.tar.gz -l ~/R/lib64/R/library/
 ```
 
-##Peak Call and Annotation
+#Peak Call and Annotation
 ```{r eval=FALSE}
 
 input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
@@ -61,7 +61,7 @@ library(ChipSeq)
 PeakCallAndAnnotation(input.file.dir,output.file.dir,genome)
 ```
 
-##Bam files sorting, index and Visualization
+#Bam files sorting, index and Visualization
 
 + Run ChipSeq to perform one-setp analysis for ChipSeq related data 
 
@@ -74,7 +74,7 @@ BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
  
 ```
 
-## Perform the above steps in one streamlined procedure
+# Perform the above steps in one streamlined procedure
 
 You run this job on the linux cluster(pegasus)
 
