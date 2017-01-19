@@ -8,8 +8,6 @@ Install the following softares firstly:
 
 2. MACS(https://github.com/taoliu/MACS)
 
-3. ChipSeq(https://github.com/aiminy/ChipSeq)
-
 #Install ChipSeq
 
 ## install from github directly
