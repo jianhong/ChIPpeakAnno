@@ -77,7 +77,7 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
   txdb<-match.arg(txdb)
     
     switch (txdb,
-            splicing = {
+            hg38 = {
               cat("Use hg38\n")
                txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
             },
