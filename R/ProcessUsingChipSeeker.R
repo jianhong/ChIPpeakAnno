@@ -5,6 +5,7 @@
 #' @param dir.name: path for bed files
 #' @param input.file.pattern : input file pattern
 #' @param out.dir.name output file directory
+#' @param txdb Annotation databased to be used("hg19","hg38")
 #' @param DD distance definition around TSS
 #' 
 #' @return
@@ -17,6 +18,7 @@
 #' dir.name="/Users/axy148/Aimin_project/Danny/bed/"
 #' input.file.pattern="bed"
 #' out.dir.name="/Users/axy148/Aimin_project/Danny/"
+#' txdb="hg19"
 #' DD=5000
 #' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
 #' 
@@ -33,10 +35,10 @@
 #' 
 #' out.dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
 #' DD=5000
-#' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
+#' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD)
 #' 
 #'
-AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,DD) {
+AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD) {
 
   re<-ParserReadFiles(dir.name,input.file.pattern,out.dir.name)
   
@@ -71,7 +73,20 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,DD
   # data("tagMatrixList")
   # tagMatrix <- tagMatrixList[[4]]
   # 
-   txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+  
+  txdb<-match.arg(txdb)
+    
+    switch (txdb,
+            splicing = {
+              cat("Use hg38\n")
+               txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+            },
+            {
+              cat("Use hg19\n") 
+              txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+            }
+           )
+  
   # 
   # tagHeatmap(tagMatrix, xlim=c(-3000, 3000), color="red")
   # 
