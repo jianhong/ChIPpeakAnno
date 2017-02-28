@@ -19,7 +19,6 @@ oligoFrequency <- function(sequence, MarkovOrder=3L, last=1e6){
     }else{
         seqInOne <- tolower(paste0(sequence, collapse="NNN"))
     }
-    seqInOne <- gsub("N", "", seqInOne)
     if(nchar(seqInOne)>last){
         message("The size of input sequence is too big! ",
                 "Only subset is uesed for frequency calculation.")
