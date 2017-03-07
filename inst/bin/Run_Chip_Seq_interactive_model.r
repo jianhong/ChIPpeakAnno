@@ -45,7 +45,8 @@
     
     cat("Finished peak calling, annotation, and coverage visualizatio...\n")
     
-  }else{
+  }else if( row =="No")
+    {
     
     cat("Do you want to perform peak merge, overlap, produing Venn diagram?\n")
     
@@ -84,7 +85,8 @@
       system(paste0(cmd1," ",cmd2))
       
       cat("Finished peak merge, overlap, produing Venn diagram?\n")
-    }else{
+    }else if(row == "No") 
+      {
       
       cat("Do you want to perform  Bam files sorting, index and Visualization?\n")
       
@@ -120,7 +122,6 @@
         
         cat("Finished Bam files sorting, index and Visualization ?\n")
       
-    }else
-      {quit()}
-    
+    }else{quit()}
+    }
   }
