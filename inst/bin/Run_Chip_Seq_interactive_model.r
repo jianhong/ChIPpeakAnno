@@ -100,14 +100,14 @@
         cat("please defne the input file directory for Bam files:\n")
         
         input<-file('stdin', 'r')
-        input.file.sample <- readLines(input, n=1)
+        input.file.dir <- readLines(input, n=1)
         
         cat("Finished to get bam files\n")
         
         cat("please defne the out file directory:\n")
         
         input<-file('stdin', 'r')
-        input.file.dir <- readLines(input, n=1)
+        output.file.dir <- readLines(input, n=1)
         
         cat("please defne genome:(example: Hs) \n")
         
