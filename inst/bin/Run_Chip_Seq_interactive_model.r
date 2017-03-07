@@ -4,6 +4,8 @@
 
 #Rscript  Rscript ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
 
+   R_lib=.libPaths()[1]
+  
   cat("Do you want to perform peak calling, annotation, and coverage visualization?\n")
   
   input<-file('stdin', 'r')
@@ -32,7 +34,7 @@
     input<-file('stdin', 'r')
     genome <- readLines(input, n=1)
     
-    R_lib=.libPaths()[1]
+   
     
     cmd1="bsub -P bbc -J \"RunR\" -o %J.RunR.log -e %J.RunR.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
     cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Chip_Seq.r ",input.file.dir," ",output.file.dir," ",genome)
@@ -107,8 +109,8 @@
         input<-file('stdin', 'r')
         input.file.dir <- readLines(input, n=1)
         
-        cat("please defne genome:\n")
-        cat("For example: Hs")
+        cat("please defne genome:(example: Hs) \n")
+        
         
         input<-file('stdin', 'r')
         genomeID <- readLines(input, n=1)
