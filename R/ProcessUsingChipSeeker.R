@@ -28,14 +28,12 @@
 #' 
 #' 
 #' dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/common_peaks_bed/"
-#' 
 #' input.file.pattern="bed"
-#' 
 #' out.dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
 #' DD=5000
 #' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
 #' 
-#'
+
 AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,DD) {
 
   re<-ParserReadFiles(dir.name,input.file.pattern,out.dir.name)
@@ -108,6 +106,8 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,DD
      #unmapped.peaks.part<-as.data.frame(matrix(rep("NA",dim(unmapped.peaks)[1]*14),dim(unmapped.peaks)[1],14))
      
      #unmapped.peaks.2<-cbind(unmapped.peaks,unmapped.peaks.part)
+     
+     print(colnames(peaks.anno))
      
      colnames(unmapped.peaks)=colnames(peaks.anno)[1:6]
      
