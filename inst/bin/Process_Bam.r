@@ -9,7 +9,7 @@ if (length(args)==0) {
 } else if (length(args)>1) {
 
 input.file.dir=args[1]
-out.file.dir=args[2]
+output.file.dir=args[2]
 genome=args[3]
 }
 
