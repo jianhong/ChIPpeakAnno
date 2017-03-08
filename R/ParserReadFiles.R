@@ -31,13 +31,15 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
     path_name=dirname(x)
     file_name=basename(x)
     
-    if(file_ext(file_name)==input.file.type){
+    n <- length(grep(input.file.type,file_name))
+    
+    #if(file_ext(file_name)==input.file.type)
+    if(n == 1) {
     re<-paste0(path_name,"/",file_name)
     #names(re)[u]<-file_name
     }else
     {re<-NULL}
     re
-    
   },input.file.type,file.name.2)
 
   file.name.4<-file.name.3[lapply(file.name.3, length) > 0]
@@ -49,7 +51,6 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
     file_name=basename(x)
     file_name
   },file.name.4))
-  
   
   #print(file.name.4)
   
