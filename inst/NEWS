@@ -1,3 +1,7 @@
+CHANGES IN VERSION 3.9.13
+-------------------------
+    o add new function cumulativePercentage.
+    
 CHANGES IN VERSION 3.9.12
 -------------------------
     o remove unused code in oligoSummary.

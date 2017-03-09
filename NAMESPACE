@@ -55,6 +55,7 @@ export(
        condenseMatrixByColnames, 
        convert2EntrezID,
        countPatternInSeqs,
+       cumulativePercentage,
        egOrgMap,
        estFragmentLength,
        estLibSize,
