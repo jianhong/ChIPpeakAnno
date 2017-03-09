@@ -13,6 +13,7 @@ Install the following softares firstly:
 emacs .bashrc
 
 export PATH=/nethome/axy148/MACS-1.4.2-1/bin:$PATH
+
 export PATH=$HOME/NGS_tools/ngsplot/bin:$PATH
 
 source .bashrc
