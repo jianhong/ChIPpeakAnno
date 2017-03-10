@@ -8,6 +8,18 @@ Install the following softares firstly:
 
 2. MACS(https://github.com/taoliu/MACS)
 
+# set Path
+
+emacs .bashrc
+
+export PYTHONPATH=/nethome/axy148/MACS-1.4.2-1/lib/python2.7/site-packages:$PYTHONPATH
+
+export PATH=/nethome/axy148/MACS-1.4.2-1/bin:$PATH
+
+export PATH=$HOME/NGS_tools/ngsplot/bin:$PATH
+
+source .bashrc
+
 #Install ChipSeq
 
 ## install from github directly
@@ -27,8 +39,9 @@ R -e 'library(devtools);install_github("aiminy/ChipSeq")'
 
 ## You can run ChipSeq using interactive model by follwing hints:
 
-Rscript ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
-
+```{bash}
+Rscript /nethome/axy148/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq_interactive_model.r
+```
 # Perform analysis in the streamlined batch model
 
 You run this job on the linux cluster(pegasus)
