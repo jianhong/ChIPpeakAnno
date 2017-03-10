@@ -76,7 +76,7 @@
       genome <- readLines(input, n=1)
       
       cmd1="bsub -P bbc -J \"InputCall\" -o %J.InputCall.log -e %J.InputCall.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
-      cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Chip_Seq.r ",sample.info.file," ",bam.info.file," ",genome)
+      cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/UseInputCall.r ",sample.info.file," ",bam.info.file," ",genome)
       
       system(paste0(cmd1," ",cmd2))
       
