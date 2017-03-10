@@ -20,4 +20,3 @@ PeakCallAndAnnotation(input.file.dir, output.file.dir, genome)
 \description{
 Call peak for bam files using macs14 and perform peak annotation using ChIPpeakAnno
 }
-

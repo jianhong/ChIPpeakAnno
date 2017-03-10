@@ -16,4 +16,3 @@ Title
 dir.name="/media/H_driver/2016/Yang/MACS/MACS/"
 reformatPath(dir.name) 
 }
-

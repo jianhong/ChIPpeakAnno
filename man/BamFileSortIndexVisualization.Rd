@@ -16,4 +16,3 @@ BamFileSortIndexVisualization(input.file.dir, output.file.dir, genome)
 \description{
 BamFileSortIndexVisualization
 }
-

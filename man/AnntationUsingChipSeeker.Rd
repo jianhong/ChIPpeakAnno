@@ -4,12 +4,15 @@
 \alias{AnntationUsingChipSeeker}
 \title{AnntationUsingChipSeeker}
 \usage{
-AnntationUsingChipSeeker(dir.name, input.file.pattern, out.dir.name, DD)
+AnntationUsingChipSeeker(dir.name, input.file.pattern, out.dir.name,
+  txdb = c("hg19", "hg38"), DD)
 }
 \arguments{
 \item{input.file.pattern}{: input file pattern}
 
 \item{out.dir.name}{output file directory}
+
+\item{txdb}{Annotation databased to be used("hg19","hg38")}
 
 \item{DD}{distance definition around TSS}
 
@@ -25,6 +28,7 @@ which.bed.file="/Users/axy148/Aimin_project/Danny/bed"
 dir.name="/Users/axy148/Aimin_project/Danny/bed/"
 input.file.pattern="bed"
 out.dir.name="/Users/axy148/Aimin_project/Danny/"
+txdb="hg19"
 DD=5000
 AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
 
@@ -39,7 +43,6 @@ dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/common_peaks_bed/"
 input.file.pattern="bed"
 out.dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
 DD=5000
-AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,DD)
+AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD)
 
 }
-

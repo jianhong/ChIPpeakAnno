@@ -14,27 +14,34 @@
   print(row)
   
   if(row=="Yes") {
+  
     
-    cat("please defne the input file directory:\n")
+    
+    cat("Do you have input bam file for control ?\n")
+    
+    input<-file('stdin', 'r')
+    row <- readLines(input, n=1)
+    
+    if(row == "No"){
+    
+    cat("please define the input Bam file directory:\n")
     
     input<-file('stdin', 'r')
     input.file.dir <- readLines(input, n=1)
     
     #input.file.dir=row
     
-    cat("please defne the output file directory:\n")
+    cat("please define the output file directory:\n")
     
     input<-file('stdin', 'r')
     output.file.dir <- readLines(input, n=1)
     
     #out.file.dir=row
     
-    cat("please defne genome name:\n")
+    cat("please define genome name:\n")
     
     input<-file('stdin', 'r')
     genome <- readLines(input, n=1)
-    
-   
     
     cmd1="bsub -P bbc -J \"RunR\" -o %J.RunR.log -e %J.RunR.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
     cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Chip_Seq.r ",input.file.dir," ",output.file.dir," ",genome)
@@ -46,6 +53,34 @@
 #    system(cmd2)
     
     cat("Finished peak calling, annotation, and coverage visualizatio...\n")
+    
+    }else if (row == "Yes"){
+    
+      cat("please define the sample information file:\n")
+      
+      input<-file('stdin', 'r')
+      sample.info.file <- readLines(input, n=1)
+      
+      #input.file.dir=row
+      
+      cat("please define the Bam files information file:\n")
+      
+      input<-file('stdin', 'r')
+      bam.info.file <- readLines(input, n=1)
+      
+      #out.file.dir=row
+      
+      cat("please define genome name:\n")
+      
+      input<-file('stdin', 'r')
+      genome <- readLines(input, n=1)
+      
+      cmd1="bsub -P bbc -J \"InputCall\" -o %J.InputCall.log -e %J.InputCall.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
+      cmd2=paste0("Rscript ",R_lib,"/ChipSeq/bin/Run_Chip_Seq.r ",sample.info.file," ",bam.info.file," ",genome)
+      
+      system(paste0(cmd1," ",cmd2))
+      
+      }
     
   }else if( row =="No")
     {

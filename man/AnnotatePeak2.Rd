@@ -33,4 +33,3 @@ AnnotatePeak(input.file.dir,input.file.pattern,7,output.file.dir,genome="Hs")
 
 
 }
-

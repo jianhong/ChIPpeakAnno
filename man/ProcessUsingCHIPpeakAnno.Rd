@@ -20,4 +20,3 @@ output.file.dir="/media/H_driver/2016/Yang/MACS/MACS/"
 ProcessUsingCHIPpeakAnno(input.file.dir,input.file.pattern,output.file.dir)
 
 }
-

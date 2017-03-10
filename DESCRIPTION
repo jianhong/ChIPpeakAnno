@@ -2,14 +2,14 @@ Package: ChipSeq
 Type: Package
 Title: An R Package for Performing ChipSeq Analysis In One Step
 Version: 0.0.1
-Authors:Aimin Yan
+Authors: Aimin Yan
 Maintainer: Aimin Yan <jlfmssm@gmail.com>
 Depends: R (>= 3.3.0)
 Description: ChipSeq is used to perform chipseq analysis in one step.
-Imports:ChIPseeker,ChIPpeakAnno,DiffBind,LOLA,Vennerable,TxDb.Hsapiens.UCSC.hg38.knownGene,
+Imports: ChIPseeker,ChIPpeakAnno,DiffBind,LOLA,Vennerable,TxDb.Hsapiens.UCSC.hg38.knownGene,
         TxDb.Hsapiens.UCSC.hg19.knownGene,grid,gtools
 Suggests: testthat,knitr,rmarkdown
 VignetteBuilder: knitr
 License: LGPL(>=2)
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

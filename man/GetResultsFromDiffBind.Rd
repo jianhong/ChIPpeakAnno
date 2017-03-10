@@ -28,4 +28,3 @@ re<-GetResultsFromDiffBind(mcf7,"no",output.file.dir)
 
 
 }
-

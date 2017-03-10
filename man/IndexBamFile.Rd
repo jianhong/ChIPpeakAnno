@@ -21,4 +21,3 @@ IndexBamFile(input.file.dir, input.file.pattern, index.file, output.file.dir,
 \description{
 IndexBamFile
 }
-

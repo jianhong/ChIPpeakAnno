@@ -22,4 +22,3 @@ testR<-ParserReadFiles(input.file.dir,out.file.dir)
 
 
 }
-
