@@ -106,13 +106,11 @@ GetSampleInfo<- function(input.sample.file,input.bam.file) {
   
 }
 
-
 #' peakcallwithinput
 #' 
 #' @export
 #' @example 
 #' 
-#' output.dir.name="/Users/axy148/ChipSeqtest/"
 #' genome="Hs"
 #' re <- peakcallwithinput(input.sample.file,input.bam.file,genome)
 #' 
@@ -129,7 +127,7 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome) {
   
   temp3=file.path(output.dir.name,"PeakCall")
   
-  dir.create(temp3)
+  if(!dir.exists(temp3)){dir.create(temp3)}
   
   #re.out<-file.name.2
   
@@ -201,9 +199,19 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome) {
      cat(as.character(zzz[u][[1]]),"\n")
      cat("\n")  
      
-     system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
+     #system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
      
    },zzz)
+  
+  
+  re<-list(cellInforun=cellInfo.run,zzz=zzz)
+  
+  #AnntationUsingChipSeeker(temp3,)
+  #dirname("/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/")
+  
+  AnntationUsingChipSeeker(temp3,"peaks.bed",dirname(temp3),DD=5000)
+  
+  return(re)
   
   #AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
   
