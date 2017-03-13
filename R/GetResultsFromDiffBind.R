@@ -154,13 +154,17 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
 
     df.str.3<-df.str.2[-grep("chrUn",df.str.2$seqnames),]
 
-    write.table(df,file=file.path(output.file.dir,"common_peaks_bed",paste0(x_name,"_cp_with_header.bed")),col.names=TRUE,row.names = FALSE,quote=FALSE,sep="\t")
+    write.table(df,file=file.path(output.file.dir,"common_peaks_bed",paste0(x_name,"_cp_with_header.bed")),
+                col.names=TRUE,row.names = FALSE,quote=FALSE,sep="\t")
 
-    write.table(df,file=file.path(output.file.dir,"common_peaks_bed","ucsc",paste0(x_name,"_4_ucsc.bed")),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    write.table(df,file=file.path(output.file.dir,"common_peaks_bed","ucsc",paste0(x_name,"_4_ucsc.bed")),
+                col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
 
-    write.table(df,file=file.path(output.file.dir,"common_peaks_bed",paste0(x_name,"_common_peaks.bed")),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    write.table(df,file=file.path(output.file.dir,"common_peaks_bed",paste0(x_name,"_common_peaks.bed")),
+                col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
 
-    write.table(df,file=file.path(output.file.dir,"common_peaks_bed","igv",paste0(x_name,"_4_igv.bed")),col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
+    write.table(df,file=file.path(output.file.dir,"common_peaks_bed","igv",paste0(x_name,"_4_igv.bed")),
+                col.names=FALSE,row.names = FALSE,quote=FALSE,sep="\t")
 
     },p.common,output.file.dir)
 
