@@ -31,12 +31,12 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
   colnames(temp$class)<-sampID.v.2
   temp$class[1,]<-sampID.v.2
   
-  #Merge the replicates of each set
+  #Merge the replicates of each set 
   if(Mergereplicates=="yes"){
   temp2<-dba.peakset(temp,consensus = -DBA_REPLICATE)
   #temp22<-dba(temp2,mask =c(9,16,17:23))
   
-  ##need to set the flexiable number
+  ##need to set the flexiable number identified from data sets
   temp22<-dba(temp2,mask =c(17:24))
   }else{
     temp22<-temp
