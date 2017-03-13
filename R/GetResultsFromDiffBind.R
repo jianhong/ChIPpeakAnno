@@ -36,7 +36,7 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
   temp2<-dba.peakset(temp,consensus = -DBA_REPLICATE)
   #temp22<-dba(temp2,mask =c(9,16,17:23))
   
-  ##need to set the flexiable number identified from data sets
+  ##need to set the flexiable number identified from data sets gg
   temp22<-dba(temp2,mask =c(17:24))
   }else{
     temp22<-temp
