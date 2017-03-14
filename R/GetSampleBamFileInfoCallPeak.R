@@ -112,7 +112,7 @@ GetSampleInfo<- function(input.sample.file,input.bam.file) {
 #' @example 
 #' 
 #' genome="Hs"
-#' re <- peakcallwithinput(input.sample.file,input.bam.file,genome)
+#' re <- peakcallwithinput(input.sample.file,input.bam.file,genome,peakcaller)
 #' 
 #' 
 peakcallwithinput <- function(input.sample.file,input.bam.file,genome,peakcaller=c("macs14","macs2")) {
