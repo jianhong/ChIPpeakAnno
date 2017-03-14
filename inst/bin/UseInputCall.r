@@ -11,14 +11,15 @@ if (length(args)==0) {
 input.sample.file=args[1]
 input.bam.file=args[2]
 genome=args[3]
+peakcaller=args[4]
 }
 
-cat(input.sample.file,"\t",input.bam.file,"\t",genome,"\n")
+cat(input.sample.file,"\t",input.bam.file,"\t",genome,"\t",peakcaller,"\n")
 
 library(ChipSeq)
 
 #PeakCallAndAnnotation(input.file.dir,out.file.dir,genome)
-re<-peakcallwithinput(input.sample.file,input.bam.file,genome)
+re<-peakcallwithinput(input.sample.file,input.bam.file,genome,peakcaller)
 
 #BamFileSortIndexVisualization(input.file.dir,out.file.dir,genome)
 

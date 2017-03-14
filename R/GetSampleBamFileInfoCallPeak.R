@@ -115,7 +115,7 @@ GetSampleInfo<- function(input.sample.file,input.bam.file) {
 #' re <- peakcallwithinput(input.sample.file,input.bam.file,genome)
 #' 
 #' 
-peakcallwithinput <- function(input.sample.file,input.bam.file,genome) {
+peakcallwithinput <- function(input.sample.file,input.bam.file,genome,peakcaller=c("macs14","macs2")) {
   
   re <- GetSampleInfo(input.sample.file,input.bam.file)
   
@@ -129,11 +129,35 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome) {
   
   if(!dir.exists(temp3)){dir.create(temp3)}
   
-  #re.out<-file.name.2
+  peakcaller<-match.arg(peakcaller)
   
-  cmd9="macs14 -t "
-  cmd10="-f BAM -g hs -n "
-  cmd11=" -m 6,18 --bw=200 -p 0.00001"
+  switch (type.boxplot,
+          macs2 = {
+            cmd9="macs2 callpeak -t "
+            cmd10="-f BAM -g hs -n "
+            cmd11=" -m 6,18 --bw=200 -p 0.00001"
+          },
+          {
+            cmd9="macs14 -t "
+            cmd10="-f BAM -g hs -n "
+            cmd11=" -m 6,18 --bw=200 -p 0.00001"
+          }
+  )
+  
+  
+  
+#   #re.out<-file.name.2
+#   
+#   "/nethome/axy148/MACS/bin/macs2 callpeak -t 
+#   /scratch/projects/bbc/BAM2BW/"2016-03-23-2-18_S7_"_bam_sorted_by_position.bam 
+# -c /scratch/projects/bbc/Project/Lluis/Alignment/2016-03-20-1-1_S5__BWA/2016-03-20-1-1_S5_.bam 
+# -f BAM -g mm 
+#   -n "2016-03-23-2-18_S7_"_bam_mm --outdir "/scratch/projects/bbc/Peak_chip_seq/Peak_chip_broad" -B -q 0.01"
+#   
+#   
+#   cmd9="macs14 -t "
+#   cmd10="-f BAM -g hs -n "
+#   cmd11=" -m 6,18 --bw=200 -p 0.00001"
   
   cellInfo.run <- lapply(1:length(cellInfo),function(u,cellInfo,temp3){
     
@@ -165,7 +189,7 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome) {
        xx <- file.name
        xx.name=paste(ID,gsub(" ","-",Type_Cell),Type_TF,sep="-") 
       
-       cmd12=paste(cmd9,xx,"–c",x.input,cmd10,paste0(temp3,"/",paste0(xx.name,"_hs_1.00e-05_macs142")),cmd11,sep=" ")
+       cmd12=paste(cmd9,xx,"–c",x.input,cmd10,file.path(temp3,paste0(xx.name,"_hs_1.00e-05_",peakcaller)),cmd11,sep=" ")
       # 
        cmd12
       #print(cmd12)
