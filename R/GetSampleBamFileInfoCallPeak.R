@@ -135,7 +135,7 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome,peakcaller
           macs2 = {
             cmd9="macs2 callpeak -t "
             cmd10="-f BAM -g hs -n "
-            cmd11=" -m 6,18 --bw=200 -p 0.00001"
+            cmd11=" -m 6 18 --bw=200 -p 0.00001"
           },
           {
             cmd9="macs14 -t "
