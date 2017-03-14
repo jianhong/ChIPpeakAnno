@@ -1,5 +1,7 @@
 import(TxDb.Hsapiens.UCSC.hg19.knownGene)
 import(TxDb.Hsapiens.UCSC.hg38.knownGene)
+import(org.Hs.eg.db)
+
 import(ChIPseeker)
 import(ChIPpeakAnno)
 import(DiffBind)
