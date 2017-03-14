@@ -189,7 +189,7 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome,peakcaller
        xx <- file.name
        xx.name=paste(ID,gsub(" ","-",Type_Cell),Type_TF,sep="-") 
       
-       cmd12=paste(cmd9,xx,"–c",x.input,cmd10,file.path(temp3,paste0(xx.name,"_hs_1.00e-05_",peakcaller)),cmd11,sep=" ")
+       cmd12=paste(cmd9,xx,"-c",x.input,cmd10,file.path(temp3,paste0(xx.name,"_hs_1.00e-05_",peakcaller)),cmd11,sep=" ")
       # 
        cmd12
       #print(cmd12)
