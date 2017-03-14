@@ -131,7 +131,7 @@ peakcallwithinput <- function(input.sample.file,input.bam.file,genome,peakcaller
   
   peakcaller<-match.arg(peakcaller)
   
-  switch (type.boxplot,
+  switch (peakcaller,
           macs2 = {
             cmd9="macs2 callpeak -t "
             cmd10="-f BAM -g hs -n "
