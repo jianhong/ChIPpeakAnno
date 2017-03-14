@@ -32,7 +32,7 @@ source .bashrc
 
 #install test version
 library(devtools)
-install_github("aiminy/ChipSeq",ref='0.99.0','dependencies = T , force = T)
+install_github("aiminy/ChipSeq",ref='0.99.0',dependencies = T , force = T)
 
 #install release version
 library(devtools)
@@ -41,7 +41,7 @@ install_github("aiminy/ChipSeq",dependencies = T , force = T)
 
 
 #If you use command line in pegasus terminal
-R -e 'library(devtools);install_github("aiminy/ChipSeq")'
+R -e 'library(devtools);install_github("aiminy/ChipSeq",ref='0.99.0',dependencies = T , force = T)'
 ```
 
 ## You can run ChipSeq using interactive model by follwing hints:
