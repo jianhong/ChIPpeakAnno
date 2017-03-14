@@ -48,6 +48,25 @@ R -e 'library(devtools);install_github("aiminy/ChipSeq",ref = "0.99.0",dependenc
 
 ```{bash}
 Rscript /nethome/axy148/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq_interactive_model.r
+
+#Do you want to perform peak calling, annotation, and coverage visualization?
+Yes
+
+#Do you have input bam file for control ?
+Yes
+
+#please define the sample information file:
+/projects/scratch/bbc/aiminy_project/SampleID_INFO_ChIP_new_Danny.csv
+
+#please define the Bam files information file:
+/projects/scratch/bbc/aiminy_project/DannyNewData.txt
+
+#please define genome name:
+Hs
+
+#Which peakcaller you want to use, please choose: macs14 or macs2 
+macs2
+
 ```
 # Perform analysis in the streamlined batch model
 
