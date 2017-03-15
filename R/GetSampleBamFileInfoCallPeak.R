@@ -145,7 +145,7 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
         cmd9 = "macs2 callpeak -t "
         #cmd10 = "-f BAM -g hs -n "
         #cmd11 = " -m 6 18 --bw=200 -p 0.00001"
-         cmd11 <- paste("-m 6 18 --bw=200", "-p", peakPvalue, sep = " ")
+        cmd11 <- paste("-m 6 18 --bw=200", "-p", peakPvalue, sep = " ")
     },{
         cmd9 = "macs14 -t "
         #cmd10 = "-f BAM -g hs -n "
