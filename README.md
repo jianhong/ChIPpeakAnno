@@ -30,15 +30,10 @@ source .bashrc
 > .libPaths()
 [1] "/nethome/axy148/R/lib64/R/library"
 
-#install test version
+#install 0.99.0 version
+#In R console
 library(devtools)
 install_github("aiminy/ChipSeq",ref='0.99.0',dependencies = T , force = T)
-
-#install release version
-library(devtools)
-install_github("aiminy/ChipSeq",dependencies = T , force = T)
-
-
 
 #If you use command line in pegasus terminal
 R -e 'library(devtools);install_github("aiminy/ChipSeq",ref = "0.99.0",dependencies = T , force = T)'
