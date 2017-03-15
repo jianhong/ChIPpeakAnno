@@ -12,11 +12,12 @@
 #' @examples
 #'  
 #' input.sample.file = "/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv"
-#' input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/"
+#' input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall2/"
 #' input.file.pattern = "bed"
-#' resmcf<-parser4diffbind(input.sample.file,input.bed.dir,input.file.pattern)
+#' output.dir="BindDiff2"
+#' resmcf<-parser4diffbind(input.sample.file,input.bed.dir,input.file.pattern,output.dir)
 #'
-parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern){
+parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern,output.dir){
 
   
   sample.info<-read.csv(input.sample.file,header = TRUE)
@@ -95,7 +96,7 @@ parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern){
 
   print(mcf)
   
-  temp3=file.path(re$output,"BindDiff")
+  temp3=file.path(re$output,output.dir)
   if(!dir.exists(temp3)){dir.create(temp3)}
    
   save(mcf,file=file.path(temp3,"mcf.RData"))
