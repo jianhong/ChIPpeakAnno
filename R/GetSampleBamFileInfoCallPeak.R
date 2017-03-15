@@ -231,7 +231,9 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
         cat(as.character(zzz[u][[1]]), "\n")
         cat("\n")
         
-        system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
+        #system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
+        
+        system(as.character(zzz[u][[1]]))
         
     }, zzz)
     
