@@ -117,8 +117,8 @@ if (row == "Yes") {
         
         cmd1 = "bsub -P bbc -J \"InputCall\" -o %J.InputCall.log -e %J.InputCall.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
         cmd2 = paste0("Rscript ", R_lib, "/ChipSeq/bin/UseInputCall.r ", 
-            sample.info.file, " ", bam.info.file, " ", genome, 
-            " ", peakcaller,peakPvalue,peak.out.dir)
+            sample.info.file," ",bam.info.file," ",genome, 
+            " ",peak.out.dir," ",peakcaller," ",peakPvalue)
         
         system(paste0(cmd1, " ", cmd2))
         
