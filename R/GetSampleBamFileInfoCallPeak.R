@@ -142,7 +142,16 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
     cmd10 <- paste("-f BAM", "-g", genome, "-n", sep = " ")
     
     switch(peakcaller, macs2 = {
-        cmd9 = "macs2 callpeak -t "
+        
+        macs2_Lib=file.path("/nethome/axy148/NGS_tools/MACS/bin/")
+      
+        Sys.setenv(PATH=paste0(macs2_Lib,":",PATH1)) 
+        
+        cmd1 <- Sys.which("masc2")[[1]]
+      
+        cat(cmd1,"\n")
+        
+        cmd9 = paste(cmd1,"callpeak -t",sep=" ")
         #cmd10 = "-f BAM -g hs -n "
         #cmd11 = " -m 6 18 --bw=200 -p 0.00001"
         cmd11 <- paste("-m 6 18 --bw=200", "-p", peakPvalue, sep = " ")
