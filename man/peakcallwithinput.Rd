@@ -4,8 +4,8 @@
 \alias{peakcallwithinput}
 \title{peakcallwithinput}
 \usage{
-peakcallwithinput(input.sample.file, input.bam.file, genome,
-  peakcaller = c("macs14", "macs2"))
+peakcallwithinput(input.sample.file, input.bam.file, genome = c("Hs", "hs",
+  "HS", "hS"), output.dir, peakcaller = c("macs14", "macs2"), peakPvalue)
 }
 \description{
 peakcallwithinput
