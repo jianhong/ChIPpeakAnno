@@ -56,8 +56,7 @@ GetSampleInfo <- function(input.sample.file, input.bam.file) {
         value
     }
     
-    cellType <- unique(as.character(re11[re11$Type_TF == "Input", 
-        ]$Type_Cell))
+    cellType <- unique(as.character(re11[re11$Type_TF == "Input", ]$Type_Cell))
     
     
     yy <- lapply(cellType, function(u, re11) {
@@ -66,8 +65,7 @@ GetSampleInfo <- function(input.sample.file, input.bam.file) {
         
         index1 <- which(substr(re11$Type_Cell, 1, n) == u)
         z <- re11[index1, ]
-        index2 <- which(nchar(as.character(z$Type_Cell)) <= n + 
-            2)
+        index2 <- which(nchar(as.character(z$Type_Cell)) <= n + 2)
         
         z2 <- z[index2, ]
         
@@ -84,8 +82,7 @@ GetSampleInfo <- function(input.sample.file, input.bam.file) {
     
     Cell.Ab.type <- unique(as.character(re1[, 4]))
     
-    re2 <- lapply(1:length(Cell.Ab.type), function(u, Cell.Ab.type, 
-        re1) {
+    re2 <- lapply(1:length(Cell.Ab.type), function(u, Cell.Ab.type, re1) {
         
         x = Cell.Ab.type[u]
         z = re1
@@ -97,15 +94,13 @@ GetSampleInfo <- function(input.sample.file, input.bam.file) {
     
     names(re2) <- Cell.Ab.type
     
-    # Get the combination of cell type and antibody with
-    # replicates
+    # Get the combination of cell type and antibody with replicates
     
     re21 <- re2[lapply(re2, length) == 1]
     
     re22 <- re2[lapply(re2, length) == 2]
     
-    re3 <- list(re1 = re1, re2 = re2, re21 = re21, re22 = re22, 
-        re11 = re11, y = yy)
+    re3 <- list(re1 = re1, re2 = re2, re21 = re21, re22 = re22, re11 = re11, y = yy)
     
     return(re3)
     
@@ -120,9 +115,8 @@ GetSampleInfo <- function(input.sample.file, input.bam.file) {
 #' re <- peakcallwithinput(input.sample.file,input.bam.file,genome,output.dir,peakcaller)
 #' 
 #' 
-peakcallwithinput <- function(input.sample.file, input.bam.file, 
-    genome = c("Hs", "hs", "HS", "hS"), output.dir, peakcaller = c("macs14", 
-        "macs2"),peakPvalue) {
+peakcallwithinput <- function(input.sample.file, input.bam.file, genome = c("Hs", 
+    "hs", "HS", "hS"), output.dir, peakcaller = c("macs14", "macs2"), peakPvalue) {
     
     re <- GetSampleInfo(input.sample.file, input.bam.file)
     
@@ -143,37 +137,32 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
     
     switch(peakcaller, macs2 = {
         
-        macs2_Lib=file.path("/nethome/axy148/NGS_tools/MACS/bin/")
-      
-        Sys.setenv(PATH=paste0(macs2_Lib,":",PATH1)) 
+        macs2_Lib = file.path("/nethome/axy148/NGS_tools/MACS/bin/")
+        
+        Sys.setenv(PATH = paste0(macs2_Lib, ":", PATH1))
         
         cmd1 <- Sys.which("masc2")[[1]]
-      
-        cat(cmd1,"\n")
         
-        cmd9 = paste(cmd1,"callpeak -t",sep=" ")
-        #cmd10 = "-f BAM -g hs -n "
-        #cmd11 = " -m 6 18 --bw=200 -p 0.00001"
+        cat(cmd1, "\n")
+        
+        cmd9 = paste(cmd1, "callpeak -t", sep = " ")
+        # cmd10 = '-f BAM -g hs -n ' cmd11 = ' -m 6 18 --bw=200 -p 0.00001'
         cmd11 <- paste("-m 6 18 --bw=200", "-p", peakPvalue, sep = " ")
-    },{
+    }, {
         cmd9 = "macs14 -t "
-        #cmd10 = "-f BAM -g hs -n "
-        #cmd11 = " -m 6,18 --bw=200 -p 0.00001"
-        cmd11 <- paste("-m 6,18 --bw=200","-p",peakPvalue,sep = " ")
+        # cmd10 = '-f BAM -g hs -n ' cmd11 = ' -m 6,18 --bw=200 -p 0.00001'
+        cmd11 <- paste("-m 6,18 --bw=200", "-p", peakPvalue, sep = " ")
     })
     
-    # #re.out<-file.name.2 '/nethome/axy148/MACS/bin/macs2
-    # callpeak -t
+    # #re.out<-file.name.2 '/nethome/axy148/MACS/bin/macs2 callpeak -t
     # /scratch/projects/bbc/BAM2BW/'2016-03-23-2-18_S7_'_bam_sorted_by_position.bam
     # -c
     # /scratch/projects/bbc/Project/Lluis/Alignment/2016-03-20-1-1_S5__BWA/2016-03-20-1-1_S5_.bam
     # -f BAM -g mm -n '2016-03-23-2-18_S7_'_bam_mm --outdir
-    # '/scratch/projects/bbc/Peak_chip_seq/Peak_chip_broad' -B -q
-    # 0.01' cmd9='macs14 -t ' cmd10='-f BAM -g hs -n ' cmd11=' -m
-    # 6,18 --bw=200 -p 0.00001'
+    # '/scratch/projects/bbc/Peak_chip_seq/Peak_chip_broad' -B -q 0.01' cmd9='macs14
+    # -t ' cmd10='-f BAM -g hs -n ' cmd11=' -m 6,18 --bw=200 -p 0.00001'
     
-    cellInfo.run <- lapply(1:length(cellInfo), function(u, cellInfo, 
-        temp3) {
+    cellInfo.run <- lapply(1:length(cellInfo), function(u, cellInfo, temp3) {
         
         # x=cellInfo[[u]]
         
@@ -201,12 +190,10 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
             
             
             xx <- file.name
-            xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, 
-                sep = "-")
+            xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
             
-            cmd12 = paste(cmd9, xx, "-c", x.input, cmd10, file.path(temp3, 
-                paste0(xx.name, "_hs_1.00e-05_", peakcaller)), 
-                cmd11, sep = " ")
+            cmd12 = paste(cmd9, xx, "-c", x.input, cmd10, file.path(temp3, paste0(xx.name, 
+                "_hs_1.00e-05_", peakcaller)), cmd11, sep = " ")
             # 
             cmd12
             # print(cmd12)
@@ -241,7 +228,7 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
         cat(as.character(zzz[u][[1]]), "\n")
         cat("\n")
         
-        #system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
+        # system(as.character(zzz[u][[1]]), intern = TRUE, ignore.stderr = TRUE)
         
         system(as.character(zzz[u][[1]]))
         
@@ -253,8 +240,7 @@ peakcallwithinput <- function(input.sample.file, input.bam.file,
     # AnntationUsingChipSeeker(temp3,)
     # dirname('/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/')
     
-    AnntationUsingChipSeeker(temp3, "peaks.bed", temp3, 
-        DD = 5000)
+    AnntationUsingChipSeeker(temp3, "peaks.bed", temp3, DD = 5000)
     
     return(re)
     
