@@ -116,7 +116,7 @@ if (row == "Yes") {
         peak.out.dir <- paste0(peak.out.dir,"_",genome,"_",peakcaller,"_",peakPvalue)
         
         cmd1 = "bsub -P bbc -J \"InputCall\" -o %J.InputCall.log -e %J.InputCall.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
-        cmd2 = paste("Rscript",R_lib,"/ChipSeq/bin/UseInputCall.r",
+        cmd2 = paste("Rscript",file.path(R_lib,"ChipSeq/bin/UseInputCall.r"),
                      sample.info.file,bam.info.file,genome,
                      peak.out.dir,peakcaller,peakPvalue,sep=" ")
         
