@@ -1,10 +1,10 @@
 importFrom("grDevices", "as.graphicsAnnot", "boxplot.stats", "col2rgb",
              "colorRampPalette", "dev.flush", "dev.hold", "rgb")
 importFrom("graphics", "abline", "axis", "hist", "legend", "lines",
-             "matplot", "par", "plot", "plot.new", "plot.window",
+             "matplot", "matlines", "par", "plot", "plot.new", "plot.window",
              "polygon", "segments", "text", "title")
 importFrom("stats", "as.dendrogram", "cor.test", "hclust", "kmeans",
-             "loess.smooth", "nobs", "rexp", "setNames", "ts")
+             "loess.smooth", "nobs", "rexp", "setNames", "ts", "fisher.test")
 importFrom("utils", "adist", "combn", "data", "installed.packages",
              "read.delim", "read.table", "write.table")
 import(BiocGenerics)
@@ -34,7 +34,7 @@ import(GenomicRanges)
 import(GenomeInfoDb)
 import(S4Vectors)
 importFrom(GenomicAlignments, summarizeOverlaps, Union, readGAlignments, readGAlignmentPairs, isProperPair)
-importFrom(SummarizedExperiment, assay, rowRanges, SummarizedExperiment, colData)
+importFrom(SummarizedExperiment, assay, assays, rowRanges, SummarizedExperiment, colData)
 importFrom(idr, est.IDR)
 importFrom(seqinr, s2c, count, words)
 importFrom(matrixStats, rowMins, rowMaxs)

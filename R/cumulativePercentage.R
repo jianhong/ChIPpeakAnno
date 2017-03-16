@@ -44,7 +44,7 @@ cumulativePercentage <- function(bamfiles, gr, input=1, binWidth=1e3,
   input <- colnames(assays(se)[[1]])[input]
   sigBin <- lapply(sampleName, function(.n){
     sig <- assays(se)[[1]][, c(input, .n)]
-    sig[order(sig[, .n]), ]
+    sig[order(sig[, .n], sig[, input]), ]
   })
   sigCumsum <- lapply(sigBin, function(.ele){
     .ele <- apply(.ele, 2, cumsum)
