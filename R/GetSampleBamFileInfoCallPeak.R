@@ -143,7 +143,7 @@ peakcallwithinput <- function(input.sample.file, input.bam.file, genome = c("Hs"
         
         Sys.setenv(PATH = paste0(macs2_Lib, ":", PATH1))
         
-        cmd1 <- Sys.which("masc2")[[1]]
+        cmd1 <- Sys.which("macs2")[[1]]
         
         cat(cmd1, "\n")
         
