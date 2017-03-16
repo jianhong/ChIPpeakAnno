@@ -137,6 +137,8 @@ peakcallwithinput <- function(input.sample.file, input.bam.file, genome = c("Hs"
     
     switch(peakcaller, macs2 = {
         
+        PATH1=Sys.getenv("PATH")
+        
         macs2_Lib = file.path("/nethome/axy148/NGS_tools/MACS/bin/")
         
         Sys.setenv(PATH = paste0(macs2_Lib, ":", PATH1))
