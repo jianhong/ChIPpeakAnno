@@ -185,13 +185,14 @@ oligoSummary <- function(sequence, oligoLength=6L,
             as.numeric(tmp[, s2c(.ele)]))
         sss <- mapply(function(mat, times, coln) mat*times, 
                       sss, ss, SIMPLIFY = FALSE)
-        consensusStr <- names(ss)[1]
+        consensusStr <- DNAString(names(ss)[1])
         for(i in 2:length(ss)){
-            consensusStr <- 
-                as.character(aligned(
-                    pairwiseAlignment(consensusStr, names(ss)[i], type="local"),
-                    degap=TRUE))
+            consensusStr <- aligned(
+                    pairwiseAlignment(consensusStr, DNAString(names(ss)[i]), 
+                                      type="local"),
+                    degap=TRUE)
         }
+        consensusStr <- tolower(as.character(consensusStr))
         idx <- regexpr(consensusStr, names(ss))
         tl <- max(idx)
         nc <- nchar(names(ss)[1])
@@ -282,7 +283,6 @@ oligoSummary <- function(sequence, oligoLength=6L,
         str2motif(.ele)
     }
     if(length(seeds)>2){
-        #seeds.rev <- as.character(reverseComplement(DNAStringSet(seeds)))
         ### split the seeds by distance
         dist <- adist(seeds, partial=TRUE)
         hc <- hclust(dist(dist), method="average")

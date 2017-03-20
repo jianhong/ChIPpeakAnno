@@ -1,5 +1,10 @@
 CHANGES IN VERSION 3.9.14
 -------------------------
+    o Fix the bug that unable to find an inherited method for function 
+    'reverseComplement' for signature '"BString"' in oligoSummary function.
+    
+CHANGES IN VERSION 3.9.14
+-------------------------
     o re-order the signals for cumulativePercentage.
     
 CHANGES IN VERSION 3.9.13
