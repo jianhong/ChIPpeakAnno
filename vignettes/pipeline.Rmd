@@ -152,7 +152,7 @@ write2FASTA(seq, "test.fa")
 Here is an example to get the Z-scores for short oligos[@leung1996over,@van2000statistical].
 ```{r consensus,fig.cap=generateFigureCaption("Histogram of Z-score of 6-mer"),fig.height=6,fig.width=6}
 ## summary of the short oligos
-freqs <- oligoFrequency(Hsapiens$chr1, MarkovOrder=3)
+freqs <- oligoFrequency(Hsapiens$chr1[50000:100000], MarkovOrder=3)
 os <- oligoSummary(seq, oligoLength=6, MarkovOrder=3, 
                    quickMotif=FALSE, freqs=freqs)
 ## plot the results

@@ -312,9 +312,11 @@ oligoSummary <- function(sequence, oligoLength=6L,
         }
     }else{
         if(length(seeds)==2){
-            consensus <- as.character(aligned(
-                pairwiseAlignment(seeds[1], seeds[2], type="local"),
-                degap=TRUE))
+            consensus <- tolower(as.character(aligned(
+                pairwiseAlignment(DNAString(seeds[1]), 
+                                  DNAString(seeds[2]),
+                                  type="local"),
+                degap=TRUE)))
             if(nchar(consensus)>=oligoLength-2){
                 motifs <- list(subgroupMotif(seeds))
             }else{
