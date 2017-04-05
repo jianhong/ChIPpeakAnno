@@ -1,5 +1,10 @@
 CHANGES IN VERSION 3.9.16
 -------------------------
+
+    o Improve the function featureAlignedExtendSignal
+    
+CHANGES IN VERSION 3.9.16
+-------------------------
     o Fix the bug that unable to find an inherited method for function 
     'reverseComplement' for signature '"BString"' in oligoSummary function.
     

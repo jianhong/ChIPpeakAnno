@@ -64,7 +64,7 @@ See Also as \code{\link{featureAlignedSignal}}, \code{\link{estLibSize}}, \code{
         peaks <- file.path(path, "peaks", "WT_2_Macs_peaks.xls")
         estLibSize(c(WT.AB2, Null.AB2, Resc.AB2))
         feature.gr <- toGRanges(peaks, format="MACS")
-        feature.gr <- feature.gr[feature.gr$seqnames=="chr1" & 
+        feature.gr <- feature.gr[seqnames(feature.gr)=="chr1" & 
                              start(feature.gr)>3000000 & 
                              end(feature.gr)<75000000]
         sig <- featureAlignedExtendSignal(c(WT.AB2, Null.AB2, Resc.AB2), 

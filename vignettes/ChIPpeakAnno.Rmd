@@ -742,7 +742,7 @@ if(interactive()){
 # Citing ChIPpeakAnno
 Please cite `ChIPpeakAnno` in your publication as follows:
 ```{r citation, echo=FALSE}
-citation("ChIPpeakAnno")
+citation(package="ChIPpeakAnno")
 ```
 
 
