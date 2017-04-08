@@ -31,7 +31,7 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
   colnames(temp$class)<-sampID.v.2
   temp$class[1,]<-sampID.v.2
   
-  temp<-dba(temp,mask =c(1,2,13,14,11,12,15,16))
+  #temp<-dba(temp,mask =c(1,2,13,14,11,12,15,16))
   
   #Merge the replicates of each set 
   if(Mergereplicates=="yes"){
@@ -39,7 +39,8 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
   #temp22<-dba(temp2,mask =c(9,16,17:23))
   print(temp2)
   ##need to set the flexiable number identified from data sets
-  temp22<-dba(temp2,mask =c(9:12))
+  t <- temp2
+  temp22<-dba(t,mask =which(t$class[which(rownames(t$class)=="Replicate"),]=="1-2"))
   }else{
     temp22<-temp
   }
@@ -174,7 +175,7 @@ GetResultsFromDiffBind<-function(mcf7,Mergereplicates=c("yes","no"),output.file.
     },p.common,output.file.dir)
 
   AnntationUsingChipSeeker(file.path(output.file.dir,"common_peaks_bed","igv"),"bed",file.path(output.file.dir,"common_peaks_bed")
-                           ,txdb="hg19",DD=5000)
+                           ,txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)
   
   return(p.common)
 }

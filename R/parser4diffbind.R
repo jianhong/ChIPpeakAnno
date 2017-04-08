@@ -12,12 +12,13 @@
 #' @examples
 #'  
 #' input.sample.file = "/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv"
-#' input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall2/"
+#' input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/"
 #' input.file.pattern = "bed"
-#' output.dir="BindDiff2"
+#' output.dir="BindDiff_4_7_2017-cutoff_10k"
 #' resmcf<-parser4diffbind(input.sample.file,input.bed.dir,input.file.pattern,output.dir)
 #'
-parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern,output.dir){
+parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern,output.dir,
+                          summit_peak=NULL){
 
   
   sample.info<-read.csv(input.sample.file,header = TRUE)
@@ -29,12 +30,18 @@ parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern,out
   
   re.bed<-re$input
   
-  re.peaks.only.bed.2<-FL(re.bed,'peaks')
-  re.summits.only.bed<-FL(re.bed,'summits')
   
+  re.peaks.only.bed.2<-FL(re.bed,'peaks')
+  
+  if(!is.null(summit_peak)){
+  re.summits.only.bed<-FL(re.bed,'summits')
+  }
   
   #put peak files into database
   re.peaks.only.bed.3<-list_to_df(re.peaks.only.bed.2)
+  
+  
+  print(re.peaks.only.bed.3)
   
   pos <- regexpr('R1', re.peaks.only.bed.3$ID)
   ID2 <- substr(re.peaks.only.bed.3$ID,1,pos+1)
@@ -72,8 +79,10 @@ parser4diffbind<-function(input.sample.file,input.bed.dir,input.file.pattern,out
 
   for(i in 1:dim(re.peaks.only.bed.5)[1]){
 
-    peaks.v=readBed(as.character(re.peaks.only.bed.5[i,6]))
-
+    #peaks.v=readBed(as.character(re.peaks.only.bed.5[i,6]))
+    
+    peaks.v <- readPeakFile(as.character(re.peaks.only.bed.5[i,6]), as = "GRanges")
+    
     peak.caller.v="macs142"
     sampID.v=as.character(re.peaks.only.bed.5[i,1])
 

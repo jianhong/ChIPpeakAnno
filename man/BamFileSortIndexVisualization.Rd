@@ -16,3 +16,12 @@ BamFileSortIndexVisualization(input.file.dir, output.file.dir, genome)
 \description{
 BamFileSortIndexVisualization
 }
+\examples{
+
+input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
+output.file.dir="/scratch/projects/bbc/aiminy_project/"
+genome="Hs"
+
+BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
+
+}

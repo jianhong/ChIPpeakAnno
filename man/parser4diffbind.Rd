@@ -5,7 +5,7 @@
 \title{parser4diffbind}
 \usage{
 parser4diffbind(input.sample.file, input.bed.dir, input.file.pattern,
-  output.dir)
+  output.dir, summit_peak = NULL)
 }
 \arguments{
 \item{input.file.pattern}{}
@@ -16,9 +16,9 @@ parser4diffbind
 \examples{
  
 input.sample.file = "/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv"
-input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall2/"
+input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/"
 input.file.pattern = "bed"
-output.dir="BindDiff2"
+output.dir="BindDiff_4_7_2017-cutoff_10k"
 resmcf<-parser4diffbind(input.sample.file,input.bed.dir,input.file.pattern,output.dir)
 
 }

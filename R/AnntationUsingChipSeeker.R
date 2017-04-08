@@ -33,9 +33,12 @@
 #' input.file.pattern="bed"
 #' out.dir.name="/Volumes/Bioinformatics$/2016/Danny/Analysis4Peaks/"
 #' DD=5000
-#' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD)
+#' distanceToTSS_cutoff=distanceToTSS_cutoff
 #' 
-AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD) {
+#' AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,
+#' distanceToTSS_cutoff)
+#' 
+AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=10000) {
 
   re<-ParserReadFiles(dir.name,input.file.pattern,out.dir.name)
   
@@ -82,6 +85,24 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
      
      peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
                               TxDb=txdb, annoDb="org.Hs.eg.db")
+     
+     #select.index <- which(peakAnno$distanceToTSS<20,000 && peakAnno$distanceToTSS >= -20,000)
+     dropAnnoM <- function (csAnno, distanceToTSS_cutoff = 10000) 
+     {
+       idx <- which(abs(mcols(csAnno@anno)[["distanceToTSS"]]) < 
+                      distanceToTSS_cutoff)
+       csAnno@anno <- csAnno@anno[idx]
+       csAnno@peakNum <- length(idx)
+       if (csAnno@hasGenomicAnnotation) {
+         csAnno@annoStat <- ChIPseeker:::getGenomicAnnoStat(csAnno@anno)
+         csAnno@detailGenomicAnnotation = csAnno@detailGenomicAnnotation[idx, 
+                                                           ]
+       }
+       csAnno
+     }
+     
+     peakAnno <- dropAnnoM(peakAnno,distanceToTSS_cutoff = distanceToTSS_cutoff)
+     
      x_name=names(re.peaks.only.bed.2)[u]
      cat(x_name)
      png(file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_pie.png")))             
