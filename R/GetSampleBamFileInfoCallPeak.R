@@ -13,8 +13,8 @@
 #' 
 #' input.sample.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv'
 #' 
-#' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/DannyNewData.txt'
-#'
+#' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/sorted_bam_files.txt'
+#'  
 #' re <- GetSampleInfo(input.sample.file,input.bam.file)
 #' 
 #' 
@@ -263,7 +263,27 @@ peakcallwithinput <- function(input.sample.file, input.bam.file, genome = c("Hs"
     
 }
 
+select.sample <- c("MDA MB 231-DD-1_cJun","MDA MB 231-1_cJun","1833-1_cJun")
+output.config.dir <- "~/"
 
+prepareConfig4ngs <- function(res,select.sample,output.config.dir){
+  
+  x <- res$re11
+  
+  xx <- x[which(x$Cell_TF %in% select.sample),]
+  
+  xxx <- cbind.data.frame(xx$file.name,rep("-1",dim(xx)[1]),gsub(" ","-",xx$Cell_TF))
+  
+  config.sample.name <- paste(gsub(" ","-",select.sample),collapse = "-and-")
+    
+  config.file.name <- file.path(output.config.dir,paste0(config.sample.name,"-config.txt"))
+  
+  write.table(xxx,file=config.file.name,col.names = FALSE,
+              row.names = FALSE,quote=FALSE,sep="\t")
+  
+  return(config.file.name)
+  
+}
 
 
 

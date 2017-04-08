@@ -16,8 +16,8 @@ GetSampleInfo
 
 input.sample.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv'
 
-input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/DannyNewData.txt'
-
+input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/sorted_bam_files.txt'
+ 
 re <- GetSampleInfo(input.sample.file,input.bam.file)
 
 
