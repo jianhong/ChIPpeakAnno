@@ -15,4 +15,9 @@ library(ChipSeq)
 
 res <- GetSampleInfo(input.sample.file,input.bam.file)
 
-ChipSeq:::configAndMultiplot(res,select.sample,output.config.dir)
+select.sample <- "MDA MB 231-DD-1_cJun,MDA MB 231-1_cJun,1833-1_cJun"
+tmp <- strsplit(select.sample,",")
+
+tmp2 <- c(tmp[[1]])
+
+ChipSeq:::configAndMultiplot(res,tmp2,output.config.dir)
