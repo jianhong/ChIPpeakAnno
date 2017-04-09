@@ -70,7 +70,9 @@ analysisVisualization <- function(R_lib) {
   print(res$re11);
   cat("please choose samples from Cell_TF :\n");
   
- 
+  input <- file("stdin", "r");
+  samples.choosed <- readLines(input, n = 3);
+  
   #system(paste0(cmd2, " ", cmd3))
   
   #print(count.file.dir)
