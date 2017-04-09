@@ -71,23 +71,25 @@ analysisVisualization <- function(R_lib) {
   cat("please choose samples from Cell_TF :\n");
   
   input <- file("stdin", "r");
-  samples.choosed <- readLines(input, n = 3);
+  samples.choosed <- readLines(input, n = 1);
   
   #system(paste0(cmd2, " ", cmd3))
   
   #print(count.file.dir)
   
-
-
     cmd1 = "bsub -P bbc -J \"VBam\" -o %J.VBam.log -e %J.VBam.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
     
     cmd2 = paste0(R_lib, "/ChipSeq/bin/Visualization.r")
     
-    cmd3 = paste("Rscript",cmd2,paste(output.config.dir,samples.choosed,collapse = " "))
+    tmp <- paste(output.config.dir,collapse = " ")
+    
+    tmp2 <- paste(tmp,samples.choosed,sep=" ")
+      
+    cmd3 = paste("Rscript",cmd2,tmp2)
     
     print(cmd3)
     
-    #system(paste0(cmd1, " ", cmd3))
+    system(paste0(cmd1, " ", cmd3))
     
     cat("Finished Visualization\n")
     

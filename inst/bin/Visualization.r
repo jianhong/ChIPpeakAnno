@@ -8,8 +8,11 @@ if (length(args)==0) {
   input.sample.file=args[1]
   input.bam.file=args[2]
   output.config.dir=args[3]
+  select.sample=args[4]
 }
 
 library(ChipSeq)
+
+res <- GetSampleInfo(input.sample.file,input.bam.file)
 
 ChipSeq:::configAndMultiplot(res,select.sample,output.config.dir)
