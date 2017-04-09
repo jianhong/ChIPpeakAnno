@@ -30,7 +30,7 @@ os <- get_os()
 cat("Your operating system is: ", os, "\n")
 
 cat("Choose analysis: \n")
-cat("\tAvaliable analysis:\t1. peakcalling\t2. annotation, \t3. visualization\t4. All\n")
+cat("\tAvaliable analysis: \t1. peakcalling \t2. annotation \t3. visualization \t4. All\n")
 
 input <- file("stdin", "r")
 row <- readLines(input, n = 1)
@@ -54,8 +54,8 @@ if(row == 4){
 analysisVisualization <- function(R_lib) {
   
   cat("You choose to visualize the sorted bam files, please define the following setting parameters: \n",
-      "input.bam.list.file (ex: /scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files.txt)\n",
       "input.sample.info.file (ex: /scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv)\n",
+      "input.bam.list.file (ex: /scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files.txt)\n",
       "output.figure.dir (ex:Visualization)\n")
   
   input <- file("stdin", "r")
