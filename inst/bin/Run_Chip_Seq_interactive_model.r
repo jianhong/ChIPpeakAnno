@@ -81,7 +81,7 @@ analysisVisualization <- function(R_lib) {
     
     cmd2 = paste0(R_lib, "/ChipSeq/bin/Visualization.r")
     
-    tmp <- paste(output.config.dir,collapse = " ")
+    tmp <- paste(count.file.dir,collapse = " ")
     
     tmp2 <- paste(tmp,samples.choosed,sep=" ")
       
