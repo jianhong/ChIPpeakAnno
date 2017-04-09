@@ -11,15 +11,5 @@ if (length(args)==0) {
 }
 
 library(ChipSeq)
-res <- GetSampleInfo(input.sample.file,input.bam.file)
-
-cat("please choose samples from Cell_TF :\n")
-
-input <- file("stdin", "r")
-samples.choosed <- readLines(input, n = 1)
-
-select.sample <- as.array(samples.choosed)
-
-print(select.sample)
 
 ChipSeq:::configAndMultiplot(res,select.sample,output.config.dir)
