@@ -268,6 +268,8 @@ output.config.dir <- "~/"
 
 configAndMultiplot <- function(res,select.sample,output.config.dir){
   
+  #res <- GetSampleInfo(input.sample.file,input.bam.file)
+  
   if(!dir.exists(output.config.dir)){dir.create(output.config.dir)}
   
   x <- res$re11

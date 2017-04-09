@@ -51,6 +51,36 @@ if(row == 4){
   choose.type <- "All"
 }
 
+analysisVisualization <- function(R_lib) {
+  
+  cat("You choose to visualize the sorted bam files, please define the following setting parameters: \n",
+      "input.bam.list.file (ex: /scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files.txt)\n",
+      "input.sample.info.file (ex: /scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv)\n",
+      "output.figure.dir (ex:Visualization)\n")
+  
+  input <- file("stdin", "r")
+  count.file.dir <- readLines(input, n = 3)
+  
+  #print(count.file.dir)
+  
+  input.sample.file <- count.file.dir[1]
+  input.bam.file <- count.file.dir[2]
+  output.config.dir <- count.file.dir[3]
+
+    cmd1 = "bsub -P bbc -J \"VBam\" -o %J.VBam.log -e %J.VBam.err -W 72:00 -n 8 -q general -u aimin.yan@med.miami.edu"
+    
+    cmd2 = paste0(R_lib, "/ChipSeq/bin/Visualization.r")
+    
+    cmd3 = paste("Rscript",cmd2,paste(count.file.dir,collapse = " "))
+    
+    print(cmd3)
+    
+    system(paste0(cmd1, " ", cmd3))
+    
+    cat("Finished Visualization\n")
+    
+}
+
 analysisAll <- function(R_lib) {
   cat("Do you want to perform peak calling, annotation, and coverage visualization?\n")
   
@@ -241,10 +271,8 @@ switch (choose.type,
           
         },
         visualization={
-          
-          
+          analysisVisualization(R_lib)
         }
-        
 )
 
 
