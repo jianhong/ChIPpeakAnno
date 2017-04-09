@@ -291,9 +291,9 @@ configAndMultiplot <- function(res,select.sample,output.config.dir){
   
   cmd2 <- "-L 4000 -RR 1 -CD 1 -CO \"blue\""
 
-  output.results.dir <- file.path(output.config.dir,paste0(config.sample.name,"results"))
+  output.results <- file.path(output.config.dir,paste0(config.sample.name,"results"))
     
-  cmd <- paste(cmd0,config.file.name,cmd1,config.results.dir,cmd2,sep=" ")  
+  cmd <- paste(cmd0,config.file.name,cmd1,output.results,cmd2,sep=" ")  
     
   system(cmd)
   
