@@ -266,7 +266,9 @@ peakcallwithinput <- function(input.sample.file, input.bam.file, genome = c("Hs"
 select.sample <- c("MDA MB 231-DD-1_cJun","MDA MB 231-1_cJun","1833-1_cJun")
 output.config.dir <- "~/"
 
-prepareConfig4ngs <- function(res,select.sample,output.config.dir){
+configAndMultiplot <- function(res,select.sample,output.config.dir){
+  
+  if(!dir.exists(output.config.dir)){dir.create(output.config.dir)}
   
   x <- res$re11
   
@@ -280,6 +282,18 @@ prepareConfig4ngs <- function(res,select.sample,output.config.dir){
   
   write.table(xxx,file=config.file.name,col.names = FALSE,
               row.names = FALSE,quote=FALSE,sep="\t")
+  
+  cmd0 <- "ngs.plot.r -G hg19 -R tss -C" 
+  
+  cmd1 <- "-O" 
+  
+  cmd2 <- "-L 4000 -RR 1 -CD 1 -CO \"blue\""
+
+  output.results.dir <- file.path(output.config.dir,paste0(config.sample.name,"results"))
+    
+  cmd <- paste(cmd0,config.file.name,cmd1,config.results.dir,cmd2,sep=" ")  
+    
+  system(cmd)
   
   return(config.file.name)
   
