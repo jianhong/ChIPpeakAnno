@@ -1,4 +1,15 @@
-CHANGES IN VERSION 3.9.16
+CHANGES IN VERSION 3.9.19
+-------------------------
+
+    o add FAQs
+
+
+CHANGES IN VERSION 3.9.18
+-------------------------
+
+    o import rowRanges() generic from DelayedArray instead of SummarizedExperiment
+    
+CHANGES IN VERSION 3.9.17
 -------------------------
 
     o Improve the function featureAlignedExtendSignal
