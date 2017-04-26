@@ -4,6 +4,10 @@ author: "Jianhong Ou, Jun Yu, Lihua Julie Zhu"
 output: BiocStyle::html_document
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('ChIPpeakAnno')`"
+vignette: >
+  %\VignetteIndexEntry{ChIPpeakAnno FAQs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}

@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.11.1
+-------------------------
+
+    o make FAQs availble
+    o Fix the bug in annoPeaks for warning of out-of-bound ranges
+
 CHANGES IN VERSION 3.9.19
 -------------------------
 

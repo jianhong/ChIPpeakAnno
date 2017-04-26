@@ -58,7 +58,12 @@ annoPeaks <- function(peaks, annoData,
                 s1 <- ifelse(str_a, start(a)+b[1], start(a)-b[2])
                 s1[s1<1] <- 1
                 start(a) <- s1
-                end(a) <- ifelse(str_a, end(a)+b[2], end(a)-b[1])
+                s2 <- ifelse(str_a, end(a)+b[2], end(a)-b[1])
+                s2.idx <- which(s2 > seqlengths(a)[as.character(seqnames(a))])
+                if(length(s2.idx)>0){
+                    s2[s2.idx] <- seqlengths(a)[as.character(seqnames(a[s2.idx]))]
+                }
+                end(a) <- s2
                 a
             }
             peaks.tmp <- extGR(peaks, bindingRegion)
