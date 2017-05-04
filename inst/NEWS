@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.11.1
 -------------------------
 
+    o add new function binOverGene, binOverRegions, plotBinOverRegions.
+    
+CHANGES IN VERSION 3.11.1
+-------------------------
+
     o make FAQs availble
     o Fix the bug in annoPeaks for warning of out-of-bound ranges
 
