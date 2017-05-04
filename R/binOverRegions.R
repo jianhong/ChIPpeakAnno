@@ -294,7 +294,7 @@ plotBinOverRegions <- function(dat, ...){
     for(arg in c("col", "lty", "lwd", "bg")){
         legend.arg[[arg]] <- matplot.arg[[arg]]
     }
-    legend.arg <- c(..., legend.arg)
+    legend.arg <- c(list(...), legend.arg)
     legend.arg <- legend.arg[!duplicated(names(legend.arg))]
     legend.arg <- legend.arg[legend.arg.names]
     legend.arg <- legend.arg[lengths(legend.arg)>0]
