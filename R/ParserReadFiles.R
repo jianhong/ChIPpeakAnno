@@ -70,19 +70,44 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
   return(re2)
 }
 
-getGeneBedName <- function() {
-  x <- read.csv("/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny/1833_4_igv.bed_5000_around_tss_annotation_4_only_mapped_peaks.csv",header = TRUE)
+#' ChipSeq:::getGeneBedName("/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny","peaks.csv","/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny")
+#' 
+getGeneBedName <- function(input.file.dir,file.pattern,output.file.dir) {
   
-  xx <- x[grep("Promoter",x$annotation),]
+  re<-ParserReadFiles(input.file.dir,file.pattern)
   
-  chr <- which(colnames(xx) == "seqnames")
-  gs  <- which(colnames(xx) == "geneStart")
-  ge  <- which(colnames(xx) == "geneEnd")
+  file.name.2<-re$input
+
+  re.out<-file.name.2
   
-  write.table(xx[,c(chr,gs,ge)],file="1833_common_gene.bed",quote = F,col.names = F,row.names = F,sep="\t")
+  if (!dir.exists(output.file.dir))
+  {
+    dir.create(output.file.dir, recursive = TRUE)
+  }
   
+  temp3 =output.file.dir
   
-  write.table(unique(xx$SYMBOL),file="1833_common_gene.txt",quote = F,col.names = F,row.names = F)
+  cmd.1 <- lapply(1:length(re.out),function(u,re.out,temp3){
+    
+    x <- read.csv(re.out[[u]],header = TRUE)
+    
+    xx <- x[grep("Promoter",x$annotation),]
+    
+    chr <- which(colnames(xx) == "seqnames")
+    gs  <- which(colnames(xx) == "geneStart")
+    ge  <- which(colnames(xx) == "geneEnd")
+    
+    file_name = file_path_sans_ext(basename(re.out[[u]]))
+    
+    write.table(xx[,c(chr,gs,ge)],file=file.path(temp3,paste0(file_name,"_gene.bed")),quote = F,col.names = F,row.names = F,sep="\t")
+    
+    write.table(unique(xx$SYMBOL),file=file.path(temp3,paste0(file_name,"_gene_name.txt")),quote = F,col.names = F,row.names = F)
+    
+    ps  <- which(colnames(xx) == "start")
+    pe  <- which(colnames(xx) == "end")
+    
+    write.table(xx[,c(chr,ps,pe)],file=file.path(temp3,paste0(file_name,"_peaks.bed")),quote = F,col.names = F,row.names = F,sep="\t")
+    
+  },re.out,temp3)
   
-  unique(xx$SYMBOL)
 }
