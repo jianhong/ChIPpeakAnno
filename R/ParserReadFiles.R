@@ -69,3 +69,20 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
   
   return(re2)
 }
+
+getGeneBedName <- function() {
+  x <- read.csv("/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny/1833_4_igv.bed_5000_around_tss_annotation_4_only_mapped_peaks.csv",header = TRUE)
+  
+  xx <- x[grep("Promoter",x$annotation),]
+  
+  chr <- which(colnames(xx) == "seqnames")
+  gs  <- which(colnames(xx) == "geneStart")
+  ge  <- which(colnames(xx) == "geneEnd")
+  
+  write.table(xx[,c(chr,gs,ge)],file="1833_common_gene.bed",quote = F,col.names = F,row.names = F,sep="\t")
+  
+  
+  write.table(unique(xx$SYMBOL),file="1833_common_gene.txt",quote = F,col.names = F,row.names = F)
+  
+  unique(xx$SYMBOL)
+}

@@ -18,7 +18,7 @@ parser4diffbind
 input.sample.file = "/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv"
 input.bed.dir = "/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/"
 input.file.pattern = "bed"
-output.dir="BindDiff_4_7_2017-cutoff_10k"
+output.dir="BindDiff_4_7_2017-cutoff_10k_test"
 resmcf<-parser4diffbind(input.sample.file,input.bed.dir,input.file.pattern,output.dir)
 
 }

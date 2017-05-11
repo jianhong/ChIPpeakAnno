@@ -5,7 +5,6 @@
 # Rscript Rscript
 # ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
 
-
 R_lib = .libPaths()[1]
 
 get_os <- function()
