@@ -194,7 +194,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   
   #cmd1="samtools sort"
   
-  lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -211,7 +211,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       } else
       {
         cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' aimin.yan@med.miami.edu",
+                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                      sep = " ")
       }
       
@@ -236,7 +236,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
-  lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -253,7 +253,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       } else
       {
         cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' aimin.yan@med.miami.edu",
+                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                      sep = " ")
       }
       
@@ -278,7 +278,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
   
-  lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -295,7 +295,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       } else
       {
         cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' aimin.yan@med.miami.edu",
+                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                      sep = " ")
       }
       
