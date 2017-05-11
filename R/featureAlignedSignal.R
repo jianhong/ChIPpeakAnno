@@ -47,7 +47,7 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     stop("cvglists must be a list of SimpleRleList or RleList")
   seqLen <-  lapply(cvglists, function(.ele) 
     sapply(.ele, function(.e) sum(runLength(.e))))
-  seqLen.keep <- table(unlist(sapply(seqLen, names)))==3
+  seqLen.keep <- table(unlist(sapply(seqLen, names)))==length(cvglists)
   seqLen <- seqLen[[1]][seqLen.keep]
   seqLen <- seqLen[!is.na(seqLen)]
   if(length(seqLen)>0){
@@ -62,66 +62,65 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     }
   }
   #feature.gr.bck <- feature.gr
-  feature.gr$oid <- 1:length(feature.gr)
-  feature.gr <- split(feature.gr, as.character(seqnames(feature.gr)))
   stopifnot(is.numeric(n.tile))
   n.tile <- round(n.tile)
-  grL <- lapply(feature.gr, function(.ele){
-    .gr <- tile(.ele, n=n.tile)
-    .gr <- lapply(.gr, function(.e){
-      if(as.character(strand(.e))[1]=="-"){
-        .e <- rev(.e)
-      }
-      .e
-    })
-    .gr <- unlist(GRangesList(.gr))
-    .gr$oid <- rep(.ele$oid, each=n.tile)
-    .gr
-  })
-  seqn <- names(grL)
+  grL <- tile(feature.gr, n=n.tile)
+  idx <- as.character(strand(feature.gr))=="-"
+  if(length(idx)>0) {
+      grL[idx] <- as(lapply(grL[idx], rev), "GRangesList")
+  }
+  grL.len <- lengths(grL)
+  grL <- unlist(grL)
+  grL$oid <- rep(seq_along(feature.gr), grL.len)
+  grL$nid <- unlist(lapply(grL.len, seq.int))
+  grL.len <- length(grL)
+  grL.s <- split(grL, as.character(seqnames(grL)))
+  grL <- unlist(grL.s) ## make sure grL and grL.s keep the same order
+  seqn <- names(grL.s)
+  seql <- seqlengths(feature.gr)
+  seql <- seql[seqn]
+  seql.f <- range(feature.gr)
+  seql.f <- seql.f[match(seqn, seqnames(seql.f))]
+  seql[is.na(seql)] <- width(seql.f)[is.na(seql)] + 1
   trimChar <- function(x, width){
-    len <- nchar(x)
-    if(len <= width) return(x)
-    return(paste0(strtrim(x, width=width), "..."))
+      len <- nchar(x)
+      if(len <= width) return(x)
+      return(paste0(strtrim(x, width=width), "..."))
   }
   cov <- lapply(cvglists, function(.dat){
-    .dat <- .dat[seqn[seqn %in% names(.dat)]]
-    if(length(.dat)!=length(seqn)){
-      warning(paste(seqn[!seqn %in% names(.dat)], collapse=", "), 
-              ifelse(length(seqn[!seqn %in% names(.dat)])>1, " are", " is"), 
-              " not in cvglists. seqlevels of cvglist are ", 
-              trimChar(paste(names(.dat), collapse=", "), width=60))
-    }
-    .dat.eleLen <- elementNROWS(.dat)
-    if(any(.dat.eleLen==0)){
-      warning(paste(names(.dat)[.dat.eleLen==0], collapse=", "), 
-              ifelse(length(names(.dat)[.dat.eleLen==0])>1, " are", " is"),
-              " is not in cvglists. seqlevels of cvglist are ", 
-              trimChar(paste(names(.dat), collapse=", "), width=60))
-      .dat <- .dat[.dat.eleLen!=0]
-    }
-    warn <- sapply(.dat, function(.ele){
-      any(is.na(runValue(.ele)))
-    })
-    if(any(warn)){
-      warning("cvglists contain NA values.")
-    }
-    .dat <- sapply(.dat, function(.ele){
-      if(any(is.infinite(runValue(.ele)))){
-        warning("cvglists contain infinite values. ", 
-                "infinite value will be converted to NA.")
-        runValue(.ele)[is.infinite(runValue(.ele))] <- NA
+      .dat <- .dat[seqn[seqn %in% names(.dat)]]
+      if(length(.dat)!=length(seqn)){
+          warning(paste(seqn[!seqn %in% names(.dat)], collapse=", "), 
+                  ifelse(length(seqn[!seqn %in% names(.dat)])>1, " are", " is"), 
+                  " not in cvglists. seqlevels of cvglist are ", 
+                  trimChar(paste(names(.dat), collapse=", "), width=60))
+          for(i in seqn[!seqn %in% names(.dat)]){
+              .dat[[i]] <- Rle(0, seql[i])
+          }
       }
-      .ele
-    })
-    .viewmean <- mapply(function(.d, .gr){
-      .m <- matrix(viewMeans(Views(.d, ranges(.gr)), na.rm=TRUE), 
-                   ncol=n.tile, byrow = TRUE)
-      rownames(.m) <- as.character(matrix(.gr$oid, ncol=n.tile, 
-                                          byrow=TRUE)[, 1])
-      .m
-    }, .dat, grL[names(.dat)], SIMPLIFY=FALSE)
-    do.call(rbind, .viewmean)
+      warn <- sapply(.dat, function(.ele){
+          any(is.na(runValue(.ele)))
+      })
+      if(any(warn)){
+          warning("cvglists contain NA values.")
+      }
+      .dat <- sapply(.dat, function(.ele){
+          if(any(is.infinite(runValue(.ele)))){
+              warning("cvglists contain infinite values. ", 
+                      "infinite value will be converted to NA.")
+              runValue(.ele)[is.infinite(runValue(.ele))] <- NA
+          }
+          .ele
+      })
+      .dat <- .dat[seqn]
+      vw <- Views(as(.dat, "RleList"), grL.s)
+      vm <- viewMeans(vw)
+      vm <- unlist(vm)
+      stopifnot(length(vm)==grL.len)
+      mm <- matrix(0, nrow=length(feature.gr), ncol=n.tile)
+      mm[grL$oid+length(feature.gr)*(grL$nid-1)] <- vm
+      mm
   })
-  lapply(cov, function(.ele) unname(.ele[order(as.numeric(rownames(.ele))), ]))
+  
+  cov
 }

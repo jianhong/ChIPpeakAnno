@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.11.1
+CHANGES IN VERSION 3.11.3
+-------------------------
+
+    o update the function featureAlignedSignal
+    
+CHANGES IN VERSION 3.11.2
 -------------------------
 
     o add new function binOverGene, binOverRegions, plotBinOverRegions.

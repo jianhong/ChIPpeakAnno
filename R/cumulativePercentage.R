@@ -12,7 +12,7 @@
 #' @import GenomicAlignments
 #' @import GenomicRanges
 #' @import S4Vectors
-#' @importFrom BiocGenerics which.min
+#' @importFrom BiocGenerics which.min, which.max
 #' @importFrom graphics abline axis legend matlines par plot
 #' @export
 #' @return A list of data.frame with the cumulative percentages.
@@ -48,7 +48,7 @@ cumulativePercentage <- function(bamfiles, gr, input=1, binWidth=1e3,
   })
   sigCumsum <- lapply(sigBin, function(.ele){
     .ele <- apply(.ele, 2, cumsum)
-    .ele <- cbind(Rank=1:nrow(.ele), .ele)
+    .ele <- cbind(Rank=seq.int(nrow(.ele)), .ele)
     sweep(.ele, MARGIN = 2, STATS = .ele[nrow(.ele),], FUN = `/`)
   })
   pin <- par("pin")
@@ -65,15 +65,21 @@ cumulativePercentage <- function(bamfiles, gr, input=1, binWidth=1e3,
            xlab="% of bins", ylab="% of tags", 
            main=sampleName[i])
       matlines(x=sigCumsum[[i]][, 1], 
-               y=sigCumsum[[i]][, -1])
+               y=sigCumsum[[i]][, -1],
+               lty = 1)
       zero <- which(sigCumsum[[i]][, 2]>1/binWidth)
-      if(length(zero)>0){
-        x.tick <- sigCumsum[[i]][zero[1], 1]
+      maxDist <- which.max(abs(sigCumsum[[i]][, 2] - sigCumsum[[i]][, 3]))
+      if(length(zero)>0 | length(maxDist)>0){
+        x <- numeric(0)
+        if(length(zero)>0) x <- c(x, zero[1])
+        if(length(maxDist)>0) x <- c(x, maxDist[1])
+        x.tick <- sigCumsum[[i]][x, 1]
         abline(v=x.tick, col="yellowgreen", lty=3)
-        axis(3, at=x.tick, labels = formatC(x.tick, digits=2))
+        axis(3, at=x.tick, labels = formatC(x.tick, digits=2), 
+             lwd = 0, lwd.ticks = 1)
       }
       legend("topleft", legend = colnames(sigCumsum[[i]])[-1], 
-             col=1:6, lty = 1:5, pch = NA, box.col = NA)
+             col=1:6, lty = 1, pch = NA, box.col = NA)
     }
   }
   return(invisible(sigCumsum))
