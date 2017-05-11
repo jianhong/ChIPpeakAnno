@@ -172,6 +172,9 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 
 #'R -e 'library(ChipSeq);ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
 
+
+#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4)'
+
 plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8) {
   
   #library(ChIPpeakAnno)
@@ -194,7 +197,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   
   #cmd1="samtools sort"
   
-  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -236,7 +239,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
-  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.2 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -278,7 +281,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
   
-  cmd.l <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.3 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -329,4 +332,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
     
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
+  re <- list(cmd.1 = cmd.1,cmd.2=cmd.2,cmd.3=cmd.3)
+  
+  return(re)
 }
