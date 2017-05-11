@@ -55,17 +55,17 @@ ParserReadFiles <- function(input.file.dir,input.file.type,output.file.dir) {
   #print(file.name.4)
   
   #For output
-  output.dir.name=reformatPath(output.file.dir)
+  #output.dir.name=reformatPath(output.file.dir)
   #print(output.dir.name)
   
   #temp=Sys.time()
   #temp1=gsub(":","-",temp)
   #temp2=gsub(" ","-",temp1)
   #temp3=file.path(output.dir.name,"ReadBam_at_",temp2)
-  temp3=output.dir.name
+  #temp3=output.dir.name
   #dir.create(temp3)
   
-  re2<-list(input=file.name.4,output=temp3)
+  re2<-list(input=file.name.4)
   
   return(re2)
 }

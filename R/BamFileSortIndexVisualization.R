@@ -170,16 +170,16 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
   
 }
 
-#'R -e 'library(ChipSeq);library(ThreeUTR);ChipSeq:::BamFileSortIndexVisualization2("/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA","marked.bam","/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
+#'R -e 'library(ChipSeq);library(ThreeUTR);ChipSeq:::BamFileSortIndexVisualization2(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
 
 BamFileSortIndexVisualization2 <- function(input.file.dir,file.type,output.file.dir,BigMem = FALSE,cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8) {
   
   #library(ChIPpeakAnno)
   
-  re<-ParserReadFiles(input.file.dir,file.type,output.file.dir)
+  re<-ParserReadFiles(input.file.dir,file.type)
   
   file.name.2<-re$input
-  output.dir.name=re$output
+  #output.dir.name=re$output
   
   re.out<-file.name.2
   
