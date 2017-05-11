@@ -170,9 +170,9 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
   
 }
 
-#'R -e 'library(ChipSeq);library(ThreeUTR);ChipSeq:::BamFileSortIndexVisualization2("/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA","marked.bam",/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot","Hs")'
+#'R -e 'library(ChipSeq);library(ThreeUTR);ChipSeq:::BamFileSortIndexVisualization2("/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA","marked.bam",/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
 
-BamFileSortIndexVisualization2 <- function(input.file.dir,file.type,output.file.dir,genome, BigMem = FALSE,
+BamFileSortIndexVisualization2 <- function(input.file.dir,file.type,output.file.dir,BigMem = FALSE,
                                            cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8) {
   
   #library(ChIPpeakAnno)
