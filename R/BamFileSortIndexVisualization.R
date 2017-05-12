@@ -208,9 +208,9 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option=c("gener
     if (m.id == 1)
     {
       
-      job.choose <- match.arg(job.option)
+      job.option <- match.arg(job.option)
       
-      switch (job.choose,
+      switch (job.option,
               parallel ={
                 cmd0 = paste(Wall.time, "-n", cores, "-q parallel -R 'rusage[mem=",
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
@@ -221,7 +221,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option=c("gener
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                              sep = " ")
               },
-              {
+              general= {
                 cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                              sep = " ")              
