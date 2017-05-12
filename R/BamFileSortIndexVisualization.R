@@ -197,46 +197,46 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   
   #cmd1="samtools sort"
   
-  cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
-                                   span.ptile,re.out,temp3){
-    
-    file_name = file_path_sans_ext(basename(re.out[[u]]))
-    
-    # file_name <- paste0(path_name2,'-',file_name)
-    #u <- 3
-    if (m.id == 1)
-    {
-      if (BigMem == TRUE)
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      } else
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      }
-      
-      job.name = paste0("bamSort.", u)
-      cmd1 = paste0("bsub -P bbc -J \"", job.name, paste0("\" -o %J.",
-                                                          job.name, ".log "), paste0("-e %J.", job.name, ".err -W"))
-      
-      
-      cmd2=paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
-      cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
-    } else
-    {
-        cmd3 = paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
-    }
-    
-    cmd <- cmd3
-    
-    system(cmd)
-    
-    cmd
-  
-  },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
+  # cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  #                                  span.ptile,re.out,temp3){
+  #   
+  #   file_name = file_path_sans_ext(basename(re.out[[u]]))
+  #   
+  #   # file_name <- paste0(path_name2,'-',file_name)
+  #   #u <- 3
+  #   if (m.id == 1)
+  #   {
+  #     if (BigMem == TRUE)
+  #     {
+  #       cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
+  #                    Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+  #                    sep = " ")
+  #     } else
+  #     {
+  #       cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
+  #                    Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+  #                    sep = " ")
+  #     }
+  #     
+  #     job.name = paste0("bamSort.", u)
+  #     cmd1 = paste0("bsub -P bbc -J \"", job.name, paste0("\" -o %J.",
+  #                                                         job.name, ".log "), paste0("-e %J.", job.name, ".err -W"))
+  #     
+  #     
+  #     cmd2=paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
+  #     cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
+  #   } else
+  #   {
+  #       cmd3 = paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
+  #   }
+  #   
+  #   cmd <- cmd3
+  #   
+  #   system(cmd)
+  #   
+  #   cmd
+  # 
+  # },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
   cmd.2 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
@@ -265,11 +265,11 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       cmd1 = paste0("bsub -w \"done(\"", wait.job.name, "\")\"", " -P bbc -J \"",
                     job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
                                                                              job.name, ".err -W"))
-      cmd2=paste("samtools index",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
+      cmd2=paste("samtools index",file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
       cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
     } else
     {
-      cmd3 = paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
+      cmd3 = paste("samtools index",file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
     }
     
     cmd <- cmd3
@@ -316,6 +316,10 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       cmd3 = paste(cmd1, cmd0, cmd8, sep = " ")
     } else
     {
+      
+      
+"ngs.plot.r -G hg19 -R tss -C config.txt -O 2017-03-02-01_S5_R1.tss -T 2017-03-02-01_S5_R1 -L 4000 -RR 1"
+      
       cmd5="ngs.plot.r -G hg19 -R tss -C"
       cmd6="-O"
       cmd7="-L 4000"
