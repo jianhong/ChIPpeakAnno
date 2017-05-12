@@ -198,7 +198,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
   
   #cmd1="samtools sort"
   
-  cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.1 <- lapply(1:length(re.out),function(u,m.id,job.option,Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
 
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -246,7 +246,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
 
     cmd
 
-  },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
+  },m.id,job.option,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
   cmd.2 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
