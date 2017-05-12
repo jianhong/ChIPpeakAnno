@@ -181,6 +181,8 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
   #library(ChIPpeakAnno)
   
   cat(job.option,"\n")
+  job.option <- as.character(job.option)
+  cat(job.option,"\n")
   
   re<-ParserReadFiles(input.file.dir,file.type)
   
