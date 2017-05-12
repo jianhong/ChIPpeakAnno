@@ -276,7 +276,7 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
 #' 
 #' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny/sorted_bam_files_2.txt'
 #' 
-#' re <- ChipSeq:::matchBamInputGene(input.sample.file,input.bam.file,"$HOME/ChipSeq/1833_common_gene.txt","~/NgsConfigFile")
+#' re <- ChipSeq:::matchBamInputGene(input.sample.file,input.bam.file,"$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile")
 #' 
 #' 
 matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"))
