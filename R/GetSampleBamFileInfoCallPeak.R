@@ -281,7 +281,7 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
 #' R -e 'libraray(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile",,job.option = "parallel")'
 #' 
 #' 
-#' bsub -P bbc -J \"bamPlot\" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'libraray(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile",,job.option = "parallel")'
+#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile")'
 #' 
 #' 
 matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"))
@@ -291,7 +291,7 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   
   cellInfo <- re$y
   
-  output.dir.name = dirname(input.sample.file)
+  #output.dir.name = dirname(input.sample.file)
   
   if (!dir.exists(output.dir))
   {
@@ -300,15 +300,15 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   
   temp3 = output.dir
   
-    cmd9 = "ngs.plot.r -G"
-    cmd10 = "-R"
-    cmd11 = "-C"
-    cmd12 = "-O" 
-    cmd13 = "-T"
-    cmd14 = "-L" 
-    cmd15 = "-RR"
-    cmd16 = "-CD"
-    cmd17= "-GO"
+    # cmd9 = "ngs.plot.r -G"
+    # cmd10 = "-R"
+    # cmd11 = "-C"
+    # cmd12 = "-O" 
+    # cmd13 = "-T"
+    # cmd14 = "-L" 
+    # cmd15 = "-RR"
+    # cmd16 = "-CD"
+    # cmd17= "-GO"
     
 
   
@@ -324,7 +324,7 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
     
     x.sample <- es[es$Type_TF != "Input", ]
     
-    x.run <- apply(x.sample, 1, function(x)
+    x.run <- apply(x.sample, 1, function(x,temp3)
     {
       
       y <- x
@@ -341,17 +341,17 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
       cmd12 = paste(paste0(xx, ":", x.input),input.gene.list,paste0(gsub(" ","-",Cell_TF), "_cJunAndp27"), sep = "\t")
       cmd12
       cat(cmd12, file = file.path(temp3,paste0(xx.name,"_config_cJunAndp27.txt")),sep = "\t")
-    })
+    },temp3)
     
     x.run
     
   }, cellInfo, temp3)
   
   
-  dir.name=temp3
-  dir.name=reformatPath(dir.name)
+  #dir.name=temp3
+  #dir.name=reformatPath(dir.name)
   
-  file.name=file.path(dir.name,dir(dir.name,recursive = TRUE))
+  file.name=file.path(temp3,dir(temp3,recursive = TRUE))
   
   file.name.2<-as.list(file.name)
   
