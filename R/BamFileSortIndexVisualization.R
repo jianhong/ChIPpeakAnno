@@ -342,7 +342,7 @@ job.name, ".err -W"))
     
   },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
-  re <- list(cmd.1 = cmd.1,cmd.2=cmd.2,cmd.3=cmd.3)
+  #re <- list(cmd.1 = cmd.1,cmd.2=cmd.2,cmd.3=cmd.3)
   
-  return(re)
+ # return(re)
 }
