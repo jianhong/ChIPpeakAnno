@@ -174,9 +174,9 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 
 #'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4,wait = FALSE)'
 
-#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",job.option = "p", cores = 32, Memory = 16000,span.ptile = 16,wait = TRUE)'
+#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",job.option = "parallel", cores = 32, Memory = 16000,span.ptile = 16,wait = TRUE)'
 
-plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("g","p","b"),cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
+plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("general","parallel","bigmem"),cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
   
   #library(ChIPpeakAnno)
   
@@ -211,17 +211,17 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("g",
       job.option <- match.arg(job.option)
       
       switch (job.option,
-              p ={
+              parallel = {
                 cmd0 = paste(Wall.time, "-n", cores, "-q parallel -R 'rusage[mem=",
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                              sep = " ")        
                 },
-              b = {
+              bigmem = {
                 cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                              sep = " ")
               },
-              g = {
+              general = {
                 cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
                              Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
                              sep = " ")              
