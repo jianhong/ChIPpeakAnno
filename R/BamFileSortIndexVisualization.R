@@ -180,6 +180,8 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
   
   #library(ChIPpeakAnno)
   
+  print(job.option)
+  
   re<-ParserReadFiles(input.file.dir,file.type)
   
   file.name.2<-re$input
@@ -249,7 +251,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
   },m.id,job.option,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
-  cmd.2 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.2 <- lapply(1:length(re.out),function(u,m.id,job.option,Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -258,17 +260,26 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
     #u <- 3
     if (m.id == 1)
     {
-      if (BigMem == TRUE)
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      } else
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      }
+      
+      job.option <- match.arg(job.option)
+      
+      switch (job.option,
+              parallel = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q parallel -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")        
+              },
+              bigmem = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")
+              },
+              general = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")              
+              }
+      )
       
       job.name = paste0("bamIndex.", u)
       wait.job.name = paste0("bamSort.", u)
@@ -294,10 +305,10 @@ job.name, ".err -W"))
     
     cmd
     
-  },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
+  },m.id,job.option,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
   
-  cmd.3 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+  cmd.3 <- lapply(1:length(re.out),function(u,m.id,job.option,Wall.time, cores, Memory,
                                    span.ptile,re.out,temp3){
     
     file_name = file_path_sans_ext(basename(re.out[[u]]))
@@ -306,17 +317,25 @@ job.name, ".err -W"))
     #u <- 3
     if (m.id == 1)
     {
-      if (BigMem == TRUE)
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      } else
-      {
-        cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-                     sep = " ")
-      }
+      job.option <- match.arg(job.option)
+      
+      switch (job.option,
+              parallel = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q parallel -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")        
+              },
+              bigmem = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")
+              },
+              general = {
+                cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
+                             Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                             sep = " ")              
+              }
+      )
       
       job.name = paste0("bamPlot.", u)
       wait.job.name = paste0("bamIndex.", u)
@@ -350,7 +369,7 @@ job.name, ".err -W"))
     
     cmd
     
-  },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
+  },m.id,job.option,Wall.time,cores,Memory,span.ptile,re.out,temp3)
   
   #re <- list(cmd.1 = cmd.1,cmd.2=cmd.2,cmd.3=cmd.3)
   
