@@ -173,9 +173,9 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 #'R -e 'library(ChipSeq);ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
 
 
-#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4)'
+#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4,wait = FALSE)'
 
-plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8) {
+plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
   
   #library(ChIPpeakAnno)
   
@@ -262,9 +262,15 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       
       job.name = paste0("bamIndex.", u)
       wait.job.name = paste0("bamSort.", u)
+      
+      if(wait == TRUE){
       cmd1 = paste0("bsub -w \"done(\"", wait.job.name, "\")\"", " -P bbc -J \"",
                     job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
                                                                              job.name, ".err -W"))
+      }else{
+      cmd1 = paste0("bsub -P bbc -J \"",job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
+job.name, ".err -W"))
+      }
       cmd2=paste("samtools index",file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
       cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
     } else
