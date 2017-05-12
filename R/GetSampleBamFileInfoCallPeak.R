@@ -14,7 +14,9 @@
 #' input.sample.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv'
 #' 
 #' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/sorted_bam_files.txt'
-#'  
+#' 
+#' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny/sorted_bam_files_2.txt'
+#' 
 #' re <- GetSampleInfo(input.sample.file,input.bam.file)
 #' 
 #' 
@@ -268,3 +270,118 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
     return(config.file.name)
     
 }
+
+#' 
+#' input.sample.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny.csv'
+#' 
+#' input.bam.file <- '/Volumes/Bioinformatics$/2017/DannyNewData/NewRe2Danny/sorted_bam_files_2.txt'
+#' 
+#' re <- ChipSeq:::matchBamInputGene(input.sample.file,input.bam.file,"$HOME/ChipSeq/1833_common_gene.txt","~/NgsConfigFile")
+#' 
+#' 
+matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"))
+{
+  
+  re <- GetSampleInfo(input.sample.file, input.bam.file)
+  
+  cellInfo <- re$y
+  
+  output.dir.name = dirname(input.sample.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir,recursive = TRUE)
+  }
+  
+  temp3 = output.dir
+  
+    cmd9 = "ngs.plot.r -G"
+    cmd10 = "-R"
+    cmd11 = "-C"
+    cmd12 = "-O" 
+    cmd13 = "-T"
+    cmd14 = "-L" 
+    cmd15 = "-RR"
+    cmd16 = "-CD"
+    cmd17= "-GO"
+    
+
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u, cellInfo, 
+                                                      temp3)
+  {
+    
+    x.name = cellInfo[[u]]$name
+    
+    es <- cellInfo[[u]]$es
+    
+    x.input <- es[es$Type_TF == "Input", ]$file.name
+    
+    x.sample <- es[es$Type_TF != "Input", ]
+    
+    x.run <- apply(x.sample, 1, function(x)
+    {
+      
+      y <- x
+      
+      ID <- y[1]
+      Type_Cell <- y[2]
+      Type_TF <- y[3]
+      Cell_TF <- y[4]
+      file.name <- y[5]
+      xx <- file.name
+      xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, 
+                      sep = "-")
+      
+      cmd12 = paste(paste0(xx, ":", x.input),input.gene.list,paste0(gsub(" ","-",Cell_TF), "_cJunAndp27"), sep = "\t")
+      cmd12
+      cat(cmd12, file = file.path(temp3,paste0(xx.name,"_config_cJunAndp27.txt")),sep = "\t")
+    })
+    
+    x.run
+    
+  }, cellInfo, temp3)
+  
+  
+  dir.name=temp3
+  dir.name=reformatPath(dir.name)
+  
+  file.name=file.path(dir.name,dir(dir.name,recursive = TRUE))
+  
+  file.name.2<-as.list(file.name)
+  
+
+  # names(file.name.2) = unlist(lapply(file.name.2, function(u)
+  # {
+  #   u$name
+  # }))
+  
+  zzz <- unlist(file.name.2)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    
+    
+    dir.name = dirname(zzz[u][[1]])
+    file_name = file_path_sans_ext(basename(zzz[u][[1]]))
+    
+    cmd = paste("ngs.plot.r -G hg19 -R tss -C",zzz[u][[1]],"-O",file.path(dir.name,paste0(file_name,".tss")),"-T",file_name,"-L 4000 -RR 1 -CD 1 -GO total",sep=" ")
+  
+    cat(cmd, "\n")
+    cat("\n")
+    
+    #system(as.character(zzz[u][[1]]))
+    
+  }, zzz)
+  
+  
+  re <- list(cellInforun = cellInfo.run, zzz = zzz)
+  
+  #AnntationUsingChipSeeker(temp3, "peaks.bed", temp3, DD = 5000)
+  
+  return(re)
+  
+}
+
+

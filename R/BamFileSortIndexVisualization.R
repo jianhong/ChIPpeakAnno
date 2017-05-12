@@ -356,6 +356,7 @@ job.name, ".err -W"))
       
       
 "ngs.plot.r -G hg19 -R tss -C config.txt -O 2017-03-02-01_S5_R1.tss -T 2017-03-02-01_S5_R1 -L 4000 -RR 1"
+"ngs.plot.r -G hg19 -R tss -C config.txt -O 2017-03-02-01_S5_R1.tss -T 2017-03-02-01_S5_R1 -L 4000 -RR 1 -GO max -SC global"
       
       cmd5="ngs.plot.r -G hg19 -R tss -C"
       cmd6="-O"

@@ -2,7 +2,7 @@
 
 # Usage:
 
-# Rscript ~/ChipSeq/inst/bin/Run_Chip_Seq_interactive_model.r
+# Rscript $HOME/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq_interactive_model.r
 
 R_lib = .libPaths()[1]
 
