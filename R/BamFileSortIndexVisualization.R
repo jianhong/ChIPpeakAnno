@@ -176,7 +176,7 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 
 #'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",job.option = "parallel", cores = 32, Memory = 16000,span.ptile = 16,wait = TRUE)'
 
-plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("general","parallel","bigmem"),cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
+plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = "general",cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
   
   #library(ChIPpeakAnno)
   
@@ -212,7 +212,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
     if (m.id == 1)
     {
       
-      job.option <- match.arg(job.option)
+      #job.option <- match.arg(job.option)
       
       switch (job.option,
               parallel = {
@@ -263,7 +263,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = c("gen
     if (m.id == 1)
     {
       
-      job.option <- match.arg(job.option)
+      #job.option <- match.arg(job.option)
       
       switch (job.option,
               parallel = {
@@ -319,7 +319,7 @@ job.name, ".err -W"))
     #u <- 3
     if (m.id == 1)
     {
-      job.option <- match.arg(job.option)
+      #job.option <- match.arg(job.option)
       
       switch (job.option,
               parallel = {
