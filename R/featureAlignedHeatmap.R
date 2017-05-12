@@ -84,10 +84,12 @@ featureAlignedHeatmap <-
         colnames(covTotalCoverage) <- names(cvglists)
         if(length(annoMcols)>0){
             sortMatrix <- mcols(feature.gr)[, annoMcols, drop=FALSE]
-            for(i in 1:ncol(sortMatrix)){
-                sortMatrix[,i] <- 
-                    factor(as.character(sortMatrix[,i]), 
-                           levels=rev(unique(as.character(sortMatrix[, i]))))
+            for(i in seq.int(ncol(sortMatrix))){
+                if(!is.numeric(sortMatrix[,i])){
+                    sortMatrix[,i] <- 
+                        factor(as.character(sortMatrix[,i]), 
+                               levels=rev(unique(as.character(sortMatrix[, i]))))
+                }
             }
             if(all(sortBy %in% colnames(mcols(feature.gr)))){
                 sortMatrix <- 
@@ -163,8 +165,22 @@ featureAlignedHeatmap <-
     height=1-margin[3]-margin[1]
     width=1-margin[4]-margin[2]
     ## draw y labels
+    isFloat <- function(x){
+        if(is.numeric(x)){
+            return(x!=floor(x))
+        }
+        return(FALSE)
+    }
     areColors <- function(x) {
         sapply(x, function(X) {
+            if(isFloat(X)) return(FALSE)
+            if(is.numeric(X)){
+                if(X<9 && X>0){
+                    return(TRUE)
+                }else{
+                    return(FALSE)
+                }
+            }
             tryCatch(is.matrix(col2rgb(X)), 
                      error = function(e) FALSE)
         })
@@ -236,39 +252,64 @@ featureAlignedHeatmap <-
         for(i in annoMcols){
             mc <- as.character(mcols[, i])
             mc.name <- ifelse(is.numeric(i), colnames(mcols)[i], i)
-            if(!all(areColors(mc))){
-                mc.label <- unique(mc)
-                mc <- factor(mc, levels=mc.label)
-                mc.label.color <- rep(colorGroup[[ci]], 
-                                      length(mc.label))[1:length(mc.label)]
-                levels(mc) <- mc.label.color
-                mc <- as.character(mc)
+            if(!all(areColors(mcols[, i]))){
+                if(is.numeric(mcols[, i])){
+                    mc.range <- range(mcols[, i])
+                    mc.color <- range(colorGroup[[ci]])
+                    mc.color <- colorRampPalette(mc.color)(100)
+                    mc <- cut(mcols[, i], breaks = 100, labels = mc.color)
+                    mc <- as.character(mc)
+                    mc.label <- sort(grid.pretty(mc.range), decreasing = TRUE)
+                    mc.label.color <-
+                        mc.color[round(100*(mc.label-min(mc.range))/
+                                     diff(mc.range))]
+                    mc.label <- mc.label[!is.na(mc.label.color)]
+                    mc.label.color <- mc.label.color[!is.na(mc.label.color)]
+                }else{
+                    mc.label <- unique(mc)
+                    mc <- factor(mc, levels=mc.label)
+                    mc.label.color <- rep(colorGroup[[ci]], 
+                                          length(mc.label))[1:length(mc.label)]
+                    levels(mc) <- mc.label.color
+                    mc <- as.character(mc)
+                }
+                
                 ci <- ci+1
-                ## mc is color
-                ## mc.label is legends
-                ## plot legned
-                ht.annoMcols.legend <- length(mc.label) * 0.03
-                wd.annoMcols.legend <- margin[4]
-                vp.annoMcols.legend <- 
-                    viewport(x=1-wd.annoMcols.legend+gap, 
-                             y=ytop-ht.annoMcols.legend/2, 
-                             width=wd.annoMcols.legend, 
-                             height=ht.annoMcols.legend,
-                             just=0,
-                             name="vp.annoMcols.legend")
-                annoMcols.legend <- legendGrob(labels=mc.label, 
-                                               ncol=1,
-                                               pch=15,
-                                               gp=gpar(col=mc.label.color))
-                allGrob <- gList(allGrob, 
-                                 gTree(children=gList(annoMcols.legend),
-                                       vp=vp.annoMcols.legend,
-                                       name=paste("gTree.annoMcols.legend",
-                                                  mc.name,
-                                                  sep=".")))
-                ytop <- ytop-ht.annoMcols.legend-gap
+            }else{
+                mc.label <- unique(mcols[, i])
+                if(is.numeric(mcols[, i])){
+                    mc <- col2rgb(mc);
+                    mc <- rgb(red=mc[1, ],
+                              green=mc[2, ],
+                              blue=mc[3, ], maxColorValue = 255)
+                }
+                mc.label.color <- unique(mc)
             }
+            ## mc is color
+            ## mc.label is legends
+            ## plot legned
+            ht.annoMcols.legend <- length(mc.label) * 0.03
+            wd.annoMcols.legend <- margin[4]
+            vp.annoMcols.legend <- 
+                viewport(x=1-wd.annoMcols.legend+gap, 
+                         y=ytop-ht.annoMcols.legend/2, 
+                         width=wd.annoMcols.legend, 
+                         height=ht.annoMcols.legend,
+                         just=0,
+                         name="vp.annoMcols.legend")
+            annoMcols.legend <- legendGrob(labels=mc.label, 
+                                           ncol=1,
+                                           pch=15,
+                                           gp=gpar(col=mc.label.color))
+            allGrob <- gList(allGrob, 
+                             gTree(children=gList(annoMcols.legend),
+                                   vp=vp.annoMcols.legend,
+                                   name=paste("gTree.annoMcols.legend",
+                                              mc.name,
+                                              sep=".")))
+            ytop <- ytop-ht.annoMcols.legend-gap
             
+            ## add annoMcols
             vp.annoMcols.sub <- viewport(x=width - .0075,
                                          y=.5, 
                                          width=.015,

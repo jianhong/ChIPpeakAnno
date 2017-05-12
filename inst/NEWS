@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.11.4
+-------------------------
+
+    o fix the bugs when annoMcols is numeric values.
+    
 CHANGES IN VERSION 3.11.3
 -------------------------
 

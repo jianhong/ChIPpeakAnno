@@ -37,12 +37,13 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     totalBPinBin <- floor((upstream + downstream)/n.tile)# * length(feature.gr)
     feature.gr$oid <- 1:length(feature.gr)
     feature.gr.expand <- 
-        suppressWarnings(promoters(feature.gr, upstream=upstream+max(fragmentLength), 
-                  downstream=downstream+max(fragmentLength)))
+        suppressWarnings(promoters(feature.gr, 
+                                   upstream=upstream+max(fragmentLength), 
+                                   downstream=downstream+max(fragmentLength)))
     strand(feature.gr.expand) <- "*"
     feature.gr <- suppressWarnings(promoters(feature.gr,
-                            upstream=upstream, 
-                            downstream=downstream))
+                                             upstream=upstream, 
+                                             downstream=downstream))
     
     grL <- tile(feature.gr, n=n.tile)
     ## reorder the tiles for negative strand and set group id for them.
