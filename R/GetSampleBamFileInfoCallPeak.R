@@ -278,6 +278,8 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
 #' 
 #' re <- ChipSeq:::matchBamInputGene(input.sample.file,input.bam.file,"$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile")
 #' 
+#' re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile")
+#' 
 #' 
 matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"))
 {
@@ -361,18 +363,21 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   lapply(1:length(zzz), function(u, zzz)
   {
     
-    
-    
     dir.name = dirname(zzz[u][[1]])
     file_name = file_path_sans_ext(basename(zzz[u][[1]]))
     
     cmd = paste("ngs.plot.r -G hg19 -R tss -C",zzz[u][[1]],"-O",file.path(dir.name,paste0(file_name,".tss")),"-T",file_name,"-L 4000 -RR 1 -CD 1 -GO total",sep=" ")
   
-    cat(cmd, "\n")
-    cat("\n")
+    
     
     #system(as.character(zzz[u][[1]]))
+    job.name = paste0("bamPlot.", u)
+    cmd.pegasus = usePegasus("general", Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,job.name)
+    cmd2 = paste(cmd.pegasus,cmd,sep = " ")
     
+    cat(cmd2, "\n")
+    cat("\n")
+    system(cmd2)
   }, zzz)
   
   
@@ -384,4 +389,35 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   
 }
 
+#' x <- ChipSeq:::usePegasus("general", Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,"bamPlot")
 
+usePegasus <- function(job.option=c("general","parallel","bigmem")
+                       , Wall.time, cores, Memory, span.ptile,job.name,wait.job.name=NULL) {
+  
+  job.option <- match.arg(job.option)
+  
+  switch (job.option,
+          parallel = {
+            cmd0 = paste(Wall.time,"-n",cores,"-q parallel -R 'rusage[mem=",Memory,"] span[ptile=",span.ptile,"]' -u aimin.yan@med.miami.edu",sep = " ")        
+          },
+          bigmem = {
+            cmd0 = paste(Wall.time,"-n",cores,"-q bigmem -R 'rusage[mem=",Memory,"] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",sep = " ")
+          },
+          general = {
+            cmd0 = paste(Wall.time,"-n",cores,"-q general -R 'rusage[mem=",Memory,"] span[ptile=",span.ptile, "]' -u aimin.yan@med.miami.edu",sep = " ")
+          }
+  )
+  
+  if(!is.null(wait.job.name)){
+    cmd1 = paste0("bsub -w \"done(\"", wait.job.name, "\")\"", " -P bbc -J \"",
+                  job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
+                                                                           job.name, ".err -W"))
+  }else{
+    cmd1 = paste0("bsub -P bbc -J \"",job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
+                                                                                               job.name, ".err -W"))
+  }
+  
+    cmd = paste(cmd1,cmd0,sep=" ")
+  
+  return(cmd)
+}
