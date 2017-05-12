@@ -174,7 +174,7 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 
 #'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4,wait = FALSE)'
 
-#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",job.option = "parallel", cores = 10, Memory = 16000,span.ptile = 4,wait = TRUE)'
+#'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",job.option = "parallel", cores = 32, Memory = 16000,span.ptile = 16,wait = TRUE)'
 
 plotBam <- function(input.file.dir,file.type,output.file.dir,job.option=c("general","parallel","bigmem"),cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
   
