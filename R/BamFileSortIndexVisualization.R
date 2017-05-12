@@ -172,7 +172,6 @@ convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem 
 
 #'R -e 'library(ChipSeq);ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot")'
 
-
 #'R -e 'library(ChipSeq); x <- ChipSeq:::plotBam(input.file.dir="/scratch/projects/bbc/Project/Danny_chip2/Alignment/BWA",file.type="*marked.bam",output.file.dir="/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot",cores = 8, Memory = 16000,span.ptile = 4,wait = FALSE)'
 
 plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8,wait=TRUE) {
@@ -197,46 +196,46 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
   
   #cmd1="samtools sort"
   
-  # cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
-  #                                  span.ptile,re.out,temp3){
-  #   
-  #   file_name = file_path_sans_ext(basename(re.out[[u]]))
-  #   
-  #   # file_name <- paste0(path_name2,'-',file_name)
-  #   #u <- 3
-  #   if (m.id == 1)
-  #   {
-  #     if (BigMem == TRUE)
-  #     {
-  #       cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
-  #                    Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-  #                    sep = " ")
-  #     } else
-  #     {
-  #       cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
-  #                    Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
-  #                    sep = " ")
-  #     }
-  #     
-  #     job.name = paste0("bamSort.", u)
-  #     cmd1 = paste0("bsub -P bbc -J \"", job.name, paste0("\" -o %J.",
-  #                                                         job.name, ".log "), paste0("-e %J.", job.name, ".err -W"))
-  #     
-  #     
-  #     cmd2=paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
-  #     cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
-  #   } else
-  #   {
-  #       cmd3 = paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sotrted")),sep=" ")
-  #   }
-  #   
-  #   cmd <- cmd3
-  #   
-  #   system(cmd)
-  #   
-  #   cmd
-  # 
-  # },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
+  cmd.1 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
+                                   span.ptile,re.out,temp3){
+
+    file_name = file_path_sans_ext(basename(re.out[[u]]))
+
+    # file_name <- paste0(path_name2,'-',file_name)
+    #u <- 3
+    if (m.id == 1)
+    {
+      if (BigMem == TRUE)
+      {
+        cmd0 = paste(Wall.time, "-n", cores, "-q bigmem -R 'rusage[mem=",
+                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                     sep = " ")
+      } else
+      {
+        cmd0 = paste(Wall.time, "-n", cores, "-q general -R 'rusage[mem=",
+                     Memory, "] span[ptile=", span.ptile, "]' -u aimin.yan@med.miami.edu",
+                     sep = " ")
+      }
+
+      job.name = paste0("bamSort.", u)
+      cmd1 = paste0("bsub -P bbc -J \"", job.name, paste0("\" -o %J.",
+                                                          job.name, ".log "), paste0("-e %J.", job.name, ".err -W"))
+
+
+      cmd2=paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sorted")),sep=" ")
+      cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
+    } else
+    {
+        cmd3 = paste("samtools sort",re.out[[u]],file.path(temp3,paste0(file_name, "_sorted")),sep=" ")
+    }
+
+    cmd <- cmd3
+
+    system(cmd)
+
+    cmd
+
+  },m.id,Wall.time,cores,Memory,span.ptile,re.out,temp3)
 
     
   cmd.2 <- lapply(1:length(re.out),function(u,m.id, Wall.time, cores, Memory,
@@ -271,11 +270,11 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,BigMem=FALSE,cores 
       cmd1 = paste0("bsub -P bbc -J \"",job.name, paste0("\" -o %J.", job.name, ".log "), paste0("-e %J.",
 job.name, ".err -W"))
       }
-      cmd2=paste("samtools index",file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
+      cmd2=paste("samtools index",file.path(temp3,paste0(file_name, "_sorted.bam")),sep=" ")
       cmd3 = paste(cmd1, cmd0, cmd2, sep = " ")
     } else
     {
-      cmd3 = paste("samtools index",file.path(temp3,paste0(file_name, "_sotrted.bam")),sep=" ")
+      cmd3 = paste("samtools index",file.path(temp3,paste0(file_name, "_sorted.bam")),sep=" ")
     }
     
     cmd <- cmd3
