@@ -281,7 +281,10 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
 #' R -e 'libraray(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile",,job.option = "parallel")'
 #' 
 #' 
-matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"),job.option)
+#' bsub -P bbc -J \"bamPlot\" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'libraray(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","$HOME/all_common_gene_unique.txt","$HOME/NgsConfigFile",,job.option = "parallel")'
+#' 
+#' 
+matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,output.dir,ngs.para=c("hg19",4000,1,1,"total"))
 {
   
   re <- GetSampleInfo(input.sample.file, input.bam.file)
@@ -360,7 +363,7 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   
   zzz <- unlist(file.name.2)
   
-  lapply(1:length(zzz), function(u,job.option,zzz)
+  lapply(1:length(zzz), function(u,zzz)
   {
     
     dir.name = dirname(zzz[u][[1]])
@@ -371,14 +374,15 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
     
     
     #system(as.character(zzz[u][[1]]))
-    job.name = paste0("bamPlot.", u)
-    cmd.pegasus = usePegasus(job.option, Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,job.name)
-    cmd2 = paste(cmd.pegasus,cmd,sep = " ")
+    # job.name = paste0("bamPlot.", u)
+    # cmd.pegasus = usePegasus(job.option, Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,job.name)
+    # cmd2 = paste(cmd.pegasus,cmd,sep = " ")
     
+    cmd2 = cmd
     cat(cmd2, "\n")
     cat("\n")
     system(cmd2)
-  },job.option,zzz)
+  },zzz)
   
   
   re <- list(cellInforun = cellInfo.run, zzz = zzz)
@@ -389,7 +393,7 @@ matchBamInputGene <- function(input.sample.file, input.bam.file,input.gene.list,
   
 }
 
-#' x <- ChipSeq:::usePegasus("general", Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,"bamPlot")
+#' x <- ChipSeq:::usePegasus("parallel", Wall.time = "72:00",cores = 32,Memory = 16000,span.ptile = 16,"bamPlot")
 
 usePegasus <- function(job.option=c("general","parallel","bigmem")
                        , Wall.time, cores, Memory, span.ptile,job.name,wait.job.name=NULL) {
