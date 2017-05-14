@@ -390,7 +390,7 @@ matchBamInputGene <- function(input.sample.file, input.bam.file, input.gene.list
 # /deepTools-1.5/bin/bamCompare --bamfile1 ChIP.bam --bamfile2 Input.bam \
 # --binSize 25 --fragmentLength 200 --missingDataAsZero no \
 # --ratio log2 --scaleFactorsMethod SES -o log2ratio_ChIP_vs_Input.bw
-#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useBamCompare("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","~/BamCompare")'
+#' bsub -P bbc -J "bamCompare" -o %J.bamCompare.log -e %J.Compare.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useBamCompare("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","~/BamCompare")'
 
 
 useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
@@ -446,7 +446,7 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
     
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
         
-      cmd5 <- file.path(output.dir,paste("log2ratio_",basename(xx),"_vs_",basename(x.input),".bw",sep=" "))
+      cmd5 <- file.path(output.dir,paste0("log2ratio_",xx,"_vs_",x.input,".bw"))
       
       
       cmd6 <- paste(cmd4,cmd5,sep=" ") 
