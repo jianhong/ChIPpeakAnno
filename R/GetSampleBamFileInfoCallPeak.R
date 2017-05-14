@@ -447,7 +447,7 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
     
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
         
-      cmd5 <- file.path(output.dir,paste0("log2ratio_",xx,"_vs_",x.input,".bw"))
+      cmd5 <- file.path(output.dir,paste0("log2ratio_",basename(xx),"_vs_",basename(x.input),".bw"))
       
       
       cmd6 <- paste(cmd4,cmd5,sep=" ") 
