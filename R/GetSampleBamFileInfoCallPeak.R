@@ -452,14 +452,16 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
       
       cmd6 <- paste(cmd4,cmd5,sep=" ") 
       
+      cmd6
+      
+      cat(cmd6, "\n")
+      cat("\n")
+    },
     }, x.input, temp3)
     
     x.run
     
-    cat(x.run, "\n")
-    
-    cat("\n")
-  },cellInfo, temp3)
+    cellInfo, temp3)
   
   
   # # dir.name=temp3 dir.name=reformatPath(dir.name)
