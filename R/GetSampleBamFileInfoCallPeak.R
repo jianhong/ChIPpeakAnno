@@ -274,6 +274,10 @@ configAndMultiplot <- function(res, select.sample, output.config.dir)
 #' bsub -P bbc -J 'bamPlot' -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene('/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv','/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt','~/all_common_gene_unique.txt','NgsConfigFile')'
 #' 
 #' 
+#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","~/all_common_gene_unique.txt","NgsConfigFile3",add.input= "yes")'
+
+#' 
+#' 
 matchBamInputGene <- function(input.sample.file, input.bam.file, input.gene.list, 
     output.dir, ngs.para = c("hg19", 4000, 1, 1, "total"), add.input = NULL)
     {
@@ -381,6 +385,121 @@ matchBamInputGene <- function(input.sample.file, input.bam.file, input.gene.list
     return(re)
     
 }
+
+
+# /deepTools-1.5/bin/bamCompare --bamfile1 ChIP.bam --bamfile2 Input.bam \
+# --binSize 25 --fragmentLength 200 --missingDataAsZero no \
+# --ratio log2 --scaleFactorsMethod SES -o log2ratio_ChIP_vs_Input.bw
+
+useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
+{
+  
+  re <- GetSampleInfo(input.sample.file, input.bam.file)
+  
+  cellInfo <- re$y
+  
+  # output.dir.name = dirname(input.sample.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  temp3 = output.dir
+  
+  # cmd9 = 'ngs.plot.r -G' cmd10 = '-R' cmd11 = '-C' cmd12 = '-O' cmd13 = '-T'
+  # cmd14 = '-L' cmd15 = '-RR' cmd16 = '-CD' cmd17= '-GO'
+  
+  
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u,cellInfo, 
+                                                      temp3)
+  {
+    
+    x.name = cellInfo[[u]]$name
+    
+    es <- cellInfo[[u]]$es
+    
+    x.input <- es[es$Type_TF == "Input", ]$file.name
+    
+    x.sample <- es[es$Type_TF != "Input", ]
+    
+    x.run <- apply(x.sample, 1, function(x, x.input, temp3)
+    {
+      
+      y <- x
+      
+      ID <- y[1]
+      Type_Cell <- y[2]
+      Type_TF <- y[3]
+      Cell_TF <- y[4]
+      file.name <- y[5]
+      xx <- file.name
+      xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+      
+      
+      cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",x.input,sep=" ")
+      cmd2 <- "--binSize 25 --fragmentLength 200"
+      cmd3 <- "--missingDataAsZero no --ratio log2 --scaleFactorsMethod SES -o"
+    
+      cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
+        
+      cmd5 <- file.path(output.dir,paste("log2ratio_",basename(xx),"_vs_",basename(x.input),".bw",sep=" "))
+      
+      
+      cmd6 <- paste(cmd4,cmd5,sep=" ") 
+      
+    }, x.input, temp3)
+    
+    x.run
+    
+    cat(x.run, "\n")
+    
+  },cellInfo, temp3)
+  
+  
+  # # dir.name=temp3 dir.name=reformatPath(dir.name)
+  # 
+  # file.name = file.path(temp3, dir(temp3, recursive = TRUE))
+  # 
+  # file.name.2 <- as.list(file.name)
+  # 
+  # 
+  # # names(file.name.2) = unlist(lapply(file.name.2, function(u) { u$name }))
+  # 
+  # zzz <- unlist(file.name.2)
+  # 
+  # lapply(1:length(zzz), function(u, zzz)
+  # {
+  #   
+  #   dir.name = dirname(zzz[u][[1]])
+  #   file_name = file_path_sans_ext(basename(zzz[u][[1]]))
+  #   
+  #   cmd = paste("ngs.plot.r -G hg19 -R tss -C", zzz[u][[1]], "-O", file.path(dir.name, 
+  #                                                                            paste0(file_name, ".tss")), "-T", file_name, "-L 4000 -RR 1 -CD 1 -GO total", 
+  #               sep = " ")
+  #   
+  #   
+  #   
+  #   # system(as.character(zzz[u][[1]])) job.name = paste0('bamPlot.', u)
+  #   # cmd.pegasus = usePegasus(job.option, Wall.time = '72:00',cores = 32,Memory
+  #   # = 16000,span.ptile = 16,job.name) cmd2 = paste(cmd.pegasus,cmd,sep = ' ')
+  #   
+  #   cmd2 = cmd
+  #   cat(cmd2, "\n")
+  #   cat("\n")
+  #   system(cmd2)
+  # }, zzz)
+  # 
+  # 
+  # re <- list(cellInforun = cellInfo.run, zzz = zzz)
+  # 
+  # # AnntationUsingChipSeeker(temp3, 'peaks.bed', temp3, DD = 5000)
+  
+  #return(re)
+  
+}
+
 
 #' x <- ChipSeq:::usePegasus('parallel', Wall.time = '72:00',cores = 32,Memory = 16000,span.ptile = 16,'bamPlot')
 
