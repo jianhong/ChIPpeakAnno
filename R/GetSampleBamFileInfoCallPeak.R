@@ -456,14 +456,12 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
       
       cat(cmd6, "\n")
       cat("\n")
-    },
     }, x.input, temp3)
     
     x.run
     
-    cellInfo, temp3)
-  
-  
+    }, cellInfo,temp3)
+
   # # dir.name=temp3 dir.name=reformatPath(dir.name)
   # 
   # file.name = file.path(temp3, dir(temp3, recursive = TRUE))
