@@ -427,8 +427,8 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
     
     x.sample <- es[es$Type_TF != "Input", ]
     
-    print(x.sample)
-    print(x.input)
+    #print(x.sample)
+    #print(x.input)
     
     x.run <- apply(x.sample, 1, function(x, x.input, temp3)
     {
@@ -479,7 +479,7 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
     cat(as.character(zzz[u][[1]]), "\n")
     cat("\n")
     
-    #system(as.character(zzz[u][[1]]))
+    system(as.character(zzz[u][[1]]))
     
   }, zzz)
   # # dir.name=temp3 dir.name=reformatPath(dir.name)
