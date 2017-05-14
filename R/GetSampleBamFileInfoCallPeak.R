@@ -454,14 +454,31 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
       
       cmd6
       
-      cat(cmd6, "\n")
-      cat("\n")
+      #cat(cmd6, "\n")
+      #cat("\n")
     }, x.input, temp3)
     
     x.run
     
     }, cellInfo,temp3)
-
+  
+  
+  names(cellInfo.run) = unlist(lapply(cellInfo, function(u)
+  {
+    u$name
+  }))
+  
+  zzz <- unlist(cellInfo.run)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    cat(as.character(zzz[u][[1]]), "\n")
+    cat("\n")
+    
+    #system(as.character(zzz[u][[1]]))
+    
+  }, zzz)
   # # dir.name=temp3 dir.name=reformatPath(dir.name)
   # 
   # file.name = file.path(temp3, dir(temp3, recursive = TRUE))
