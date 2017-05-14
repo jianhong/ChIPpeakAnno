@@ -445,8 +445,8 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
       
       
       cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",x.input,sep=" ")
-      cmd2 <- "--binSize 25 --fragmentLength 200"
-      cmd3 <- "--missingDataAsZero no --ratio log2 --scaleFactorsMethod SES -o"
+      cmd2 <- "--binSize 25"
+      cmd3 <- "--ratio log2 -o"
     
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
         
