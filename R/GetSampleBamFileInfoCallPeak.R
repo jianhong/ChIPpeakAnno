@@ -443,8 +443,9 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
       xx <- file.name
       xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
       
+      # ~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCompare  --bamfile1 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-03_S11_R1.marked_sorted.bam --bamfile2 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-17_S1_R1.marked_sorted.bam --binSize 25 --ratio log2 -o ~/BamCompare/log2ratio_2017-03-02-03_S11_R1.marked_sorted.bam_vs_2017-03-02-17_S1_R1.marked_sorted.bam.bw 
       
-      cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",x.input,sep=" ")
+      cmd1 <- paste("~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCompare --bamfile1",xx,"--bamfile2",x.input,sep=" ")
       cmd2 <- "--binSize 25"
       cmd3 <- "--ratio log2 -o"
     
