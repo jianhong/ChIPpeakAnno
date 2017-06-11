@@ -3585,3 +3585,60 @@ runPlotBam2 <- function(input.sample.file,input.bam.file,output.dir) {
   system(mergeBam)
   
 }
+
+#' bsub -P bbc -J 'bamPlot' -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene('/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv','/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt','~/all_common_gene_unique.txt','NgsConfigFile')'
+#' 
+#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot4Merged","*_sorted.bam","~/all_common_gene_unique.txt","NgsPlot4Merged")'
+#' 
+plotMergedBamWgene <- function(input.bam.file.dir,file.pattern,input.gene.list, 
+                              output.dir, ngs.para = c("hg19", 4000, 1, 1, "total"), add.input = NULL)
+{
+  
+  cellInfor <- list.files(input.bam.file.dir,pattern = file.pattern,all.files = TRUE,
+             full.names = TRUE, recursive = TRUE,include.dirs = TRUE)
+  
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  temp3 = output.dir
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u,cellInfo, 
+                                                      temp3)
+  {
+    xx <- cellInfo[u]
+    xxx <- file_path_sans_ext(basename(xx)) 
+    cmd12 = paste(xx, input.gene.list, xxx, sep = "\t")
+    cat(cmd12, file = file.path(temp3, paste0(xxx, "_config_cJunAndp27.txt")), sep = "\t")
+  },cellInfo,temp3)
+
+  # dir.name=temp3 dir.name=reformatPath(dir.name)
+  file.name <- list.files(temp3,pattern = "*_config_cJunAndp27.txt",all.files = TRUE,
+             full.names = TRUE, recursive = TRUE,include.dirs = TRUE)
+  
+  file.name.2 <- as.list(file.name)
+  
+  zzz <- unlist(file.name.2)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    dir.name = dirname(zzz[u][[1]])
+    file_name = file_path_sans_ext(basename(zzz[u][[1]]))
+    
+    cmd = paste("ngs.plot.r -G hg19 -R tss -C", zzz[u][[1]], "-O", file.path(dir.name, 
+                                                                             paste0(file_name, ".tss")), "-T", file_name, "-L 4000 -RR 1 -CD 1 -GO total", 
+                sep = " ")
+  
+    cmd2 = cmd
+    cat(cmd2, "\n")
+    cat("\n")
+    system(cmd2)
+  }, zzz)
+  
+  return(re)
+  
+}
+
