@@ -3580,5 +3580,8 @@ runPlotBam2 <- function(input.sample.file,input.bam.file,output.dir) {
   
   n.job <- 12
   
-  DoGs:::createBsubJobArrayRfun(Rfun3,paste0("mergeBam[1-",n.job,"]"),NULL)
+  mergeBam <- DoGs:::createBsubJobArrayRfun(Rfun3,paste0("mergeBam[1-",n.job,"]"),NULL)
+  
+  system(mergeBam)
+  
 }
