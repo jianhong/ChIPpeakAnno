@@ -3588,13 +3588,13 @@ runPlotBam2 <- function(input.sample.file,input.bam.file,output.dir) {
 
 #' bsub -P bbc -J 'bamPlot' -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene('/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv','/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt','~/all_common_gene_unique.txt','NgsConfigFile')'
 #' 
-#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::matchBamInputGene("/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot4Merged","*_sorted.bam","~/all_common_gene_unique.txt","NgsPlot4Merged")'
+#' bsub -P bbc -J "bamPlot" -o %J.bamPlot.log -e %J.bamPlot.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::plotMergedBamWgene("/scratch/projects/bbc/aiminy_project/DannyNewNgsPlot4Merged","*_sorted.bam","~/all_common_gene_unique.txt","NgsPlot4Merged")'
 #' 
 plotMergedBamWgene <- function(input.bam.file.dir,file.pattern,input.gene.list, 
                               output.dir, ngs.para = c("hg19", 4000, 1, 1, "total"), add.input = NULL)
 {
   
-  cellInfor <- list.files(input.bam.file.dir,pattern = file.pattern,all.files = TRUE,
+  cellInfo <- list.files(input.bam.file.dir,pattern = file.pattern,all.files = TRUE,
              full.names = TRUE, recursive = TRUE,include.dirs = TRUE)
   
   
