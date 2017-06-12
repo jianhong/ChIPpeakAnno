@@ -30,17 +30,46 @@ source .bashrc
 > .libPaths()
 [1] "/nethome/axy148/R/lib64/R/library"
 
+#install 0.99.0 version
+#In R console
 library(devtools)
-install_github("aiminy/ChipSeq",dependencies = T , force = T)
+install_github("aiminy/ChipSeq",ref='0.99.0',dependencies = T , force = T)
 
 #If you use command line in pegasus terminal
-R -e 'library(devtools);install_github("aiminy/ChipSeq")'
+R -e 'library(devtools);install_github("aiminy/ChipSeq",ref = "0.99.0",dependencies = T , force = T)'
 ```
 
 ## You can run ChipSeq using interactive model by follwing hints:
 
 ```{bash}
 Rscript /nethome/axy148/R/lib64/R/library/ChipSeq/bin/Run_Chip_Seq_interactive_model.r
+Your operating system is:  linux 
+
+#Do you want to perform peak calling, annotation, and coverage visualization?
+Yes
+[1] "Yes"
+
+#Do you have input bam file for control ?
+Yes
+
+#please define the sample information file:
+/projects/scratch/bbc/aiminy_project/SampleID_INFO_ChIP_new_Danny.csv
+
+#please define the Bam files information file:
+/projects/scratch/bbc/aiminy_project/DannyNewDataHQ.txt
+
+#please define genome name:
+hs
+
+#Which peakcaller you want to use, please choose: macs14 or macs2 
+macs2
+
+#The peakcaller you choose is : macs2 please define p value threshold for peak calling: 
+0.1
+
+#Please define the name of output directory for peaks: 
+PeakCallDefault4HQ
+
 ```
 # Perform analysis in the streamlined batch model
 

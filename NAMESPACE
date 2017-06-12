@@ -1,15 +1,19 @@
 import(TxDb.Hsapiens.UCSC.hg19.knownGene)
 import(TxDb.Hsapiens.UCSC.hg38.knownGene)
+import(org.Hs.eg.db)
+
 import(ChIPseeker)
 import(ChIPpeakAnno)
 import(DiffBind)
 import(LOLA)
 import(Vennerable)
 import(EnsDb.Hsapiens.v75)
+import(GenomicRanges)
 
-importFrom(tools,file_ext)
+#importFrom(tools,file_ext)
 importFrom(grid,grid.text,gpar)
 importFrom(gtools,smartbind)
+importFrom(tools,file_ext,file_path_sans_ext)
 
 export(AnnotatePeak2)
 export(AnnotatePeak3)
