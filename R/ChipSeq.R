@@ -1,10 +1,6 @@
-Gmail	AIMIN YAN <jlfmssm@gmail.com>
-  (no subject)
-Aimin Yan <aimin@jimmy.harvard.edu>	Mon, Jul 17, 2017 at 4:37 PM
-To: jlfmssm <jlfmssm@gmail.com>
-  #' AnnotatePeak2
-  #'
-  #' @param input.file.dir 
+#' AnnotatePeak2
+#'
+#' @param input.file.dir 
 #' @param input.file.pattern 
 #' @param index.file 
 #' @param output.file.dir 
