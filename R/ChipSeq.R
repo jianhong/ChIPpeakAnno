@@ -145,7 +145,9 @@ AnnotatePeak2 <- function(input.file.dir,input.file.pattern,index.file,output.fi
     
   }
   
-}#' AnnotatePeak3
+}
+
+#' AnnotatePeak3
 #'
 #' @param input.file.dir 
 #' @param output.file.dir 
@@ -516,7 +518,6 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,genome)
   
   
 }
-
 
 convertBam2StrandBw2 <- function(input.bam.file.dir, output.bw.file.dir, BigMem = FALSE,
                                  cores = 15, Memory = 25000, Wall.time = "72:00", span.ptile = 8)
@@ -3685,7 +3686,7 @@ plotMergedBamWgene <-
     
   }
 
-#mcf.with.zhao <- ChipSeq:::addMoreBed2mcf("/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny_zhao.csv","~/Dropbox (BBSR)/BWA","/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall","bed$",mcf=NULL,"/Volumes/Bioinformatics$/2017/DannyNewData/testRun5")
+#mcf.with.zhao <- ChipSeq:::addMoreBed2mcf("/Volumes/Bioinformatics$/2017/DannyNewData/SampleID_INFO_ChIP_new_Danny_zhao.csv","~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/BamDanny","/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall","bed$",mcf=NULL,"/Volumes/Bioinformatics$/2017/DannyNewData/testRun5")
 
 addMoreBed2mcf<-function(input.sample.file,input.bam.dir,input.bed.dir,input.file.pattern,mcf=NULL,output.dir){
   
@@ -4126,7 +4127,6 @@ useChIPpeakAnno <- function(mcf.with.zhao) {
 # ZR751,ZR75,ER,Responsive,Full-Media,1,reads/Chr18_ZR75_ER_1.bam,ZR75c,reads/Chr18_ZR75_input.bam,peaks/ZR75_ER_1.bed.gz,bed
 # ZR752,ZR75,ER,Responsive,Full-Media,2,reads/Chr18_ZR75_ER_2.bam,ZR75c,reads/Chr18_ZR75_input.bam,peaks/ZR75_ER_2.bed.gz,bed
 
-
 #prepareBamFile("~/Dropbox (BBSR)/BWA")
 
 prepareBamFile <- function(input.bam.dir){
@@ -4150,9 +4150,9 @@ prepareBamFile <- function(input.bam.dir){
   
 }
 
-# tamoxifen <- prepareSampleSheet(mcf.with.zhao)
+# tamoxifen <- prepareSampleSheet(mcf.with.zhao,"~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/BamDanny")
 
-prepareSampleSheet <- function(mcf.with.zhao){
+prepareSampleSheet <- function(mcf.with.zhao,output.file.dir){
   
   sampleSheet <- mcf.with.zhao$sample.4.dba[,c(1,2,3,5,9,13)]
   sampleSheet2 <- cbind(sampleSheet[,1:3],rep("Danny-Treatment",dim(sampleSheet)[1]),rep("Danny-condition",dim(sampleSheet)[1]),sampleSheet[,4:6],rep("bed",dim(sampleSheet)[1]))
@@ -4170,7 +4170,9 @@ prepareSampleSheet <- function(mcf.with.zhao){
   tamoxifen <- dba.contrast(tamoxifen, group1 = c(5,6),group2=c(15,16),name1="p27_231", name2="p27_1833")
   tamoxifen <- dba.analyze(tamoxifen)
   
+  save(tamoxifen,file=file.path(output.file.dir,"Danny_Dba.RData"))
   tamoxifen
+
   # dba.report(tamoxifen,contrast = 1)
   # dba.report(tamoxifen,contrast = 2)
   # dba.report(tamoxifen,contrast = 3)
@@ -4180,8 +4182,182 @@ prepareSampleSheet <- function(mcf.with.zhao){
   
 }
 
+#generateBedFromDba(tamoxifen,"~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/Bba2Bed")
 
-gene.231dd.231.1833.1833shp27 <- read.xlsx(
-  "/Volumes/Bioinformatics$/2017/DannyNewData/AnnotationNew4DBA/table_S3_headerless.xlsx",
-  sheetIndex = 1,header = FALSE)
+generateBedFromDba <- function(tamoxifen,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  n <- length(tamoxifen$contrasts)
+  
+  lapply(1:n,function(u,tamoxifen){
+    
+    temp <- as.data.frame(dba.report(tamoxifen,contrast = u,th=1))
+    
+    file.name <- paste(colnames(as.data.frame(dba.report(tamoxifen,contrast = u,th=1)))[c(7,8)],collapse = "-")
+    
+    write.table(temp, row.names=F, col.names = F, quote =F,sep="\t", file=file.path(output.file.dir,paste0(file.name,".bed")))
+    
+  },tamoxifen)
+  
+}
 
+#' dir.name="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/Bba2Bed"
+#' input.file.pattern=".bed"
+#' out.dir.name="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/AnnotationNew4DBA"
+#' txdb="hg19"
+#' DD=5000
+#' 
+#' AnntationUsingChipSeeker2(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000, AP=c("Promoter","Intron"))
+#'
+#' res.promoter <- AnntationUsingChipSeeker2(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000,AP=c("Promoter"))
+#' 
+#' AnntationUsingChipSeeker2(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000,AP=c("Intron"))
+#' 
+ 
+AnntationUsingChipSeeker2 <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=5000,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
+  
+  re<-ParserReadFiles(dir.name,input.file.pattern)
+  
+  re.bed<-re$input
+  
+  re.peaks.only.bed.2 <- re.bed
+  
+  # if(length(dir(dir.name,pattern="peaks.bed"))!=0)
+  # {
+  # re.peaks.only.bed.2<-FL(re.bed,'peaks')
+  # cat("peaks\n")
+  # print(re.peaks.only.bed.2)
+  # }
+  # 
+  # if(length(dir(dir.name,pattern="summits.bed"))!=0){
+  # re.summits.only.bed<-FL(re.bed,'summits')
+  # cat("summits\n")
+  # print(re.summits.only.bed)
+  # }
+  
+  txdb<-match.arg(txdb)
+  
+  switch (txdb,
+          hg38 = {
+            cat("Use hg38\n")
+            txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+          },
+          {
+            cat("Use hg19\n") 
+            txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+          }
+  )
+  
+  APpath <- paste(AP,collapse = "_")
+  
+  temp3=file.path(out.dir.name,"Annotation",APpath)
+  
+  if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
+  
+  d=DD
+  
+  peaks.anno.list <- lapply(1:length(re.peaks.only.bed.2),function(u,re.peaks.only.bed.2,d){
+    
+    peaks=readPeakFile(re.peaks.only.bed.2[[u]],as="data.frame")
+    
+    print(head(peaks))
+    
+    peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
+                             TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,genomicAnnotationPriority=AP,annoDb="org.Hs.eg.db")
+    
+    #select.index <- which(peakAnno$distanceToTSS<20,000 && peakAnno$distanceToTSS >= -20,000)
+    dropAnnoM <- function (csAnno, distanceToTSS_cutoff) 
+    {
+      idx <- which(abs(mcols(csAnno@anno)[["distanceToTSS"]]) < 
+                     distanceToTSS_cutoff)
+      csAnno@anno <- csAnno@anno[idx]
+      csAnno@peakNum <- length(idx)
+      if (csAnno@hasGenomicAnnotation) {
+        csAnno@annoStat <- ChIPseeker:::getGenomicAnnoStat(csAnno@anno)
+        csAnno@detailGenomicAnnotation = csAnno@detailGenomicAnnotation[idx, 
+                                                                        ]
+      }
+      csAnno
+    }
+    
+    peakAnno <- dropAnnoM(peakAnno,distanceToTSS_cutoff = distanceToTSS_cutoff)
+    
+    x_name=names(re.peaks.only.bed.2)[u]
+    cat(x_name,"\n")
+    png(file.path(temp3,paste0(x_name,"_",d,APpath,"_around_tss_annotation_pie.png")))
+    plotAnnoPie(peakAnno)
+    dev.off()
+    
+    peaks.anno=as.data.frame(peakAnno)
+    
+    print(head(peaks.anno))
+    
+    #print(paste0(peaks[,c(2,3)]))
+    group1 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][1] 
+    group2 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][2] 
+    
+    colnames(peaks.anno)[5:13]=c("starnd","width_DiffDind_based","strand","Conc", group1,group2,"Fold","p.value","FDR")
+    
+    print(colnames(peaks.anno))
+    write.table(peaks.anno,file=file.path(temp3,paste0(x_name,"_",d,APpath,"_around_tss_annotation_4_only_mapped_peaks.xls")),
+                row.names = FALSE,quote=FALSE,sep="\t")
+    
+    # unmapped.peaks<-peaks[-which(paste0(peaks[,2],"_",peaks[,3]) %in% paste0(peaks.anno[,2],"_",peaks.anno[,3])),]
+    # 
+    # cat(dim(peaks)[1]," ",dim(peaks.anno)[1]," ",dim(unmapped.peaks)[1],"\n")
+    # 
+    # 
+    # if(dim(unmapped.peaks)[1]!=0){
+    #   
+    #   colnames(unmapped.peaks)=colnames(peaks.anno)[1:6]
+    #   
+    #   unmapped.peaks.3<-smartbind(peaks.anno,unmapped.peaks)
+    #   
+    #   unmapped.peaks.4<-unmapped.peaks.3[order(unmapped.peaks.3[,1],unmapped.peaks.3[,2]),]
+    #   
+    #   write.table(unmapped.peaks.4,file=file.path(temp3,paste0(x_name,"_",d,APpath,"_around_tss_annotation_4_all_peaks.xls")),row.names = FALSE,quote=FALSE,sep="\t")
+    # }
+    # 
+    
+    peaks.anno
+    
+  },re.peaks.only.bed.2,d)
+  
+}
+
+#' out.dir.name="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/CombineChipSeqWithRNASeq"
+#' rna.seq.input.file="/Volumes/Bioinformatics$/2017/DannyNewData/AnnotationNew4DBA/table_S3_headerless.xlsx"
+#' 
+#' integrateChipSeqWithRNASeq(out.dir.name,rna.seq.input.file) 
+#' 
+integrateChipSeqWithRNASeq <- function(output.file.dir,rna.seq.input.file) {
+ 
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  gene.231dd.231.1833.1833shp27 <- read.xlsx(rna.seq.input.file,sheetIndex = 1,header = FALSE)
+  
+  colnames(gene.231dd.231.1833.1833shp27)=c("SYMBOL","FC_231DD_231","p_231DD_231","FC_1833_231","p_1833_231","FC_1833shp27_1833","p_1833shp27_1833")
+  
+  data.231DD.231 <- gene.231dd.231.1833.1833shp27[,c(1,2,3)]
+  data.1833.231 <- gene.231dd.231.1833.1833shp27[,c(1,4,5)]
+  data.1833shp27.1833 <- gene.231dd.231.1833.1833shp27[c(1,6,7)]
+  
+  cJun.231DD.231.ChipSeq.RNASeq <- merge(res.promoter[[2]],data.231DD.231,by="SYMBOL")
+  p27.231DD.231.ChipSeq.RNASeq <- merge(res.promoter[[5]],data.231DD.231,by="SYMBOL")
+  
+  cJun.231.1833.ChipSeq.RNASeq <- merge(res.promoter[[3]],data.1833.231,by="SYMBOL")
+  p27.231.1833.ChipSeq.RNASeq  <- merge(res.promoter[[6]],data.1833.231,by="SYMBOL")
+  
+  write.table(cJun.231DD.231.ChipSeq.RNASeq,file=file.path(output.file.dir,"cJun_231DD_231_DBA_DGE.xls"),
+              row.names = FALSE,quote=FALSE,sep="\t")
+  
+  write.table(p27.231DD.231.ChipSeq.RNASeq,file=file.path(output.file.dir,"p27_231DD_231_DBA_DGE.xls"),
+              row.names = FALSE,quote=FALSE,sep="\t")
+  
+  write.table(cJun.231.1833.ChipSeq.RNASeq,file=file.path(output.file.dir,"cJun_231_1833_DBA_DGE.xls"),
+              row.names = FALSE,quote=FALSE,sep="\t")
+  
+  write.table(p27.231.1833.ChipSeq.RNASeq,file=file.path(output.file.dir,"p27_231_1833_DBA_DGE.xls"),
+              row.names = FALSE,quote=FALSE,sep="\t")
+}

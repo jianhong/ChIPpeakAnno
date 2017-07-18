@@ -425,7 +425,9 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
      
    },re.peaks.only.bed.2,d)
    
-}#' BamFileSortIndexVisualization 
+}
+
+#' BamFileSortIndexVisualization 
 #'
 #' @param input.file.dir 
 #' @param output.file.dir 

@@ -9,6 +9,7 @@ import(LOLA)
 import(Vennerable)
 import(EnsDb.Hsapiens.v75)
 import(GenomicRanges)
+import(xlsx)
 
 #importFrom(tools,file_ext)
 importFrom(grid,grid.text,gpar)
