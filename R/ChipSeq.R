@@ -4455,6 +4455,8 @@ system(cm1)
 
 submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
+  Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
+  
   if (!dir.exists(output.file.dir))
   {
     dir.create(output.file.dir, recursive = TRUE)
