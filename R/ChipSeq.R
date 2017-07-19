@@ -3714,7 +3714,7 @@ addMoreBed2mcf<-function(input.sample.file,input.bam.dir,input.bed.dir,input.fil
   #put peak files into database
   re.peaks.only.bed.3<-list_to_df(re.peaks.only.bed.2)
   
-  # print(re.peaks.only.bed.3)
+  print(re.peaks.only.bed.3)
   
   ll <- re.peaks.only.bed.3$ID
   
@@ -4361,3 +4361,119 @@ integrateChipSeqWithRNASeq <- function(output.file.dir,rna.seq.input.file) {
   write.table(p27.231.1833.ChipSeq.RNASeq,file=file.path(output.file.dir,"p27_231_1833_DBA_DGE.xls"),
               row.names = FALSE,quote=FALSE,sep="\t")
 }
+
+addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, dataDirectory, chipseq, VennDiagram) {
+  library(GenomicRanges)
+  library(rtracklayer)
+  library(IRanges)
+  
+  input = import.bed(file.path(dataDirectory, 'ES_input_filtered_ucsc_chr6.bed'),
+                     asRangedData=FALSE)
+  
+  rep1 = import.bed("/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/2017-03-02-01_S5_R1-MDA-MB-231-DD-1-cJun_hs_1.00e-05_macs142_peaks.bed",genome = "hg19")
+                    
+  rep2 = import.bed("/Volumes/Bioinformatics$/2017/DannyNewData/PeakCall/2017-03-02-02_S2_R1-MDA-MB-231-DD-2-cJun_hs_1.00e-05_macs142_peaks.bed",genome = "hg19")
+  
+  library(chipseq)
+  estimate.mean.fraglen(rep1)
+  
+  prepareChIPseq = function(reads){
+  
+  frag.len = median( estimate.mean.fraglen(reads) )
+  cat( paste0( 'Median fragment size for this library is ', round(frag.len)))
+  reads.extended = resize(reads, width = frag.len)
+  return( trim(reads.extended) )
+  }
+  
+  rep1 = prepareChIPseq(rep1)
+  
+  ovlp = findOverlaps(rep1,rep2)
+  ovlp = as.data.frame(ovlp)
+  
+  ov = min( length(unique(ovlp$queryHits)), length(unique(ovlp$subjectHits)) )
+  
+  
+  library(VennDiagram)
+  draw.pairwise.venn(
+    area1=length(rep1),
+    area2=length(rep2),
+    cross.area=ov,
+    category=c("rep1", "rep2"),
+    fill=c("steelblue", "blue3"),
+    cat.cex=0.7)
+}
+
+
+#plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
+plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+#/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
+
+cmd = "computeMatrix reference-point --referencePoint TSS -b 4000 -a 4000 -R"
+input.beds=file.path(input.region.bed.dir,select.region.bed)
+input.bw.file.dir=file.path(input.bw.file.dir,"log2ratio_*.bw")
+outFileNameMatrix=file.path(output.file.dir,"matrix1_cJun_p27_TSS.gz")
+outFileSortedRegions=file.path(output.file.dir,"regions_cJun_p27_genes.bed")
+outHeatMapFile=file.path(output.file.dir,"heatmap_cJun_p27.png")
+
+cmd1=paste(cmd,input.beds,"-S",input.bw.file.dir,"--skipZero","-o",outFileNameMatrix,"--outFileSortedRegions",outFileSortedRegions,collapse = " ")
+
+cmd2=paste("plotHeatmap -m",outFileNameMatrix,"-out",outHeatMapFile,collapse = " ")
+
+# 
+# testFiles/genes.bed -S testFiles/log2ratio_H3K4Me3_chr19.bw --skipZeros 
+# -o matrix1_H3K4me3_l2r_TSS.gz
+# --outFileSortedRegions regions1_H3K4me3_l2r_genes.bed
+# 
+# deepTools2.0/bin/computeMatrix scale-regions \
+#   -R genes_chr19_firstHalf.bed genes_chr19_secondHalf.bed \ # separate multiple files with spaces
+#   -S testFiles/log2ratio_*.bw  \ or use the wild card approach
+#   -b 3000 -a 3000 \
+#   --regionBodyLength 5000 \
+#   --skipZeros -o matrix2_multipleBW_l2r_twoGroups_scaled.gz \
+#   --outFileNameMatrix matrix2_multipleBW_l2r_twoGroups_scaled.tab \
+#   --outFileSortedRegions regions2_multipleBW_l2r_twoGroups_genes.bed
+# 
+# computeMatrix reference-point \ # choose the mode
+#        --referencePoint TSS \ # alternatives: TES, center
+#        -b 3000 -a 10000 \ # define the region you are interested in
+#        -R testFiles/genes.bed \
+#        -S testFiles/log2ratio_H3K4Me3_chr19.bw  \
+#        --skipZeros \
+#        -o matrix1_H3K4me3_l2r_TSS.gz \ # to be used with plotHeatmap and plotProfile
+#        --outFileSortedRegions regions1_H3K4me3_l2r_genes.bed
+
+system(cm1)
+
+#print(cmd2)
+
+}
+
+
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::submitJob4plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin/annotation","hg19_gene.bed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+
+submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
+  
+  if (!dir.exists(out.gff.dir))
+  {
+    dir.create(out.gff.dir, recursive = TRUE)
+  }
+  
+  job.name <- "HeapMapPlot"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
+  
+  Rinput <- paste0('\\"',input.bw.file.dir,'\\",',
+                   '\\"',input.region.bed.dir,'\\",',
+                   '\\"',select.region.bed,'\\",',
+                   '\\"',output.file.dir,'\\"')
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  cmd.gff <- createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  
+  system(cmd.gff)
+}
+
