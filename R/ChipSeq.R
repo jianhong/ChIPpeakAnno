@@ -4457,7 +4457,7 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   
   if (!dir.exists(out.gff.dir))
   {
-    dir.create(out.gff.dir, recursive = TRUE)
+    dir.create(output.file.dir, recursive = TRUE)
   }
   
   job.name <- "HeapMapPlot"
