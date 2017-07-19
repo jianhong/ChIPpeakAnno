@@ -4455,7 +4455,7 @@ system(cm1)
 
 submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
-  if (!dir.exists(out.gff.dir))
+  if (!dir.exists(output.file.dir))
   {
     dir.create(output.file.dir, recursive = TRUE)
   }
