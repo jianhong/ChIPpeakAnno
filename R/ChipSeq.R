@@ -4472,8 +4472,40 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   
   Rfun <-paste0(Rfun1,Rinput,Rfun2)
   
+  #cmd.java.1="module load java/1.8.0_60"
+  
+  cmd.java ='export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre"'
+  
   cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
   
-  system(cmd.gff)
+  cmd2=paste(cmd.java,cmd.gff,sep=";")
+  
+  system(cmd2)
 }
 
+# Welcome to Rattler, *please* read these important system notes:
+#   
+#   --> Rattler is currently running the SLURM resource manager to
+# schedule all compute resources. Example SLURM job scripts are
+# available on the system at /cm/shared/docs/slurm/current/job_scripts
+# 
+# To run an interactive shell, issue:
+#   srun -p hipri -t 0:30:00 -n 36 -N 1 --pty /bin/bash -l
+# 
+# To submit a batch job, issue:       sbatch job_script
+# To show all queued jobs, issue:     squeue
+# To kill a queued job, issue:        scancel <jobId>
+#   
+#   See "man slurm" for more detailed information.
+# 
+# --> Rattler has 3 main queues with the following timelimits:
+#   * hipri    (2 days)
+# * iq       (1 day)
+# * requestq (infinite) - Requires a valid slurm reservation to use
+# 
+# --> To see which software packages are available issue: "module avail"
+# 
+# Use the following commands to adjust your environment:
+#   'module add <module>'     - adds a module to your environment for this session
+# 'module initadd <module>' - configure module to be loaded at every login
+# 
