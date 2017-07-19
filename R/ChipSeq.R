@@ -4455,7 +4455,7 @@ system(cm1)
 
 submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
-  Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
+  #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
   
   if (!dir.exists(output.file.dir))
   {
@@ -4475,14 +4475,16 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   Rfun <-paste0(Rfun1,Rinput,Rfun2)
   
   #cmd.java.1="module load java/1.8.0_60"
+  cmd.java.1="R CMD javareconf -e"
+  cmd.java.2="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_LD_LIBRARY_PATH"
   
   #cmd.java ='export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre"'
   
   cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
   
-  #cmd2=paste(cmd.java,cmd.gff,sep=";")
+  cmd2=paste(cmd.java.1,cmd.java.2,cmd.gff,sep=";")
   
-  system(cmd.gff)
+  system(cmd2)
 }
 
 # Welcome to Rattler, *please* read these important system notes:
