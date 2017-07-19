@@ -4472,7 +4472,7 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   
   Rfun <-paste0(Rfun1,Rinput,Rfun2)
   
-  cmd.gff <- createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
   
   system(cmd.gff)
 }
