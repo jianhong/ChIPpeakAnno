@@ -4443,9 +4443,9 @@ cmd2=paste("plotHeatmap -m",outFileNameMatrix,"-out",outHeatMapFile,collapse = "
 #        --skipZeros \
 #        -o matrix1_H3K4me3_l2r_TSS.gz \ # to be used with plotHeatmap and plotProfile
 #        --outFileSortedRegions regions1_H3K4me3_l2r_genes.bed
-cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
-cmd1=paste(cmd.java.2,cmd1,sep=";")
-system(cm1)
+#cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
+#cmd1=paste(cmd.java.2,cmd1,sep=";")
+system(cmd1)
 
 #print(cmd2)
 
@@ -4477,15 +4477,15 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   
   #cmd.java.1="module load java/1.8.0_60"
   #cmd.java.1="R CMD javareconf -e"
-  cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
+ # cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
   
   #cmd.java ='export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre"'
   
   cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
   
-  cmd2=paste(cmd.java.2,cmd.gff,sep=";")
+  #cmd2=paste(cmd.java.2,cmd.gff,sep=";")
   
-  system(cmd2)
+  system(cmd.gff)
 }
 
 # Welcome to Rattler, *please* read these important system notes:
