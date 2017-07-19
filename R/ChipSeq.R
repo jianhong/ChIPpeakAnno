@@ -4443,7 +4443,8 @@ cmd2=paste("plotHeatmap -m",outFileNameMatrix,"-out",outHeatMapFile,collapse = "
 #        --skipZeros \
 #        -o matrix1_H3K4me3_l2r_TSS.gz \ # to be used with plotHeatmap and plotProfile
 #        --outFileSortedRegions regions1_H3K4me3_l2r_genes.bed
-
+cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
+cmd1=paste(cmd.java.2,cmd1,sep=";")
 system(cm1)
 
 #print(cmd2)
