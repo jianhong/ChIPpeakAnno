@@ -4404,14 +4404,31 @@ addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, 
 }
 
 
+#input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 #plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
-plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
+#
+plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
 #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
+  
+  bed.file.list <- list.files(
+    input.region.bed.dir,
+    pattern = "*.bed$",
+    all.files = TRUE,
+    full.names = TRUE,
+    recursive = TRUE,
+    include.dirs = TRUE)
+  
+if(!is.null(select.region.bed)){
+input.beds = bed.file.list[-grep(paste(select.region.bed,collapse = "|"), bed.file.list)] 
+input.beds = paste(input.beds,collapse = " ")
+}else{
+input.beds = paste(bed.file.list,collapse = " ")
+}
 
 cmd = "computeMatrix reference-point --referencePoint TSS -b 4000 -a 4000 -R"
-input.beds=file.path(input.region.bed.dir,select.region.bed)
+input.beds=input.beds
 input.bw.file.dir=file.path(input.bw.file.dir,"log2ratio_*.bw")
 outFileNameMatrix=file.path(output.file.dir,"matrix1_cJun_p27_TSS.gz")
 outFileSortedRegions=file.path(output.file.dir,"regions_cJun_p27_genes.bed")
@@ -4486,6 +4503,7 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
   #cmd2=paste(cmd.java.2,cmd.gff,sep=";")
   
   system(cmd.gff)
+
 }
 
 # Welcome to Rattler, *please* read these important system notes:
@@ -4620,3 +4638,64 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
   write.table(gene.45.1,file=file.path(out.dir.name,"gene_200.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
   write.table(gene.45.1.sorted.by.chr,file=file.path(out.dir.name,"gene_200_sorted.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
 }
+
+
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/BamCompare","~/ChipSeqBed",NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+
+bashJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+  
+  #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
+  
+  if (!dir.exists(output.file.dir))
+  {
+    dir.create(output.file.dir, recursive = TRUE)
+  }
+  
+  job.name <- "generateMatrix"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
+  
+  if(!is.null(select.region.bed)){
+    Rinput <- paste0('\\"',input.bw.file.dir,'\\",',
+                   '\\"',input.region.bed.dir,'\\",',
+                   '\\"',select.region.bed,'\\",',
+                   '\\"',output.file.dir,'\\"')
+  }else
+  {
+    Rinput <- paste0('\\"',input.bw.file.dir,'\\",',
+                     '\\"',input.region.bed.dir,'\\",',
+                     '\\"',output.file.dir,'\\"')
+  }
+  
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  #cmd.java.1="module load java/1.8.0_60"
+  #cmd.java.1="R CMD javareconf -e"
+  # cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
+  
+  #cmd.java ='export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre"'
+  
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  
+  #cmd2=paste(cmd.java.2,cmd.gff,sep=";")
+  
+  system(cmd.gff)
+  
+  job.name <- "plotHeatmap"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::usePlotHeatmap('
+  
+  Rinput <- paste0('\\"',output.file.dir,'\\",',
+                   '\\"',output.file.dir,'\\"')
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name="generateMatrix")
+  
+  system(cmd.gff)
+  
+}
+
