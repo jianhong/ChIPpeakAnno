@@ -4514,3 +4514,42 @@ submitJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed
 #   'module add <module>'     - adds a module to your environment for this session
 # 'module initadd <module>' - configure module to be loaded at every login
 # 
+
+#plotHeatMapUsedeepTools("/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap/matrix1_cJun_p27_TSS.gz","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")
+#
+usePlotHeatmap <- function(input.matrix.file,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
+  
+  outHeatMapFile=file.path(output.file.dir,"heatmap_cJun_p27.png")
+  
+  cmd2=paste("plotHeatmap -m",input.matrix.file,"-out",outHeatMapFile,collapse = " ")
+  
+  system(cmd2)
+  
+}
+
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::submitJob4usePlotHeatmap("/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap/matrix1_cJun_p27_TSS.gz","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+
+submitJob4usePlotHeatmap <- function(input.matrix.file,output.file.dir){
+  
+  if (!dir.exists(output.file.dir))
+  {
+    dir.create(output.file.dir, recursive = TRUE)
+  }
+  
+  job.name <- "plotHeatmap"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::usePlotHeatmap('
+  
+  Rinput <- paste0('\\"',input.matrix.file,'\\",',
+                   '\\"',output.file.dir,'\\"')
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  
+  system(cmd.gff)
+}
