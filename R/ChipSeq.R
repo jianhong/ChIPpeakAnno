@@ -4665,9 +4665,8 @@ bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,
   
   Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
   
-  input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir
   
-    Rinput <- paste0('\\"',input.sample.file,'\\",',
+  Rinput <- paste0('\\"',input.sample.file,'\\",',
                      '\\"',input.bw.file.dir,'\\",',
                     '\\"',input.region.bed.dir,'\\",',
                    '\\"',select.region.bed,'\\",',
