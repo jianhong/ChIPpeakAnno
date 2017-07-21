@@ -4407,18 +4407,15 @@ addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, 
 #input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 #plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
 #
-plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+  
+  bw.file.sample.label <- mapBw3Sample(input.sample.file,input.bw.dir)
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
 #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
   
-  bed.file.list <- list.files(
-    input.region.bed.dir,
-    pattern = "*.bed$",
-    all.files = TRUE,
-    full.names = TRUE,
-    recursive = TRUE,
-    include.dirs = TRUE)
+  bw.file.list <- as.character(bw.file.sample.label$file.bw)
+  samplesLabel <- as.character(bw.file.sample.label$sampleLabel)
   
 if(!is.null(select.region.bed)){
 input.beds = bed.file.list[-grep(paste(select.region.bed,collapse = "|"), bed.file.list)] 
@@ -4429,12 +4426,13 @@ input.beds = paste(bed.file.list,collapse = " ")
 
 cmd = "computeMatrix reference-point --referencePoint TSS -b 4000 -a 4000 -R"
 input.beds=input.beds
-input.bw.file.dir=file.path(input.bw.file.dir,"log2ratio_*.bw")
+input.bw.file=paste(bw.file.list,collapse = " ")
+input.samplesLabel=paste(samplesLabel,collapse = " ")
 outFileNameMatrix=file.path(output.file.dir,"matrix1_cJun_p27_TSS.gz")
 outFileSortedRegions=file.path(output.file.dir,"regions_cJun_p27_genes.bed")
 outHeatMapFile=file.path(output.file.dir,"heatmap_cJun_p27.png")
 
-cmd1=paste(cmd,input.beds,"-S",input.bw.file.dir,"--skipZero","-o",outFileNameMatrix,"--outFileSortedRegions",outFileSortedRegions,collapse = " ")
+cmd1=paste(cmd,input.beds,"-S",input.bw.file.dir,"--skipZero","-o",outFileNameMatrix,"--outFileSortedRegions",outFileSortedRegions,"--samplesLabel",input.samplesLabel,collapse = " ")
 
 cmd2=paste("plotHeatmap -m",outFileNameMatrix,"-out",outHeatMapFile,collapse = " ")
 
@@ -4640,9 +4638,9 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
 }
 
 
-#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/BamCompare","~/ChipSeqBed",NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv",~/BamCompare","~/ChipSeqBed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
 
-bashJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
   
   #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
   
@@ -4656,13 +4654,15 @@ bashJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.d
   Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
   
   if(!is.null(select.region.bed)){
-    Rinput <- paste0('\\"',input.bw.file.dir,'\\",',
-                   '\\"',input.region.bed.dir,'\\",',
+    Rinput <- paste0('\\"',input.sample.file,'\\",',
+                     '\\"',input.bw.file.dir,'\\",',
+                    '\\"',input.region.bed.dir,'\\",',
                    '\\"',select.region.bed,'\\",',
                    '\\"',output.file.dir,'\\"')
   }else
   {
-    Rinput <- paste0('\\"',input.bw.file.dir,'\\",',
+    Rinput <- paste0('\\"',input.sample.file,'\\",',
+                     '\\"',input.bw.file.dir,'\\",',
                      '\\"',input.region.bed.dir,'\\",',
                      '\\"',output.file.dir,'\\"')
   }
@@ -4699,3 +4699,24 @@ bashJob4plotHeatMapUsedeepTools <- function(input.bw.file.dir,input.region.bed.d
   
 }
 
+#input.bw.dir="~/BamCompare"
+#input.sample.file="~/SampleID_INFO_ChIP_new_Danny.csv"
+#
+#mapBw3Sample(input.sample.file,input.bw.dir)
+#
+mapBw3Sample <- function(input.sample.file,input.bw.dir) {
+  
+  file.1 <- list.files(input.bw.dir,pattern=".bw$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  sample.file <- fread(input.sample.file)
+  
+  file.2<-cbind(unlist(lapply(file.1,function(u){x<-basename(u);p1 <- regexpr("\\_", x);p2 <- regexpr("\\.", x);xx <- substr(x,p1+1,p2-1)})),file.1)
+  
+  colnames(file.2)=c("ID","file.bw")
+  file.3 <- merge(file.2,sample.file,by="ID",sort=F)
+  sampleLabel= paste(gsub(" ", "-", file.3$Type_Cell), file.3$Type_TF, sep = "-")
+  sampleLabel=gsub("MDA-MB-","",sampleLabel)
+  file.4 <- cbind(file.3,sampleLabel)
+  file.5 <- file.4[,c(2,6)]
+  file.5
+}
