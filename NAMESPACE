@@ -9,12 +9,14 @@ import(LOLA)
 import(Vennerable)
 import(EnsDb.Hsapiens.v75)
 import(GenomicRanges)
-import(data.table,dplyr)
+
 
 #importFrom(tools,file_ext)
 importFrom(grid,grid.text,gpar)
 importFrom(gtools,smartbind)
 importFrom(tools,file_ext,file_path_sans_ext)
+importFrom(dplyr,"%>%",inner_join)
+import(data.table,fread,subset)
 
 export(AnnotatePeak2)
 export(AnnotatePeak3)

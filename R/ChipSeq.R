@@ -4409,7 +4409,7 @@ addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, 
 #
 plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
   
-  bw.file.sample.label <- mapBw3Sample(input.sample.file,input.bw.dir)
+  bw.file.sample.label <- mapBw3Sample(input.sample.file,input.bw.file.dir)
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
 #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
@@ -4638,7 +4638,7 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
 }
 
 
-#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv",~/BamCompare","~/ChipSeqBed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCompare","~/ChipSeqBed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmapAddlabel")'
 
 bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
   
