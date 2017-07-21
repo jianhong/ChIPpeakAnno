@@ -4676,6 +4676,7 @@ bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,
     Rinput <- paste0('\\"',input.sample.file,'\\",',
                      '\\"',input.bw.file.dir,'\\",',
                      '\\"',input.region.bed.dir,'\\",',
+                     NULL,
                      '\\"',output.file.dir,'\\"')
   }
   
