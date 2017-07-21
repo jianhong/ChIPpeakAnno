@@ -4407,7 +4407,7 @@ addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, 
 #input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 #plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
 #
-plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
   bw.file.sample.label <- mapBw3Sample(input.sample.file,input.bw.file.dir)
   
@@ -4638,9 +4638,9 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
 }
 
 
-#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCompare","~/ChipSeqBed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmapAddlabel")'
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCompare","~/ChipSeqBed",select.region.bed=NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmapAddlabel")'
 
-bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
+bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
   #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
   
@@ -4653,19 +4653,19 @@ bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,
   
   Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
   
-  if(!is.null(select.region.bed)){
+  #if(!is.null(select.region.bed)){
     Rinput <- paste0('\\"',input.sample.file,'\\",',
                      '\\"',input.bw.file.dir,'\\",',
                     '\\"',input.region.bed.dir,'\\",',
                    '\\"',select.region.bed,'\\",',
                    '\\"',output.file.dir,'\\"')
-  }else
-  {
-    Rinput <- paste0('\\"',input.sample.file,'\\",',
-                     '\\"',input.bw.file.dir,'\\",',
-                     '\\"',input.region.bed.dir,'\\",',
-                     '\\"',output.file.dir,'\\"')
-  }
+  #}else
+  #{
+  #  Rinput <- paste0('\\"',input.sample.file,'\\",',
+  #                   '\\"',input.bw.file.dir,'\\",',
+  #                   '\\"',input.region.bed.dir,'\\",',
+  #                   '\\"',output.file.dir,'\\"')
+  #}
   
   Rfun2 <- ')'
   
