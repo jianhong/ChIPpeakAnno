@@ -4425,6 +4425,8 @@ plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.re
   bw.file.list <- as.character(bw.file.sample.label$file.bw)
   samplesLabel <- as.character(bw.file.sample.label$sampleLabel)
   
+  print(bed.file.list)
+  
 if(!is.null(select.region.bed)){
 input.beds = bed.file.list[-grep(paste(select.region.bed,collapse = "|"), bed.file.list)] 
 input.beds = paste(input.beds,collapse = " ")
@@ -4432,6 +4434,8 @@ input.beds = paste(input.beds,collapse = " ")
 input.beds = paste(bed.file.list,collapse = " ")
 }
 
+  print(input.beds)
+  
 cmd = "computeMatrix reference-point --referencePoint TSS -b 4000 -a 4000 -R"
 input.beds=input.beds
 input.bw.file=paste(bw.file.list,collapse = " ")
@@ -4661,19 +4665,19 @@ bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,
   
   Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::plotHeatMapUsedeepTools('
   
-  #if(!is.null(select.region.bed)){
+  if(!is.null(select.region.bed)){
     Rinput <- paste0('\\"',input.sample.file,'\\",',
                      '\\"',input.bw.file.dir,'\\",',
                     '\\"',input.region.bed.dir,'\\",',
                    '\\"',select.region.bed,'\\",',
                    '\\"',output.file.dir,'\\"')
-  #}else
-  #{
-  #  Rinput <- paste0('\\"',input.sample.file,'\\",',
-  #                   '\\"',input.bw.file.dir,'\\",',
-  #                   '\\"',input.region.bed.dir,'\\",',
-  #                   '\\"',output.file.dir,'\\"')
-  #}
+  }else
+  {
+    Rinput <- paste0('\\"',input.sample.file,'\\",',
+                     '\\"',input.bw.file.dir,'\\",',
+                     '\\"',input.region.bed.dir,'\\",',
+                     '\\"',output.file.dir,'\\"')
+  }
   
   Rfun2 <- ')'
   
