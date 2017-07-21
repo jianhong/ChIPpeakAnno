@@ -4608,7 +4608,7 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
   common.gene.peak <- file.table %>%
     Reduce(function(dtf1,dtf2) inner_join(dtf1,dtf2,by="SYMBOL"),.)
   
-  x <- subset(common.gene.peak,select=c("geneChr.x","geneStart.x","geneEnd.x","geneStrand.x","SYMBOL"))
+  x <- data.table::subset(common.gene.peak,select=c("geneChr.x","geneStart.x","geneEnd.x","geneStrand.x","SYMBOL"))
   
   setkey(x,NULL)
   xx <- unique(x)
