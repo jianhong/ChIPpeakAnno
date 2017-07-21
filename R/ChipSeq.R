@@ -4414,6 +4414,14 @@ plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.re
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
 #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
   
+   bed.file.list <- list.files(
+        input.region.bed.dir,
+        pattern = "*.bed$",
+        all.files = TRUE,
+        full.names = TRUE,
+        recursive = TRUE,
+        include.dirs = TRUE)
+  
   bw.file.list <- as.character(bw.file.sample.label$file.bw)
   samplesLabel <- as.character(bw.file.sample.label$sampleLabel)
   
