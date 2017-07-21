@@ -4440,7 +4440,7 @@ outFileNameMatrix=file.path(output.file.dir,"matrix1_cJun_p27_TSS.gz")
 outFileSortedRegions=file.path(output.file.dir,"regions_cJun_p27_genes.bed")
 outHeatMapFile=file.path(output.file.dir,"heatmap_cJun_p27.png")
 
-cmd1=paste(cmd,input.beds,"-S",input.bw.file.dir,"--skipZero","-o",outFileNameMatrix,"--outFileSortedRegions",outFileSortedRegions,"--samplesLabel",input.samplesLabel,collapse = " ")
+cmd1=paste(cmd,input.beds,"-S",input.bw.file,"--skipZero","-o",outFileNameMatrix,"--outFileSortedRegions",outFileSortedRegions,"--samplesLabel",input.samplesLabel,collapse = " ")
 
 cmd2=paste("plotHeatmap -m",outFileNameMatrix,"-out",outHeatMapFile,collapse = " ")
 
@@ -4608,10 +4608,10 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
     x
     })
   
-  library(dplyr)
-  x <- data_frame(i = c("a","b","c"), j = 1:3)
-  y <- data_frame(i = c("b","c","d"), k = 4:6)
-  z <- data_frame(i = c("c","d","a"), l = 7:9)
+  # library(dplyr)
+  # x <- data_frame(i = c("a","b","c"), j = 1:3)
+  # y <- data_frame(i = c("b","c","d"), k = 4:6)
+  # z <- data_frame(i = c("c","d","a"), l = 7:9)
   
   common.gene.peak <- file.table %>%
     Reduce(function(dtf1,dtf2) inner_join(dtf1,dtf2,by="SYMBOL"),.)
