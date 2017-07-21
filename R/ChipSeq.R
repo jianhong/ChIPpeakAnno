@@ -4694,8 +4694,9 @@ bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,
   job.name <- "plotHeatmap"
   
   Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::usePlotHeatmap('
+  input.matrix.file <- file.path(output.file.dir,"matrix1_cJun_p27_TSS.gz")
   
-  Rinput <- paste0('\\"',output.file.dir,'\\",',
+  Rinput <- paste0('\\"',input.matrix.file,'\\",',
                    '\\"',output.file.dir,'\\"')
   Rfun2 <- ')'
   
