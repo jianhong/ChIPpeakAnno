@@ -4407,7 +4407,7 @@ addTestFunction4HeatmapChipSeq <- function(GenomicRanges, rtracklayer, IRanges, 
 #input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 #plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
 #
-plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
+plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed=NULL,output.file.dir){
   
   bw.file.sample.label <- mapBw3Sample(input.sample.file,input.bw.file.dir)
   
