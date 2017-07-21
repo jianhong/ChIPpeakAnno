@@ -15,7 +15,7 @@ import(GenomicRanges)
 importFrom(grid,grid.text,gpar)
 importFrom(gtools,smartbind)
 importFrom(tools,file_ext,file_path_sans_ext)
-importFrom(dplyr,"%>%",inner_join)
+importFrom(dplyr,"%>%",inner_join,)
 importFrom(data.table,fread)
 
 export(AnnotatePeak2)

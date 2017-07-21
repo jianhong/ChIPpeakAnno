@@ -4726,3 +4726,91 @@ mapBw3Sample <- function(input.sample.file,input.bw.dir) {
   file.5 <- file.4[,c(2,6)]
   file.5
 }
+
+makeHeatMapByme <- function() {
+  compute.matrix.file="/Users/axy148/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Danny_ChipSeq_heatmapBasedSortedBed/matrix1_cJun_p27_TSS.gz"
+  
+  table = read.table(gzfile(compute.matrix.file), skip=1)
+  matrix = table[7:dim(table)[2]]
+  image(1:dim(matrix)[2], 1:dim(matrix)[1], t(as.matrix(matrix)),  axes=FALSE, xlab='sample', ylab='gene')
+  axis(2, at=1:length(table$V1), labels=table$V4, las = 1)
+}
+
+# input.bam.file.dir="/Volumes/Bioinformatics$/2017/DannyNewData/BindDiff/common_peaks_bed/Annotation"
+# out.dir.name = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
+# gene.full <- generateBed4HeatMap2(input.bam.file.dir,out.dir.name)
+#
+generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name) {
+  
+  if (!dir.exists(out.dir.name))
+  {
+    dir.create(out.dir.name, recursive = TRUE)
+  }
+  
+  file.list <- list.files(
+    input.bam.file.dir,
+    pattern = "*xls$",
+    all.files = TRUE,
+    full.names = TRUE,
+    recursive = TRUE,
+    include.dirs = TRUE)
+  
+  file.table  <- lapply(file.list,function(u){
+    y <- basename(u)
+    pos <- regexpr("\\_", y)
+    pos <- pos - 1
+    y <- substr(y, 1, pos)
+    x <-fread(u)
+    x<- cbind(x,rep(y,dim(x)[1]))
+    colnames(x)[dim(x)[2]]="sample_name"
+    x
+  })
+  
+  # library(dplyr)
+  # x <- data_frame(i = c("a","b","c"), j = 1:3)
+  # y <- data_frame(i = c("b","c","d"), k = 4:6)
+  # z <- data_frame(i = c("c","d","a"), l = 7:9)
+  
+  common.gene.peak <- file.table %>%
+    Reduce(function(dtf1,dtf2) full_join(dtf1,dtf2,by="SYMBOL"),.)
+  
+  x <- subset(common.gene.peak,select=c("geneChr.x","geneStart.x","geneEnd.x","geneStrand.x","SYMBOL"))
+  
+  setkey(x,NULL)
+  xx <- unique(x)
+  xxx<-xx[complete.cases(xx),]
+  
+  # gene.231dd.231.1833.1833shp27 <- read.xlsx(
+  # "/Volumes/Bioinformatics$/2017/DannyNewData/AnnotationNew4DBA/table_S3_headerless.xlsx",
+  # sheetIndex = 1,header = FALSE)
+  # colnames(gene.231dd.231.1833.1833shp27)=c("SYMBOL","FC_231DD_231","p_231DD_231","FC_1833_231","p_1833_231","FC_1833shp27_1833","p_1833shp27_1833")
+  #save(gene.231dd.231.1833.1833shp27,file="./data/gene.RData")
+  #gene.45 <- merge(gene.231dd.231.1833.1833shp27,xxx,by="SYMBOL",sort = FALSE)
+  
+  gene.45 <- xxx
+  gene.45.1 <- gene.45
+  colnames(gene.45.1)=c("chr","start","end","strand","SYMBOL")
+
+  gene.45.1[which(gene.45.1$strand==1),]$strand="+"
+  gene.45.1[which(gene.45.1$strand==2),]$strand="-"
+
+
+  gene.45.1.sorted.by.chr <- gene.45.1[order(gene.45.1$chr),]
+
+  gene.45.1$chr<-paste0("chr",gene.45.1$chr)
+  gene.45.1.sorted.by.chr$chr<-paste0("chr",gene.45.1.sorted.by.chr$chr)
+
+  write.table(gene.45.1,file=file.path(out.dir.name,"gene_p27_cJun.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
+  write.table(gene.45.1.sorted.by.chr,file=file.path(out.dir.name,"gene_p27_cJun_sorted.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
+  
+  # > length(unique(file.table[[1]]$SYMBOL))
+  # [1] 417
+  # > length(unique(file.table[[2]]$SYMBOL))
+  # [1] 222
+  # > length(unique(file.table[[3]]$SYMBOL))
+  # [1] 458
+  # 
+  # 
+  # unique(c(unique(file.table[[1]]$SYMBOL),unique(file.table[[2]]$SYMBOL),unique(file.table[[3]]$SYMBOL)))
+  
+}
