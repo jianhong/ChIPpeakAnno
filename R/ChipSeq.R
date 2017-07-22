@@ -1565,6 +1565,8 @@ useBamCompare <- function(input.sample.file,input.bam.file,output.dir)
     u$name
   }))
   
+  sysyem("module unload python/2.7.3")
+  
   zzz <- unlist(cellInfo.run)
   
   lapply(1:length(zzz), function(u, zzz)
