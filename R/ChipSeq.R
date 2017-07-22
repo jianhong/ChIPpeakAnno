@@ -4143,9 +4143,9 @@ useChIPpeakAnno <- function(mcf.with.zhao) {
 
 #prepareBamFile("~/Dropbox (BBSR)/BWA")
 
-prepareBamFile <- function(input.bam.dir){
+prepareBamFile <- function(input.bam.dir,file.pattern){
   
-  bam <- list.files(path = input.bam.dir, "*marked.bam$", all.files = TRUE,
+  bam <- list.files(path = input.bam.dir, pattern=file.pattern, all.files = TRUE,
                     full.names = TRUE, recursive = TRUE,
                     ignore.case = FALSE, include.dirs = TRUE, no.. = FALSE)
   bam2 <- as.data.frame(cbind(basename(bam),bam))
@@ -5427,4 +5427,145 @@ bashJob4generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name,Ab){
   
 }
 
+# /deepTools-1.5/bin/bamCompare --bamfile1 ChIP.bam --bamfile2 Input.bam \
+# --binSize 25 --fragmentLength 200 --missingDataAsZero no \
+# --ratio log2 --scaleFactorsMethod SES -o log2ratio_ChIP_vs_Input.bw
 
+#' bsub -P bbc -J "bamCompare" -o %J.bamCompare.log -e %J.Compare.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useBamCompare("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","~/BamCompare")'
+
+useBamCompare2 <- function(input.sample.file,input.bam.file,output.dir)
+{
+  
+  #sampleF <- read.table(input.sample.file,header = FALSE)
+  #colnames(sampleF) <- c("ID","SampleName")
+  
+  #bam <- prepareBamFile(input.bam.file,file.pattern)
+  
+  re <- GetSampleInfo(input.sample.file, input.bam.file)
+  
+  cellInfo <- re$y
+  # output.dir.name = dirname(input.sample.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  temp3 = output.dir
+  
+  # cmd9 = 'ngs.plot.r -G' cmd10 = '-R' cmd11 = '-C' cmd12 = '-O' cmd13 = '-T'
+  # cmd14 = '-L' cmd15 = '-RR' cmd16 = '-CD' cmd17= '-GO'
+  
+  
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u,cellInfo, 
+                                                      temp3)
+  {
+    
+    x.name = cellInfo[[u]]$name
+    
+    es <- cellInfo[[u]]$es
+    
+    x.input <- es[es$Type_TF == "Input", ]$file.name
+    
+    x.sample <- es[es$Type_TF != "Input", ]
+    
+    #print(x.sample)
+    #print(x.input)
+    
+    x.run <- apply(x.sample, 1, function(x, x.input, temp3)
+    {
+      
+      y <- x
+      
+      ID <- y[1]
+      Type_Cell <- y[2]
+      Type_TF <- y[3]
+      Cell_TF <- y[4]
+      file.name <- y[5]
+      xx <- file.name
+      xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+      
+      # ~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCompare  --bamfile1 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-03_S11_R1.marked_sorted.bam --bamfile2 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-17_S1_R1.marked_sorted.bam --binSize 25 --ratio log2 -o ~/BamCompare/log2ratio_2017-03-02-03_S11_R1.marked_sorted.bam_vs_2017-03-02-17_S1_R1.marked_sorted.bam.bw 
+      
+      cmd1 <- paste("~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCompare --bamfile1",xx,"--bamfile2",x.input,sep=" ")
+      cmd2 <- "--binSize 25"
+      cmd3 <- "--ratio log2 -o"
+      
+      cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
+      
+      cmd5 <- file.path(output.dir,paste0("log2ratio_",basename(as.character(xx)),"_vs_",basename(as.character(x.input)),".bw"))
+      
+      
+      cmd6 <- paste(cmd4,cmd5,sep=" ") 
+      
+      cmd6
+      
+      #cat(cmd6, "\n")
+      #cat("\n")
+    }, x.input, temp3)
+    
+    x.run
+    
+  }, cellInfo,temp3)
+  
+  
+  names(cellInfo.run) = unlist(lapply(cellInfo, function(u)
+  {
+    u$name
+  }))
+  
+  sysyem("module unload python/2.7.3")
+  
+  zzz <- unlist(cellInfo.run)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    cat(as.character(zzz[u][[1]]), "\n")
+    cat("\n")
+    
+    system(as.character(zzz[u][[1]]))
+    
+  }, zzz)
+  # # dir.name=temp3 dir.name=reformatPath(dir.name)
+  # 
+  # file.name = file.path(temp3, dir(temp3, recursive = TRUE))
+  # 
+  # file.name.2 <- as.list(file.name)
+  # 
+  # 
+  # # names(file.name.2) = unlist(lapply(file.name.2, function(u) { u$name }))
+  # 
+  # zzz <- unlist(file.name.2)
+  # 
+  # lapply(1:length(zzz), function(u, zzz)
+  # {
+  #   
+  #   dir.name = dirname(zzz[u][[1]])
+  #   file_name = file_path_sans_ext(basename(zzz[u][[1]]))
+  #   
+  #   cmd = paste("ngs.plot.r -G hg19 -R tss -C", zzz[u][[1]], "-O", file.path(dir.name, 
+  #                                                                            paste0(file_name, ".tss")), "-T", file_name, "-L 4000 -RR 1 -CD 1 -GO total", 
+  #               sep = " ")
+  #   
+  #   
+  #   
+  #   # system(as.character(zzz[u][[1]])) job.name = paste0('bamPlot.', u)
+  #   # cmd.pegasus = usePegasus(job.option, Wall.time = '72:00',cores = 32,Memory
+  #   # = 16000,span.ptile = 16,job.name) cmd2 = paste(cmd.pegasus,cmd,sep = ' ')
+  #   
+  #   cmd2 = cmd
+  #   cat(cmd2, "\n")
+  #   cat("\n")
+  #   system(cmd2)
+  # }, zzz)
+  # 
+  # 
+  # re <- list(cellInforun = cellInfo.run, zzz = zzz)
+  # 
+  # # AnntationUsingChipSeeker(temp3, 'peaks.bed', temp3, DD = 5000)
+  
+  #return(re)
+  
+}
