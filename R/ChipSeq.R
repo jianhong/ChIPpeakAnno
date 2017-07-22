@@ -4660,6 +4660,8 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
 
 #R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCompare","~/ChipSeqBed",select.region.bed=NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmapAddlabel")'
 
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCoverage","~/ChipSeqBed_p27_cJun",select.region.bed=NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap4p27_cJun")'
+
 bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
   #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
@@ -5144,3 +5146,84 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),output.file.dir){
   # 
   # return(p.common)
 }
+
+
+#input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
+#plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
+#
+useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
+  
+  bam.file.sample.label <- mapBam2Sample(input.sample.file,input.bam.file.dir)
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
+  
+  bam.file.list <- as.character(bam.file.sample.label$file.bw)
+  samplesLabel <- as.character(bam.file.sample.label$sampleLabel)
+  
+  lapply(1:length(bam.file.list),function(u,bam.file.list,samplesLabel,output.file.dir){
+    
+    cmd = paste("Rscript run_spp.R",
+                paste0("-c=",bam.file.list[u]),
+                paste0("-savp=",file.path(output.file.dir,paste0(samplesLabel[u],"_QC.pdf"))),
+                paste0("-out=",file.path(output.file.dir,paste0(samplesLabel[u],"_QC_metrix.txt"))),sep=" ")
+    
+    system(cmd)
+    
+  },bam.file.list,samplesLabel,output.file.dir)
+
+}
+
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::submitJob4plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin/annotation","hg19_gene.bed","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap")'
+
+submitJob4useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
+  
+  #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
+  
+  if (!dir.exists(output.file.dir))
+  {
+    dir.create(output.file.dir, recursive = TRUE)
+  }
+  
+  job.name <- "QC"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::useRunSppR('
+  
+  Rinput <- paste0('\\"',input.sample.file,'\\",',
+                   '\\"',input.bam.file.dir,'\\",',
+                   '\\"',output.file.dir,'\\"')
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  
+  system(cmd.gff)
+  
+}
+
+#input.bw.dir="~/BamCompare"
+#input.sample.file="~/SampleID_INFO_ChIP_new_Danny.csv"
+#
+#mapBw3Sample(input.sample.file,input.bw.dir)
+#
+mapBam2Sample <- function(input.sample.file,input.bam.dir) {
+  
+  file.1 <- list.files(input.bw.dir,pattern=".bam$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  sample.file <- fread(input.sample.file)
+  
+  file.2<-cbind(unlist(lapply(file.1,function(u){x<-basename(u);p1 <- regexpr("\\_", x);p2 <- regexpr("\\.", x);xx <- substr(x,p1+1,p2-1)})),file.1)
+  
+  colnames(file.2)=c("ID","file.bam")
+  file.3 <- merge(file.2,sample.file,by="ID",sort=F)
+  sampleLabel= paste(gsub(" ", "-", file.3$Type_Cell), file.3$Type_TF, sep = "-")
+  sampleLabel=gsub("MDA-MB-","",sampleLabel)
+  file.4 <- cbind(file.3,sampleLabel)
+  file.5 <- file.4[,c(2,6)]
+  file.5
+}
+
+
+  
+  
