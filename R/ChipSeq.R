@@ -4636,7 +4636,7 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
   
   x <- data.table::subset(common.gene.peak,select=c("geneChr.x","geneStart.x","geneEnd.x","geneStrand.x","SYMBOL"))
   
-  setkey(x,NULL)
+  data.table::setkey(x,NULL)
   xx <- unique(x)
   xxx<-xx[complete.cases(xx),]
   
@@ -5389,7 +5389,7 @@ AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
   
 }
 
-# R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4generateBed4HeatMap2("~/SampleID_INFO_ChIP_new_Danny.csv","~/","cJun")'
+# R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4generateBed4HeatMap2("~/cJun","~/","cJun")'
 
 bashJob4generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name,Ab){
   

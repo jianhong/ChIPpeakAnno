@@ -16,7 +16,7 @@ importFrom(grid,grid.text,gpar)
 importFrom(gtools,smartbind)
 importFrom(tools,file_ext,file_path_sans_ext)
 importFrom(dplyr,"%>%",inner_join,full_join)
-importFrom(data.table,fread)
+importFrom(data.table,fread,setkey)
 
 export(AnnotatePeak2)
 export(AnnotatePeak3)
