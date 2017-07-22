@@ -330,11 +330,17 @@ AnnotatePeak3<- function(input.file.dir,output.file.dir,genome) {
 #'   
 AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=5000,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
   
-  re<-ParserReadFiles(dir.name,input.file.pattern)
+  #re<-ParserReadFiles(dir.name,input.file.pattern)
   
-  re.bed<-re$input
+  #re.bed<-re$input
   
-  re.peaks.only.bed.2 <- re.bed
+  #re.peaks.only.bed.2 <- re.bed
+  
+  file.1 <- list.files(dir.name,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  #re.bed<-re$input
+  
+  re.peaks.only.bed.2 <- file.1
   
   # if(length(dir(dir.name,pattern="peaks.bed"))!=0)
   # {
@@ -4750,7 +4756,18 @@ makeHeatMapByme <- function() {
 # out.dir.name = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 # gene.full <- generateBed4HeatMap2(input.bam.file.dir,out.dir.name)
 #
-generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name) {
+# input.bam.file.dir="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Peak2Bed/p27"
+# out.dir.name = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Peak2Bed"
+# gene.full <- generateBed4HeatMap2(input.bam.file.dir,out.dir.name,"p27")
+#
+# input.bam.file.dir="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Peak2Bed/cJun"
+# out.dir.name = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Peak2Bed"
+# gene.full <- generateBed4HeatMap2(input.bam.file.dir,out.dir.name,"cJun")
+#
+
+generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name,Ab) {
+  
+  out.dir.name <-file.path(out.dir.name,paste0(Ab,"_gene_bed"))
   
   if (!dir.exists(out.dir.name))
   {
@@ -4810,8 +4827,8 @@ generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name) {
   gene.45.1$chr<-paste0("chr",gene.45.1$chr)
   gene.45.1.sorted.by.chr$chr<-paste0("chr",gene.45.1.sorted.by.chr$chr)
 
-  write.table(gene.45.1,file=file.path(out.dir.name,"gene_p27_cJun.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
-  write.table(gene.45.1.sorted.by.chr,file=file.path(out.dir.name,"gene_p27_cJun_sorted.bed"),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
+  write.table(gene.45.1,file=file.path(out.dir.name,paste0("gene_",Ab,".bed")),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
+  write.table(gene.45.1.sorted.by.chr,file=file.path(out.dir.name,paste0("gene_",Ab,"_sorted.bed")),row.names = FALSE,col.names = FALSE,quote=FALSE,sep="\t")
   
   # > length(unique(file.table[[1]]$SYMBOL))
   # [1] 417
@@ -4822,7 +4839,7 @@ generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name) {
   # 
   # 
   # unique(c(unique(file.table[[1]]$SYMBOL),unique(file.table[[2]]$SYMBOL),unique(file.table[[3]]$SYMBOL)))
-  
+  gene.45.1.sorted.by.chr
 }
 
 
@@ -4972,15 +4989,17 @@ useBamCoverage <- function(input.sample.file,input.bam.file,output.dir)
   
 }
 
-#' output.file.dir="/Volumes/Bioinformatics$/2017/DannyNewData/BindDiff_7_21_2017_target"
+#' output.file.dir="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap/Peak2Bed"
 #' #mcf7=mcf2
-#' re<-getTargetGene4Ab(mcf2,"yes",output.file.dir)
+#' re<-getTargetGene4Ab(mcf2,"yes","p27",output.file.dir)
+#' re<-getTargetGene4Ab(mcf2,"yes","cJun",output.file.dir)
 #' 
-getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),output.file.dir){
+getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),Ab,output.file.dir){
   
+  output.file.dir = file.path(output.file.dir,Ab)
   if (!dir.exists(output.file.dir))
   {
-    dir.create(output.file.dir, recursive = TRUE)
+    dir.create(output.file.dir,recursive = TRUE)
   }
   
   temp<-mcf7
@@ -5013,13 +5032,30 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),output.file.dir){
   }
   
   print(temp22)
-  temp22
-  # Tissue1<-temp22$class[2,]
-  # Tissue2<-unique(temp22$class[2,])
-  # 
-  # TF<-unique(temp22$class[3,])
-  # TF.n<-length(TF)
-  # 
+  #temp22 <- re
+  
+   Tissue1<-temp22$class[2,]
+   Tissue2<-unique(temp22$class[2,])
+   
+   TF<-unique(temp22$class[3,])
+   TF.n<-length(TF)
+    
+   for(i in 1:length(Tissue2)){
+     
+     #for(j in 1:length(TF)){
+     p <- which(temp22$class[2,]==Tissue2[i]&temp22$class[3,]==Ab)
+     cat(Tissue2[i]," ",Ab," ",p,"\n")
+     if(length(p)!=0){
+     #as.data.frame(dba.peakset(temp22,peaks=1,bRetrieve=TRUE))
+     dba.peakset(temp22,peaks=as.integer(p),bRetrieve=TRUE, writeFile = file.path(output.file.dir,paste0(Tissue2[i],"_",Ab,".bed")))
+    }
+     
+   }
+   
+   AnntationUsingChipSeeker3(output.file.dir,".bed",output.file.dir
+                            ,txdb="hg19",DD=5000)
+   
+#   AnntationUsingChipSeeker2
   # temp3=file.path(output.file.dir,"Venn")
   # 
   # if(!dir.exists(temp3))
@@ -5147,7 +5183,6 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),output.file.dir){
   # return(p.common)
 }
 
-
 #input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
 #plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
 #
@@ -5224,6 +5259,172 @@ mapBam2Sample <- function(input.sample.file,input.bam.dir) {
   file.5
 }
 
+#' dir.name="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/Bba2Bed"
+#' input.file.pattern=".bed"
+#' out.dir.name="~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/AnnotationNew4DBA"
+#' txdb="hg19"
+#' DD=5000
+#' 
+#' AnntationUsingChipSeeker3(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000, AP=c("Promoter","Intron"))
+#'
+#' res.promoter <- AnntationUsingChipSeeker3(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000,AP=c("Promoter"))
+#' 
+#' AnntationUsingChipSeeker3(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000,AP=c("Intron"))
+#' 
 
+AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=NULL,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
+  
+  re<-ParserReadFiles(dir.name,input.file.pattern)
+  
+  re.bed<-re$input
+  
+  re.peaks.only.bed.2 <- re.bed
+  
+  # if(length(dir(dir.name,pattern="peaks.bed"))!=0)
+  # {
+  # re.peaks.only.bed.2<-FL(re.bed,'peaks')
+  # cat("peaks\n")
+  # print(re.peaks.only.bed.2)
+  # }
+  # 
+  # if(length(dir(dir.name,pattern="summits.bed"))!=0){
+  # re.summits.only.bed<-FL(re.bed,'summits')
+  # cat("summits\n")
+  # print(re.summits.only.bed)
+  # }
+  
+  txdb<-match.arg(txdb)
+  
+  switch (txdb,
+          hg38 = {
+            cat("Use hg38\n")
+            txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+          },
+          {
+            cat("Use hg19\n") 
+            txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+          }
+  )
+  
+  APpath <- paste(AP,collapse = "_")
+  
+  temp3=file.path(out.dir.name,"Annotation",APpath)
+  
+  if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
+  
+  d=DD
+  
+  peaks.anno.list <- lapply(1:length(re.peaks.only.bed.2),function(u,re.peaks.only.bed.2,d){
+    
+    peaks=readPeakFile(re.peaks.only.bed.2[[u]],as="data.frame")
+    
+    print(head(peaks))
+    
+    peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
+                             TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,genomicAnnotationPriority=AP,annoDb="org.Hs.eg.db")
+    
+    #select.index <- which(peakAnno$distanceToTSS<20,000 && peakAnno$distanceToTSS >= -20,000)
+    dropAnnoM <- function (csAnno, distanceToTSS_cutoff) 
+    {
+      idx <- which(abs(mcols(csAnno@anno)[["distanceToTSS"]]) < 
+                     distanceToTSS_cutoff)
+      csAnno@anno <- csAnno@anno[idx]
+      csAnno@peakNum <- length(idx)
+      if (csAnno@hasGenomicAnnotation) {
+        csAnno@annoStat <- ChIPseeker:::getGenomicAnnoStat(csAnno@anno)
+        csAnno@detailGenomicAnnotation = csAnno@detailGenomicAnnotation[idx, 
+                                                                        ]
+      }
+      csAnno
+    }
+    
+    if(!is.null(distanceToTSS_cutoff)){
+    peakAnno <- dropAnnoM(peakAnno,distanceToTSS_cutoff = distanceToTSS_cutoff)
+    }else
+    {
+    peakAnno <- peakAnno 
+    }
+    
+    x_name=names(re.peaks.only.bed.2)[u]
+    cat(x_name,"\n")
+    png(file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_pie.png")))
+    plotAnnoPie(peakAnno)
+    dev.off()
+    
+    peaks.anno=as.data.frame(peakAnno)
+    
+    print(head(peaks.anno))
+    
+    #print(paste0(peaks[,c(2,3)]))
+    #group1 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][1] 
+    #group2 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][2] 
+    
+    #colnames(peaks.anno)[5:13]=c("starnd","width_DiffDind_based","strand","Conc", group1,group2,"Fold","p.value","FDR")
+    
+    print(colnames(peaks.anno))
+    write.table(peaks.anno,file=file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_4_only_mapped_peaks.xls")),
+                row.names = FALSE,quote=FALSE,sep="\t")
+
+    # unmapped.peaks<-peaks[-which(paste0(peaks[,2],"_",peaks[,3]) %in%
+    # paste0(peaks.anno[,2],"_",peaks.anno[,3])),]
+    # 
+    # cat(dim(peaks)[1]," ",dim(peaks.anno)[1]," ",dim(unmapped.peaks)[1],"\n")
+    # 
+    # 
+    # if(dim(unmapped.peaks)[1]!=0){
+    # 
+    # colnames(unmapped.peaks)=colnames(peaks.anno)[1:6]
+    # 
+    # unmapped.peaks.3<-smartbind(peaks.anno,unmapped.peaks)
+    # 
+    # unmapped.peaks.4<-unmapped.peaks.3[order(unmapped.peaks.3[,1],unmapped.peaks.3[,2]),]
+    # 
+    # write.table(unmapped.peaks.4,file=file.path(temp3,paste0(x_name,"_",d,APpath,"_around_tss_annotation_4_all_peaks.xls")),row.names
+    # = FALSE,quote=FALSE,sep="\t") }
+
+
+    peaks.anno
+    
+  },re.peaks.only.bed.2,d)
+  
+}
+
+# R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4generateBed4HeatMap2("~/SampleID_INFO_ChIP_new_Danny.csv","~/","cJun")'
+
+bashJob4generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name,Ab){
+  
+  #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
+  
+  if (!dir.exists(out.dir.name))
+  {
+    dir.create(out.dir.name, recursive = TRUE)
+  }
+  
+  job.name <- "generateGeneBed"
+  
+  Rfun1 <- 'library(ChipSeq);re <- ChipSeq:::generateBed4HeatMap2('
   
   
+  Rinput <- paste0('\\"',input.bam.file.dir,'\\",',
+                   '\\"',out.dir.name,'\\",',
+                   '\\"',Ab,'\\"')
+
+  Rfun2 <- ')'
+  
+  Rfun <-paste0(Rfun1,Rinput,Rfun2)
+  
+  #cmd.java.1="module load java/1.8.0_60"
+  #cmd.java.1="R CMD javareconf -e"
+  # cmd.java.2="export LD_LIBRARY_PATH=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server:$LD_LIBRARY_PATH"
+  
+  #cmd.java ='export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre"'
+  
+  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  
+  #cmd2=paste(cmd.java.2,cmd.gff,sep=";")
+  
+  system(cmd.gff)
+  
+}
+
+

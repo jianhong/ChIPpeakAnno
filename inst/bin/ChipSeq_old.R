@@ -326,12 +326,19 @@ AnnotatePeak3<- function(input.file.dir,output.file.dir,genome) {
 #'   
 AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=5000,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
 
+  #re<-ParserReadFiles(dir.name,input.file.pattern)
+  
+  #file.1 <- list.files(dir.name,pattern=input.file.patter,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  #re.bed<-re$input
+  
+  #re.peaks.only.bed.2 <- file.1
+  
   re<-ParserReadFiles(dir.name,input.file.pattern)
   
   re.bed<-re$input
   
   re.peaks.only.bed.2 <- re.bed
-  
   # if(length(dir(dir.name,pattern="peaks.bed"))!=0)
   # {
   # re.peaks.only.bed.2<-FL(re.bed,'peaks')
