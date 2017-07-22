@@ -4888,7 +4888,7 @@ useBamCoverage <- function(input.sample.file,input.bam.file,output.dir)
       #--ignoreForNormalization chrX
       #--extendReads
       
-      cmd1 <- paste("bamCoverage --bam",xx,sep=" ")
+      cmd1 <- paste("~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCoverage --bam",xx,sep=" ")
       cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX --extendReads"
       cmd3 <- "-o"
       
