@@ -4889,7 +4889,7 @@ useBamCoverage <- function(input.sample.file,input.bam.file,output.dir)
       #--extendReads
       
       cmd1 <- paste("bamCoverage --bam",xx,sep=" ")
-      cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 ----ignoreForNormalization chrX --extendReads"
+      cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX --extendReads"
       cmd3 <- "-o"
       
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
