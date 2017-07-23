@@ -5190,12 +5190,12 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),Ab,output.file.dir
 #
 useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
   
-  bam.file.sample.label <- mapBam2Sample(input.sample.file,input.bam.file.dir)
+  bam.file.sample.label <- mapBam2Sample2(input.sample.file,input.bam.file.dir)
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   #/projects/ctsi/bbc/aimin/annotation/hg19_gene.bed
   
-  bam.file.list <- as.character(bam.file.sample.label$file.bw)
+  bam.file.list <- as.character(bam.file.sample.label$file.bam)
   samplesLabel <- as.character(bam.file.sample.label$sampleLabel)
   
   lapply(1:length(bam.file.list),function(u,bam.file.list,samplesLabel,output.file.dir){
@@ -5251,6 +5251,23 @@ mapBam2Sample <- function(input.sample.file,input.bam.dir) {
   sample.file <- fread(input.sample.file)
   
   file.2<-cbind(unlist(lapply(file.1,function(u){x<-basename(u);p1 <- regexpr("\\_", x);p2 <- regexpr("\\.", x);xx <- substr(x,p1+1,p2-1)})),file.1)
+  
+  colnames(file.2)=c("ID","file.bam")
+  file.3 <- merge(file.2,sample.file,by="ID",sort=F)
+  sampleLabel= paste(gsub(" ", "-", file.3$Type_Cell), file.3$Type_TF, sep = "-")
+  sampleLabel=gsub("MDA-MB-","",sampleLabel)
+  file.4 <- cbind(file.3,sampleLabel)
+  file.5 <- file.4[,c(2,6)]
+  file.5
+}
+
+mapBam2Sample2 <- function(input.sample.file,input.bam.dir) {
+  
+  file.1 <- list.files(input.bam.dir,pattern=".bam$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  sample.file <- fread(input.sample.file)
+  
+  file.2<-cbind(unlist(lapply(file.1,function(u){x<-basename(u);p2 <- regexpr("\\.", x);xx <- substr(x,1,p2-1)})),file.1)
   
   colnames(file.2)=c("ID","file.bam")
   file.3 <- merge(file.2,sample.file,by="ID",sort=F)
