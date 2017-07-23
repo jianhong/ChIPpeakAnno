@@ -5431,7 +5431,7 @@ bashJob4generateBed4HeatMap2 <- function(input.bam.file.dir,out.dir.name,Ab){
 # --binSize 25 --fragmentLength 200 --missingDataAsZero no \
 # --ratio log2 --scaleFactorsMethod SES -o log2ratio_ChIP_vs_Input.bw
 
-#' bsub -P bbc -J "bamCompare" -o %J.bamCompare.log -e %J.Compare.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useBamCompare("/scratch/projects/bbc/aiminy_project/DannyNewData2/SampleID_INFO_ChIP_new_Danny.csv","/scratch/projects/bbc/aiminy_project/DannyNewData2/sorted_bam_files_2.txt","~/BamCompare")'
+#' bsub -P bbc -J "bamCompare" -o %J.bamCompare.log -e %J.Compare.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useBamCompare2("/nethome/axy148/R/lib64/R/library/ChipSeq/extdata/zhao_data.csv","/nethome/axy148/_visualization/sort_bam.txt","~/BamCompareZhao")'
 
 useBamCompare2 <- function(input.sample.file,input.bam.file,output.dir)
 {
@@ -5515,7 +5515,7 @@ useBamCompare2 <- function(input.sample.file,input.bam.file,output.dir)
     u$name
   }))
   
-  sysyem("module unload python/2.7.3")
+  system("module unload python/2.7.3")
   
   zzz <- unlist(cellInfo.run)
   
