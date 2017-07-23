@@ -5186,8 +5186,7 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),Ab,output.file.dir
   # return(p.common)
 }
 
-#input.region.bed.dir = "~/Dropbox (BBSR)/BBSR Team Folder/Aimin_Yan/ChipSeq/heatmap"
-#plotHeatMapUsedeepTools("~/BamCompare","/projects/ctsi/bbc/aimin","hg19_gene.bed",)
+#bsub -P bbc -J "RunSppR" -o %J.RunSppR.log -e %J.RunSppR.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/SampleID_INFO_ChIP_new_Danny.csv","~/sort_bam","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_data_QC")'
 #
 useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
   
@@ -5201,7 +5200,7 @@ useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
   
   lapply(1:length(bam.file.list),function(u,bam.file.list,samplesLabel,output.file.dir){
     
-    cmd = paste("Rscript run_spp.R",
+    cmd = paste("Rscript ~/phantompeakqualtools/run_spp.R",
                 paste0("-c=",bam.file.list[u]),
                 paste0("-savp=",file.path(output.file.dir,paste0(samplesLabel[u],"_QC.pdf"))),
                 paste0("-out=",file.path(output.file.dir,paste0(samplesLabel[u],"_QC_metrix.txt"))),sep=" ")
@@ -5590,6 +5589,3 @@ ngs2 <- function(config.file,output.file.dir){
   system(cmd)
   
 }
-
-
-
