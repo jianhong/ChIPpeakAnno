@@ -5580,3 +5580,16 @@ ngs <- function(){
 system("ngs.plot.r -G hg19 -R tss -C ~/zhao_config.txt -O zhao.tss -L 4000")
 
 }
+
+# bsub -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::ngs2()'
+
+ngs2 <- function(config.file,output.file.dir){
+  
+  cmd=paste("ngs.plot.r -G hg19 -R tss -C",config.file,"-O",output.file.dir,"-L 4000",collapse = " ")
+  
+  system(cmd)
+  
+}
+
+
+
