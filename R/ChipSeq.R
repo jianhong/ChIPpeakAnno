@@ -4668,6 +4668,9 @@ generateBed4HeatMap <- function(input.bam.file.dir,out.dir.name) {
 
 #R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("~/SampleID_INFO_ChIP_new_Danny.csv","~/BamCoverage","~/ChipSeqBed_p27_cJun",select.region.bed=NULL,"/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_heatmap4p27_cJun")'
 
+
+#R -e 'library(PathwaySplice);library(ChipSeq);ChipSeq:::bashJob4plotHeatMapUsedeepTools("/nethome/axy148/R/lib64/R/library/ChipSeq/extdata/zhao_data.csv","~/BamCompareZhao","~/cJun_gene_bed",select.region.bed=NULL,"/scratch/projects/bbc/aiminy_project/zhao_ChipSeq_heatmap4cJun")'
+
 bashJob4plotHeatMapUsedeepTools <- function(input.sample.file,input.bw.file.dir,input.region.bed.dir,select.region.bed,output.file.dir){
   
   #Sys.setenv(JAVA_HOME='/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.45.x86_64/jre/lib/amd64/server')
@@ -5568,4 +5571,12 @@ useBamCompare2 <- function(input.sample.file,input.bam.file,output.dir)
   
   #return(re)
   
+}
+
+# bsub -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::ngs()'
+
+ngs <- function(){
+  
+system("ngs.plot.r -G hg19 -R tss -C ~/zhao_config.txt -O zhao.tss -L 4000")
+
 }
