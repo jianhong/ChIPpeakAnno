@@ -5247,7 +5247,7 @@ submitJob4useRunSppR <- function(input.sample.file,input.bam.file.dir,output.fil
 #
 mapBam2Sample <- function(input.sample.file,input.bam.dir) {
   
-  file.1 <- list.files(input.bw.dir,pattern=".bam$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  file.1 <- list.files(input.bam.dir,pattern=".bam$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
   sample.file <- fread(input.sample.file)
   
