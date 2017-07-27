@@ -453,21 +453,31 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
 #' input.file.dir="/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA/"
 #' output.file.dir="/scratch/projects/bbc/aiminy_project/"
 #' genome="Hs"
+#' d=4000
+#' BamFileSortIndexVisualization(input.file.dir,output.file.dir,4000,genome)
 #' 
-#' BamFileSortIndexVisualization(input.file.dir,output.file.dir,genome)
+#'bsub -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA","/scratch/projects/bbc/aiminy_project/7_27_2017",400000,"Hs")'
+#'
 #' 
-BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,genome) {
+BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genome) {
   
   #library(ChIPpeakAnno)
   
   re<-ParserReadFiles(input.file.dir,"bam")
   
   file.name.2<-re$input
-  output.dir.name=re$output
+  #output.dir.name=re$output
   
-  temp3=paste0(output.dir.name,"_visualization")
+  #temp3=paste0(output.dir.name,"_visualization")
   
-  dir.create(temp3)
+  temp3=output.file.dir
+  
+  if (!dir.exists(temp3))
+  {
+    dir.create(temp3, recursive = TRUE)
+  }
+    
+  #dir.create(temp3)
   
   re.out<-file.name.2
   
@@ -499,7 +509,9 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,genome)
   
   cmd5="ngs.plot.r -G hg19 -R tss -C"
   cmd6="-O"
-  cmd7="-L 4000"
+  #cmd7="-L 4000"
+  cm7=paste("-L",d,sep=" ")
+  
   #cmd3="-L 4000 -RR 1 -CD 1 -CO \\\"blue\\\""
   
   #ngs.plot.r -G hg19 -R tss -C $1 -O $2 -L 4000 -RR 1 -CD 1 -CO "blue"
@@ -5188,6 +5200,14 @@ getTargetGene4Ab<-function(mcf7,Mergereplicates=c("yes","no"),Ab,output.file.dir
 
 #bsub -P bbc -J "RunSppR" -o %J.RunSppR.log -e %J.RunSppR.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/SampleID_INFO_ChIP_new_Danny.csv","~/sort_bam","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_data_QC")'
 #
+#R/lib64/R/library/ChipSeq/extdata/zhao_data.csv 
+#
+#bsub -P bbc -J "RunSppR" -o %J.RunSppR.log -e %J.RunSppR.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("R/lib64/R/library/ChipSeq/extdata/zhao_data.csv","~/sort_bam","/scratch/projects/bbc/aiminy_project/zhao_ChipSeq_data_QC")'
+#
+#bsub -P bbc -J "RunSppR" -o %J.RunSppR.log -e %J.RunSppR.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/SampleID_INFO_ChIP_new_Danny.csv","/projects/scratch/bbc/Project/Danny_chip2/BigWig","/scratch/projects/bbc/aiminy_project/Danny_ChipSeq_data_QC_2")'
+#
+#
+#
 useRunSppR <- function(input.sample.file,input.bam.file.dir,output.file.dir){
   
   bam.file.sample.label <- mapBam2Sample2(input.sample.file,input.bam.file.dir)
@@ -5605,4 +5625,138 @@ ngs2 <- function(config.file,output.file.dir){
   
   system(cmd)
   
+}
+
+doAlignment<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+filterSam<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  cmd2='samtools view -Sh /home/someusername/myFastqFile.sam | grep -e "^@" -e "XM:i:[012][^0-9]" | grep -v "XS:i:" > /home/someusername/myFastqFile.sam.filtered.sam'
+  
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+convertSam2Bam<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  cmd3="samtools view -S -b /home/someusername/myFastqFile.sam.filtered.sam > /home/someusername/myFastqFile.sam.filtered.sam.bam"
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+sortBam<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  cmd4="samtools sort /home/someusername/myFastqFile.sam.filtered.sam.bam /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted"
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+removePCRduplicates<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  
+  cmd5="samtools rmdup -s /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted.bam /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted.bam.nodup.bam"
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+indexBAM<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  
+  cmd6="samtools index /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted.bam.nodup.bam"
+  
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+bam2Bed<-function(input.fastq.dir,bowtie2Indeces,output.dir){
+  re <- parserreadfiles(input.fastq.dir, "fastq")
+  res <- re$input
+  index <- system('echo $LSB_JOBINDEX',intern = TRUE)
+  cmd7="bedtools bamtobed -i /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted.bam.nodup.bam > /home/someusername/myFastqFile.sam.filtered.sam.bam.sorted.bam.nodup.bam.bed"
+  cmd0="bowtie2 -x"
+  "/home/someusername/bowtie2Indeces/somegenome -U /home/someusername/myFastqFile.fastq -S /home/someusername/myFastqFile.sam"
+  u <- as.integer(index)
+  path_name = dirname(res[[u]])
+  file_name = file_path_sans_ext(basename(res[[u]]))
+  cmd1 <- paste(cmd0,bowtie2Indeces,"-U",res[[u]],"-S",file.path(output.dir,paste0(file_name,".sam")), sep = " ")
+  cmd2 <- cmd1
+  system(cmd2)
+  cat(cmd2,"\n")
+}
+
+getBamReady<-function(input.fastq.dir,bowtie2Indecesinput,sample.num,output.bam.dir){
+
+Rfun1 <- 'library(ChipSeq);library(DoGs);re <- ChipSeq:::doAlignment('
+Rinput <- paste0('\\"',input.fastq.dir,'\\",',
+                 '\\"',bowtie2Indecesinput,'\\",',
+                 '\\"',output.dir,'\\"')
+Rfun2 <- ')'
+Rfun <-paste0(Rfun1,Rinput,Rfun2)
+alignment <- createBsubJobArrayRfun(Rfun,paste0("alignment[1-",sample.num,"]",NULL))
+system(alignment)
+}
+
+getEffectOfRmDup<-function(){
+  not.rm <- read.table("~/Dropbox (BBSR)/Aimin_project/Research/ChipSeq/Danny_ChipSeq_data_QC/qc_16.txt")
+  rm <- read.table("~/Dropbox (BBSR)/Aimin_project/Research/ChipSeq/Danny_ChipSeq_data_QC_2/16_samples_QC.txt")
+  res <- as.data.table(rbind(cbind(rep("not_rm",length(not.rm[,11])),not.rm[,11]),cbind(rep("rm",length(rm[,11])),rm[,11])))
+  boxplot(as.numeric(res$V2)~res$V1)
 }
