@@ -510,7 +510,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genom
   cmd5="ngs.plot.r -G hg19 -R tss -C"
   cmd6="-O"
   #cmd7="-L 4000"
-  cm7=paste("-L",d,sep=" ")
+  cmd7=paste("-L",d,sep=" ")
   
   #cmd3="-L 4000 -RR 1 -CD 1 -CO \\\"blue\\\""
   
