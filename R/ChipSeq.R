@@ -5764,9 +5764,13 @@ getEffectOfRmDup<-function(){
 
 #' sbatch -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::runIDR()'
 
+#'
+#' sbatch -p hipri test-job.sh
+
+
 runIDR <- function()
 {
-cmd="idr --samples /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak1 /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak2"
+cmd="idr --samples /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak1 /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak2 --plot testIDR"
 system(cmd)
 
 }
