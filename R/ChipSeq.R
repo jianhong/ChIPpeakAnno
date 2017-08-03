@@ -5812,7 +5812,7 @@ peakCallAndAnnotationWithoutInput <- function(input.file.dir,output.file.dir,gen
   file.name.2<-re$input
   #output.dir.name=re$output
   
-  temp3=file.path(output.dir.name,"PeakCall")
+  temp3=file.path(output.file.dir,"PeakCall")
   
   if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
   
