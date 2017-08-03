@@ -5807,7 +5807,7 @@ peakCallAndAnnotationWithoutInput <- function(input.file.dir,output.file.dir,gen
     
   })
   
-  re<-ParserReadFiles(input.file.dir,"bam",output.file.dir)
+  re<-ParserReadFiles(input.file.dir,"bam")
   
   file.name.2<-re$input
   #output.dir.name=re$output
