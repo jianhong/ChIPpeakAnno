@@ -5766,6 +5766,7 @@ getEffectOfRmDup<-function(){
 
 #' sbatch -p hipri test-job.sh
 #' sbatch -p hipri test-job.sh
+#' squeue -u steven.miamiuniv
 
 
 runIDR <- function()
@@ -5773,4 +5774,75 @@ runIDR <- function()
 cmd="idr --samples /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak1 /home/steven.miamiuniv/Softwares/idr-2.0.2/tests/data/peak2 --plot testIDR"
 system(cmd)
 
+}
+
+# bsub -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/scratch/projects/bbc/aiminy_project/7_27_2017_bam/","/scratch/projects/bbc/aiminy_project/macs2_call","hs","macs2",0.0001)'
+# 
+peakCallAndAnnotationWithoutInput <- function(input.file.dir,output.file.dir,genome = "hs",peakcaller = c("macs14", "macs2"), peakPvalue) {
+  
+  genome <- match.arg(genome)
+  
+  cmd10 <- paste("-f BAM", "-g", genome, "-n", sep = " ")
+  
+  switch(peakcaller, macs2 = {
+    
+    PATH1 = Sys.getenv("PATH")
+    
+    macs2_Lib = file.path("/nethome/axy148/NGS_tools/MACS/bin/")
+    
+    Sys.setenv(PATH = paste0(macs2_Lib, ":", PATH1))
+    
+    cmd1 <- Sys.which("macs2")[[1]]
+    
+    cat(cmd1, "\n")
+    
+    cmd9 = paste(cmd1, "callpeak -t", sep = " ")
+    
+    cmd11 <- paste("-p", peakPvalue, sep = " ")
+    
+  }, {
+    cmd9 = "macs14 -t "
+    
+    cmd11 <- paste("-m 6,18 --bw=200 -p", peakPvalue, sep = " ")
+    
+  })
+  
+  re<-ParserReadFiles(input.file.dir,"bam",output.file.dir)
+  
+  file.name.2<-re$input
+  #output.dir.name=re$output
+  
+  temp3=file.path(output.dir.name,"PeakCall")
+  
+  if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
+  
+  re.out<-file.name.2
+  
+  #cmd9="macs14 -t "
+  #cmd10="-f BAM -g hs -n "
+  #cmd11=" -m 6,18 --bw=200 -p 0.00001"
+  
+  lapply(1:length(re.out),function(u,re.out,temp3){
+    
+    x=re.out[[u]]
+    x_name=names(re.out)[u]
+    
+    cmd12=paste(cmd9,x,cmd10,file.path(temp3,paste0(x_name,"_hs_1.00e-05_macs")),cmd11,sep=" ")
+    
+    print(cmd12)
+    system(cmd12, intern = TRUE, ignore.stderr = TRUE)
+    
+    #re=read.table(u,header=FALSE)
+    #  re<-as.character(re[,1])
+    #  #colnames(re)=c("Count","GeneName")
+    #  re
+  },re.out,temp3)
+  
+  #AnnotatePeak2(paste0(temp3,"/"),"*macs142_peaks.bed",7,paste0(output.dir.name,"PeakAnnotation_at_",temp2),genome="Hs")
+  
+  #AnnotatePeak3(paste0(temp3,"/"),paste0(output.dir.name,"_PeakAnnotation"),
+  #              genome="Hs")
+  
+  #BamFileSortIndexVisualization2(re,genome)
+  
 }
