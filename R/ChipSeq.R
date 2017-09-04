@@ -5253,7 +5253,7 @@ submitJob4useRunSppR <- function(input.sample.file,input.bam.file.dir,output.fil
   
   Rfun <-paste0(Rfun1,Rinput,Rfun2)
   
-  cmd.gff <- PathwaySplice:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
+  cmd.gff <- DoGs:::createBsubJobArrayRfun(Rfun,job.name,wait.job.name=NULL)
   
   system(cmd.gff)
   
