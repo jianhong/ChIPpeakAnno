@@ -8,7 +8,7 @@ Using IDR to assess the consistency of replicate experiments and obtain a high-c
 }
 \usage{
 IDRfilter(peaksA, peaksB, bamfileA, bamfileB, 
-          maxgap=0L, minoverlap=1L, singleEnd=TRUE,
+          maxgap=-1L, minoverlap=0L, singleEnd=TRUE,
           IDRcutoff=0.01, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -19,11 +19,10 @@ IDRfilter(peaksA, peaksB, bamfileA, bamfileB,
   \item{bamfileA, bamfileB}{
     file path of bam files.
 }
-  \item{maxgap}{
-    Non-negative integer. Peak intervals with a separation of maxgap or less are considered to be overlapped.
-}
-  \item{minoverlap}{
-    Non-negative integer. Peak intervals with an overlapping of minoverlap or more are considered to be overlapped.
+  \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
   \item{singleEnd}{
     (Default TRUE) A logical indicating if reads are single or paired-end. 

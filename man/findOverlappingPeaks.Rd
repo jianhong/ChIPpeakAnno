@@ -15,8 +15,8 @@ The new function findOverlapsOfPeaks is recommended.
 Convert RangedData to GRanges with toGRanges function.
 }
 \usage{
-findOverlappingPeaks(Peaks1, Peaks2, maxgap = 0L,
-    minoverlap=1L, multiple = c(TRUE, FALSE), 
+findOverlappingPeaks(Peaks1, Peaks2, maxgap = -1L,
+    minoverlap=0L, multiple = c(TRUE, FALSE),
     NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2",
     select=c("all", "first","last","arbitrary"), annotate = 0,
     ignore.strand=TRUE, 
@@ -29,13 +29,10 @@ RangedData: See example below.
   \item{Peaks2}{
 RangedData: See example below.
 }
-  \item{maxgap}{
-Non-negative integer. Intervals with a separation of maxgap or less are 
-considered to be overlapping.
-}
-\item{minoverlap}{
-Non-negative integer. Intervals with an overlapping of minoverlap or more are 
-considered to be overlapping.
+  \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
   \item{multiple}{
 TRUE or FALSE: TRUE may return multiple overlapping peaks in Peaks2 for one 

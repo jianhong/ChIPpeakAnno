@@ -68,7 +68,6 @@ annoPeaks <- function(peaks, annoData,
             }
             peaks.tmp <- extGR(peaks, bindingRegion)
             ol <- findOverlaps(query=peaks.tmp, subject=annotation,
-                               maxgap=0L, minoverlap=1L,
                                type="any", select="all",
                                ignore.strand=FALSE)
         }else{
@@ -77,7 +76,6 @@ annoPeaks <- function(peaks, annoData,
                                     upstream=-1*bindingRegion[1],
                                     downstream=bindingRegion[2])
             ol <- findOverlaps(query=peaks, subject=annotation,
-                               maxgap=0L, minoverlap=1L,
                                type="any", select="all",
                                ignore.strand=FALSE)
         }
@@ -120,7 +118,6 @@ annoPeaks <- function(peaks, annoData,
         }
         
         ol <- findOverlaps(query=peaks, subject=annotation,
-                           maxgap=0L, minoverlap=1L,
                            type="any", select="all",
                            ignore.strand=FALSE)
     }

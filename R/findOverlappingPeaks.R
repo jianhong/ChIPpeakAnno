@@ -1,5 +1,5 @@
 ##require library graph, RBGL
-findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L, 
+findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                                  multiple = c(TRUE, FALSE),
                                  NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", 
                                  select=c("all", "first", "last", "arbitrary"), 
@@ -166,7 +166,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = 0L,minoverlap=1L,
                                      all, 1:length(all), SIMPLIFY=FALSE))
         all.peaks <- Peaks[all[,2]]
         all.peaks$gpForFindOverlapsOfPeaks <- all[, 1]
-        all.peaks.rd <- reduce(all.peaks, min.gapwidth=maxgap, with.revmap=TRUE)
+        all.peaks.rd <- reduce(all.peaks, min.gapwidth=maxgap+1L, with.revmap=TRUE)
         mapping <- all.peaks.rd$revmap
         m <- sapply(mapping, length)
         mIndex <- rep(1:length(mapping), m)

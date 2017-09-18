@@ -1,5 +1,5 @@
 ##require library graph, RBGL
-findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L, 
+findOverlapsOfPeaks <- function(..., maxgap=-1L, minoverlap=0L,
                                 ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll")){
   ###check inputs
   NAME_conn_string <- "___conn___"
@@ -73,7 +73,7 @@ findOverlapsOfPeaks <- function(..., maxgap=0L, minoverlap=1L,
   names(listname) <- listcode
   names(all.peaks.split) <- listname[names(all.peaks.split)]
   peaklist <- lapply(all.peaks.split, reduce, 
-                     min.gapwidth=maxgap, with.revmap=TRUE, 
+                     min.gapwidth=maxgap+1L, with.revmap=TRUE, 
                      ignore.strand=ignore.strand)
   peaklist <- mapply(function(peaks, info){
     revmap <- peaks$revmap

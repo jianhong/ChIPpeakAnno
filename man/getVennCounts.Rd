@@ -8,7 +8,7 @@ Obtain Venn Counts for peak ranges using chromosome ranges or feature field,
 internal function for makeVennDigram
 }
 \usage{
-getVennCounts(..., maxgap = 0L, minoverlap=1L, 
+getVennCounts(..., maxgap = -1L, minoverlap=0L,
     by=c("region", "feature", "base"), 
     ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"))
 }
@@ -17,13 +17,10 @@ getVennCounts(..., maxgap = 0L, minoverlap=1L,
     Objects of \link[GenomicRanges:GRanges]{GRanges} or 
     \link[IRanges:RangedData]{RangedData}: See example below.
 }
-  \item{maxgap}{
-Non-negative integer. Intervals with a separation of maxgap or less are 
-considered to be overlapping.
-}
-\item{minoverlap}{
-Non-negative integer. Intervals with an overlapping of minoverlap or more are 
-considered to be overlapping.
+  \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
 \item{by}{region, feature or base, default region. feature means using feature 
 field in the RangedData or GRanges for calculating overlap, region means using 
@@ -66,9 +63,9 @@ peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704),
                     space = c("1", "2", "3", "1", "2"), 
                     strand = c(1, 1, -1,-1,1), 
                     feature=c("a","c","d","e", "a"))
-    getVennCounts(peaks1,peaks2, maxgap=0)
-    getVennCounts(peaks1,peaks2, maxgap=0, by="feature")
-    getVennCounts(peaks1, peaks2, maxgap=0, by="base")
+    getVennCounts(peaks1,peaks2)
+    getVennCounts(peaks1,peaks2, by="feature")
+    getVennCounts(peaks1, peaks2, by="base")
 }
 }
 \keyword{ misc }

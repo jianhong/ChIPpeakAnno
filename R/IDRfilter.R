@@ -1,5 +1,5 @@
 IDRfilter <- function(peaksA, peaksB, bamfileA, bamfileB, 
-                      maxgap=0L, minoverlap=1L, singleEnd=TRUE,
+                      maxgap=-1L, minoverlap=0L, singleEnd=TRUE,
                       IDRcutoff=0.01, ...){
     stopifnot(class(peaksA)=="GRanges")
     stopifnot(class(peaksB)=="GRanges")

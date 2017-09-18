@@ -7,7 +7,7 @@ annotatePeakInBatch <-
                          "upstream", "downstream", 
                          "upstreamORdownstream", 
                          "nearestBiDirectionalPromoters"),
-              multiple = c(TRUE,FALSE), maxgap = 0L,
+              multiple = c(TRUE,FALSE), maxgap = -1L,
               PeakLocForDistance=c("start","middle","end"),
               FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"),
               select=c("all", "first", "last", "arbitrary"),
@@ -270,7 +270,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                                maxgap=0,
                                                 ignore.strand=ignore.strand,
                                                 select=select,
                                                 type="any"))
@@ -286,7 +285,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="any"))
@@ -302,7 +300,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                                maxgap=0,
                                                 ignore.strand=ignore.strand,
                                                 select=select,
                                                 type="any"))
@@ -318,7 +315,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="any"))
@@ -333,7 +329,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist1 <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="any"))
@@ -346,7 +341,6 @@ annotatePeakInBatch <-
             start(featureGR) <- start
             width(featureGR) <- width
             dist2 <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="any"))
@@ -355,7 +349,6 @@ annotatePeakInBatch <-
         }
         if(output=="inside"){
             dist <- as.data.frame(findOverlaps(myPeakList, TSS.ordered,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="within"))
@@ -367,7 +360,6 @@ annotatePeakInBatch <-
                 apply(cbind(start(featureGR) - maxgap, 1), 1, max)
             end(featureGR) <- end(featureGR) + maxgap
             dist <- as.data.frame(findOverlaps(myPeakList, featureGR,
-                                               maxgap=0,
                                                ignore.strand=ignore.strand,
                                                select=select,
                                                type="any"))

@@ -44,7 +44,7 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
                        CD=HiC_REV_GR,
                        D.dws=HiC.D.dws)
     peaks.ol.HiCdata <- lapply(HiC.groups, function(hic){
-        ol <- findOverlaps(peaks, hic, maxgap=0)
+        ol <- findOverlaps(peaks, hic)
         this.peaks <- peaks[queryHits(ol)]
         this.peaks$HiC.idx <- subjectHits(ol)
         this.peaks
@@ -54,7 +54,7 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
     }
     ## refine annoData by HiCdata
     anno.ol.HiCdata <- lapply(HiC.groups, function(hic){
-        ol <- findOverlaps(annoData, hic, maxgap=0)
+        ol <- findOverlaps(annoData, hic)
         annoData.ol.HiC <- annoData[queryHits(ol)]
         annoData.ol.HiC.pos <- 
             switch(bindingType,

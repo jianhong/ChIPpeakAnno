@@ -10,7 +10,7 @@ Find the overlapped peaks among two or more set of peaks.
 Find the overlapping peaks for two or more (less than five) set of peak ranges.
 }
 \usage{
-findOverlapsOfPeaks(\dots, maxgap=0L, minoverlap=1L, 
+findOverlapsOfPeaks(\dots, maxgap=-1L, minoverlap=0L,
                     ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"))
 }
 %- maybe also 'usage' for other objects documented here.
@@ -18,11 +18,10 @@ findOverlapsOfPeaks(\dots, maxgap=0L, minoverlap=1L,
   \item{\dots}{
     Objects of \link[GenomicRanges:GRanges]{GRanges}: See example below.
 }
-  \item{maxgap}{
-Non-negative integer. Peak intervals with a separation of maxgap or less are considered to be overlapped.
-}
-\item{minoverlap}{
-Non-negative integer. Peak intervals with an overlapping of minoverlap or more are considered to be overlapped.
+  \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
 \item{ignore.strand}{
     When set to TRUE, the strand information is ignored in the overlap calculations.

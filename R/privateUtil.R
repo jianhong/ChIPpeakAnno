@@ -139,7 +139,7 @@ trimPeakList <- function(Peaks, ignore.strand, by, keepMetadata=FALSE){
 }
 
 vennCounts <- function(PeaksList, n, names,
-                       maxgap=0L, minoverlap=1L, 
+                       maxgap=-1L, minoverlap=0L,
                        by=c("region", "feature", "base"), 
                        ignore.strand=TRUE, 
                        connectedPeaks=c("min", "merge", "keepAll")){

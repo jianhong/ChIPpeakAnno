@@ -8,7 +8,7 @@ Make Venn Diagram from two or more peak ranges, Also calculate p-value to
 determine whether those peaks overlap significantly.
 }
 \usage{
-makeVennDiagram(Peaks, NameOfPeaks, maxgap = 0L, minoverlap = 1L,
+makeVennDiagram(Peaks, NameOfPeaks, maxgap = -1L, minoverlap = 0L,
                  totalTest, by = c("region", "feature", "base"),
                  ignore.strand = TRUE, connectedPeaks = c("min",
                  "merge", "keepAll"), method = c("hyperG",
@@ -23,13 +23,10 @@ See example below.
 Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"). This will
 be used as label in the Venn Diagram.
 }
- \item{maxgap}{
- Non-negative integer. Intervals with a separation of maxgap or less are 
- considered to be overlapping.
-}
-\item{minoverlap}{
-Non-negative integer. Intervals with an overlapping of minoverlap or more are 
-considered to be overlapping.
+ \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
 \item{totalTest}{
 Numeric value to specify the total number of tests performed to obtain the 

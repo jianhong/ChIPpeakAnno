@@ -1,6 +1,6 @@
 ##require library graph, RBGL
 
-getVennCounts <- function(..., maxgap = 0L, minoverlap=1L, 
+getVennCounts <- function(..., maxgap = -1L, minoverlap=0L,
                           by=c("region", "feature", "base"), 
                           ignore.strand=TRUE, 
                           connectedPeaks=c("min", "merge", "keepAll")){

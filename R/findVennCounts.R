@@ -1,4 +1,4 @@
-findVennCounts <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap = 1L,  totalTest, useFeature=FALSE)
+findVennCounts <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap = 0L,  totalTest, useFeature=FALSE)
 {
 	if (missing(totalTest))
 	{

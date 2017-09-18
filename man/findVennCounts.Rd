@@ -8,7 +8,7 @@ Obtain Venn Counts for two peak ranges using chromosome ranges or feature
 field, internal function for makeVennDigram
 }
 \usage{
-findVennCounts(Peaks, NameOfPeaks, maxgap = 0L, minoverlap = 1L, 
+findVennCounts(Peaks, NameOfPeaks, maxgap = -1L, minoverlap = 0L,
                totalTest, useFeature=FALSE)
 }
 \arguments{
@@ -18,13 +18,11 @@ RangedDataList: See example below.}
 Character vector to specify the name of Peaks, e.g., c("TF1", "TF2"), 
 this will be used as label in the Venn Diagram.
 }
-  \item{maxgap}{
- Non-negative integer. Intervals with a separation of maxgap or less are 
- considered to be overlapping.
+  \item{maxgap,minoverlap}{
+Used in the internal call to \code{findOverlaps()} to detect overlaps.
+See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+for a description of these arguments.
 }
-\item{minoverlap}{
-Non-negative integer. Intervals with an overlapping of minoverlap or more are 
-considered to be overlapping.}
   \item{totalTest}{
 Numeric value to specify the total number of tests performed to obtain the 
 list of peaks.

@@ -15,7 +15,7 @@ AnnotationData, output=c("nearestLocation", "overlapping", "both",
                          "upstreamORdownstream",
                          "nearestBiDirectionalPromoters"),
 multiple=c(TRUE,FALSE), 
-maxgap=0L, PeakLocForDistance=c("start", "middle", "end"), 
+maxgap=-1L, PeakLocForDistance=c("start", "middle", "end"),
 FeatureLocForDistance=c("TSS", "middle","start", "end","geneEnd"), 
 select=c("all", "first","last","arbitrary"),
 ignore.strand=TRUE, bindingRegion=NULL, ...)
@@ -53,8 +53,12 @@ with maximum gap}
 overlapping features for each peak. FALSE: output at most one overlapping 
 feature for each peak. This parameter is kept for backward compatibility, 
 please use select.}
-\item{maxgap}{Non-negative integer. Intervals with a separation of maxgap or 
-less are considered to be overlapping}
+\item{maxgap}{The maximum \emph{gap} that is allowed between 2 ranges for the
+ranges to be considered as overlapping. The \emph{gap} between 2 ranges
+is the number of positions that separate them. The \emph{gap} between
+2 adjacent ranges is 0. By convention when one range has its start or
+end strictly inside the other (i.e. non-disjoint ranges), the \emph{gap}
+is considered to be -1.}
 \item{PeakLocForDistance}{Specify the location of peak for calculating 
 distance,i.e., middle means using middle of the peak to calculate distance 
 to feature, start means using start of the peak to calculate the distance 

@@ -1,4 +1,4 @@
-makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=0L, minoverlap=1L, 
+makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
                             totalTest, by=c("region", "feature", "base"), 
                             ignore.strand=TRUE, 
                             connectedPeaks=c("min", "merge", "keepAll"), 
