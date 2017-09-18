@@ -143,7 +143,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=0,
+                                             maxgap=1,
                                              output="upstream&inside"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 8)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 4)
@@ -152,7 +152,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=1,
+                                             maxgap=2,
                                              output="upstream&inside"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 8)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 5)
@@ -161,7 +161,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=0,
+                                             maxgap=1,
                                              output="upstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 6)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 0)
@@ -170,7 +170,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=1,
+                                             maxgap=2,
                                              output="upstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 6)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 1)
@@ -189,7 +189,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=0,
+                                             maxgap=1,
                                              output="inside&downstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 8)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 5)
@@ -198,7 +198,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=1,
+                                             maxgap=2,
                                              output="inside&downstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 9)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 6)
@@ -207,7 +207,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=0,
+                                             maxgap=1,
                                              output="downstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 2)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 5)
@@ -216,7 +216,7 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=1,
+                                             maxgap=2,
                                              output="downstream"))
     expect_equal(sum(annotation$peak=="a"& !is.na(annotation$feature)), 3)
     expect_equal(sum(annotation$peak=="b"& !is.na(annotation$feature)), 6)
@@ -240,12 +240,12 @@ test_that("annotatePeakInBatch works not correct", {
     suppressWarnings(annotation <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=0,
+                                             maxgap=1,
                                              output="upstreamORdownstream"))
     suppressWarnings(annotation1 <- 
                          annotatePeakInBatch(myPeak, 
                                              AnnotationData=feature, 
-                                             maxgap=1,
+                                             maxgap=2,
                                              output="upstreamORdownstream"))
     expect_equal(length(annotation), 2)
     expect_equal(length(annotation1), 3)
@@ -377,14 +377,14 @@ test_that("annotatePeakInBatch works not correct", {
     gaps.anno <- annotatePeakInBatch(exons, 
                                      AnnotationData=gaps, 
                                      output="overlapping", 
-                                     maxgap=-1,
+                                     maxgap=0,
                                      ignore.strand = FALSE)
     gaps.anno.1 <- gaps.anno[!is.na(gaps.anno$feature)]
     expect_equal(length(gaps.anno.1), 0)
     gaps.anno <- annotatePeakInBatch(exons, 
                                      AnnotationData=gaps, 
                                      output="overlapping", 
-                                     maxgap=2,
+                                     maxgap=3,
                                      ignore.strand = FALSE)
     gaps.anno.2 <- gaps.anno[!is.na(gaps.anno$feature)]
     expect_equal(length(gaps.anno.2), 2*length(exons))
