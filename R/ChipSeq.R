@@ -5873,7 +5873,7 @@ peakCallAndAnnotationWithoutInput <- function(input.file.dir,output.file.dir,gen
 # 
 parseToSampleInfo <- function(input.dir,input.pattern,output.dir,output.file,label){
   
-  file.1 <- list.files(input.bam.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  file.1 <- list.files(input.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   s <- file.1
   ss <- basename(as.character(s))
   sss <- tools::file_path_sans_ext(ss)

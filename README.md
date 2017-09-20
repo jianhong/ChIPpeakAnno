@@ -37,6 +37,7 @@ install_github("aiminy/ChipSeq",ref='0.99.0',dependencies = T , force = T)
 
 #If you use command line in pegasus terminal
 R -e 'library(devtools);install_github("aiminy/ChipSeq",ref = "0.99.0",dependencies = T , force = T)'
+
 ```
 
 ## You can run ChipSeq using interactive model by follwing hints:
@@ -95,3 +96,10 @@ You will find the follwing latest directories that was created with a timestamp
 #Peak call is located in  
 /scratch/projects/bbc/aiminy_project/ReadBam_at_2016-12-01-18-58-57_visualization/
 ```
+
+# install
+```{r}
+R -e 'library(devtools);install_github("aiminy/ChipSeq")'
+R -e 'library(ChipSeq);library(ChipSeq);ChipSeq:::parseToSampleInfo("/projects/scratch/bbc/Project/Danny_chip3/Filtered_bam","*.bam$","~/Danny_chip3","sample_infor_Danny_chip3.txt","Danny_chip3")'
+```
+
