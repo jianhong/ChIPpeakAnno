@@ -8,6 +8,10 @@ Install the following softares firstly:
 
 2. MACS(https://github.com/taoliu/MACS)
 
+3. sudo apt-get install libboost-dev
+
+4. R -e 'library(devtools);devtools::install_github("hms-dbmi/spp", build_vignettes = FALSE)'
+
 # set Path
 
 emacs .bashrc
