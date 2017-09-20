@@ -5865,3 +5865,26 @@ peakCallAndAnnotationWithoutInput <- function(input.file.dir,output.file.dir,gen
   #BamFileSortIndexVisualization2(re,genome)
   
 }
+
+#input <- "~/nodup.bam.txt"
+#output <- "~/"
+#
+# R -e 'library(ChipSeq);library(ChipSeq);ChipSeq:::parseToSampleInfo("/projects/scratch/bbc/Project/Danny_chip3/Filtered_bam","*.bam$","~/Danny_chip3","sample_infor_Danny_chip3.txt","Danny_chip3")'
+# 
+parseToSampleInfo <- function(input.dir,input.pattern,output.dir,output.file,label){
+  
+  file.1 <- list.files(input.bam.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  s <- file.1
+  ss <- basename(as.character(s))
+  sss <- tools::file_path_sans_ext(ss)
+  ssss <- tools::file_path_sans_ext(sss)
+  
+  sm.info <- cbind.data.frame(ssss,rep(label,length(sss)),ssss,rep("Link",length(sss)))
+  
+  colnames(sm.info) <- c("ID","Type_Cell","Type_TF","Link")
+  
+  if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+  
+  write.table(sm.info,file=file.path(output.dir,output.file),row.names = FALSE,quote=FALSE,sep=",")
+  
+}
