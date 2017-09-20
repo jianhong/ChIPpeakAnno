@@ -5879,7 +5879,7 @@ parseToSampleInfo <- function(input.dir,input.pattern,output.dir,output.file,lab
   sss <- tools::file_path_sans_ext(ss)
   ssss <- tools::file_path_sans_ext(sss)
   
-  sm.info <- cbind.data.frame(ssss,rep(label,length(sss)),ssss,rep("Link",length(sss)))
+  sm.info <- cbind.data.frame(sss,rep(label,length(sss)),ssss,rep("Link",length(sss)))
   
   colnames(sm.info) <- c("ID","Type_Cell","Type_TF","Link")
   
