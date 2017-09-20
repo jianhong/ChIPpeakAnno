@@ -11,7 +11,7 @@
 peakPermTest(peaks1, peaks2, ntimes=100, 
              seed=as.integer(Sys.time()),
              mc.cores=getOption("mc.cores", 2L),
-             maxgap=0L, pool,
+             maxgap=-1L, pool,
              TxDb, bindingDistribution,
              bindingType=c("TSS", "geneEnd"), 
              featureType=c("transcript", "exon"),

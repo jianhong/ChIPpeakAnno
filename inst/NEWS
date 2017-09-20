@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.11.6
+-------------------------
+
+    o fix the bugs Codoc mismatches from documentation object 'peakPermTest'
+
 CHANGES IN VERSION 3.11.4
 -------------------------
 
