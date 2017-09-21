@@ -12,7 +12,7 @@ Install the following softares firstly:
 
 4. R -e 'library(devtools);devtools::install_github("hms-dbmi/spp", build_vignettes = FALSE)'
 
-## set Path
+## Set Path
 
 emacs .bashrc
 
@@ -44,9 +44,6 @@ R -e 'library(PathwaySplice);library(DoGs);library(ChipSeq);ChipSeq:::submitJob4
 R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/Danny_chip3/sample_infor_Danny_chip3.txt","/media/aiminyan/DATA/Danny_chip3","/media/aiminyan/DATA/Danny_chip3_chipSeq_QC")'
 
 # Get heatmap locally
-# 
-# if bam files are not sorted and indexed yet, run the foollowing 
-R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs")'
 
 #install hg19 genome data if this data is not in your environment, 
 # download ngsplotdb_hg19_75_3.00.tar.gz,ngsplotdb_hg19_75_3.00_enhancer.tar.gz and ngsplotdb_hg19_75_3.00_dhs.tar.gz to ~/Downloads
@@ -54,6 +51,9 @@ R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aim
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00.tar.gz
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_enhancer.tar.gz
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_dhs.tar.gz
+
+# if bam files are not sorted and indexed yet, run the foollowing 
+R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs")'
 
 # if bam files are already sorted and indexed, run the following 
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs",bam.sort=TRUE)'
