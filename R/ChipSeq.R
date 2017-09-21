@@ -488,7 +488,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
   lapply(1:length(re.out),function(u,re.out,temp3){
     
     x=re.out[[u]]
-    x_name=names(re.out)[u]
+    x_name=tools::file_path_sans_ext(x)
     cmd2=paste0(cmd1," ",x," ",file.path(temp3,paste0(x_name,"_sorted")))
     
     #print(cmd2)
@@ -501,7 +501,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
   lapply(1:length(re.out),function(u,re.out,temp3){
     
     x=re.out[[u]]
-    x_name=names(re.out)[u]
+    x_name=tools::file_path_sans_ext(x)
     cmd4=paste0(cmd3," ",file.path(temp3,paste0(x_name,"_sorted.bam")))
     
     #print(cmd2)
@@ -523,7 +523,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
   lapply(1:length(re.out),function(u,re.out,temp3){
     
     x=re.out[[u]]
-    x_name=names(re.out)[u]
+    x_name=tools::file_path_sans_ext(x)
     
     cmd8=paste(cmd5,file.path(temp3,paste0(x_name,"_sorted.bam")),cmd6,file.path(temp3,paste0(x_name,"_sorted")),cmd7,sep=" ")
     
