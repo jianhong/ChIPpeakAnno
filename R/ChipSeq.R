@@ -528,7 +528,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
     x=re.out[[u]]
     x_name=tools::file_path_sans_ext(basename(x))
     
-    cmd8=paste(cmd5,file.path(temp3,paste0(x_name,"_sorted.bam")),cmd6,file.path(temp3,paste0(x_name,"_sorted.bam")),cmd7,sep=" ")
+    cmd8=paste(cmd5,file.path(temp3,paste0(x_name,"_sorted.bam")),cmd6,file.path(temp3,x_name),cmd7,sep=" ")
     
     print(cmd8)
     system(cmd8, intern = TRUE, ignore.stderr = TRUE)
