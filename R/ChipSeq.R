@@ -459,13 +459,15 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
 #'bsub -P bbc -J "zhaoCJun" -o %J.zhaoCJun.log -e %J.zhaoCJun.err -W 72:00 -n 32 -q parallel -R 'rusage[mem= 16000 ] span[ptile= 16 ]' -u aimin.yan@med.miami.edu R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA","/scratch/projects/bbc/aiminy_project/7_27_2017",400000,"Hs")'
 #'
 #' 
-BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genome) {
+BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.file.dir,d,genome) {
   
   #library(ChIPpeakAnno)
   
-  re<-ParserReadFiles(input.file.dir,"bam")
+  #re<-ParserReadFiles(input.file.dir,"bam")
+
+  file.1 <- list.files(input.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
-  file.name.2<-re$input
+  file.name.2<-file.1
   #output.dir.name=re$output
   
   #temp3=paste0(output.dir.name,"_visualization")
@@ -487,7 +489,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genom
     
     x=re.out[[u]]
     x_name=names(re.out)[u]
-    cmd2=paste0(cmd1," ",x," ",paste0(temp3,"/",x_name,"_sorted"))
+    cmd2=paste0(cmd1," ",x," ",file.path(temp3,paste0(x_name,"_sorted")))
     
     #print(cmd2)
     system(cmd2)
@@ -500,7 +502,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genom
     
     x=re.out[[u]]
     x_name=names(re.out)[u]
-    cmd4=paste0(cmd3," ",paste0(temp3,"/",x_name,"_sorted.bam"))
+    cmd4=paste0(cmd3," ",file.path(temp3,paste0(x_name,"_sorted.bam")))
     
     #print(cmd2)
     system(cmd4)
@@ -523,7 +525,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,output.file.dir,d,genom
     x=re.out[[u]]
     x_name=names(re.out)[u]
     
-    cmd8=paste(cmd5,paste0(temp3,"/",paste0(x_name,"_sorted.bam")),cmd6,paste0(temp3,"/",paste0(x_name,"_sorted")),cmd7,sep=" ")
+    cmd8=paste(cmd5,file.path(temp3,paste0(x_name,"_sorted.bam")),cmd6,file.path(temp3,paste0(x_name,"_sorted")),cmd7,sep=" ")
     
     print(cmd8)
     system(cmd8, intern = TRUE, ignore.stderr = TRUE)
