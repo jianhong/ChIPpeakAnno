@@ -489,7 +489,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
     
     x=re.out[[u]]
     x_name=tools::file_path_sans_ext(x)
-    cmd2=paste0(cmd1," ",x," ",file.path(temp3,paste0(x_name,"_sorted")))
+    cmd2=paste0(cmd1," ",x," ","-o"," ",file.path(temp3,paste0(x_name,"_sorted")))
     
     #print(cmd2)
     system(cmd2)
