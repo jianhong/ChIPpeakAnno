@@ -1,6 +1,6 @@
 # Intructions for using ChipSeq
 
-##Set up environment
+## Set up environment
 
 Install the following softares firstly:
 
@@ -12,7 +12,7 @@ Install the following softares firstly:
 
 4. R -e 'library(devtools);devtools::install_github("hms-dbmi/spp", build_vignettes = FALSE)'
 
-# set Path
+## set Path
 
 emacs .bashrc
 
@@ -24,22 +24,26 @@ export PATH=$HOME/NGS_tools/ngsplot/bin:$PATH
 
 source .bashrc
 
-#Install ChipSeq
+## Use ChipSeq
 
-
-# install
 ```{r}
+# install ChipSeq
+# 
 R -e 'library(devtools);install_github("aiminy/ChipSeq")'
 
+# Generate sample_infor_Danny_chip3.txt in ~/Danny_chip3
+# 
 R -e 'library(ChipSeq);library(ChipSeq);ChipSeq:::parseToSampleInfo("/projects/scratch/bbc/Project/Danny_chip3/Filtered_bam","*.bam$","~/Danny_chip3","sample_infor_Danny_chip3.txt","Danny_chip3")'
 
-# cluster
+# Get CC plot on cluster
+# 
 R -e 'library(PathwaySplice);library(DoGs);library(ChipSeq);ChipSeq:::submitJob4useRunSppR(""~/Danny_chip3/sample_infor_Danny_chip3.txt","/projects/scratch/bbc/Project/Danny_chip3/Filtered_bam","/scratch/projects/bbc/aiminy_project/Danny_chip3_Chipseq_QC")'
 
-# Get CC plot
+# Get CC plot locally
+# 
 R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/Danny_chip3/sample_infor_Danny_chip3.txt","/media/aiminyan/DATA/Danny_chip3","/media/aiminyan/DATA/Danny_chip3_chipSeq_QC")'
 
-# Get heatmap
+# Get heatmap locally
 # 
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA","/scratch/projects/bbc/aiminy_project/7_27_2017",400000,"Hs")'
 

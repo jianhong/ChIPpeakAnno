@@ -465,7 +465,7 @@ BamFileSortIndexVisualization <- function(input.file.dir,input.pattern,output.fi
   
   #re<-ParserReadFiles(input.file.dir,"bam")
 
-  file.1 <- list.files(input.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  file.1 <- list.files(input.file.dir,pattern=input.pattern, all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
   file.name.2<-file.1
   #output.dir.name=re$output
