@@ -47,4 +47,10 @@ R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/Danny_chip3/sample_infor_Da
 # 
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/projects/scratch/bbc/Project/Danny_chip/Alignment/BWA","/scratch/projects/bbc/aiminy_project/7_27_2017",400000,"Hs")'
 
+#install hg19 genome data if this data is not in your environment, 
+# download ngsplotdb_hg19_75_3.00.tar.gz,ngsplotdb_hg19_75_3.00_enhancer.tar.gz and ngsplotdb_hg19_75_3.00_dhs.tar.gz to ~/Downloads
+# install these data
+ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00.tar.gz
+ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_enhancer.tar.gz
+ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_dhs.tar.gz 
 ```
