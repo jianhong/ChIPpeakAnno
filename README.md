@@ -58,4 +58,6 @@ R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aim
 # if bam files are already sorted and indexed, run the following 
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs",bam.sort=TRUE)'
 
+# call peaks use macs2 without using input 
+ R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
 ```
