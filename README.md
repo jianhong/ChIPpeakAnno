@@ -60,4 +60,7 @@ R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aim
 
 # call peaks use macs2 without using input 
  R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
+ 
+ # annotate peaks
+ R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/Danny_chip3_macs2_call/PeakCall","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
 ```
