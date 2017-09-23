@@ -5650,7 +5650,7 @@ ngs2 <- function(config.file,distance.around.tss,output.file.dir){
     dir.create(output.file.dir, recursive = TRUE)
   }
   
-  cmd=paste("ngs.plot.r -G hg19 -R tss -C",config.file,"-O",output.file.dir,"-L",distance.around.tss,"-CO white:blue:red", collapse = " ")
+  cmd=paste("ngs.plot.r -G hg19 -R tss -C",config.file,"-O",output.file.dir,"-L",distance.around.tss,"-CO white:white:red", collapse = " ")
   
   system(cmd)
   
