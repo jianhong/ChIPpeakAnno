@@ -58,6 +58,9 @@ R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aim
 # if bam files are already sorted and indexed, run the following 
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs",bam.sort=TRUE)'
 
+# Generate heatmap normalized by inputs, you need to make a Danny_chip3_4_ngs_plot.txt firstly
+R -e 'library(ChipSeq);ChipSeq:::ngs2("/media/H_driver/Aimin_project/Danny_chip3_4_ngs_plot.txt",5000,"/media/H_driver/Aimin_project/heapmapNormalizedByInput")'
+
 # call peaks use macs2 without using input 
  R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
  
