@@ -5893,3 +5893,60 @@ parseToSampleInfo <- function(input.dir,input.pattern,output.dir,output.file,lab
   write.table(sm.info,file=file.path(output.dir,output.file),row.names = FALSE,quote=FALSE,sep=",")
   
 }
+
+# ChipSeq:::getAb2inputPair("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt")
+# 
+getAb2inputPair <- function(input.infor.file)
+{
+  
+  f <- read.table(input.infor.file,header = FALSE)
+  
+  colnames(f)=c("Ab","Input")
+  
+  print(f)
+  
+  return(f)
+}
+ 
+#  ChipSeq:::getBwUseBamCompare("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","~")
+#  
+getBwUseBamCompare <- function(input.infor.file,output.dir)
+{
+  x.sample <- getAb2inputPair(input.infor.file)
+    
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+    x.run <- apply(x.sample, 1, function(x,output.dir)
+    {
+      
+      print(t(x))
+      
+      x <- as.data.frame(t(x))
+      xx <- x$Ab
+      xx.input <- x$Input
+      
+      #xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+      
+      cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",xx.input,sep=" ")
+      cmd2 <- "--binSize 25"
+      cmd3 <- "--ratio log2 -o"
+      
+      cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
+      
+      cmd5 <- file.path(output.dir,paste0("log2ratio_",basename(as.character(xx)),"_vs_",basename(as.character(xx.input)),".bw"))
+      
+      cmd6 <- paste(cmd4,cmd5,sep=" ") 
+      
+      cmd6
+      
+      print(cmd6)
+      
+      #system(cmd6)
+      
+    }, output.dir)
+    
+
+}
