@@ -5645,6 +5645,11 @@ system("ngs.plot.r -G hg19 -R tss -C ~/zhao_config.txt -O zhao.tss -L 4000")
 
 ngs2 <- function(config.file,distance.around.tss,output.file.dir){
   
+  if (!dir.exists(output.file.dir))
+  {
+    dir.create(output.file.dir, recursive = TRUE)
+  }
+  
   cmd=paste("ngs.plot.r -G hg19 -R tss -C",config.file,"-O",output.file.dir,"-L",distance.around.tss,collapse = " ")
   
   system(cmd)
