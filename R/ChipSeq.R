@@ -5944,7 +5944,7 @@ getBwUseBamCompare <- function(input.infor.file,output.dir)
       
       print(cmd6)
       
-      #system(cmd6)
+      system(cmd6)
       
     }, output.dir)
     
