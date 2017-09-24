@@ -5955,3 +5955,109 @@ getBwUseBamCompare <- function(input.infor.file,output.dir)
     
 
 }
+
+peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.dir,peakcaller = c("macs14","macs2"), peakPvalue)
+{
+  x.sample <- getAb2inputPair(input.infor.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  peakcaller <- match.arg(peakcaller)
+  
+  genome <- match.arg(genome)
+  cmd10 <- paste("-f BAM", "-g", genome, "-n", sep = " ")
+  
+  switch(peakcaller, macs2 = {
+    
+    PATH1 = Sys.getenv("PATH")
+    
+    macs2_Lib = file.path("/nethome/axy148/NGS_tools/MACS/bin/")
+    
+    Sys.setenv(PATH = paste0(macs2_Lib, ":", PATH1))
+    
+    cmd1 <- Sys.which("macs2")[[1]]
+    
+    cat(cmd1, "\n")
+    
+    cmd9 = paste(cmd1, "callpeak -t", sep = " ")
+    
+    cmd11 <- paste("-p", peakPvalue, sep = " ")
+    
+  }, {
+    cmd9 = "macs14 -t "
+    
+    cmd11 <- paste("-p", peakPvalue, sep = " ")
+    
+  })
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u, cellInfo, temp3)
+  {
+    
+    x.name = cellInfo[[u]]$name
+    
+    es <- cellInfo[[u]]$es
+    
+    x.input <- es[es$Type_TF == "Input", ]$file.name
+    
+    x.sample <- es[es$Type_TF != "Input", ]
+    
+    x.run <- apply(x.sample, 1, function(x)
+    {
+      
+      y <- x
+      
+      ID <- y[1]
+      Type_Cell <- y[2]
+      Type_TF <- y[3]
+      Cell_TF <- y[4]
+      file.name <- y[5]
+      xx <- file.name
+      xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+      
+      cmd12 = paste(cmd9, xx, "-c", x.input, cmd10, file.path(temp3, paste0(xx.name, 
+                                                                            "_hs_1.00e-05_", peakcaller)), cmd11, sep = " ")
+      
+      cmd12
+      
+    })
+    
+    x.run
+    
+  }, cellInfo, temp3)
+  
+  
+  names(cellInfo.run) = unlist(lapply(cellInfo, function(u)
+  {
+    u$name
+  }))
+  
+  zzz <- unlist(cellInfo.run)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    cat(as.character(zzz[u][[1]]), "\n")
+    cat("\n")
+    
+    system(as.character(zzz[u][[1]]))
+    
+  }, zzz)
+  
+  
+  re <- list(cellInforun = cellInfo.run, zzz = zzz)
+  
+  AnntationUsingChipSeeker(temp3, "peaks.bed", temp3, DD = 5000)
+  
+  return(re)
+  
+}
+
+
+
+
+
+
+
