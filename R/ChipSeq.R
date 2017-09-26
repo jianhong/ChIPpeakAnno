@@ -5937,7 +5937,8 @@ getBwUseBamCompare <- function(input.infor.file,output.dir)
       
       cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",xx.input,sep=" ")
       cmd2 <- "--binSize 25"
-      cmd3 <- "--ratio log2 -o"
+      #cmd3 <- "--ratio log2 -o"
+      cmd3 <- "--ratio subtract --normalizeTo1x 2451960000 --ignoreForNormalization chrX -o"
       
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
       
