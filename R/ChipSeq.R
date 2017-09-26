@@ -6196,8 +6196,7 @@ useBamCoverage <- function(input.sample.file,input.bam.file,output.dir)
   
 }
 
-
-getBwUseBamCoverage2 <- function(input.infor.file,output.dir)
+getBwUseBamCoverage2 <- function(input.infor.file,bl_file,output.dir)
 {
   x.sample <- getAb2inputPair(input.infor.file)
   
@@ -6218,7 +6217,8 @@ getBwUseBamCoverage2 <- function(input.infor.file,output.dir)
     #xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
     
     cmd1 <- paste("bamCoverage --bam",xx,sep=" ")
-    cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX"
+    cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX --blackListFileName"
+    cmd2 <- paste(cmd2,bl_file,sep=" ")
     cmd3 <- "-o"
     
     
