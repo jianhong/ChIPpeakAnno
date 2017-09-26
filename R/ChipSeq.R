@@ -6056,8 +6056,190 @@ peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.
 }
 
 
+useBamCoverage <- function(input.sample.file,input.bam.file,output.dir)
+{
+  
+  re <- GetSampleInfo(input.sample.file, input.bam.file)
+  
+  cellInfo <- re$y
+  
+  # output.dir.name = dirname(input.sample.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  temp3 = output.dir
+  
+  # cmd9 = 'ngs.plot.r -G' cmd10 = '-R' cmd11 = '-C' cmd12 = '-O' cmd13 = '-T'
+  # cmd14 = '-L' cmd15 = '-RR' cmd16 = '-CD' cmd17= '-GO'
+  
+  
+  
+  cellInfo.run <- lapply(1:length(cellInfo), function(u,cellInfo, 
+                                                      temp3)
+  {
+    
+    x.name = cellInfo[[u]]$name
+    
+    es <- cellInfo[[u]]$es
+    
+    x.input <- es[es$Type_TF == "Input", ]$file.name
+    
+    x.sample <- es[es$Type_TF != "Input", ]
+    
+    #print(x.sample)
+    #print(x.input)
+    
+    x.run <- apply(x.sample, 1, function(x, x.input, temp3)
+    {
+      
+      y <- x
+      
+      ID <- y[1]
+      Type_Cell <- y[2]
+      Type_TF <- y[3]
+      Cell_TF <- y[4]
+      file.name <- y[5]
+      xx <- file.name
+      xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+      
+      # ~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCompare  --bamfile1 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-03_S11_R1.marked_sorted.bam --bamfile2 /scratch/projects/bbc/aiminy_project/DannyNewNgsPlot/2017-03-02-17_S1_R1.marked_sorted.bam --binSize 25 --ratio log2 -o ~/BamCompare/log2ratio_2017-03-02-03_S11_R1.marked_sorted.bam_vs_2017-03-02-17_S1_R1.marked_sorted.bam.bw 
+      
+      #bamCoverage -b reads.bam -o coverage.bw
+      
+      #bamCoverage --bam a.bam -o a.SeqDepthNorm.bw \
+      #--binSize 10
+      #--normalizeTo1x 2150570000
+      #--ignoreForNormalization chrX
+      #--extendReads
+      
+      cmd1 <- paste("~/python/Python-2.7.11/python  ~/NGS_tools/deepTools/bin/bamCoverage --bam",xx,sep=" ")
+      cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX"
+      cmd3 <- "-o"
+      
+      cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
+      
+      cmd5 <- file.path(output.dir,paste0("To1x_",basename(as.character(xx)),"_vs_","no_input",".bw"))
+      
+      
+      cmd6 <- paste(cmd4,cmd5,sep=" ") 
+      
+      cmd6
+      
+      #cat(cmd6, "\n")
+      #cat("\n")
+    }, x.input, temp3)
+    
+    x.run
+    
+  }, cellInfo,temp3)
+  
+  
+  names(cellInfo.run) = unlist(lapply(cellInfo, function(u)
+  {
+    u$name
+  }))
+  
+  zzz <- unlist(cellInfo.run)
+  
+  lapply(1:length(zzz), function(u, zzz)
+  {
+    
+    cat(as.character(zzz[u][[1]]), "\n")
+    cat("\n")
+    
+    system(as.character(zzz[u][[1]]))
+    
+  }, zzz)
+  # # dir.name=temp3 dir.name=reformatPath(dir.name)
+  # 
+  # file.name = file.path(temp3, dir(temp3, recursive = TRUE))
+  # 
+  # file.name.2 <- as.list(file.name)
+  # 
+  # 
+  # # names(file.name.2) = unlist(lapply(file.name.2, function(u) { u$name }))
+  # 
+  # zzz <- unlist(file.name.2)
+  # 
+  # lapply(1:length(zzz), function(u, zzz)
+  # {
+  #   
+  #   dir.name = dirname(zzz[u][[1]])
+  #   file_name = file_path_sans_ext(basename(zzz[u][[1]]))
+  #   
+  #   cmd = paste("ngs.plot.r -G hg19 -R tss -C", zzz[u][[1]], "-O", file.path(dir.name, 
+  #                                                                            paste0(file_name, ".tss")), "-T", file_name, "-L 4000 -RR 1 -CD 1 -GO total", 
+  #               sep = " ")
+  #   
+  #   
+  #   
+  #   # system(as.character(zzz[u][[1]])) job.name = paste0('bamPlot.', u)
+  #   # cmd.pegasus = usePegasus(job.option, Wall.time = '72:00',cores = 32,Memory
+  #   # = 16000,span.ptile = 16,job.name) cmd2 = paste(cmd.pegasus,cmd,sep = ' ')
+  #   
+  #   cmd2 = cmd
+  #   cat(cmd2, "\n")
+  #   cat("\n")
+  #   system(cmd2)
+  # }, zzz)
+  # 
+  # 
+  # re <- list(cellInforun = cellInfo.run, zzz = zzz)
+  # 
+  # # AnntationUsingChipSeeker(temp3, 'peaks.bed', temp3, DD = 5000)
+  
+  #return(re)
+  
+}
 
 
-
-
+getBwUseBamCoverage2 <- function(input.infor.file,output.dir)
+{
+  x.sample <- getAb2inputPair(input.infor.file)
+  
+  if (!dir.exists(output.dir))
+  {
+    dir.create(output.dir, recursive = TRUE)
+  }
+  
+  x.run <- apply(x.sample, 1, function(x,output.dir)
+  {
+    
+    print(t(x))
+    
+    x <- as.data.frame(t(x))
+    xx <- x$Ab
+    xx.input <- x$Input
+    
+    #xx.name = paste(ID, gsub(" ", "-", Type_Cell), Type_TF, sep = "-")
+    
+    cmd1 <- paste("bamCoverage --bam",xx,sep=" ")
+    cmd2 <- "--binSize 25 --normalizeTo1x 2451960000 --ignoreForNormalization chrX"
+    cmd3 <- "-o"
+    
+    
+    
+    #cmd1 <- paste("bamCompare --bamfile1",xx,"--bamfile2",xx.input,sep=" ")
+    #cmd2 <- "--binSize 25"
+    #cmd3 <- "--ratio log2 -o"
+    
+    cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
+    
+    cmd5 <- file.path(output.dir,paste0("Un_norma",basename(as.character(xx)),".bw"))
+    
+    cmd6 <- paste(cmd4,cmd5,sep=" ") 
+    
+    cmd6
+    
+    print(cmd6)
+    
+    system(cmd6)
+    
+  }, output.dir)
+  
+  
+}
 
