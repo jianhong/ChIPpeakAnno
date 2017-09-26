@@ -5915,7 +5915,7 @@ getAb2inputPair <- function(input.infor.file)
  
 #  ChipSeq:::getBwUseBamCompare("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","~")
 #  
-getBwUseBamCompare <- function(input.infor.file,output.dir)
+getBwUseBamCompare <- function(input.infor.file,bl_file,output.dir)
 {
   x.sample <- getAb2inputPair(input.infor.file)
     
@@ -5939,7 +5939,8 @@ getBwUseBamCompare <- function(input.infor.file,output.dir)
       cmd2 <- "--binSize 25"
       #cmd3 <- "--ratio log2 -o"
       cmd3 <- "--ratio subtract --normalizeTo1x 2451960000 --ignoreForNormalization chrX -o"
-      
+      cmd3 <- "--ratio subtract --normalizeTo1x 2451960000 --ignoreForNormalization chrX --blackListFileName"
+      cmd3 <- paste(cmd3,bl_file,"-o",sep=" ")
       cmd4 <- paste(cmd1,cmd2,cmd3,sep=" ") 
       
       cmd5 <- file.path(output.dir,paste0("log2ratio_",basename(as.character(xx)),"_vs_",basename(as.character(xx.input)),".bw"))
