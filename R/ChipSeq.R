@@ -5958,7 +5958,7 @@ getBwUseBamCompare <- function(input.infor.file,bl_file,output.dir)
 
 }
 
-# R -e 'library(ChipSeq)::peakCall2("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","Hs","~/","macs2",0.00001)'
+# R -e 'library(ChipSeq)::peakCall2("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","hs","~/","macs2",0.00001)'
 # 
 peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.dir,peakcaller = c("macs14","macs2"), peakPvalue)
 {

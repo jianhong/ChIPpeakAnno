@@ -64,10 +64,17 @@ R -e 'library(ChipSeq);ChipSeq:::ngs2("/media/H_driver/Aimin_project/Danny_chip3
 
 # Generate Normalized-By-Subtract-Inputs-Rm-BlackList-Region BigWig files
  R -e 'library(ChipSeq);ChipSeq:::getBwUseBamCompare("/media/H_driver/Aimin_project/Danny_chip3.txt","/media/H_driver/Aimin_project/REF/consensusBlacklist.bed","/media/H_driver/Aimin_project/Norma_sub_Coverage_rm_bl")'
-
-# call peaks use macs2 without using input 
+```
+## call peaks use macs2 without using input
+```{r} 
  R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
- 
- # annotate peaks
+```
+
+## annotate peaks
+```{r}
  R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/Danny_chip3_macs2_call/PeakCall","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
+```
+## call peaks use macs2 without using input
+```{r}
+R -e 'library(ChipSeq)::peakCall2("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","hs","~/","macs2",0.00001)'
 ```
