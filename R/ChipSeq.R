@@ -5958,6 +5958,8 @@ getBwUseBamCompare <- function(input.infor.file,bl_file,output.dir)
 
 }
 
+# R -e 'library(ChipSeq)::peakCall2("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","Hs","~/","macs2",0.00001)'
+# 
 peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.dir,peakcaller = c("macs14","macs2"), peakPvalue)
 {
   x.sample <- getAb2inputPair(input.infor.file)
@@ -5968,8 +5970,11 @@ peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.
   }
   
   peakcaller <- match.arg(peakcaller)
-  
+
   genome <- match.arg(genome)
+
+  genome <- tolower(genome)
+  
   cmd10 <- paste("-f BAM", "-g", genome, "-n", sep = " ")
   
   switch(peakcaller, macs2 = {
@@ -5995,17 +6000,19 @@ peakCall2 <- function(input.infor.file,genome = c("Hs","hs", "HS", "hS"),output.
     xx <- x$Ab
     xx.input <- x$Input
     
-    x.name <- paste(peakcaller,basename(as.character(xx)),"_vs_",basename(as.character(xx.input)),genome,peakPvalue,sep="_")
+    x.name <- paste(peakcaller,basename(as.character(xx)),basename(as.character(xx.input)),genome,peakPvalue,sep="_")
     
     cmd12 = paste(cmd9, xx, "-c", xx.input, cmd10, file.path(output.dir, x.name), cmd11, sep = " ")
-      print(cmd12)
       
-      # system(cmd12)
+    print(cmd12)
+      
+    system(cmd12)
+    
     },output.dir)
 
   #AnntationUsingChipSeeker(output.dir, "peaks.bed", temp3, DD = 5000)
   
-  return(re)
+#  return(re)
   
 }
 
