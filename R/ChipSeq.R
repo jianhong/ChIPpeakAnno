@@ -5335,7 +5335,7 @@ mapBam2Sample3 <- function(input.sample.file,input.bam.dir) {
 #' AnntationUsingChipSeeker3(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=5000,AP=c("Intron"))
 #' 
 
-AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=NULL,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
+AnotationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38"),DD,distanceToTSS_cutoff=NULL,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
   
   re<-ParserReadFiles(dir.name,input.file.pattern)
   
@@ -5343,18 +5343,6 @@ AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
   
   re.peaks.only.bed.2 <- re.bed
   
-  # if(length(dir(dir.name,pattern="peaks.bed"))!=0)
-  # {
-  # re.peaks.only.bed.2<-FL(re.bed,'peaks')
-  # cat("peaks\n")
-  # print(re.peaks.only.bed.2)
-  # }
-  # 
-  # if(length(dir(dir.name,pattern="summits.bed"))!=0){
-  # re.summits.only.bed<-FL(re.bed,'summits')
-  # cat("summits\n")
-  # print(re.summits.only.bed)
-  # }
   
   txdb<-match.arg(txdb)
   
@@ -5383,10 +5371,11 @@ AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
     
     print(head(peaks))
     
+    if(dim(peaks)[1]>0){
+    
     peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
                              TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,genomicAnnotationPriority=AP,annoDb="org.Hs.eg.db")
     
-    #select.index <- which(peakAnno$distanceToTSS<20,000 && peakAnno$distanceToTSS >= -20,000)
     dropAnnoM <- function (csAnno, distanceToTSS_cutoff) 
     {
       idx <- which(abs(mcols(csAnno@anno)[["distanceToTSS"]]) < 
@@ -5409,6 +5398,9 @@ AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
     }
     
     x_name=names(re.peaks.only.bed.2)[u]
+    x_name=tools::file_path_sans_ext(x_name)
+    x_name=tools::file_path_sans_ext(x_name)
+    
     cat(x_name,"\n")
     png(file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_pie.png")))
     plotAnnoPie(peakAnno)
@@ -5418,35 +5410,12 @@ AnntationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
     
     print(head(peaks.anno))
     
-    #print(paste0(peaks[,c(2,3)]))
-    #group1 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][1] 
-    #group2 <- strsplit(tools::file_path_sans_ext(x_name),"-")[[1]][2] 
-    
-    #colnames(peaks.anno)[5:13]=c("starnd","width_DiffDind_based","strand","Conc", group1,group2,"Fold","p.value","FDR")
-    
     print(colnames(peaks.anno))
     write.table(peaks.anno,file=file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_4_only_mapped_peaks.xls")),
                 row.names = FALSE,quote=FALSE,sep="\t")
 
-    # unmapped.peaks<-peaks[-which(paste0(peaks[,2],"_",peaks[,3]) %in%
-    # paste0(peaks.anno[,2],"_",peaks.anno[,3])),]
-    # 
-    # cat(dim(peaks)[1]," ",dim(peaks.anno)[1]," ",dim(unmapped.peaks)[1],"\n")
-    # 
-    # 
-    # if(dim(unmapped.peaks)[1]!=0){
-    # 
-    # colnames(unmapped.peaks)=colnames(peaks.anno)[1:6]
-    # 
-    # unmapped.peaks.3<-smartbind(peaks.anno,unmapped.peaks)
-    # 
-    # unmapped.peaks.4<-unmapped.peaks.3[order(unmapped.peaks.3[,1],unmapped.peaks.3[,2]),]
-    # 
-    # write.table(unmapped.peaks.4,file=file.path(temp3,paste0(x_name,"_",d,APpath,"_around_tss_annotation_4_all_peaks.xls")),row.names
-    # = FALSE,quote=FALSE,sep="\t") }
-
-
     peaks.anno
+    }
     
   },re.peaks.only.bed.2,d)
   
