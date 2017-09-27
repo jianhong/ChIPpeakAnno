@@ -1,6 +1,7 @@
 import(TxDb.Hsapiens.UCSC.hg19.knownGene)
 import(TxDb.Hsapiens.UCSC.hg38.knownGene)
 import(org.Hs.eg.db)
+import(BSgenome.Hsapiens.UCSC.hg19,BSgenome,GenomicFeatures,GenomeInfoDb)
 
 import(ChIPseeker)
 import(ChIPpeakAnno)
