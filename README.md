@@ -70,11 +70,16 @@ R -e 'library(ChipSeq);ChipSeq:::ngs2("/media/H_driver/Aimin_project/Danny_chip3
  R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
 ```
 
-## annotate peaks
+## Annotate peaks
 ```{r}
  R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/Danny_chip3_macs2_call/PeakCall","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
 ```
-## call peaks use macs2 without using input
+## Call peaks use macs2 with input
 ```{r}
-R -e 'library(ChipSeq)::peakCall2("/Volumes/Bioinformatics$/Aimin_project/Danny_chip3.txt","hs","~/","macs2",0.00001)'
+R -e 'library(ChipSeq);ChipSeq:::peakCall2("/media/H_driver/Aimin_project/Danny_chip3.txt","hs","/media/H_driver/Aimin_project/peak_call_with_input","macs2",0.00001)'
+
+```
+## Annotate peaks called with inputs
+```{r}
+R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/peak_call_with_input","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation_with_ input",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
 ```
