@@ -61,6 +61,10 @@ R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aim
 # Generate heatmap normalized by inputs, you need to make a Danny_chip3_4_ngs_plot.txt firstly
 R -e 'library(ChipSeq);ChipSeq:::ngs2("/media/H_driver/Aimin_project/Danny_chip3_4_ngs_plot.txt",5000,"/media/H_driver/Aimin_project/heapmapNormalizedByInput")'
 
+
+# Generate Normalized-By-Subtract-Inputs-Rm-BlackList-Region BigWig files
+ R -e 'library(ChipSeq);ChipSeq:::getBwUseBamCompare("/media/H_driver/Aimin_project/Danny_chip3.txt","/media/H_driver/Aimin_project/REF/consensusBlacklist.bed","/media/H_driver/Aimin_project/Norma_sub_Coverage_rm_bl")'
+
 # call peaks use macs2 without using input 
  R -e 'library(ChipSeq);re <- ChipSeq:::peakCallAndAnnotationWithoutInput("/media/aiminyan/DATA/Danny_chip3","/media/H_driver/Danny_chip3_macs2_call","hs","macs2",0.0001)'
  
