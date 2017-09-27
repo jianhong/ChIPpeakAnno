@@ -6178,22 +6178,13 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
     dir.create(out.dir.name, recursive = TRUE)
   }
   
+  file.1 <- list.files(dir.name,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
-  dir.name=reformatPath(dir.name)
-  out.dir.name=reformatPath(out.dir.name)
-  
-  file.name=paste0(dir.name,dir(dir.name,recursive = TRUE,pattern=input.file.pattern))
-  file.name.2<-as.list(file.name)
-  
-  names(file.name.2)=basename(file.name.2)
-  
-  print(file.name.2)
-  
-  re.out<-lapply(names(file.name.2),function(u){
+  re.out<-lapply(file.1,function(u){
     
     
     #print(names(u))
-    uu=file.name.2[[u]]
+    uu=u
     
     re=read.table(uu,header=TRUE)
     colnames(re)[c(7,9)]=c("-10*LOG10(pvalue)","FDR(%)")
@@ -6243,18 +6234,18 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
     
     seq.temp3<-getAllPeakSequence(temp3.trimmed,genome=genome.mm10)
     
-    write2FASTA(seq.temp3, paste0(out.dir.name,u,".fa"))
+    write2FASTA(seq.temp3, file.path(out.dir.name,paste0(basename(u),".fa")))
     
-    re2<-list(originalPeak=re,down1Peak=temp,aroundSummit100Peak=temp2,GR=temp3)
-    re2
+    #re2<-list(originalPeak=re,down1Peak=temp,aroundSummit100Peak=temp2,GR=temp3)
+    #re2
   })
   
-  sample.name<-sapply(strsplit(names(file.name.2),split="_peaks_"),"[[",1)
+  #sample.name<-sapply(strsplit(names(file.name.2),split="_peaks_"),"[[",1)
   
-  names(re.out)<-sample.name
+  #names(re.out)<-sample.name
   
   
-  return(re.out)
+  #return(re.out)
 }
 
 
