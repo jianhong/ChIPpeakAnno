@@ -6180,6 +6180,8 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   
   file.1 <- list.files(dir.name,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
+  print(file.1)
+  
   re.out<-lapply(file.1,function(u){
     
     
