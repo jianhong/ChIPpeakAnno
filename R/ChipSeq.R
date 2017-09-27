@@ -5340,10 +5340,9 @@ AnotationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
   re<-ParserReadFiles(dir.name,input.file.pattern)
   
   re.bed<-re$input
-  
+
   re.peaks.only.bed.2 <- re.bed
-  
-  
+
   txdb<-match.arg(txdb)
   
   switch (txdb,
@@ -5359,7 +5358,7 @@ AnotationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
   
   APpath <- paste(AP,collapse = "_")
   
-  temp3=file.path(out.dir.name,"Annotation",APpath)
+  temp3=file.path(out.dir.name,APpath)
   
   if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
   
@@ -5402,7 +5401,7 @@ AnotationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
     x_name=tools::file_path_sans_ext(x_name)
     
     cat(x_name,"\n")
-    png(file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_pie.png")))
+    png(file.path(temp3,paste0(x_name,"_",d,".png")))
     plotAnnoPie(peakAnno)
     dev.off()
     
@@ -5411,7 +5410,7 @@ AnotationUsingChipSeeker3 <- function(dir.name,input.file.pattern,out.dir.name,t
     print(head(peaks.anno))
     
     print(colnames(peaks.anno))
-    write.table(peaks.anno,file=file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_4_only_mapped_peaks.xls")),
+    write.table(peaks.anno,file=file.path(temp3,paste0(x_name,"_",d,".xls")),
                 row.names = FALSE,quote=FALSE,sep="\t")
 
     peaks.anno
