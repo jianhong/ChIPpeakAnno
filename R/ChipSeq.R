@@ -6184,16 +6184,17 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   
   re.out<-lapply(file.1,function(u){
     
-    
     #print(names(u))
     uu=u
-    
     re=read.table(uu,header=TRUE)
+    
+    print(head(re))
+    
     colnames(re)[c(7,9)]=c("-10*LOG10(pvalue)","FDR(%)")
     temp<-re
     temp$start<-temp$start-1
     temp$end<-temp$end-1
-    temp$summit<-temp$summit-1
+    temp$summit<-temp$abs_summit-1
     temp
     
     summitPeak<-temp$start+temp$summit
