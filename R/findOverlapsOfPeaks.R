@@ -42,7 +42,7 @@ findOverlapsOfPeaks <- function(..., maxgap=-1L, minoverlap=0L,
   xlist <- xlist - 1
   xlist <- xlist[nrow(xlist):1,,drop=FALSE] 
   ## reverse xlist to match the order of names
-  xlist <- apply(xlist, 2, paste, collapse="")
+  xlist <- apply(xlist, 2, base::paste, collapse="")
   if(length(venn_cnt$all)!=length(xlist)) 
     stop("length of 'xlist' and 'all' should be identical.")
   #     all <- do.call(rbind,
@@ -67,7 +67,7 @@ findOverlapsOfPeaks <- function(..., maxgap=-1L, minoverlap=0L,
                     function(id) 
                       paste(names[as.logical(id)], 
                             collapse=NAME_long_string))
-  listcode <- apply(outcomes, 1, paste, collapse="")
+  listcode <- apply(outcomes, 1, base::paste, collapse="")
   listname <- listname[-1]
   listcode <- listcode[-1]
   names(listname) <- listcode

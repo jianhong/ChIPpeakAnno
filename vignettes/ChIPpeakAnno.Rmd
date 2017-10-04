@@ -309,7 +309,7 @@ Alternatively,  users have the option to use other tools to plot Venn diagram. T
 #         n <- which(colnames(venn_cnt)=="Counts") - 1
 #         SetNames=colnames(venn_cnt)[1:n]
 #         Weight=venn_cnt[,"Counts"]
-#         names(Weight) <- apply(venn_cnt[,1:n], 1, paste, collapse="")
+#         names(Weight) <- apply(venn_cnt[,1:n], 1, base::paste, collapse="")
 #         Venn(SetNames=SetNames, Weight=Weight)
 #     }
 # 

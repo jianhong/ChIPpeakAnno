@@ -161,7 +161,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         xlist <- xlist - 1
         xlist <- xlist[nrow(xlist):1,,drop=FALSE] 
         ## reverse xlist to match the order of names
-        xlist <- apply(xlist, 2, paste, collapse="")
+        xlist <- apply(xlist, 2, base::paste, collapse="")
         all <- do.call(rbind, mapply(function(.ele, .id) cbind(.id, .ele), 
                                      all, 1:length(all), SIMPLIFY=FALSE))
         all.peaks <- Peaks[all[,2]]
@@ -190,7 +190,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         mapping$HHH_row___H <- NULL
         mcols(all.peaks.rd) <- mapping
         names(all.peaks.rd) <- sapply(all.peaks.rd$peakNames, 
-                                      paste, 
+                                      base::paste,
                                       collapse=NAME_short_string)
         all.peaks.rd$gpForFindOverlapsOfPeaks <- 
             unlist(lapply(all.peaks.rd$gpForFindOverlapsOfPeaks, unique)) 
@@ -203,7 +203,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         listname <- apply(outcomes, 1, 
                           function(id) paste(names[as.logical(id)], 
                                              collapse=NAME_long_string))
-        listcode <- apply(outcomes, 1, paste, collapse="")
+        listcode <- apply(outcomes, 1, base::paste, collapse="")
         listname <- listname[-1]
         listcode <- listcode[-1]
         peaklist <- list()

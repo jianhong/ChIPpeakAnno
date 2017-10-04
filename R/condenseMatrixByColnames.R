@@ -22,7 +22,7 @@ condenseMatrixByColnames <- function(mx,iname,sep=";",cnt=FALSE){
     m_split<-split(mx[,cnames],mx[,iname])
     colN<-length(cnames)
     m_list<-lapply(m_split,function(.ele){
-        x<-apply(matrix(.ele,nrow=colN,byrow=TRUE),1,paste,collapse=sep)
+        x<-apply(matrix(.ele,nrow=colN,byrow=TRUE),1,base::paste,collapse=sep)
         if(cnt) {
             unlist(lapply(x, function(w){
                 tmp<-unique(as.character(unlist(strsplit(w,sep))))

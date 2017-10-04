@@ -4,7 +4,7 @@ xget <- function(x, envir, mode, ifnotfound=NA, inherits,
     y <- mget(x=x, envir=envir, mode=mode, 
               ifnotfound=ifnotfound, inherits=inherits)
     switch(output, 
-           all=sapply(y, paste, collapse=";"),
+           all=sapply(y, base::paste, collapse=";"),
            first=sapply(y, `[`, 1)
     )
 }

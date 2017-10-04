@@ -182,8 +182,8 @@ vennCounts <- function(PeaksList, n, names,
         counts <- do.call(cbind, xlist)
         counts <- counts[, ncontrasts:1]
         counts <- counts - 1
-        counts <- apply(counts, 1, paste, collapse="")
-        idx <- apply(outcomes, 1, paste, collapse="")
+        counts <- apply(counts, 1, base::paste, collapse="")
+        idx <- apply(outcomes, 1, base::paste, collapse="")
         wids <- width(disj[as.numeric(names(gps))])
         wids <- split(wids, counts)
         wids <- wids[idx]

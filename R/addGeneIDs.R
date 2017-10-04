@@ -143,7 +143,7 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
                     next
                 }
                 x <- AnnotationDbi::mget(IDs, orgDB,ifnotfound=NA)
-                x <- sapply(x,paste,collapse=";")
+                x <- sapply(x,base::paste,collapse=";")
                 x <- as.data.frame(x, stringsAsFactors=FALSE)
                 m_ent <- merge(m_ent, x, 
                                by.x="entrez_id",
