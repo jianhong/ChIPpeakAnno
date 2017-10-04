@@ -60,6 +60,7 @@ Suggests:
     BiocStyle,
     rtracklayer,
     knitr,
+    rmarkdown,
     testthat,
     trackViewer,
     motifStack,
