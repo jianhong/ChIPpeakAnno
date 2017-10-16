@@ -24,7 +24,7 @@ export PATH=$HOME/NGS_tools/ngsplot/bin:$PATH
 
 source .bashrc
 
-## Use ChipSeq
+## Install ChipSeq
 ```{r}
 # install ChipSeq
 R -e 'library(devtools);install_github("aiminy/ChipSeq")'
