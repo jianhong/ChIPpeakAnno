@@ -94,3 +94,8 @@ R -e 'library(ChipSeq);ChipSeq:::peakCall2("/media/H_driver/Aimin_project/Danny_
 ```{r}
 R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/peak_call_with_input","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation_with_ input",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
 ```
+
+## Get sequence around summit peak
+```{r}
+R -e 'library(ChipSeq);re <- ChipSeq:::getSummitSequence("/media/H_driver/Aimin_project/peak_call_with_input","*.xls$","hg19","/media/H_driver/Aimin_project/SummitSeq")'
+```
