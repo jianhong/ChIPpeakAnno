@@ -47,13 +47,12 @@ R -e 'library(ChipSeq);re <- ChipSeq:::useRunSppR("~/Danny_chip3/sample_infor_Da
 
 ## Get heatmap locally
 
-From https://drive.google.com/drive/folders/0B1PVLadG_dCKNEsybkh5TE9XZ1E, download the genome data
+From https://drive.google.com/drive/folders/0B1PVLadG_dCKNEsybkh5TE9XZ1E, download the genome data file
 
 ```{r}
-#install hg19 genome data if this data is not in your environment, 
-# download ngsplotdb_hg19_75_3.00.tar.gz,ngsplotdb_hg19_75_3.00_enhancer.tar.gz and ngsplotdb_hg19_75_3.00_dhs.tar.gz to ~/Download
+# For example, to install hg19 genome data, you need to download ngsplotdb_hg19_75_3.00.tar.gz,ngsplotdb_hg19_75_3.00_enhancer.tar.gz and ngsplotdb_hg19_75_3.00_dhs.tar.gz to ~/Download firstly
 
-# install these data
+# Then install these data using the following commands:
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00.tar.gz
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_enhancer.tar.gz
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_dhs.tar.gz
