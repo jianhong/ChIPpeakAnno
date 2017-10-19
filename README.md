@@ -58,12 +58,12 @@ ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_enhancer.tar.gz
 ngsplotdb.py install ~/Downloads/ngsplotdb_hg19_75_3.00_dhs.tar.gz
 ```
 
-## If bam files are not sorted and indexed yet, run the foollowing 
+## If bam files are not sorted and indexed yet, run the foollowing with bam.sort=FALSE
 ```{r}
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs")'
 ```  
 
-## If bam files are already sorted and indexed, run the following 
+## If bam files are already sorted and indexed, run the following with bam.sort=TRUE
 ```{r}
 R -e 'library(ChipSeq);re <- ChipSeq:::BamFileSortIndexVisualization("/media/aiminyan/DATA/Danny_chip3","*.bam$","/media/aiminyan/DATA/Danny_chip3_heatmap",5000,"Hs",bam.sort=TRUE)'
 ```  
