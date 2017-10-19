@@ -85,7 +85,7 @@ R -e 'library(ChipSeq);ChipSeq:::getBwUseBamCompare("/media/H_driver/Aimin_proje
 
 ## Annotate peaks
 ```{r}
- R -e 'library(ChipSeq);re <- ChipSeq:::AnntationUsingChipSeeker3("/media/H_driver/Aimin_project/Danny_chip3_macs2_call/PeakCall","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
+ R -e 'library(ChipSeq);re <- ChipSeq:::AnotationUsingChipSeeker3("/media/H_driver/Aimin_project/Danny_chip3_macs2_call/PeakCall","*.narrowPeak$","/media/H_driver/Aimin_project/Danny_chip3_macs2_annotation",txdb="hg19",DD=5000,distanceToTSS_cutoff=10000)'
 ```
 
 ## Call peaks use macs2 with input
