@@ -12,7 +12,7 @@ featureAlignedExtendSignal(bamfiles, index = bamfiles, feature.gr,
                            upstream, downstream, n.tile = 100, 
                            fragmentLength, librarySize, 
                            pe=c("auto", "PE", "SE"),
-                           adjustFragmentLength, ...)
+                           adjustFragmentLength, gal, ...)
 }
 \arguments{
   \item{bamfiles}{
@@ -39,6 +39,9 @@ featureAlignedExtendSignal(bamfiles, index = bamfiles, feature.gr,
 }
   \item{adjustFragmentLength}{
     A numberic vector with length 1. Adjust the fragments/reads length to. 
+}
+  \item{gal}{
+    A GAlignmentsList object or a list of GAlignmentPairs. If bamfiles is missing, gal is required.
 }
   \item{\dots}{
    Not used.

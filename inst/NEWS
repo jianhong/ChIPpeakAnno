@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.11.8
+-------------------------
+
+    o make featureAlignedExtendSignal accept GAlignments list object
+    
 CHANGES IN VERSION 3.11.6
 -------------------------
 
