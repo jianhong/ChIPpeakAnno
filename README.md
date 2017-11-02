@@ -37,7 +37,8 @@ R -e 'library(ChipSeq);library(ChipSeq);ChipSeq:::parseToSampleInfo("/projects/s
 
 ## Get CC plot on cluster
 
-### Get sample_infor_Danny_chip3.txt from https://www.dropbox.com/sh/z20u8ofiub8v7pk/AAAEYZwxHj9wUfZJxqf7QsNMa?dl=0
+### Get sample_infor_Danny_chip3.txt from the following link
+https://www.dropbox.com/sh/z20u8ofiub8v7pk/AAAEYZwxHj9wUfZJxqf7QsNMa?dl=0
 ```{r}
 R -e 'library(PathwaySplice);library(DoGs);library(ChipSeq);ChipSeq:::submitJob4useRunSppR(""~/Danny_chip3/sample_infor_Danny_chip3.txt","/projects/scratch/bbc/Project/Danny_chip3/Filtered_bam","/scratch/projects/bbc/aiminy_project/Danny_chip3_Chipseq_QC")'
 ```
