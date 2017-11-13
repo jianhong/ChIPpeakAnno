@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.13.1
+-------------------------
+
+    o change the test value from GNAI3;MIR197 to GNAI3 to avoid the error because of 
+    update of annotation database.
+    
 CHANGES IN VERSION 3.11.8
 -------------------------
 
