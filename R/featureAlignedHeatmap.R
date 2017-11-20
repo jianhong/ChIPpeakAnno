@@ -41,8 +41,8 @@ featureAlignedHeatmap <-
             warning("feature.gr is set to the center of feature.gr")
         }
         zeroAt <- upstream/(upstream + downstream)
-        end(feature.gr) <- start(feature.gr) + downstream
-        start(feature.gr) <- start(feature.gr) - upstream
+        feature.gr <- promoters(feature.gr, upstream = upstream,
+                                downstream = downstream + 1)
         grWidr <- unique(width(feature.gr))
     }
     stopifnot(is.numeric(zeroAt))

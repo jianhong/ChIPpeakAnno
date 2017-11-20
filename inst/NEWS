@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.13.2
+-------------------------
+
+    o featureAlignedSignal generate outputs with rownames
+
 CHANGES IN VERSION 3.13.1
 -------------------------
 

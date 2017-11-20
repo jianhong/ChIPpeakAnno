@@ -22,8 +22,8 @@ featureAlignedSignal <- function(cvglists, feature.gr,
       width(feature.gr) <- 1
       warning("feature.gr is set to the center of feature.gr")
     }
-    end(feature.gr) <- start(feature.gr) + downstream
-    start(feature.gr) <- start(feature.gr) - upstream
+    feature.gr <- promoters(feature.gr, upstream = upstream,
+                            downstream = downstream + 1)
     grWidr <- unique(width(feature.gr))
   }
   if(any(start(feature.gr)<1)){
@@ -87,6 +87,9 @@ featureAlignedSignal <- function(cvglists, feature.gr,
       if(len <= width) return(x)
       return(paste0(strtrim(x, width=width), "..."))
   }
+  rowname.feature.gr <- paste0(as.character(seqnames(feature.gr)), ":",
+                               start(feature.gr), "-",
+                               end(feature.gr))
   cov <- lapply(cvglists, function(.dat){
       .dat <- .dat[seqn[seqn %in% names(.dat)]]
       if(length(.dat)!=length(seqn)){
@@ -119,6 +122,7 @@ featureAlignedSignal <- function(cvglists, feature.gr,
       stopifnot(length(vm)==grL.len)
       mm <- matrix(0, nrow=length(feature.gr), ncol=n.tile)
       mm[grL$oid+length(feature.gr)*(grL$nid-1)] <- vm
+      rownames(mm) <- rowname.feature.gr
       mm
   })
   

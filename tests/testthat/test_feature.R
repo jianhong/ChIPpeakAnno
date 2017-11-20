@@ -9,8 +9,8 @@ test_that("featureAligend works not correct", {
                          n.tile=11)
     sig.unique <- lapply(sig, unique)
     expect_true(all(sapply(sig.unique, nrow)==1))
-    expect_equal(sig.unique[["A"]][,1], 1)
-    expect_equal(sig.unique[["B"]][,6], 1)
+    expect_equal(unname(sig.unique[["A"]][,1]), 1)
+    expect_equal(unname(sig.unique[["B"]][,6]), 1)
     f1 <- featureAlignedDistribution(sig, feature.gr, 
                                upstream=5, downstream=5, 
                                n.tile=11, type="l")

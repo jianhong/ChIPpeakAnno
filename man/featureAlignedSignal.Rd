@@ -26,7 +26,7 @@ featureAlignedSignal(cvglists, feature.gr,
 }
 \value{
   A list of matrix. In each matrix, each row record the signals for 
-  corresponding feature.
+  corresponding feature. rownames of the matrix show the seqnames and coordinates.
 }
 \author{
   Jianhong Ou
