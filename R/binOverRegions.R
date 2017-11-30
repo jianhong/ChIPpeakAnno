@@ -189,57 +189,45 @@ binOverRegions <- function(cvglists, TxDb,
     features.s <- features.s[seqn]
     cvglists <- lapply(cvglists, function(.ele) .ele[seqn])
     features.l <- as(features.s, "RangesList")
-    cvglists.sub <- lapply(cvglists, function(.ele) .ele[features.l])
-    resetGRanges <- function(ir, bins=c("upstream"=nbinsUpstream,
-                                        "5UTR"=nbinsUTR,
-                                        "CDS" =nbinsCDS,
-                                        "3UTR"=nbinsUTR,
-                                        "downstream"=nbinsDownstream)){
-        stopifnot(is(ir, "IRanges"))
-        if(length(ir)<1) return(ir)
-        w <- c(0, width(ir))
-        s <- cumsum(w)
-        x <- IRanges(start = s[-length(s)]+1, end = s[-1])
-        mcols(x) <- mcols(ir)
-        ## merge 5UTR, CDS, and 3UTR
-        mcols(x)$oid <- seq_along(ir)
-        x <- split(x, mcols(x)$feature_type)
-        x <- lapply(x, function(.ele){
-            w <- rowsum(width(.ele), mcols(.ele)$tx_name)
-            .ele <- .ele[!duplicated(mcols(.ele)$tx_name)]
-            width(.ele) <- w[mcols(.ele)$tx_name, 1]
-            .ele
-        })
-        ## split Feture By Bins
-        x <- mapply(function(.x, n){
-            mc <- mcols(.x)
-            .x <- IRanges::tile(x=.x, n=n)
-            #all(lengths(.x)==n)
-            .x <- unlist(.x)
-            nc <- nrow(mc)
-            mc <- mc[rep(seq.int(nc), each=n), ]
-            mc$id <- rep(seq.int(n), times=nc)
-            mcols(.x) <- mc
-            .x
-        }, x, bins[names(x)], SIMPLIFY = FALSE)
-        x <- unlist(RangesList(x), use.names = FALSE)
-        x <- x[order(mcols(x)$oid)]
-        mcols(x)$oid <- NULL
-        x
-    }
-    features.n <- IRangesList(lapply(features.l, resetGRanges))
-    cnts <- lapply(cvglists.sub, function(cvglist.sub){
-        vw <- Views(cvglist.sub, features.n)
-        cnt <- lapply(vw, viewMeans)
-        unlist(cnt, use.names = FALSE)
+    
+    bins=c("upstream"=nbinsUpstream,
+           "5UTR"=nbinsUTR,
+           "CDS" =nbinsCDS,
+           "3UTR"=nbinsUTR,
+           "downstream"=nbinsDownstream)
+    
+    features.view <- lapply(cvglists, function(.ele) {
+      vw <- Views(.ele, features.l)
+      cntByChr <- lapply(vw, function(.vw){
+        .df <- elementMetadata(.vw)
+        .gr <- GRanges(paste(.df$feature_type, .df$tx_name), ranges(.vw), 
+                       feature_type=.df$feature_type, tx_name=.df$tx_name)
+        .gr.s <- split(.gr, seqnames(.gr))
+        .cvg <- subject(.vw)
+        .cvgs <- rep(list(.cvg), length(.gr.s))
+        .gr.l <- as(.gr.s, "RangesList")
+        names(.cvgs) <- names(.gr.l)
+        .cvgs <- as(.cvgs, "SimpleRleList")
+        .cvg.sub <- .cvgs[.gr.l]
+        ### split the RleList into bins
+        .ir <- IRanges(1, lengths(.cvg.sub))
+        .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
+        names(.ir) <- names(.cvg.sub)
+        .cnt <- viewMeans(Views(.cvg.sub, .ir))
+        .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
+        .cnt <- lapply(.cnt, do.call, what=rbind)
+        lapply(.cnt, colSums)
+      })
+      cntByFeature <- swapList(cntByChr)
+      cntByFeature <- lapply(cntByFeature, function(.ele){
+        colSums(do.call(rbind, .ele))/len
+      })
     })
-    features.n <- unlist(features.n)
-    d <- as.data.frame(mcols(features.n)[, -1])
-    d <- cbind(d, do.call(cbind, cnts))
-    d <- split(d, d$feature_type)
-    d <- lapply(d, function(.ele) rowsum(.ele[, -(1:2)], .ele$id, 
-                                         reorder = FALSE)/len)
+    d <- swapList(features.view)
     d <- d[feature_type[feature_type %in% names(d)]]
+    d <- lapply(d, do.call, what=cbind)
+    return(d)
+    
     return(d)
 }
 
@@ -460,54 +448,42 @@ binOverGene <- function(cvglists, TxDb,
     features.s <- features.s[seqn]
     cvglists <- lapply(cvglists, function(.ele) .ele[seqn])
     features.l <- as(features.s, "RangesList")
-    cvglists.sub <- lapply(cvglists, function(.ele) .ele[features.l])
-    resetGRanges <- function(ir, bins=c("upstream"=nbinsUpstream,
-                                        "gene"=nbinsGene,
-                                        "downstream"=nbinsDownstream)){
-        stopifnot(is(ir, "IRanges"))
-        if(length(ir)<1) return(ir)
-        w <- c(0, width(ir))
-        s <- cumsum(w)
-        x <- IRanges(start = s[-length(s)]+1, end = s[-1])
-        mcols(x) <- mcols(ir)
-        mcols(x)$oid <- seq_along(ir)
-        if(length(mcols(x)$feature_type)==0) mcols(x)$feature_type <- "gene"
-        x <- split(x, mcols(x)$feature_type)
-        x <- lapply(x, function(.ele){
-            w <- rowsum(width(.ele), mcols(.ele)$gene_id)
-            .ele <- .ele[!duplicated(mcols(.ele)$gene_id)]
-            width(.ele) <- w[mcols(.ele)$gene_id, 1]
-            .ele
-        })
-        ## split Feture By Bins
-        x <- mapply(function(.x, n){
-            mc <- mcols(.x)
-            .x <- IRanges::tile(x=.x, n=n)
-            #all(lengths(.x)==n)
-            .x <- unlist(.x)
-            nc <- nrow(mc)
-            mc <- mc[rep(seq.int(nc), each=n), ]
-            mc$id <- rep(seq.int(n), times=nc)
-            mcols(.x) <- mc
-            .x
-        }, x, bins[names(x)], SIMPLIFY = FALSE)
-        x <- unlist(RangesList(x), use.names = FALSE)
-        x <- x[order(mcols(x)$oid)]
-        mcols(x)$oid <- NULL
-        x
-    }
-    features.n <- IRangesList(lapply(features.l, resetGRanges))
-    cnts <- lapply(cvglists.sub, function(cvglist.sub){
-        vw <- Views(cvglist.sub, features.n)
-        cnt <- lapply(vw, viewMeans)
-        unlist(cnt, use.names = FALSE)
+    
+    bins=c("upstream"=nbinsUpstream,
+           "gene"=nbinsGene,
+           "downstream"=nbinsDownstream)
+    
+    features.view <- lapply(cvglists, function(.ele) {
+      vw <- Views(.ele, features.l)
+      cntByChr <- lapply(vw, function(.vw){
+        .df <- elementMetadata(.vw)
+        if(length(.df$feature_type) == 0) .df$feature_type <- "gene"
+        .gr <- GRanges(paste(.df$feature_type, .df$gene_id), ranges(.vw), 
+                       feature_type=.df$feature_type, gene_id=.df$gene_id)
+        .gr.s <- split(.gr, seqnames(.gr))
+        .cvg <- subject(.vw)
+        .cvgs <- rep(list(.cvg), length(.gr.s))
+        .gr.l <- as(.gr.s, "RangesList")
+        names(.cvgs) <- names(.gr.l)
+        .cvgs <- as(.cvgs, "SimpleRleList")
+        .cvg.sub <- .cvgs[.gr.l]
+        ### split the RleList into bins
+        .ir <- IRanges(1, lengths(.cvg.sub))
+        .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
+        names(.ir) <- names(.cvg.sub)
+        .cnt <- viewMeans(Views(.cvg.sub, .ir))
+        .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
+        .cnt <- lapply(.cnt, do.call, what=rbind)
+        lapply(.cnt, colSums)
+      })
+      cntByFeature <- swapList(cntByChr)
+      cntByFeature <- lapply(cntByFeature, function(.ele){
+        colSums(do.call(rbind, .ele))/len
+      })
     })
-    features.n <- unlist(features.n)
-    d <- as.data.frame(mcols(features.n)[, -1])
-    d <- cbind(d, do.call(cbind, cnts))
-    d <- split(d, d$feature_type)
-    d <- lapply(d, function(.ele) rowsum(.ele[, -(1:2)], .ele$id)/len)
+    d <- swapList(features.view)
     feature_type <- c("upstream", "gene", "downstream")
     d <- d[feature_type[feature_type %in% names(d)]]
+    d <- lapply(d, do.call, what=cbind)
     return(d)
 }

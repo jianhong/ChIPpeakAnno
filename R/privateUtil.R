@@ -609,3 +609,24 @@ filterByLevel <- function(goenrichments, onto, level=4){
   levels <- sapply(as.character(goenrichments$go.id), getGOLevel, onto=onto)
   goenrichments[levels <= level, , drop=FALSE]
 }
+
+swapList <- function(x){
+  stopifnot(is.list(x))
+  null <- sapply(x, function(.ele){
+    stopifnot(is.list(.ele))
+  })
+  levelsA <- names(x)
+  levelsB <- sapply(x, names)
+  levelsB <- unique(levelsB)
+  y <- as.list(levelsB)
+  names(y) <- levelsB
+  for(.lB in levelsB){
+    y[[.lB]] <- list()
+  }
+  for(.lA in levelsA){
+    for(.lB in names(x[[.lA]])){
+      y[[.lB]][[.lA]] <- x[[.lA]][[.lB]]
+    }
+  }
+  y
+}
