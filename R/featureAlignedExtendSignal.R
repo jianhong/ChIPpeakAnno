@@ -7,7 +7,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
                                        pe=c("auto", "PE", "SE"),
                                        adjustFragmentLength,
                                        gal, ...){
-    message("The signal is being calculated for DNA-seq.")
+    #message("The signal is being calculated for DNA-seq.")
     if(missing(fragmentLength)){
         stop("fragmentLength is missing")
     }
