@@ -78,7 +78,7 @@
 \examples{
   macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
   macsOutput <- toGRanges(macs, format="MACS")
-  if(interactive()){
+  if(Sys.getenv("USER")=="jianhongou"){
     ## MACS connection
     macs <- readLines(macs)
     macs <- textConnection(macs)

@@ -99,7 +99,7 @@ Methods Mol Biol. 2013;1067:105-24. doi: 10.1007/978-1-62703-607-8\_8.}
 makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks}
 
 \examples{
-if (interactive()){
+if (Sys.getenv("USER")=="jianhongou"){
     ##Display the list of genomes available at UCSC:
     #library(rtracklayer)
     #ucscGenomes()[, "db"]

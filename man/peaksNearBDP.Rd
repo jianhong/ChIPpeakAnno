@@ -61,10 +61,11 @@ annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
 \seealso{annotatePeakInBatch, findOverlappingPeaks, makeVennDiagram }
 \examples{
 
-if (interactive())
+if (Sys.getenv("USER")=="jianhongou")
 {
     data(myPeakList)
     data(TSS.human.NCBI36)
+    seqlevelsStyle(TSS.human.NCBI36) <- seqlevelsStyle(myPeakList)
     annotatedBDP = peaksNearBDP(myPeakList[1:6,], 
                                 AnnotationData=TSS.human.NCBI36,
                                 MaxDistance=5000,

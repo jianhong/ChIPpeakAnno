@@ -34,12 +34,12 @@ Jianhong Ou
     See Also as \code{\link{annoPeaks}}, \code{\link{annoGR}}
 }
 \examples{
-  if(interactive()){
+  if(Sys.getenv("USER")=="jianhongou"){
     library(EnsDb.Hsapiens.v75)
     data("myPeakList")
     annoGR <- annoGR(EnsDb.Hsapiens.v75)
     seqlevelsStyle(myPeakList) <- seqlevelsStyle(annoGR)
-    bdp(myPeakList, annoGR)
+    ChIPpeakAnno:::bdp(myPeakList, annoGR)
   }
 }
 \keyword{ misc }

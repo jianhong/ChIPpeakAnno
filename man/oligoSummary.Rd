@@ -52,7 +52,7 @@ Jianhong Ou
 See Also as \code{\link{frequency}}
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
         data(annotatedPeak)
         library(BSgenome.Hsapiens.UCSC.hg19)
         seq <- getAllPeakSequence(annotatedPeak[1:100], 

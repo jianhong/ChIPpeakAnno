@@ -28,7 +28,7 @@ estLibSize(bamfiles, index = bamfiles, ...)
     Jianhong Ou
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
         path <- system.file("extdata", "reads", package="MMDiffBamSubset")
         if(file.exists(path)){
             WT.AB2 <- file.path(path, "WT_2.bam")

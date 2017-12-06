@@ -83,7 +83,7 @@
     Jianhong Ou
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
         library(EnsDb.Hsapiens.v79)
         anno <- annoGR(EnsDb.Hsapiens.v79)
     }

@@ -31,7 +31,7 @@ calculate the coverage of gene body per gene
 per bin.
 }
 \examples{
-if(interactive()){
+if(Sys.getenv("USER")=="jianhongou"){
 path <- system.file("extdata", package="ChIPpeakAnno")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(rtracklayer)

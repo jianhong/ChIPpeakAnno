@@ -34,7 +34,7 @@ estFragmentLength(bamfiles, index = bamfiles, plot = TRUE, lag.max = 1000, ...)
     Jianhong Ou
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
         path <- system.file("extdata", "reads", package="MMDiffBamSubset")
         if(file.exists(path)){
             WT.AB2 <- file.path(path, "WT_2.bam")

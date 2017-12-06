@@ -38,7 +38,7 @@
 \examples{
 data(annotatedPeak)
 str(annotatedPeak) 
-if (interactive()) {
+if (Sys.getenv("USER")=="jianhongou") {
 y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
 hist(as.numeric(as.character(y)), 
      xlab="Distance To Nearest TSS", main="", breaks=1000, 

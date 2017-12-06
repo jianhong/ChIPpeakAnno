@@ -49,7 +49,7 @@ Jianhong Ou
   \link{makeVennDiagram}, \link{findOverlappingPeaks}
 }
 \examples{
-if(interactive()){
+if(Sys.getenv("USER")=="jianhongou"){
 peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704), 
                             end = c(967754, 2010997, 2496804), 
                             names = c("Site1", "Site2", "Site3")), 

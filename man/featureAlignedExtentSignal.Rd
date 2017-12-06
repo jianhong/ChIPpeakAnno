@@ -58,7 +58,7 @@ Jianhong Ou
 See Also as \code{\link{featureAlignedSignal}}, \code{\link{estLibSize}}, \code{\link{estFragmentLength}}
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
     path <- system.file("extdata", package="MMDiffBamSubset")
     if(file.exists(path)){
         WT.AB2 <- file.path(path, "reads", "WT_2.bam")

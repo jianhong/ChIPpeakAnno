@@ -45,7 +45,7 @@ a list with two elements,
 Jianhong Ou
 }
 \examples{
-    if(interactive()){
+    if(Sys.getenv("USER")=="jianhongou"){
         path <- system.file("extdata", package="ChIPpeakAnno")
         peaksA <- toGRanges(file.path(path, "peaks.narrowPeak"), 
                             format="narrowPeak")

@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.13.4
+-------------------------
+
+    o suppress the message from featureAlignedExtendSignal
+    o modified help files to make the samples run on local test.
+    
 CHANGES IN VERSION 3.13.3
 -------------------------
 
