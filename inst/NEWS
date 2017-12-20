@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.13.5
+-------------------------
+
+    o add minFragmentSize parameter to estFragmentLength
+
 CHANGES IN VERSION 3.13.4
 -------------------------
 

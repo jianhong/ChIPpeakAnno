@@ -7,7 +7,8 @@
     estimate the fragment length for bam files
 }
 \usage{
-estFragmentLength(bamfiles, index = bamfiles, plot = TRUE, lag.max = 1000, ...)
+estFragmentLength(bamfiles, index = bamfiles, plot = TRUE, 
+                  lag.max = 1000, minFragmentSize=100, ...)
 }
 \arguments{
   \item{bamfiles}{
@@ -22,6 +23,9 @@ estFragmentLength(bamfiles, index = bamfiles, plot = TRUE, lag.max = 1000, ...)
 }
   \item{lag.max}{
     maximum lag at which to calculate the acf. See \code{\link[stats]{acf}}
+}
+  \item{minFragmentSize}{
+    minimal fragment size to avoid the phantom peak.
 }
   \item{\dots}{
     Not used.

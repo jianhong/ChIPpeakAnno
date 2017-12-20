@@ -1,5 +1,5 @@
-estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000, ...){
-    message("The fragment size is being calculated for DNA-seq.")
+estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000, minFragmentSize=100, ...){
+    #message("The fragment size is being calculated for DNA-seq.")
     res <- mapply(function(f, i) {
         if(suppressMessages(testPairedEndBam(f, index=i))){
             isize <- 
@@ -15,6 +15,7 @@ estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000,
             isize.y <- isize
             ## do smooth and select the max point
             isize.smooth <- loess.smooth(isize.x, isize.y, span=1/3, evaluation = length(isize.x))
+            isize.smooth$y[seq.int(minFragmentSize)] <- 0
             pos <- round(isize.smooth$x[which.max(isize.smooth$y)], digits = 0)
             if(plot){
                 try({
@@ -25,7 +26,7 @@ estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000,
             pos
         }else{
             ## count reads for all chromosomes
-            seqinfo <- lapply(scanBamHeader(f), 
+            seqinfo <- lapply(scanBamHeader(f, index=i), 
                                               function(.ele) .ele$targets)
             seqn <- sort(table(unlist(lapply(seqinfo, names))))
             seqn <- names(seqn[which(seqn==max(seqn))])
@@ -91,11 +92,12 @@ estFragmentLength <- function(bamfiles, index=bamfiles, plot=TRUE, lag.max=1000,
             ccf <- ccf(reads.gr.neg.ts, reads.gr.pos.ts, type = "correlation", plot=FALSE, lag.max=lag.max)
             keep <- ccf$lag>=0
             lag <- ccf$lag[keep]
-            acf <- ccf$acf[keep]
+            acf1 <- acf <- ccf$acf[keep]
+            acf[seq.int(minFragmentSize)] <- 0
             pos <- lag[which.max(acf)]
             if(plot){
                 try({
-                    plot(lag, acf, xlab="Lag", ylab="ACF", main=paste(f, "insertion size (not including reads length)"), type="l")
+                    plot(lag, acf1, xlab="Lag", ylab="ACF", main=paste(f, "insertion size (not including reads length)"), type="l")
                     abline(v=pos, col="red")
                 })
             }
