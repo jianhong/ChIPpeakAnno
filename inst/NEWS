@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.13.6
+-------------------------
+
+    o Improve the functions featureAlignedSignal and featureAlignedExtendSignal
+    
 CHANGES IN VERSION 3.13.5
 -------------------------
 

@@ -65,8 +65,17 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     grL <- tile(feature.gr, n=n.tile)
     ## reorder the tiles for negative strand and set group id for them.
     idx <- as.character(strand(feature.gr))=="-"
-    if(length(idx)>0) {
-        grL[idx] <- as(lapply(grL[idx], rev), "GRangesList")
+    if(sum(idx)>0) {
+        grL.rev <- grL[idx]
+        grL.rev.len <- lengths(grL.rev)
+        grL.rev <- unlist(grL.rev, use.names = FALSE)
+        grL.rev$oid <- rep(seq.int(length(grL[idx])), grL.rev.len)
+        grL.rev <- rev(grL.rev)
+        grL.rev.oid <- grL.rev$oid
+        grL.rev$oid <- NULL
+        grL.rev <- split(grL.rev, grL.rev.oid)
+        grL[idx] <- as(grL.rev, "GRangesList")
+        rm(grL.rev, grL.rev.len, grL.rev.oid)
     }
     grL.eleLen <- elementNROWS(grL)
     grs <- unlist(grL)
