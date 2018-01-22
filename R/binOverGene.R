@@ -156,7 +156,7 @@ binOverGene <- function(cvglists, TxDb,
   features.s <- split(features, seqnames(features))
   features.s <- features.s[seqn]
   cvglists <- lapply(cvglists, function(.ele) .ele[seqn])
-  features.l <- as(features.s, "RangesList")
+  features.l <- as(features.s, "IntegerRangesList")
   
   bins=c("upstream"=nbinsUpstream,
          "gene"=nbinsGene,
@@ -172,7 +172,7 @@ binOverGene <- function(cvglists, TxDb,
       .gr.s <- split(.gr, seqnames(.gr))
       .cvg <- subject(.vw)
       .cvgs <- rep(list(.cvg), length(.gr.s))
-      .gr.l <- as(.gr.s, "RangesList")
+      .gr.l <- as(.gr.s, "IntegerRangesList")
       names(.cvgs) <- names(.gr.l)
       .cvgs <- as(.cvgs, "SimpleRleList")
       .cvg.sub <- .cvgs[.gr.l]
