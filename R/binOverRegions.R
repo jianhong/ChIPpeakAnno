@@ -62,75 +62,106 @@ binOverRegions <- function(cvglists, TxDb,
     features <- toGRanges(TxDb, feature="geneModel")
     feature_type <- c("upstream", "5UTR", "CDS", "3UTR", "downstream")
     features <- features[features$feature_type %in% c("5UTR", "CDS", "3UTR")]
+    transcripts <- transcripts(TxDb, columns=c("tx_name", "gene_id"))
+    trx <- unique(mcols(transcripts))
+    features$gene_id <- trx[match(features$tx_name, trx$tx_name), "gene_id"]
+    features <- features[lengths(features$gene_id)>0]
+    features$tx_name <- sapply(features$gene_id, function(.ele) .ele[1])
+    features$gene_id <- NULL
+    
+    features.disjoin <- disjoin(features, with.revmap=TRUE)
+    features.disjoin.1 <- features.disjoin[rep(seq_along(features.disjoin), lengths(features.disjoin$revmap))]
+    features.disjoin.1$revmap <- unlist(features.disjoin$revmap)
+    features.disjoin.1$feature_type <- features$feature_type[features.disjoin.1$revmap]
+    features.disjoin.1$tx_name <- features$tx_name[features.disjoin.1$revmap]
+    features.disjoin.1$revmap2 <- rep(seq_along(features.disjoin), lengths(features.disjoin$revmap))
+    feature_type2 <- split(features.disjoin.1$feature_type, features.disjoin.1$revmap2)
+    feature_type2 <- lapply(feature_type2, unique)
+    feature_type2 <- feature_type2[lengths(feature_type2)==1]
+    features.disjoin.1 <- features.disjoin.1[match(as.numeric(names(feature_type2)), features.disjoin.1$revmap2)]
+    features.disjoin.1$seqn <- paste(features.disjoin.1$tx_name, 
+                                     features.disjoin.1$feature_type, 
+                                     as.character(seqnames(features.disjoin.1)))
+    features1 <- GRanges(seqnames = features.disjoin.1$seqn, ranges = ranges(features.disjoin.1),
+                         strand = strand(features.disjoin.1))
+    features1 <- reduce(features1)
+    mcols(features1) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(features1)), " ")), 
+                                   stringsAsFactors=FALSE)
+    colnames(mcols(features1)) <- c("tx_name", "feature_type", "seqn")
+    features1 <- GRanges(seqnames = features1$seqn, 
+                         ranges = ranges(features1),
+                         strand = strand(features1),
+                         tx_name = features1$tx_name,
+                         feature_type = features1$feature_type)
+    seqinfo(features1) <- seqinfo(features)[seqlevels(features1)]
+    features <- features1
+    rm(list=c("features.disjoin", "features.disjoin.1", "feature_type2", "features1"))
+    
     txs <- unique(features$tx_name)
     txs <- txs[!is.na(txs)]
     if(includeIntron){
-        cds <- toGRanges(TxDb, feature="CDS")
-        tx_name <- cds$tx_name
-        l <- lengths(tx_name)
-        cds <- cds[rep(seq_along(cds), l)]
-        cds$tx_name <- unlist(tx_name)
-        cds$gene_id <- NULL
-        cds$feature_type <- "CDS"
-        txs <- intersect(cds$tx_name, txs)
-        cds <- cds[cds$tx_name %in% txs]
-        features <- features[features$tx_name %in% txs]
+        cds <- features[features$feature_type=="CDS"]
+        cds <- GRanges(seqnames = paste(as.character(seqnames(cds)), cds$tx_name),
+                       ranges = ranges(cds), strand = strand(cds))
+        cds <- reduce(cds, min.gapwidth=1e9)
+        mcols(cds) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(cds)), " ")), 
+                                 stringsAsFactors = FALSE)
+        colnames(mcols(cds)) <- c("seqn", "tx_name")
+        cds <- GRanges(seqnames = cds$seqn, ranges = ranges(cds), strand = strand(cds),
+                       tx_name = cds$tx_name, feature_type = "CDS")
+        seqinfo(cds) <- seqinfo(features)[seqlevels(cds)]
         features <- features[features$feature_type %in% c("5UTR", "3UTR")]
         features <- c(features, cds)
     }
     ## resort by txs
     features <- features[order(as.numeric(factor(features$tx_name, 
                                                  levels = txs)))]
+    ## features must contain 5UTR, CDS and 3UTR
+    txs <- split(features$feature_type, features$tx_name)
+    txs <- lapply(txs, unique)
+    txs <- names(txs)[lengths(txs)==3]
+    features <- features[features$tx_name %in% txs]
     ## add upstream and downstream
     if(upstream.cutoff>0 && downstream.cutoff>0){
-        transcripts <- toGRanges(TxDb, feature="transcript")
-        transcripts <- transcripts[transcripts$tx_name %in% txs]
+        genes <- GRanges(seqnames = paste(as.character(seqnames(features)), features$tx_name),
+                         ranges = ranges(features), strand = strand(features))
+        genes <- reduce(genes, min.gapwidth=1e9)
+        mcols(genes) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(genes)), " ")),
+                                   stringsAsFactors = FALSE)
+        colnames(mcols(genes)) <- c("seqn", "tx_name")
+        genes <- GRanges(seqnames = genes$seqn, ranges = ranges(genes), strand = strand(genes),
+                       tx_name = genes$tx_name)
+        seqinfo(genes) <- seqinfo(features)[seqlevels(genes)]
         suppressWarnings({
-            upstream <- promoters(transcripts,
+            upstream <- promoters(genes,
                                   upstream = upstream.cutoff,
                                   downstream = 0)})
         upstream <- trim(upstream)
         upstream <- upstream[width(upstream)>=nbinsUpstream]
         revert.strand <- function(gr){
-            l <- levels(strand(gr))
+            l <- as.character(strand(gr))
             l.plus <- which(l=="+")
             l.minus <- which(l=="-")
-            if(length(l.plus)==1){
+            if(length(l.plus)>=1){
                 l[l.plus] <- "-"
             }
-            if(length(l.minus)==1){
+            if(length(l.minus)>=1){
                 l[l.minus] <- "+"
             }
-            levels(strand(gr)) <- l
+            strand(gr) <- l
             gr
         }
-        transcripts.rev.strand <- revert.strand(transcripts)
+        genes.rev.strand <- revert.strand(genes)
         suppressWarnings({downstream <- 
-            promoters(transcripts.rev.strand,
+            promoters(genes.rev.strand,
                       upstream = downstream.cutoff,
                       downstream = 0)})
         downstream <- revert.strand(downstream)
         downstream <- trim(downstream)
         downstream <- downstream[width(downstream)>=nbinsDownstream]
-        upstream$gene_id <- NULL
-        downstream$gene_id <- NULL
         upstream$feature_type <- "upstream"
         downstream$feature_type <- "downstream"
         features <- c(features, upstream, downstream)
-        features <- 
-            features[order(as.numeric(factor(features$tx_name, 
-                                             levels = txs)),
-                           as.numeric(factor(features$feature_type,
-                                             levels = feature_type)),
-                           ifelse(strand(features)=="-", -1, 1)*start(features))]
-    }else{
-        ## make sure features are sorted by 5' --> 3'
-        features <- 
-            features[order(as.numeric(factor(features$tx_name, 
-                                             levels = txs)),
-                           as.numeric(factor(features$feature_type,
-                                             levels = c("5UTR", "CDS", "3UTR"))),
-                           ifelse(strand(features)=="-", -1, 1)*start(features))]
     }
     ## split the features by seqnames and generate Views for cvglist
     seqn <- Reduce(intersect, lapply(cvglists, names))
@@ -140,31 +171,32 @@ binOverRegions <- function(cvglists, TxDb,
              "None of them in the seqlevels of TxDb.")
     }
     features <- features[seqnames(features) %in% seqn]
-    ## make sure all the region involved in same transcript should have same coverage
-    features.disjoin <- disjoin(features, with.revmap=TRUE, ignore.strand=TRUE)
-    revmap.len <- lengths(features.disjoin$revmap)
-    revmap.id <- rep(seq_along(features.disjoin), revmap.len)
-    revmap.len <- rep(revmap.len, revmap.len)
-    revmap.len <- data.frame(id=unlist(features.disjoin$revmap), 
-                             id2=revmap.id,
-                             len=revmap.len)
-    revmap.len$tx_name <- features[revmap.len$id]$tx_name
-    revmap.len$feature_type <- features[revmap.len$id]$feature_type
-    revmap.len$tx_type <- paste(revmap.len$tx_name, 
-                                revmap.len$feature_type, sep="_")
-    revmap.len$tx_type_len <- paste(revmap.len$tx_type, 
-                                    revmap.len$len, sep="_")
-    revmap.len$width <- width(features.disjoin[revmap.len$id2])
-    revmap.width <- rowsum(revmap.len$width, revmap.len$tx_type_len)
-    revmap.len$width2 <- revmap.width[revmap.len$tx_type_len, 1]
-    maxWidth <- aggregate(revmap.len$width2, by=list(id=revmap.len$tx_type), 
-                          FUN=max)
-    revmap.len <- revmap.len[paste(revmap.len$tx_type, revmap.len$width2) %in% 
-                                 paste(as.character(maxWidth[, 1]), 
-                                       maxWidth[, 2]), ]
-    revmap.len <- revmap.len[order(revmap.len$id), ]
-    features <- features[revmap.len$id]
-    ranges(features) <- ranges(features.disjoin[revmap.len$id2])
+    
+    ## make sure no overlaps in all the region 
+    features.disjoin <- disjoin(features, with.revmap=TRUE)
+    features.disjoin <- features.disjoin[lengths(features.disjoin$revmap)==1]
+    features.disjoin$revmap <- unlist(features.disjoin$revmap)
+    features.disjoin$feature_type <- features$feature_type[features.disjoin$revmap]
+    features.disjoin$tx_name <- features$tx_name[features.disjoin$revmap]
+    features.disjoin$revmap <- NULL
+    features.disjoin.tx_name <- split(features.disjoin$feature_type, features.disjoin$tx_name)
+    features.disjoin.tx_name <- lapply(features.disjoin.tx_name, unique)
+    features.disjoin.tx_name <- 
+      names(features.disjoin.tx_name)[lengths(features.disjoin.tx_name) ==
+                                        max(lengths(features.disjoin.tx_name))]
+    features.disjoin <- features.disjoin[features.disjoin$tx_name %in% 
+                                           features.disjoin.tx_name]
+    seqinfo(features.disjoin) <- seqinfo(features)[seqlevels(features.disjoin)]
+    features <- features.disjoin
+    rm(features.disjoin)
+    ## make sure features are sorted by 5' --> 3'
+    features <- 
+      features[order(as.numeric(factor(features$tx_name, 
+                                       levels = txs)),
+                     as.numeric(factor(features$feature_type,
+                                       levels = feature_type[feature_type %in% unique(features$feature_type)])),
+                     ifelse(strand(features)=="-", -1, 1)*start(features))]
+    
     ## filter by minCDSLen, min5UTR, min3UTR
     filterByLen <- function(type, minlen, maxLen){
         x <- features[features$feature_type %in% type]
@@ -257,19 +289,18 @@ plotBinOverRegions <- function(dat, ...){
     }
     feature_type <- feature_type[feature_type %in% names(dat)]
     dat <- dat[feature_type]
-    dat <- lapply(dat, function(.ele) rbind(.ele, NA))
     bins <- elementNROWS(dat)
     dat <- do.call(rbind, dat)
     matplot(dat, type = "l", xaxt="n", ...)
-    bins.sum <- cumsum(bins)
+    bins.sum <- cumsum(bins) + .5
     bins.sum <- bins.sum[-length(bins.sum)]
-    abline(v = bins.sum, lty=2)
+    abline(v = bins.sum, lty=2, col="gray")
     axis(side = 1, at = bins.sum, 
          labels = rep("", length(bins.sum)), 
-         tick = TRUE, lwd=-1, lwd.ticks=1)
+         tick = TRUE, lwd=-1, lwd.ticks=1, ...)
     bins.sum2 <- c(0, bins.sum) + bins/2
     axis(side = 1, at = bins.sum2, 
-         labels = feature_type, lwd=-1)
+         labels = feature_type, lwd=-1, ...)
     legend.arg <- formals("legend")
     legend.arg.names <- names(legend.arg)
     legend.arg$x <- "topright"

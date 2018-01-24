@@ -13,10 +13,10 @@ featureAlignedSignal(cvglists, feature.gr,
 }
 \arguments{
   \item{cvglists}{
-    List of \link[IRanges]{SimpleRleList} or \link[IRanges]{RleList}
+    List of \link[IRanges:AtomicList-class]{SimpleRleList} or \link[IRanges:AtomicList-class]{RleList}
   }
   \item{feature.gr}{
-    An object of \link[GenomicRanges]{GRanges} with identical width.
+    An object of \link[GenomicRanges:GRanges-class]{GRanges} with identical width.
   }
   \item{upstream, downstream}{Set the feature.gr to upstream and dwonstream 
   from the center of the feature.gr if they are set.}

@@ -23,7 +23,7 @@ featureAlignedExtendSignal(bamfiles, index = bamfiles, feature.gr,
     this is given without the '.bai' extension.
 }
   \item{feature.gr}{
-    An object of \link[GenomicRanges]{GRanges} with identical width.
+    An object of \link[GenomicRanges:GRanges-class]{GRanges} with identical width.
 }
   \item{upstream, downstream}{upstream or dwonstream from the feature.gr.}
   \item{n.tile}{The number of tiles to generate for each element of feature.gr, 

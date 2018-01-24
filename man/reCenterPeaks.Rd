@@ -11,7 +11,7 @@ reCenterPeaks(peaks, width=2000L, ...)
 }
 \arguments{
   \item{peaks}{
-    An object of \link[GenomicRanges]{GRanges} or \link{annoGR}.
+    An object of \link[GenomicRanges:GRanges-class]{GRanges} or \link{annoGR}.
 }
   \item{width}{
     The width of new peaks

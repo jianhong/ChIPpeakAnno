@@ -21,27 +21,27 @@ peaks in GRanges: See example below
 exon data obtained from getAnnotation or customized annotation of class GRanges 
 containing additional variable:  strand (1 or + for plus strand and -1 or - for
 minus strand). This parameter is for backward compatibility only. 
-\code{\link[GenomicFeatures]{TxDb}} should be used instead.
+\code{\link[GenomicFeatures:TxDb-class]{TxDb}} should be used instead.
 }
   \item{TSS}{
 TSS data obtained from getAnnotation or customized annotation of class GRanges 
 containing additional variable:  strand (1 or + for plus strand and -1 or - for
 minus strand). For example, data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), 
 data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8). This parameter is for 
-backward compatibility only. \code{\link[GenomicFeatures]{TxDb}} should be 
+backward compatibility only. \code{\link[GenomicFeatures:TxDb-class]{TxDb}} should be 
 used instead.
 }
   \item{utr5}{
 5 prime UTR data obtained from getAnnotation or customized annotation of class 
 GRanges containing additional variable:  strand (1 or + for plus strand and -1
 or - for minus strand). This parameter is for backward compatibility only. 
-\code{\link[GenomicFeatures]{TxDb}} should be used instead.
+\code{\link[GenomicFeatures:TxDb-class]{TxDb}} should be used instead.
 }
   \item{utr3}{
 3 prime UTR data obtained from getAnnotation or customized annotation of class
 GRanges containing additional variable:  strand (1 or + for plus strand and -1 
 or - for minus strand). This parameter is for backward compatibility only. 
-\code{\link[GenomicFeatures]{TxDb}} should be used instead.
+\code{\link[GenomicFeatures:TxDb-class]{TxDb}} should be used instead.
 }
   \item{proximal.promoter.cutoff}{
 Specify the cutoff in bases to classify proximal promoter or enhencer. Peaks 
@@ -67,7 +67,7 @@ precedence order is specified, for example, if promoter is specified before
 5'UTR, then only promoter will be incremented for the same example. 
 The values could be any conbinations of "Promoters", "immediateDownstream", 
 "fiveUTRs", "threeUTRs", "Exons" and "Introns", Default=NULL}
-  \item{TxDb}{an object of \code{\link[GenomicFeatures]{TxDb}}}
+  \item{TxDb}{an object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}}
 }
 \value{
 A list of two named vectors: percentage and jaccard (Jaccard Index). The 

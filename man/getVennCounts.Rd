@@ -14,12 +14,12 @@ getVennCounts(..., maxgap = -1L, minoverlap=0L,
 }
 \arguments{
     \item{\dots}{
-    Objects of \link[GenomicRanges:GRanges]{GRanges} or 
-    \link[IRanges:RangedData]{RangedData}: See example below.
+    Objects of \link[GenomicRanges:GRanges-class]{GRanges} or 
+    \link[IRanges:RangedData-class]{RangedData}: See example below.
 }
   \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
-See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
 for a description of these arguments.
 }
 \item{by}{region, feature or base, default region. feature means using feature 

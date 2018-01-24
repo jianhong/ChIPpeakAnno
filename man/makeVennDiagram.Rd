@@ -16,7 +16,7 @@ makeVennDiagram(Peaks, NameOfPeaks, maxgap = -1L, minoverlap = 0L,
 }
 \arguments{
   \item{Peaks}{
-A list of peaks in \link[GenomicRanges:GRanges]{GRanges} format: 
+A list of peaks in \link[GenomicRanges:GRanges-class]{GRanges} format: 
 See example below.
 }
   \item{NameOfPeaks}{
@@ -25,7 +25,7 @@ be used as label in the Venn Diagram.
 }
  \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
-See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
 for a description of these arguments.
 }
 \item{totalTest}{
@@ -49,7 +49,7 @@ in nucleotide level.
 }
 \item{method}{method used for p value calculation. hyperG means 
 hypergeometric test and permutation means \link{peakPermTest}}
-\item{TxDb}{An object of \link[GenomicFeatures:TxDb]{TxDb}}
+\item{TxDb}{An object of \link[GenomicFeatures:TxDb-class]{TxDb}}
 \item{\dots}{Additional arguments to be passed to 
 \link[VennDiagram:venn.diagram]{venn.diagram}}
 }

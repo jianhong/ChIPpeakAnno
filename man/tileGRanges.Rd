@@ -1,7 +1,7 @@
 \name{tileGRanges}
 \alias{tileGRanges}
 \title{
-    Slide windows on a given \link[GenomicRanges]{GRanges} object
+    Slide windows on a given \link[GenomicRanges:GRanges-class]{GRanges} object
 }
 \description{
     tileGRanges returns a set of genomic regions by sliding the windows in
@@ -12,7 +12,7 @@ tileGRanges(targetRegions, windowSize, step, keepPartialWindow=FALSE, ...)
 }
 \arguments{
   \item{targetRegions}{
-    A \link[GenomicRanges]{GRanges} object of genomic regions of interest.
+    A \link[GenomicRanges:GRanges-class]{GRanges} object of genomic regions of interest.
 }
   \item{windowSize}{
     Size of windows
@@ -29,7 +29,7 @@ tileGRanges(targetRegions, windowSize, step, keepPartialWindow=FALSE, ...)
 }
 
 \value{
-A \link[GenomicRanges]{GRanges} object.
+A \link[GenomicRanges:GRanges-class]{GRanges} object.
 }
 
 \author{

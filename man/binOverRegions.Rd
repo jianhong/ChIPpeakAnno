@@ -11,10 +11,10 @@ binOverRegions(cvglists, TxDb, upstream.cutoff = 1000L,
   maxCDSLen = Inf, maxUTRLen = Inf)
 }
 \arguments{
-\item{cvglists}{A list of \link[IRanges]{SimpleRleList} or 
-\link[IRanges]{RleList}. It represents the coverage for samples.}
+\item{cvglists}{A list of \link[IRanges:AtomicList-class]{SimpleRleList} or 
+\link[IRanges:AtomicList-class]{RleList}. It represents the coverage for samples.}
 
-\item{TxDb}{An object of \code{\link[GenomicFeatures]{TxDb}}. 
+\item{TxDb}{An object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}. 
 It is used for extracting the annotations.}
 
 \item{upstream.cutoff, downstream.cutoff}{cutoff length for upstream 

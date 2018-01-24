@@ -22,7 +22,7 @@ and may be defunct as soon as the next release.
   \item{Peaks2}{RangedData: See example below.}
   \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
-See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
 for a description of these arguments.
 }
   \item{multiple}{TRUE or FALSE: TRUE may return multiple overlapping peaks in 
@@ -48,8 +48,8 @@ Include overlapFeature and shortestDistance in the OverlappingPeaks or not.
   the minimal involved peaks in any concered groups 
 }
 \item{\dots}{
-    Objects of \link[GenomicRanges:GRanges]{GRanges} or 
-    \link[IRanges:RangedData]{RangedData}: See also 
+    Objects of \link[GenomicRanges:GRanges-class]{GRanges} or 
+    \link[IRanges:RangedData-class]{RangedData}: See also 
     \code{\link{findOverlapsOfPeaks}}. 
     Or any parameter need to be passed into read.delim function for 
     2RangedData function.

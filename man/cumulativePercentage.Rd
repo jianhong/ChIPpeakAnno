@@ -7,13 +7,13 @@ cumulativePercentage(bamfiles, gr, input = 1, binWidth = 1000, ...)
 \arguments{
 \item{bamfiles}{Bam file names.}
 
-\item{gr}{An object of \link[GenomicRanges]{GRanges}}
+\item{gr}{An object of \link[GenomicRanges:GRanges-class]{GRanges}}
 
 \item{input}{Which file name is input. default 1.}
 
 \item{binWidth}{The width of each bin.}
 
-\item{...}{parameter for \link[GenomicAlignments]{summarizeOverlaps}.}
+\item{...}{parameter for \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}.}
 }
 \value{
 A list of data.frame with the cumulative percentages.

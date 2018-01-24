@@ -16,13 +16,13 @@ findEnhancers(peaks, annoData, DNAinteractiveData,
 
 \arguments{
     \item{peaks}{
-    peak list, \link[GenomicRanges]{GRanges} object
+    peak list, \link[GenomicRanges:GRanges-class]{GRanges} object
   }
   \item{annoData}{
-    annotation data, \link[GenomicRanges]{GRanges} object
+    annotation data, \link[GenomicRanges:GRanges-class]{GRanges} object
   }
   \item{DNAinteractiveData}{
-    DNA interaction data, \link[GenomicRanges]{GRanges} object with interaction blocks informations.
+    DNA interaction data, \link[GenomicRanges:GRanges-class]{GRanges} object with interaction blocks informations.
   }
   \item{bindingType}{
     Specifying the criteria to associate peaks with annotation. Here is how to use it together with the parameter bindingRegion. The annotation will be shift to a new position depend on the DNA interaction region.

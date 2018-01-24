@@ -4,7 +4,7 @@
     Perform overlap queries between reads and genomic features by bins
 }
 \description{
-    summarizeOverlapsByBins extends \link[GenomicAlignments]{summarizeOverlaps} 
+    summarizeOverlapsByBins extends \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps} 
     by providing fixed window size and step to split each feature into bins and 
     then do queries. It will return counts by signalSummaryFUN, 
     which applied to bins in one feature, for each feature.
@@ -17,15 +17,15 @@ summarizeOverlapsByBins(targetRegions, reads,
 }
 \arguments{
   \item{targetRegions}{
-    A \link[GenomicRanges]{GRanges} object of genomic regions of interest.
+    A \link[GenomicRanges:GRanges-class]{GRanges} object of genomic regions of interest.
 }
   \item{reads}{
-    A \link[GenomicRanges]{GRanges}, \link[GenomicRanges]{GRangesList}
-    \link[GenomicAlignments]{GAlignments}, 
-    \link[GenomicAlignments]{GAlignmentsList}, 
-    \link[GenomicAlignments]{GAlignmentPairs} or 
-    \link[Rsamtools]{BamFileList} object that represents the data to be 
-    counted by \code{\link[GenomicAlignments]{summarizeOverlaps}}.
+    A \link[GenomicRanges:GRanges-class]{GRanges}, \link[GenomicRanges:GRangesList-class]{GRangesList}
+    \link[GenomicAlignments:GAlignments-class]{GAlignments}, 
+    \link[GenomicAlignments:GAlignmentsList-class]{GAlignmentsList}, 
+    \link[GenomicAlignments:GAlignmentPairs-class]{GAlignmentPairs} or 
+    \link[Rsamtools:BamFile-class]{BamFileList} object that represents the data to be 
+    counted by \code{\link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}}.
   }
   \item{windowSize}{
     Size of windows
@@ -37,15 +37,15 @@ summarizeOverlapsByBins(targetRegions, reads,
     function, which will be applied to the bins in each feature.
   }
   \item{mode}{
-    mode can be one of the pre-defined count methods. see \link[GenomicAlignments]{summarizeOverlaps}. default is countByOverlaps, alia of countOverlaps(features, reads, ignore.strand=ignore.strand)
+    mode can be one of the pre-defined count methods. see \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}. default is countByOverlaps, alia of countOverlaps(features, reads, ignore.strand=ignore.strand)
   }
   \item{...}{
-    Additional arguments passed to \code{\link[GenomicAlignments]{summarizeOverlaps}}. 
+    Additional arguments passed to \code{\link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}}. 
   }
 }
 
 \value{
-A \link[SummarizedExperiment]{RangedSummarizedExperiment} object. The assays slot holds the counts, rowRanges holds the annotation from features.
+A \link[SummarizedExperiment:RangedSummarizedExperiment-class]{RangedSummarizedExperiment} object. The assays slot holds the counts, rowRanges holds the annotation from features.
 }
 
 \author{

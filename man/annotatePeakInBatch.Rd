@@ -21,12 +21,12 @@ select=c("all", "first","last","arbitrary"),
 ignore.strand=TRUE, bindingRegion=NULL, ...)
 }
 \arguments{
- \item{myPeakList}{A \link[GenomicRanges:GRanges]{GRanges} object }
+ \item{myPeakList}{A \link[GenomicRanges:GRanges-class]{GRanges} object }
  \item{mart}{A mart object, used if AnnotationData is not supplied, see useMart 
  of bioMaRt package for details }
  \item{featureType}{ A charcter vector used with mart argument if 
  AnnotationData is not supplied; it's value is "TSS"", "miRNA"" or "Exon" }
- \item{AnnotationData}{ A \link[GenomicRanges]{GRanges} or \link{annoGR} oject. 
+ \item{AnnotationData}{ A \link[GenomicRanges:GRanges-class]{GRanges} or \link{annoGR} oject. 
  It can be obtained from function getAnnotation or customized annotation of 
  class GRanges containing additional variable:  strand (1 or + for plus strand 
  and -1 or - for minus strand). Pre-compliled annotations, such as 
@@ -89,7 +89,7 @@ For details, see \link{annoPeaks}.}
 \item{...}{Parameters could be passed to \link{annoPeaks}}
 }
 \value{
-An object of \link[GenomicRanges:GRanges]{GRanges} with slot start holding 
+An object of \link[GenomicRanges:GRanges-class]{GRanges} with slot start holding 
 the start position of the peak, slot end holding the end position of the peak, 
 slot space holding the chromosome location where the peak is located, slot 
 rownames holding the id of the peak. In addition, the following variables 

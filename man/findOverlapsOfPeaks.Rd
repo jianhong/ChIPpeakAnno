@@ -16,11 +16,11 @@ findOverlapsOfPeaks(\dots, maxgap=-1L, minoverlap=0L,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{\dots}{
-    Objects of \link[GenomicRanges:GRanges]{GRanges}: See example below.
+    Objects of \link[GenomicRanges:GRanges-class]{GRanges}: See example below.
 }
   \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
-See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
 for a description of these arguments.
 }
 \item{ignore.strand}{
@@ -37,9 +37,9 @@ Efficiently perform overlap queries with an interval tree implemented with GRang
   return value is An object of overlappingPeaks. 
   \item{venn_cnt}{an object of VennCounts}
   \item{peaklist}{a list consists of all overlapping peaks or unique peaks}
-  \item{uniquePeaks}{an object of \link[GenomicRanges]{GRanges} consists of all unique peaks}
-  \item{mergedPeaks}{an object of \link[GenomicRanges]{GRanges} consists of all merged overlapping peaks}
-  \item{peaksInMergedPeaks}{an object of \link[GenomicRanges]{GRanges} consists of all peaks in each samples involved in the overlapping peaks}
+  \item{uniquePeaks}{an object of \link[GenomicRanges:GRanges-class]{GRanges} consists of all unique peaks}
+  \item{mergedPeaks}{an object of \link[GenomicRanges:GRanges-class]{GRanges} consists of all merged overlapping peaks}
+  \item{peaksInMergedPeaks}{an object of \link[GenomicRanges:GRanges-class]{GRanges} consists of all peaks in each samples involved in the overlapping peaks}
   \item{overlappingPeaks}{a list of data frame consists of the annotation of all the overlapped peaks}
   \item{all.peaks}{a list of GRanges object which contain the input peaks with formated rownames.}
 }

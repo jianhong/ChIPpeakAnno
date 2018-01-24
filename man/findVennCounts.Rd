@@ -20,7 +20,7 @@ this will be used as label in the Venn Diagram.
 }
   \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
-See \code{?\link[IRanges]{findOverlaps}} in the \pkg{IRanges} package
+See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
 for a description of these arguments.
 }
   \item{totalTest}{

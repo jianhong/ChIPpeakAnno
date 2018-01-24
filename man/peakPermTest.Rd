@@ -19,7 +19,7 @@ peakPermTest(peaks1, peaks2, ntimes=100,
 }
 \arguments{
   \item{peaks1, peaks2}{
-  an object of \link[GenomicRanges]{GRanges}
+  an object of \link[GenomicRanges:GRanges-class]{GRanges}
 }
   \item{ntimes}{
   number of permutations
@@ -28,17 +28,17 @@ peakPermTest(peaks1, peaks2, ntimes=100,
   random seed
 }
   \item{mc.cores}{
-  The number of cores to use. see \link[parallel]{mclapply}
+  The number of cores to use. see \link[parallel:mclapply]{mclapply}
 }
   \item{maxgap}{
-  See \link[IRanges]{findOverlaps} in the IRanges package for a description 
+  See \link[IRanges:findOverlaps-methods]{findOverlaps} in the IRanges package for a description 
   of these arguments.
 }
   \item{pool}{
   an object of \link{permPool}
 }
   \item{TxDb}{
-  an object of \link[GenomicFeatures]{TxDb}
+  an object of \link[GenomicFeatures:TxDb-class]{TxDb}
 }
   \item{bindingDistribution}{
   an object of \link{bindist}

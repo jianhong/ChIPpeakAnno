@@ -19,10 +19,10 @@ featureAlignedHeatmap(cvglists, feature.gr, upstream, downstream,
 \arguments{
   \item{cvglists}{
     Output of \link{featureAlignedSignal} or a 
-    list of \link[IRanges]{SimpleRleList} or \link[IRanges]{RleList}
+    list of \link[IRanges:AtomicList-class]{SimpleRleList} or \link[IRanges:AtomicList-class]{RleList}
 }
   \item{feature.gr}{
-    An object of \link[GenomicRanges]{GRanges} with identical width. 
+    An object of \link[GenomicRanges:GRanges-class]{GRanges} with identical width. 
     If the width equal to 1, you can use upstream and downstream to set
     the range for plot.
     If the width not equal to 1, you can use zeroAt to set the zero point
@@ -48,7 +48,7 @@ featureAlignedHeatmap(cvglists, feature.gr, upstream, downstream,
   \item{...}{Not used.}
 }
 \value{
-  invisible \link[grid]{gList} object.
+  invisible \link[grid:grob]{gList} object.
 }
 \author{
   Jianhong Ou

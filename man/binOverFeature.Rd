@@ -20,7 +20,7 @@ binOverFeature(..., annotationData=GRanges(),
     Objects of GRanges to be analyzed
 }
   \item{annotationData}{
-    An object of \link[GenomicRanges]{GRanges} or \link{annoGR} for annotation
+    An object of \link[GenomicRanges:GRanges-class]{GRanges} or \link{annoGR} for annotation
 }
   \item{select}{
     Logical: annotate the peaks to all features or the nearest one

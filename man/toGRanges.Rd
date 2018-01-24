@@ -36,7 +36,7 @@
 }
 \arguments{
     \item{data}{an object of data.frame, 
-        \link[GenomicFeatures]{TxDb} or \link[ensembldb]{EnsDb}, or 
+        \link[GenomicFeatures:TxDb-class]{TxDb} or \link[ensembldb]{EnsDb}, or 
         the file name of data to be imported. 
         Alternatively, data can be a readable txt-mode connection (See ?read.table).}
     \item{format}{
@@ -66,11 +66,11 @@
     \item{\dots}{parameters passed to \link{read.table}}
     \item{OrganismDb}{an object of \link[OrganismDbi]{OrganismDb}. It is used 
         for extracting gene symbol for geneModel group for 
-        \link[GenomicFeatures]{TxDb}}
+        \link[GenomicFeatures:TxDb-class]{TxDb}}
 }
 
 \value{
- An object of \link[GenomicRanges:GRanges]{GRanges}
+ An object of \link[GenomicRanges:GRanges-class]{GRanges}
 }
 \author{
   Jianhong Ou

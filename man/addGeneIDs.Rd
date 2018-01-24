@@ -78,7 +78,7 @@ Jianhong Ou, Lihua Julie Zhu
 }
 
 \seealso{
-    \link[biomaRt:getBM]{getBM}, \link[AnnotationDbi:AnnotationDb]{AnnotationDbi}
+    \link[biomaRt:getBM]{getBM}, \link[AnnotationDbi:AnnotationDb]{AnnotationDb}
 }
 \examples{
  data(annotatedPeak)

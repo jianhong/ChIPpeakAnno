@@ -14,10 +14,10 @@ preparePool(TxDb, template, bindingDistribution,
 }
 \arguments{
   \item{TxDb}{
-an object of \link[GenomicFeatures]{TxDb}
+an object of \link[GenomicFeatures:TxDb-class]{TxDb}
 }
   \item{template}{
-an object of \link[GenomicRanges]{GRanges}
+an object of \link[GenomicRanges:GRanges-class]{GRanges}
 }
   \item{bindingDistribution}{
 an object of \link{bindist}
@@ -35,7 +35,7 @@ given chromosomes.
 }
 \value{
 a list with two elements,
- grs, a list of \link[GenomicRanges]{GRanges}.
+ grs, a list of \link[GenomicRanges:GRanges-class]{GRanges}.
  N, the numbers of elements should be drawn from in each GRanges.
 }
 \seealso{

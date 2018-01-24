@@ -10,7 +10,7 @@ getAllPeakSequence(myPeakList, upstream = 200L, downstream = upstream,
                    genome, AnnotationData)
 }
 \arguments{
-  \item{myPeakList}{ An object of \link[GenomicRanges:GRanges]{GRanges}: 
+  \item{myPeakList}{ An object of \link[GenomicRanges:GRanges-class]{GRanges}: 
   See example below}
   \item{upstream}{upstream offset from the peak start, e.g., 200 }
   \item{downstream}{ downstream offset from the peak end, e.g., 200 }
@@ -24,7 +24,7 @@ getAllPeakSequence(myPeakList, upstream = 200L, downstream = upstream,
    obtained from biomaRt automatically using the mart object}
 }
 \value{
- \link[GenomicRanges:GRanges]{GRanges} with slot start holding the start 
+ \link[GenomicRanges:GRanges-class]{GRanges} with slot start holding the start 
  position of the peak, slot end holding the end position of the peak, 
  slot rownames holding the id of the peak and slot seqnames holding the 
  chromosome where the peak is located. In addition, the following variables 

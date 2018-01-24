@@ -12,7 +12,7 @@ bdp (peaks, annoData, maxgap=2000L, ...)
 }
 \arguments{
   \item{peaks}{
-    peak list, \link[GenomicRanges]{GRanges} object
+    peak list, \link[GenomicRanges:GRanges-class]{GRanges} object
   }
   \item{annoData}{
     annotation data, \link{annoGR} object

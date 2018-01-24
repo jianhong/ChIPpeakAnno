@@ -24,7 +24,7 @@
 \section{Slots}{
   \describe{
     \item{seqnames, ranges, strand, elementMetadata, seqinfo}{
-    slots inherit from \link[GenomicRanges]{GRanges}. 
+    slots inherit from \link[GenomicRanges:GRanges-class]{GRanges}. 
     The ranges must have unique names.}
     
     \item{\code{source}}{character, where the annotation comes from}
@@ -33,7 +33,7 @@
     
     \item{\code{feature}}{annotation type, could be "gene", "exon", 
     "transcript", "CDS", "fiveUTR", "threeUTR", "microRNA", "tRNAs", 
-    "geneModel" for \link[GenomicFeatures]{TxDb} object, or "gene", 
+    "geneModel" for \link[GenomicFeatures:TxDb-class]{TxDb} object, or "gene", 
     "exon" "transcript" for \link[ensembldb]{EnsDb} object}
     
     \item{\code{mdata}}{data frame, metadata from annotation}
@@ -53,7 +53,7 @@
   \describe{
     \item{info}{Print basic info for annoGR object}
     \item{annoGR("TxDb"), annoGR("EnsDb")}{Create a annoGR object from 
-    \link[GenomicFeatures]{TxDb} or \link[ensembldb]{EnsDb} object}
+    \link[GenomicFeatures:TxDb-class]{TxDb} or \link[ensembldb]{EnsDb} object}
   }
 }
 \usage{
@@ -68,8 +68,8 @@
                    date, source, mdata)
 }
 \arguments{
-    \item{ranges}{an object of \link[GenomicRanges]{GRanges}, 
-        \link[GenomicFeatures]{TxDb} or \link[ensembldb]{EnsDb}}
+    \item{ranges}{an object of \link[GenomicRanges:GRanges-class]{GRanges}, 
+        \link[GenomicFeatures:TxDb-class]{TxDb} or \link[ensembldb]{EnsDb}}
     \item{feature}{annotation type}
     \item{date}{a \link{Date} object}
     \item{...}{could be following parameters}
@@ -77,7 +77,7 @@
     \item{mdata}{data frame, metadata from annotation}
     \item{OrganismDb}{an object of OrganismDb. It is used 
         for extracting gene symbol for geneModel group for 
-        \link[GenomicFeatures]{TxDb}}
+        \link[GenomicFeatures:TxDb-class]{TxDb}}
 }
 \author{
     Jianhong Ou

@@ -15,12 +15,12 @@ tileCount(reads, genome, windowSize=1e6, step=1e6,
 }
 \arguments{
   \item{reads}{
-    A \link[GenomicRanges]{GRanges}, \link[GenomicRanges]{GRangesList}
-    \link[GenomicAlignments]{GAlignments}, 
-    \link[GenomicAlignments]{GAlignmentsList}, 
-    \link[GenomicAlignments]{GAlignmentPairs} or 
-    \link[Rsamtools]{BamFileList} object that represents the data to be 
-    counted by \code{\link[GenomicAlignments]{summarizeOverlaps}}.
+    A \link[GenomicRanges:GRanges-class]{GRanges}, \link[GenomicRanges:GRangesList-class]{GRangesList}
+    \link[GenomicAlignments:GAlignments-class]{GAlignments}, 
+    \link[GenomicAlignments:GAlignmentsList-class]{GAlignmentsList}, 
+    \link[GenomicAlignments:GAlignmentPairs-class]{GAlignmentPairs} or 
+    \link[Rsamtools:BamFile-class]{BamFileList} object that represents the data to be 
+    counted by \code{\link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}}.
   }
   \item{genome}{
     The object from/on which to get/set the sequence information.
@@ -35,15 +35,15 @@ tileCount(reads, genome, windowSize=1e6, step=1e6,
     Keep last partial window or not.
   }
   \item{mode}{
-    mode can be one of the pre-defined count methods. see \link[GenomicAlignments]{summarizeOverlaps}. default is countByOverlaps, alia of countOverlaps(features, reads, ignore.strand=ignore.strand)
+    mode can be one of the pre-defined count methods. see \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}. default is countByOverlaps, alia of countOverlaps(features, reads, ignore.strand=ignore.strand)
   }
   \item{...}{
-    Additional arguments passed to \code{\link[GenomicAlignments]{summarizeOverlaps}}. 
+    Additional arguments passed to \code{\link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}}. 
   }
 }
 
 \value{
-A \link[SummarizedExperiment]{RangedSummarizedExperiment} object. The assays slot holds the counts, rowRanges holds the annotation from genome.
+A \link[SummarizedExperiment:RangedSummarizedExperiment-class]{RangedSummarizedExperiment} object. The assays slot holds the counts, rowRanges holds the annotation from genome.
 }
 
 \author{
