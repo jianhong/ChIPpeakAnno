@@ -616,8 +616,7 @@ swapList <- function(x){
     stopifnot(is.list(.ele))
   })
   levelsA <- names(x)
-  levelsB <- sapply(x, names)
-  levelsB <- unique(levelsB)
+  levelsB <- unique(unlist(sapply(x, names, simplify = FALSE)))
   y <- as.list(levelsB)
   names(y) <- levelsB
   for(.lB in levelsB){

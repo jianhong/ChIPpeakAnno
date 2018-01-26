@@ -9,10 +9,10 @@
 peaksNearBDP(myPeakList, AnnotationData, MaxDistance=5000L, ...)
 }
 \arguments{
- \item{myPeakList}{\link[GenomicRanges:GRanges]{GRanges} or 
- \link[IRanges:RangedData]{RangedData}: See example below}
+ \item{myPeakList}{\link[GenomicRanges:GRanges-class]{GRanges} or 
+ \link[IRanges:RangedData]{RangedData-class}: See example below}
  \item{AnnotationData}{ annotation data obtained from getAnnotation or 
- customized annotation of class \link[GenomicRanges:GRanges]{GRanges} containing additional variable:  strand (1 or + for plus 
+ customized annotation of class \link[GenomicRanges:GRanges-class]{GRanges} containing additional variable:  strand (1 or + for plus 
  strand and -1 or - for minus strand). For example, data(TSS.human.NCBI36),
  data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and data(TSS.zebrafish.Zv8).}
 \item{MaxDistance}{Specify the maximum gap allowed between the peak and 

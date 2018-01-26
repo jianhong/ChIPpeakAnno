@@ -48,7 +48,7 @@ featureAlignedHeatmap(cvglists, feature.gr, upstream, downstream,
   \item{...}{Not used.}
 }
 \value{
-  invisible \link[grid:grob]{gList} object.
+  invisible gList object.
 }
 \author{
   Jianhong Ou

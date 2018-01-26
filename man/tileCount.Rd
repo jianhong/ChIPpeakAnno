@@ -4,7 +4,7 @@
     Perform overlap queries between reads and genome by windows
 }
 \description{
-    tileCount extends \link[GenomicAlignments]{summarizeOverlaps} 
+    tileCount extends \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps} 
     by providing fixed window size and step to split whole genome into windows and 
     then do queries. It will return counts in each windows.
 }

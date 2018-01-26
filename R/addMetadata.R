@@ -28,10 +28,11 @@ addMetadata <- function(ol, colNames=NULL, FUN=c, ...){
     }
     Peaks <- unlist(GRangesList(PeaksList), use.names = FALSE)
     ol$peaklist <- lapply(ol$peaklist, function(.ele){
-        .mcols <- sapply(colNames, function(i){
-            sapply(.ele$peakNames, function(.name) FUN(mcols(Peaks[.name])[, i], ...))
-        }, simplify = FALSE)
-        mcols(.ele) <- cbind(mcols(.ele), DataFrame(as.data.frame(do.call(cbind, .mcols), stringsAsFactors=FALSE)))
+        .mcols <- aggregate(mcols(Peaks[unlist(.ele$peakNames)]), 
+                            by=list(addMetatdata_group=rep(seq_along(.ele), lengths(.ele$peakNames))), 
+                            FUN=mean, ...)
+        .mcols <- .mcols[order(.mcols$addMetatdata_group), ]
+        mcols(.ele) <- cbind(mcols(.ele), .mcols[, colNames])
         .ele
     })
     ol

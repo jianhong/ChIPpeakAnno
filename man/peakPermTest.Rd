@@ -28,7 +28,7 @@ peakPermTest(peaks1, peaks2, ntimes=100,
   random seed
 }
   \item{mc.cores}{
-  The number of cores to use. see \link[parallel:mclapply]{mclapply}
+  The number of cores to use. see mclapply.
 }
   \item{maxgap}{
   See \link[IRanges:findOverlaps-methods]{findOverlaps} in the IRanges package for a description 
