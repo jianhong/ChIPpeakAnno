@@ -60,6 +60,7 @@ binOverRegions <- function(cvglists, TxDb,
     stopifnot(maxUTRLen>minUTRLen)
     stopifnot(minUTRLen>=nbinsUTR)
     features <- toGRanges(TxDb, feature="geneModel")
+    features.reduced <- reduce(features)
     feature_type <- c("upstream", "5UTR", "CDS", "3UTR", "downstream")
     features <- features[features$feature_type %in% c("5UTR", "CDS", "3UTR")]
     transcripts <- transcripts(TxDb, columns=c("tx_name", "gene_id"))
@@ -161,6 +162,21 @@ binOverRegions <- function(cvglists, TxDb,
         downstream <- downstream[width(downstream)>=nbinsDownstream]
         upstream$feature_type <- "upstream"
         downstream$feature_type <- "downstream"
+        #remove the overlapping parts
+        rmOverlaps <- function(gr, tobeRemoved=features.reduced){
+          gr.intersect <- intersect(gr, tobeRemoved, ignore.strand=TRUE)
+          gr.intersect$tx_name <- NA
+          gr.intersect$feature_type <- NA
+          gr.disjoin <- disjoin(c(gr, gr.intersect), 
+                                      with.revmap=TRUE, ignore.strand=TRUE)
+          gr.disjoin <- gr.disjoin[lengths(gr.disjoin$revmap)==1]
+          gr.disjoin$revmap <- unlist(gr.disjoin$revmap)
+          strand(gr.disjoin) <- strand(gr[gr.disjoin$revmap])
+          mcols(gr.disjoin) <- mcols(gr[gr.disjoin$revmap])
+          gr.disjoin
+        }
+        upstream <- rmOverlaps(upstream)
+        downstream <- rmOverlaps(downstream)
         features <- c(features, upstream, downstream)
     }
     ## split the features by seqnames and generate Views for cvglist
@@ -213,6 +229,14 @@ binOverRegions <- function(cvglists, TxDb,
                                       Inf, Inf)))
     if(length(txs)<2){
         stop("less than 2 CDS left.")
+    }
+    features <- features[features$tx_name %in% txs]
+    ## features must contain 5UTR, CDS, 3UTR, and/or upstream, downstream.
+    txs <- split(features$feature_type, features$tx_name)
+    txs <- lapply(txs, unique)
+    txs <- names(txs)[lengths(txs)==length(unique(features$feature_type))]
+    if(length(txs)<2){
+      stop("less than 2 CDS left.")
     }
     features <- features[features$tx_name %in% txs]
     ## calculate fators to balance the region be count multiple times
