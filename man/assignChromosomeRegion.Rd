@@ -84,8 +84,8 @@ information in the vectors:
    proximal promoter regions.}
    \item{\code{ImmediateDownstream}}{Percent or the picard index of the peaks 
    resided in immediate downstream regions.}
-   \item{\code{Enhancer.Silencer}}{Percent or the picard index of the peaks 
-   resided in enhancer/silencer regions.}
+   \item{\code{Intergenic.Region}}{Percent or the picard index of the peaks 
+   resided in intergenic regions.}
 }
 \references{ 1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to
 annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 
