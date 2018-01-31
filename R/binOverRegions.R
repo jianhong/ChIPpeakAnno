@@ -266,7 +266,7 @@ binOverRegions <- function(cvglists, TxDb,
         .cvgs <- as(.cvgs, "SimpleRleList")
         .cvg.sub <- .cvgs[.gr.l]
         ### split the RleList into bins
-        .ir <- IRanges(1, lengths(.cvg.sub))
+        .ir <- IRanges(rep(1, length(.cvg.sub)), lengths(.cvg.sub))
         .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
         names(.ir) <- names(.cvg.sub)
         .cnt <- viewMeans(Views(.cvg.sub, .ir))
