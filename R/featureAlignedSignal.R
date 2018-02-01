@@ -75,7 +75,7 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     grL.rev.oid <- grL.rev$oid
     grL.rev$oid <- NULL
     grL.rev <- split(grL.rev, grL.rev.oid)
-    grL[idx] <- as(grL.rev, "GRangesList")
+    grL[idx] <- as(grL.rev, "CompressedGRangesList")
     rm(grL.rev, grL.rev.len, grL.rev.oid)
   }
   grL.len <- lengths(grL)
