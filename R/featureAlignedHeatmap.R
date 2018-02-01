@@ -13,9 +13,9 @@ featureAlignedHeatmap <-
     if(!missing(upper.extreme)){
         stopifnot(is.numeric(upper.extreme))
     }
-    stopifnot(class(gp)=="gpar")
+    stopifnot(is(gp, "gpar"))
     stopifnot(is.logical(newpage))
-    stopifnot(class(feature.gr)=="GRanges")
+    stopifnot(is(feature.gr, "GRanges"))
     
     grWidr <- unique(width(feature.gr))
     if(missing(upstream) || missing(downstream)){
@@ -61,7 +61,7 @@ featureAlignedHeatmap <-
         cvglists <- list(cvglists)
         names(cvglists) <- cvglistsName
     }
-    if(class(cvglists)!="list"){
+    if(!is(cvglists, "list")){
         stop("cvglists must be output of featureAlignedSignal or 
              a list of SimpleRleList or RleList")
     }

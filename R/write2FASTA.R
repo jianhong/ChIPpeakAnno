@@ -2,7 +2,7 @@ write2FASTA <- function(mySeq, file="", width=80){
     if(!inherits(mySeq, c("RangedData", "GRanges"))){
         stop("mySeq must be an object of RangedData or GRanges")
     }
-    if(class(mySeq)=="RangedData"){
+    if(is(mySeq, "RangedData")){
         mySeq <- toGRanges(mySeq)
     }
     if(is.null(mySeq$sequence)){

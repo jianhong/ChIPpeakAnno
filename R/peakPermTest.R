@@ -6,7 +6,7 @@ peakPermTest <- function(peaks1, peaks2, ntimes=100,
                          bindingType=c("TSS", "geneEnd"), 
                          featureType=c("transcript", "exon"),
                          seqn=NA, ...){
-    if(class(peaks1)!="GRanges" || class(peaks2)!="GRanges"){
+    if(!is(peaks1, "GRanges") || !is(peaks2, "GRanges")){
         stop("class of peaks1 and peaks2 must be GRanges.")
     }
     if(!missing(bindingDistribution)){

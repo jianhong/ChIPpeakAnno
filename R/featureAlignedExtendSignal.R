@@ -16,7 +16,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
       stopifnot(length(adjustFragmentLength)==1)
     }
     if(!missing(bamfiles)){
-      stopifnot(class(bamfiles)=="character")
+      stopifnot(is(bamfiles, "character"))
       stopifnot(length(bamfiles)==length(index))
       galInput <- FALSE
     }else{
@@ -34,7 +34,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
       }
       galInput <- TRUE
     }
-    stopifnot(class(feature.gr)=="GRanges")
+    stopifnot(is(feature.gr, "GRanges"))
     if(missing(upstream) | missing(downstream)){
         stop("upstream and downstream is missing")
     }
@@ -74,7 +74,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
         grL.rev.oid <- grL.rev$oid
         grL.rev$oid <- NULL
         grL.rev <- split(grL.rev, grL.rev.oid)
-        grL[idx] <- as(grL.rev, "GRangesList")
+        grL[idx] <- as(grL.rev, "CompressedGRangesList")
         rm(grL.rev, grL.rev.len, grL.rev.oid)
     }
     grL.eleLen <- elementNROWS(grL)

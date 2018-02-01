@@ -7,7 +7,7 @@ getGeneSeq <- function(LocationParameters, mart){
              It should contain six fields as c(distanceToNearestTSS, 
              upstream, downstream, GeneStart, GeneEnd)!")
     }
-    if (missing(mart) || class(mart) !="Mart")
+    if (missing(mart) || !is(mart, "Mart"))
     {
         stop("No valid mart object is passed in!")
     }

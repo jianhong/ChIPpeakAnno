@@ -7,8 +7,8 @@ summarizeOverlapsByBins <- function(targetRegions, reads,
                                     windowSize=50, step=10, 
                                     signalSummaryFUN=max, 
                                     mode=countByOverlaps, ...){
-    stopifnot(class(targetRegions)=="GRanges")
-    stopifnot(base::mode(signalSummaryFUN)=="function")
+    stopifnot(is(targetRegions, "GRanges"))
+    stopifnot(is.function(signalSummaryFUN))
     stopifnot(length(reads)>1)
     if(length(names(targetRegions))==0 || any(duplicated(names(targetRegions)))){
         stop("duplicated or null targetRegions names.")

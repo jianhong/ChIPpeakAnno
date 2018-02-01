@@ -15,16 +15,16 @@ summarizePatternInPeaks <-
         {
             stop("format needs to be either fasta or fastq!")
         }
-        if (missing(BSgenomeName) || class(BSgenomeName) != "BSgenome")
+        if (missing(BSgenomeName) || !is(BSgenomeName, "BSgenome"))
         {
             stop("BSgenomeName is required as BSgenome object!")
         }
-        if (missing(peaks) || (class(peaks) != "RangedData" && 
-                                   class(peaks) !="GRanges")) {
+        if (missing(peaks) || (!is(peaks, "RangedData") && 
+                                   !is(peaks, "GRanges"))) {
             stop("No valid peaks passed in. It needs to 
                  be RangedData or GRanges object.")
         }
-        if(class(peaks)=="RangedData") 
+        if(is(peaks, "RangedData")) 
             peaks <- toGRanges(peaks, format="RangedData")
         if (!missing(outfile) && file.exists(outfile) && !append)
         {

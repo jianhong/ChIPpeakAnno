@@ -2,7 +2,7 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     if (missing(data)){
         stop("data is required!")
     }
-    if ((class(data) != "data.frame") || dim(data)[2] <3)
+    if ((!is(data, "data.frame")) || dim(data)[2] <3)
     {
         stop("No valid data passed in. For example a data frame as BED format 
              file with at least 3 fields in the order of: chromosome, start and end. 

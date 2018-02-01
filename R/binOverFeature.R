@@ -12,7 +12,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
     PeaksList <- list(...)
     isGRangesList <- FALSE
     if(length(PeaksList)==1){
-        if(class(PeaksList[[1]])=="GRangesList"){
+        if(is(PeaksList[[1]], "GRangesList")){
             PeaksList <- PeaksList[[1]]
             names <- names(PeaksList)
             isGRangesList <- TRUE
@@ -43,7 +43,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
     if(class(annotationData)=="annoGR")
         annotationData <- as(annotationData, "GRanges")
     annotationData <- unique(annotationData)
-    if(class(annotationData)=="RangedData") 
+    if(is(annotationData, "RangedData")) 
         annotationData <- toGRanges(annotationData)
     if (!all(as.character(strand(annotationData)) %in% c("+", "-", "*")))
         stop("strands of annotationData must be +, - or *")

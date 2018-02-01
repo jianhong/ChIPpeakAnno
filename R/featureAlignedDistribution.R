@@ -1,7 +1,7 @@
 featureAlignedDistribution <- function(cvglists, feature.gr, 
                                        upstream, downstream, 
                                        n.tile=100, zeroAt, ...){
-    stopifnot(class(feature.gr)=="GRanges")
+    stopifnot(is(feature.gr, "GRanges"))
     dots <- list(...)
     
     grWidr <- unique(width(feature.gr))
@@ -51,7 +51,7 @@ featureAlignedDistribution <- function(cvglists, feature.gr,
         cvglists <- list(cvglists)
         names(cvglists) <- cvglistsName
     }
-    if(class(cvglists)!="list"){
+    if(!is(cvglists, "list")){
         stop("cvglists must be output of featureAlignedSignal or 
              a list of SimpleRleList or RleList")
     }

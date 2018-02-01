@@ -55,8 +55,8 @@ annotatePeakInBatch <-
                      Suggest call getAnnotation before calling 
                      annotatePeakInBatch")
             }
-            if(class(mart) != "Mart"){
-                if(class(mart)=="GRanges"){
+            if(!is(mart, "Mart")){
+                if(is(mart, "GRanges")){
                     warning("AnnotationData is missing, and a GRanges is passed
                             to mart parameter. Trying to annotate peaks by 
                             the GRanges you input.")

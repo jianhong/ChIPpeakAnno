@@ -18,7 +18,7 @@ convert2EntrezID <- function(IDs, orgAnn, ID_type="ensembl_gene_id")
         stop("Currently only the following type of IDs are supported: ensembl_gene_id, refseq_id and gene_symbol!")
     }
     
-    if(class(orgAnn) != "AnnDbBimap")
+    if(!is(orgAnn, "AnnDbBimap"))
     {
         stop("orgAnn is not a valid annotation dataset! For example, orgs.Hs.eg.db package for human
 			 and the org.Mm.eg.db package for mouse.")

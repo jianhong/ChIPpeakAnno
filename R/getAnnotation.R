@@ -3,7 +3,7 @@ getAnnotation <- function(mart,
                                         "5utr", "3utr", 
                                         "ExonPlusUtr", "transcript")){
     featureType = match.arg(featureType)
-    if (missing(mart) || class(mart) !="Mart")
+    if (missing(mart) || !is(mart, "Mart"))
     {
         stop("No valid mart object is passed in!")
     }

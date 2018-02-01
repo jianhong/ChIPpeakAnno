@@ -7,7 +7,7 @@ BED2RangedData <- function(data.BED, header=FALSE, ...)
         data.BED <- read.delim(data.BED, header=header, ...)
         header <- FALSE
     }
-    if ((class(data.BED) != "data.frame") || dim(data.BED)[2] <3)
+    if ((!is(data.BED, "data.frame")) || dim(data.BED)[2] <3)
     {
         stop("No valid data.BED passed in, which is a data frame or file as BED 
              format with at least 3 fields in the order of: chromosome, start 

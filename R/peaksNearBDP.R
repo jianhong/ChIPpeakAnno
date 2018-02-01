@@ -5,7 +5,7 @@ peaksNearBDP <- function(myPeakList, AnnotationData,
     }
     if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
         stop("myPeakList needs to be GRanges object")
-        if(class(myPeakList)=="RangedData")
+        if(is(myPeakList, "RangedData"))
             myPeakList <- toGRanges(myPeakList, format="RangedData")
     }
     if (!missing(AnnotationData)){        
@@ -14,7 +14,7 @@ peaksNearBDP <- function(myPeakList, AnnotationData,
         }
         if(class(AnnotationData)=="annoGR")
             AnnotationData <- AnnotationData@gr
-        if(class(AnnotationData)=="RangedData") 
+        if(is(AnnotationData, "RangedData")) 
             AnnotationData <- toGRanges(AnnotationData, format="RangedData")
     }else{
         stop("Missing required argument AnnotationData!")
