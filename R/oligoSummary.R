@@ -1,13 +1,13 @@
 oligoFrequency <- function(sequence, MarkovOrder=3L, last=1e6){
     stopifnot(is.numeric(MarkovOrder))
     stopifnot(MarkovOrder>0)
-    if(class(sequence)=="GRanges"){
+    if(is(sequence, "GRanges")){
         sequence <- sequence$sequence
     }else{
         if(inherits(sequence, c("DNAStringSet", "DNAString"))){
             sequence <- as.character(sequence)
         }else{
-            if(class(sequence)!="character"){
+            if(!is.character(sequence)){
                 stop("sequence must be an object of DNAStringSet or DNAString",
                      "or output of getAllPeakSequence")
             }
@@ -42,13 +42,13 @@ oligoSummary <- function(sequence, oligoLength=6L,
     MarkovOrder <- as.integer(MarkovOrder)
     stopifnot(MarkovOrder>0&MarkovOrder<6)
     stopifnot(MarkovOrder < oligoLength-2)
-    if(class(sequence)=="GRanges"){
+    if(is(sequence, "GRanges")){
         sequence <- sequence$sequence
     }else{
-        if(class(sequence)=="DNAStringSet"){
+        if(is(sequence, "DNAStringSet")){
             sequence <- as.character(sequence)
         }else{
-            if(class(sequence)!="character"){
+            if(!is.character(sequence)){
                 stop("sequence must be an object of DNAStringSet or DNAString",
                      "or output of getAllPeakSequence")
             }

@@ -15,7 +15,7 @@ formatStrand <- function(strand){
 }
 ###clear seqnames, the format should be chr+NUM
 formatSeqnames <- function(gr) {
-    if(class(gr)=="GRanges"){
+    if(is(gr, "GRanges")){
         seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqlevels(gr))] <-
             paste("chr", 
                   seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 

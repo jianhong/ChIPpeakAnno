@@ -1,7 +1,7 @@
 featureAlignedSignal <- function(cvglists, feature.gr, 
                                  upstream, downstream, 
                                  n.tile=100, ...){
-  stopifnot(class(feature.gr)=="GRanges")
+  stopifnot(is(feature.gr, "GRanges"))
   
   grWidr <- unique(width(feature.gr))
   if(missing(upstream) || missing(downstream)){
@@ -39,7 +39,7 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     cvglists <- list(cvglists)
     names(cvglists) <- cvglistsName
   }
-  if(class(cvglists)!="list"){
+  if(!is(cvglists, "list")){
     stop("cvglists must be a list of SimpleRleList or RleList")
   }
   cls <- sapply(cvglists, class)
@@ -75,7 +75,7 @@ featureAlignedSignal <- function(cvglists, feature.gr,
     grL.rev.oid <- grL.rev$oid
     grL.rev$oid <- NULL
     grL.rev <- split(grL.rev, grL.rev.oid)
-    grL[idx] <- as(grL.rev, "GRangesList")
+    grL[idx] <- as(grL.rev, "CompressedGRangesList")
     rm(grL.rev, grL.rev.len, grL.rev.oid)
   }
   grL.len <- lengths(grL)

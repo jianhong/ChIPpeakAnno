@@ -33,7 +33,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     {
         feature_ids = unique(as.character(annotatedPeak$feature))
     }
-    else if (class(annotatedPeak)  ==  "character")
+    else if (is.character(annotatedPeak))
     {
         feature_ids = unique(annotatedPeak)
     }
@@ -60,7 +60,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                 stop("Currently only the following type of IDs are supported:
                      ensembl_gene_id, refseq_id and gene_symbol!")
             orgAnn <- get(paste(GOgenome, orgAnn, sep=""))
-            if(class(orgAnn) != "AnnDbBimap"){
+            if(!is(orgAnn, "AnnDbBimap")){
                 stop("orgAnn is not a valid annotation dataset! 
                      For example, orgs.Hs.eg.db package for human and 
                      the org.Mm.eg.db package for mouse.")

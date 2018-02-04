@@ -14,7 +14,7 @@ getAllPeakSequence <- function(myPeakList,
     if(inherits(myPeakList, "RangedData")){
         myPeakList <- RangedData2GRanges(myPeakList)
     }
-    if (class(genome) == "BSgenome")
+    if (is(genome, "BSgenome"))
     {
         strand <- strand(myPeakList)
         width <- width(myPeakList)
@@ -56,7 +56,7 @@ getAllPeakSequence <- function(myPeakList,
         }   
 
         myPeakList
-    }else if (class(genome) =="Mart"){
+    }else if (is(genome, "Mart")){
         if (missing(AnnotationData)) {
             message("No AnnotationData as GRanges is passed in, 
                     so now querying biomart database for AnnotationData ....")

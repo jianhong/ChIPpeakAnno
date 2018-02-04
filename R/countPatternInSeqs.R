@@ -1,5 +1,5 @@
 countPatternInSeqs <- function(pattern, sequences){     
-    if(missing(pattern) || class(pattern) != "DNAStringSet" )
+    if(missing(pattern) || !is(pattern, "DNAStringSet" ))
     {
         stop("pattern is required as a DNAStringSet object!")
         

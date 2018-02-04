@@ -1,8 +1,8 @@
 IDRfilter <- function(peaksA, peaksB, bamfileA, bamfileB, 
                       maxgap=-1L, minoverlap=0L, singleEnd=TRUE,
                       IDRcutoff=0.01, ...){
-    stopifnot(class(peaksA)=="GRanges")
-    stopifnot(class(peaksB)=="GRanges")
+    stopifnot(is(peaksA,"GRanges"))
+    stopifnot(is(peaksB,"GRanges"))
     stopifnot(file.exists(bamfileA))
     stopifnot(file.exists(bamfileB))
     ol <- findOverlapsOfPeaks(peaksA, peaksB, 

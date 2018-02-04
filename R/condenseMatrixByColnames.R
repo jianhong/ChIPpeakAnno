@@ -12,10 +12,10 @@
 #	condenseMatrixByColnames(a,2)
 
 condenseMatrixByColnames <- function(mx,iname,sep=";",cnt=FALSE){
-    if(class(mx)!="matrix") stop("mx must be matrix\n")
+    if(!is(mx, "matrix")) stop("mx must be matrix\n")
     if(length(iname)!=1) stop("iname must be single colname\n")
     m_cname<-colnames(mx)
-    if(class(iname)=="numeric"&iname<=length(m_cname)) iname<-m_cname[iname]
+    if(is(iname, "numeric") &iname<=length(m_cname)) iname<-m_cname[iname]
     cnames<-m_cname[which(m_cname!=iname)]
     if(length(m_cname)==length(cnames)) 
         stop("the colum name specified for condense does not exist")

@@ -4,13 +4,13 @@ buildBindingDistribution <- function(x, AnnotationData,
     if(missing(AnnotationData) || missing(x)){
         stop("x and AnnotationData is required.")
     }
-    if(class(x)!="GRanges"){
+    if(!is(x, "GRanges")){
         stop("x must be an object of GRanges")
     }
     if(class(AnnotationData)=="annoGR"){
         AnnotationData <- as(AnnotationData, "GRanges")
     }
-    if(class(AnnotationData)!="GRanges"){
+    if(!is(AnnotationData, "GRanges")){
         stop("AnnotationData must be an object of GRanges")
     }
     bindingType <- match.arg(bindingType)

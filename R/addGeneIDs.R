@@ -12,7 +12,7 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
              call.=FALSE)
     }
     
-    if(class(annotatedPeak)=="RangedData"){
+    if(is(annotatedPeak, "RangedData")){
         annotatedPeak <- RangedData2GRanges(annotatedPeak)
     }
     feature_ids <- switch(class(annotatedPeak),
@@ -32,10 +32,10 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
         
     }
     if(!missing(orgAnn)){
-        if(class(orgAnn)=="OrgDb"){
+        if(is(orgAnn, "OrgDb")){
             orgAnn <- deparse(substitute(orgAnn))
         }
-        if(class(orgAnn)!="character"){
+        if(!is(orgAnn, "character")){
             stop("orgAnn must be a character.")
         }
         if(!grepl(".eg.db",orgAnn,ignore.case=TRUE)){
@@ -132,7 +132,7 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
                     IDs2Add<-IDs2Add[IDs2Add!=IDtoAdd]
                     next
                 }
-                if(class(orgDB)!="AnnDbBimap" & class(orgDB)!="IpiAnnDbMap"){
+                if(!is(orgDB, "AnnDbBimap") & !is(orgDB, "IpiAnnDbMap")){
                     if(!silence){
                         message(paste("The IDs2Add you input, \"", 
                                       IDtoAdd, 
@@ -155,7 +155,7 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
         }
         m_ent<-m_ent[, c(feature_id_type,IDs2Add), drop=FALSE]
 }else{
-    if(missing(mart) || class(mart) !="Mart"){
+    if(missing(mart) || !is(mart, "Mart")){
         stop('No valid mart object is passed in!',call.=FALSE)
     }
     IDs2Add<-unique(IDs2Add)
@@ -183,7 +183,7 @@ if(length(duplicated_ids)>0){
     m_ent<-m_ent[!(m_ent[,feature_id_type] %in% duplicated_ids),]
     m_ent<-rbind(m_ent,m_ent.duplicated)
 }
-if (class(annotatedPeak) %in% c("GRanges")){
+if (is(annotatedPeak, "GRanges")){
     #rearrange m_ent by annotatedPeak$feature
     #data.frame is very important for order...
     orderlist <- data.frame(annotatedPeak$feature)

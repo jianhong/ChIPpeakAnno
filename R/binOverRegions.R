@@ -48,7 +48,7 @@ binOverRegions <- function(cvglists, TxDb,
         cvglists <- list(cvglists)
         names(cvglists) <- cvglistsName
     }
-    if(class(cvglists)!="list"){
+    if(!is(cvglists, "list")){
         stop("cvglists must be a list of SimpleRleList or RleList")
     }
     cls <- sapply(cvglists, class)

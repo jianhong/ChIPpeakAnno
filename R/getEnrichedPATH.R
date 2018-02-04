@@ -43,7 +43,7 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     }
     if (inherits(annotatedPeak, what=c("RangedData", "GRanges"))){
         feature_ids = unique(as.character(annotatedPeak$feature))
-    }else if (class(annotatedPeak)  ==  "character"){
+    }else if (is.character(annotatedPeak)){
         feature_ids = unique(annotatedPeak)
     }else{
         stop("annotatedPeak needs to be RangedData type with feature variable 

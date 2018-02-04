@@ -1,5 +1,5 @@
 egOrgMap <- function(name){
-    if(class(name)!="character") 
+    if(!is(name, "character"))
         stop("class of input organism should be character")
     organism <- c("org.Ag.eg.db"="Anopheles gambiae",
     "org.At.eg.db"="Arabidopsis thaliana",

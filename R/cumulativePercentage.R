@@ -4,7 +4,7 @@
 #' paired samples.
 #' 
 #' @param bamfiles Bam file names.
-#' @param gr An object of \link[GenomicRanges]{GRanges}
+#' @param gr An object of \link[GenomicRanges:GRanges-class]{GRanges}
 #' @param input Which file name is input. default 1.
 #' @param binWidth The width of each bin.
 #' @param ... parameter for \link[GenomicAlignments]{summarizeOverlaps}.
@@ -36,7 +36,7 @@
 
 cumulativePercentage <- function(bamfiles, gr, input=1, binWidth=1e3,
                                  ...){
-  stopifnot(class(gr)=="GRanges")
+  stopifnot(is(gr, "GRanges"))
   tileTargetRegions <- tileGRanges(gr, windowSize = binWidth, step = binWidth)
   se <- summarizeOverlaps(features=tileTargetRegions, reads=bamfiles, ...)
   ## resample

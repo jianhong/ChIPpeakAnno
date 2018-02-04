@@ -43,7 +43,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
     if(class(annotationData)=="annoGR")
         annotationData <- as(annotationData, "GRanges")
     annotationData <- unique(annotationData)
-    if(class(annotationData)=="RangedData") 
+    if(is(annotationData, "RangedData")) 
         annotationData <- toGRanges(annotationData)
     if (!all(as.character(strand(annotationData)) %in% c("+", "-", "*")))
         stop("strands of annotationData must be +, - or *")

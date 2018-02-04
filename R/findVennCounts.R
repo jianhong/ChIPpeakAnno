@@ -28,7 +28,7 @@ findVennCounts <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap = 0L,  tot
 	}
 	lapply(seq_len(n1), function(i)
 	{
-		if (class(Peaks[[i]]) != "RangedData")
+		if (!is(Peaks[[i]], "RangedData"))
 		{
 			err.msg = paste("Element", i, "in Peaks is not a valid RangedData object", sep=" ")
 			stop(err.msg)
