@@ -155,13 +155,13 @@ findOverlapsOfPeaks <- function(..., maxgap=-1L, minoverlap=0L,
     }
     b
   }, uniquePeaks, PeaksList[names(uniquePeaks)])
-  if(class(uniquePeaks)!="GRangesList") 
+  if(!is(uniquePeaks, "GRangesList"))
     uniquePeaks <- GRangesList(uniquePeaks)
   uniquePeaks <- unlist(uniquePeaks, use.names = FALSE)
   mergedPeaks <- peaklist[names(peaklist) %in% 
                             listname[grepl(NAME_long_string,
                                            listname, fixed = TRUE)]]
-  if(class(mergedPeaks)!="GRangesList")
+  if(!is(mergedPeaks, "GRangesList"))
     mergedPeaks <- GRangesList(mergedPeaks)
   mergedPeaks <- unlist(mergedPeaks, use.names = FALSE)
   peaksInMergedPeaks <- lapply(PeaksList, function(.ele){
