@@ -24,6 +24,6 @@ BMC Genomics 10:37doi:10.1186/1471-2164-10-37
 }
 \examples{
 data(Peaks.Ste12.Replicate2)
-str(Peaks.Ste12.Replicate2)
+Peaks.Ste12.Replicate2
 }
 \keyword{datasets}

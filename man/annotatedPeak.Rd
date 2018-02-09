@@ -37,7 +37,7 @@
 }
 \examples{
 data(annotatedPeak)
-str(annotatedPeak) 
+head(annotatedPeak, 4)  # show first 4 ranges
 if (Sys.getenv("USER")=="jianhongou") {
 y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
 hist(as.numeric(as.character(y)), 

@@ -22,6 +22,6 @@ BMC Genomics 10:37
 }
 \examples{
 data(Peaks.Ste12.Replicate1)
-str(Peaks.Ste12.Replicate1)
+Peaks.Ste12.Replicate1
 }
 \keyword{datasets}
