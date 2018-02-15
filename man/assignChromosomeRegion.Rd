@@ -86,6 +86,12 @@ information in the vectors:
    resided in immediate downstream regions.}
    \item{\code{Intergenic.Region}}{Percent or the picard index of the peaks 
    resided in intergenic regions.}
+   
+The Jaccard index, also known as Intersection over Union. 
+The Jaccard index is between 0 and 1. The higher the index,
+the more significant the overlap between the peak region and the genomic 
+features in consideration.
+
 }
 \references{ 1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to
 annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 

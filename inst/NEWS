@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.13.16
+-------------------------
+
+    o Fix the bug in assignChromosomeRegion for the integer overflow.
+    
 CHANGES IN VERSION 3.13.14
 -------------------------
 

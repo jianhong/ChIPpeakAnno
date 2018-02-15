@@ -24,6 +24,7 @@ assignChromosomeRegion <-
             }
             if(inherits(peaks.RD, "RangedData")) 
                 peaks.RD <- as(peaks.RD, "GRanges")
+            ignore.strand <- all(as.character(strand(peaks.RD))=="*")
             exons <- exons(TxDb, columns=NULL)
             introns <- unique(unlist(intronsByTranscript(TxDb)))
             fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
@@ -67,10 +68,19 @@ assignChromosomeRegion <-
             annotation <- lapply(annotation, formatSeqnames)
             annotation <- GRangesList(annotation)
             newAnno <- c(unlist(annotation))
-            newAnno.rd <- reduce(trim(newAnno))
-            Intergenic.Region <- gaps(newAnno.rd, end=seqlengths(TxDb))
-            Intergenic.Region <- 
+            if(ignore.strand){
+              newAnno.rd <- newAnno
+              strand(newAnno.rd) <- "*"
+              newAnno.rd <- reduce(trim(newAnno.rd))
+              Intergenic.Region <- gaps(newAnno.rd, end=seqlengths(TxDb))
+              Intergenic.Region <- 
+                Intergenic.Region[strand(Intergenic.Region)=="*"]
+            }else{
+              newAnno.rd <- reduce(trim(newAnno))
+              Intergenic.Region <- gaps(newAnno.rd, end=seqlengths(TxDb))
+              Intergenic.Region <- 
                 Intergenic.Region[strand(Intergenic.Region)!="*"]
+            }
             if(!all(seqlevels(peaks.RD) %in% seqlevels(newAnno))){
                 warning("peaks.RD has sequence levels not in TxDb.")
                 sharedlevels <- 
@@ -86,27 +96,42 @@ assignChromosomeRegion <-
             names(Intergenic.Region) <- NULL
             annotation$Intergenic.Region <- Intergenic.Region
             anno.names <- names(annotation)
+            ol.anno <- findOverlaps(peaks.RD, annotation, ignore.strand=ignore.strand)
             if(nucleotideLevel){
-                ##create a new annotation GRanges
-                newAnno <- c(newAnno, peaks.RD)
-                ##create a splited cluster (no overlapps for all ranges)
-                newAnno <- disjoin(newAnno)
-                annotation$peaks.RD <- peaks.RD
-                ol.anno <- findOverlaps(newAnno, annotation)
-                ##calculate Jaccard index
-                ol.anno.splited <- 
-                    split(queryHits(ol.anno),
-                          names(annotation)[subjectHits(ol.anno)])
-                jaccardIndex <- unlist(lapply(ol.anno.splited, function(.ele){
-                    intersection <- intersect(.ele, ol.anno.splited$peaks.RD)
-                    union <- union(.ele, ol.anno.splited$peaks.RD)
-                    length(intersection)/length(union)
-                }))
-                jaccardIndex <- jaccardIndex[anno.names]
-                names(jaccardIndex) <- anno.names
-                jaccardIndex[is.na(jaccardIndex)] <- 0
+              ## calculate Jaccard index
+              jaccardIndex <- unlist(lapply(annotation, function(.ele){
+                intersection <- intersect(.ele, peaks.RD, ignore.strand=ignore.strand)
+                union <- union(.ele, peaks.RD, ignore.strand=ignore.strand)
+                sum(as.numeric(width(intersection)))/sum(as.numeric(width(union)))
+              }))
+              jaccardIndex <- jaccardIndex[anno.names]
+              names(jaccardIndex) <- anno.names
+              jaccardIndex[is.na(jaccardIndex)] <- 0
+              
+              ## create a new annotations
+              newAnno <- unlist(annotation)
+              newAnno$source <- rep(names(annotation), lengths(annotation))
+              newAnno.disjoin <- disjoin(newAnno, with.revmap=TRUE, ignore.strand=ignore.strand)
+              if(!is.null(precedence)){
+                revmap <- cbind(from=unlist(newAnno.disjoin$revmap), 
+                                to=rep(seq_along(newAnno.disjoin), lengths(newAnno.disjoin$revmap)))
+                revmap <- revmap[order(revmap[, "to"], revmap[, "from"]), , drop=FALSE]
+                revmap <- revmap[!duplicated(revmap[, "to"]), , drop=FALSE]
+                newAnno.disjoin$source <- newAnno[revmap[, "from"]]$source
+              }else{
+                revmap <- unlist(newAnno.disjoin$revmap)
+                newAnno.disjoin <- rep(newAnno.disjoin, lengths(newAnno.disjoin))
+                newAnno.disjoin$source <- newAnno[revmap]$source
+              }
+              ol.anno <- findOverlaps(peaks.RD, newAnno.disjoin, ignore.strand=ignore.strand)
+              queryHits <- newAnno.disjoin[subjectHits(ol.anno)]
+              totalLen <- sum(as.numeric(width(peaks.RD)))
+              ##mcols(queryHits)$subjectHits <- anno.names[ol.anno[,2]]
+              queryHits.list <- split(queryHits, queryHits$source)
+              lens <- unlist(lapply(queryHits.list, function(.ele) 
+                sum(as.numeric(width(.ele)))))
+              percentage <- 100 * lens/totalLen
             }else{
-                ol.anno <- findOverlaps(peaks.RD, annotation)
                 ##calculate Jaccard index
                 ol.anno.splited <- split(queryHits(ol.anno),
                                          anno.names[subjectHits(ol.anno)])
@@ -118,38 +143,21 @@ assignChromosomeRegion <-
                     intersection/union
                 }))
                 names(jaccardIndex) <- anno.names
-            }
-            ol.anno <- as.data.frame(ol.anno)
-            if(nucleotideLevel){
-                ####keep the part in peaks.RD
-                ol.anno <- 
-                    ol.anno[ol.anno[,1] %in% 
-                                unique(ol.anno[ol.anno[,2]==
-                                                   length(annotation),1]),]
-            }
-            ####keep the part only annotated in peaks.RD for peaks.RD
-            ol.anno.splited <- split(ol.anno, ol.anno[,2])
-            hasAnnoHits <- 
-                do.call(rbind, 
-                        ol.anno.splited[names(ol.anno.splited)!=
+                ol.anno <- as.data.frame(ol.anno)
+                ####keep the part only annotated in peaks.RD for peaks.RD
+                ol.anno.splited <- split(ol.anno, ol.anno[,2])
+                hasAnnoHits <- 
+                  do.call(rbind, 
+                          ol.anno.splited[names(ol.anno.splited)!=
                                             as.character(length(annotation))])
-            hasAnnoHits <- unique(hasAnnoHits[,1])
-            ol.anno <- 
-                ol.anno[!(ol.anno[,2]==length(annotation) & 
+                hasAnnoHits <- unique(hasAnnoHits[,1])
+                ol.anno <- 
+                  ol.anno[!(ol.anno[,2]==length(annotation) & 
                               (ol.anno[,1] %in% hasAnnoHits)), ]    
-            if(!is.null(precedence)){
-                ol.anno <- ol.anno[!duplicated(ol.anno[,1]), ]
-            }
-            ##calculate percentage
-            if(nucleotideLevel){
-                queryHits <- newAnno[ol.anno[,1]]
-                totalLen <- sum(width(queryHits[!duplicated(queryHits)]))
-                ##mcols(queryHits)$subjectHits <- anno.names[ol.anno[,2]]
-                queryHits.list <- split(queryHits, anno.names[ol.anno[,2]])
-                lens <- unlist(lapply(queryHits.list, function(.ele) 
-                    sum(width(.ele))))
-                percentage <- 100 * lens/totalLen
-            }else{
+                if(!is.null(precedence)){
+                  ol.anno <- ol.anno[!duplicated(ol.anno[,1]), ]
+                }
+                ##calculate percentage
                 subjectHits <-anno.names[ol.anno[,2]]
                 counts <- table(subjectHits)
                 percentage <- 100 * counts / length(peaks.RD)
