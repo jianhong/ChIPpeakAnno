@@ -120,7 +120,7 @@ assignChromosomeRegion <-
                 newAnno.disjoin$source <- newAnno[revmap[, "from"]]$source
               }else{
                 revmap <- unlist(newAnno.disjoin$revmap)
-                newAnno.disjoin <- rep(newAnno.disjoin, lengths(newAnno.disjoin))
+                newAnno.disjoin <- rep(newAnno.disjoin, lengths(newAnno.disjoin$revmap))
                 newAnno.disjoin$source <- newAnno[revmap]$source
               }
               ol.anno <- findOverlaps(peaks.RD, newAnno.disjoin, ignore.strand=ignore.strand)
