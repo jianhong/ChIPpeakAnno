@@ -100,7 +100,7 @@ annoScore <- function(queryHits, subjectHits){
     stopifnot(length(queryHits)==length(subjectHits))
     ## jaccard index of two range
     intersection <- pintersect(queryHits, subjectHits)
-    totalSize <- punion(queryHits, subjectHits, fill.gap=TRUE)
+    totalSize <- punion(queryHits, subjectHits, fill.gap=TRUE, ignore.strand=TRUE)
     JaccardIndex <- width(intersection)/width(totalSize)
     JaccardIndex
 }
