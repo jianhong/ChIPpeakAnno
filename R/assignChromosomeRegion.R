@@ -117,12 +117,12 @@ assignChromosomeRegion <-
                 newAnno.disjoin$source <- newAnno[revmap]$source
               }
               ol.anno <- findOverlaps(peaks.RD, newAnno.disjoin, ignore.strand=ignore.strand)
-              queryHits <- newAnno.disjoin[subjectHits(ol.anno)]
+              queryHits <- peaks.RD[queryHits(ol.anno)]
+              subjectHits <- newAnno.disjoin[subjectHits(ol.anno)]
               totalLen <- sum(as.numeric(width(peaks.RD)))
-              ##mcols(queryHits)$subjectHits <- anno.names[ol.anno[,2]]
-              queryHits.list <- split(queryHits, queryHits$source)
+              queryHits.list <- split(queryHits, subjectHits$source)
               lens <- unlist(lapply(queryHits.list, function(.ele) 
-                sum(as.numeric(width(.ele)))))
+                sum(as.numeric(width(unique(.ele))))))
               percentage <- 100 * lens/totalLen
             }else{
                 ##calculate Jaccard index

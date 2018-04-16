@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.13.17
+CHANGES IN VERSION 3.13.19
+-------------------------
+
+    o Fix the bug in assignChromosomeRegion for the percentage calculation when nucleotideLevel equal to true.
+    
+CHANGES IN VERSION 3.13.18
 -------------------------
 
     o Fix the bug in assignChromosomeRegion for resetting seqlevels.
