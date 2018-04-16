@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.13.17
 -------------------------
 
+    o Fix the bug in assignChromosomeRegion for resetting seqlevels.
+    
+CHANGES IN VERSION 3.13.17
+-------------------------
+
     o Fix the bug in annoScore by setting the ignore.strand for punion.
     
 CHANGES IN VERSION 3.13.16

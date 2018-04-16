@@ -56,13 +56,6 @@ assignChromosomeRegion <-
                 c("Exons", "Introns", "fiveUTRs", "threeUTRs", 
                   "Promoters", "immediateDownstream")
             ###clear seqnames, the format should be chr+NUM
-            formatSeqnames <- function(gr) {
-                seqlevels(gr)[grepl("^(\\d+|MT|M|X|Y)$", seqlevels(gr))] <-
-                    paste("chr", seqlevels(gr)[grepl("^(\\d+|MT|M|X|Y)$", 
-                                                     seqlevels(gr))], sep="")
-                seqlevels(gr)[seqlevels(gr)=="chrMT"] <- "chrM"
-                trim(gr)
-            }
             peaks.RD <- formatSeqnames(peaks.RD)
             peaks.RD <- unique(peaks.RD)
             annotation <- lapply(annotation, formatSeqnames)
@@ -85,7 +78,7 @@ assignChromosomeRegion <-
                 warning("peaks.RD has sequence levels not in TxDb.")
                 sharedlevels <- 
                     intersect(seqlevels(newAnno), seqlevels(peaks.RD))
-                peaks.RD <- keepSeqlevels(peaks.RD, sharedlevels)
+                peaks.RD <- keepSeqlevels(peaks.RD, sharedlevels, pruning.mode="coarse")
             }
             mcols(peaks.RD) <- NULL
             if(!is.null(precedence)){
