@@ -2,7 +2,7 @@ citHeader("Please cite the paper below for the ChIPpeakAnno package.")
 
 citEntry(entry="Article",
 	title="ChIPpeakAnno: a Bioconductor package to annotate ChIP-seq and ChIP-chip data",
-	author=personList(as.person("Lihua Zhu"), as.person("Claude Gazin"), as.person("Nathan Lawson"), as.person("Herve Pages"), as.person("Simon Lin"), as.person("David Lapointe"), as.person("Michael Green")),
+	author=personList(as.person("Lihua Zhu"), as.person("Claude Gazin"), as.person("Nathan Lawson"), as.person("Hervé Pagès"), as.person("Simon Lin"), as.person("David Lapointe"), as.person("Michael Green")),
 	journal="BMC Bioinformatics",
 	volume=11,
 	year=2010,
