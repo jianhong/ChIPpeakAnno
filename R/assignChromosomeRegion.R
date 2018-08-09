@@ -131,7 +131,9 @@ assignChromosomeRegion <-
                 jaccardIndex <- unlist(lapply(anno.names, function(.name){
                     union <- length(annotation[[.name]]) + 
                         length(peaks.RD) - 
-                        length(ol.anno.splited[[.name]])
+                        length(unique(subjectHits(findOverlaps(peaks.RD, 
+                                                               annotation[[.name]], 
+                                                               ignore.strand=ignore.strand))))
                     intersection <- length(ol.anno.splited[[.name]])
                     intersection/union
                 }))

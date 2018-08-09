@@ -21,7 +21,7 @@ importFrom(RBGL,
 importFrom(AnnotationDbi, dbconn, select)
 importFrom(DBI, dbGetQuery)
 importFrom(regioneR, permTest, numOverlaps)
-importFrom(BiocInstaller, biocLite)
+importFrom(BiocManager, install)
 import(IRanges)
 import(Biostrings)
 import(BSgenome)

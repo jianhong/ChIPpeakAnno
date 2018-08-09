@@ -83,6 +83,7 @@
     macs <- readLines(macs)
     macs <- textConnection(macs)
     macsOutput <- toGRanges(macs, format="MACS")
+    close(macs)
     ## bed
     toGRanges(system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno"),
                 format="BED")

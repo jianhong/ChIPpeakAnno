@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.15.1
+-------------------------
+
+    o Fix the bug in assignChromosomeRegion for the Jaccard index calculation.
+
 CHANGES IN VERSION 3.13.19
 -------------------------
 

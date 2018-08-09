@@ -44,9 +44,9 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
         is.installed <- function(orgpkg) 
             is.element(orgpkg, installed.packages()[,1])
         if(!is.installed(orgAnn)){
-            biocLite(pkgs=orgAnn, 
-                     suppressUpdates=TRUE, 
-                     suppressAutoUpdate=TRUE)
+            BiocManager::install(pkgs=orgAnn, 
+                     update=FALSE, 
+                     ask=FALSE)
         }
         if(!library(orgAnn, 
                     character.only=TRUE, 
