@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75")
+packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI")
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
@@ -15,7 +15,7 @@ option_list = list(make_option(c("-i", "--input_file_dir"), type="character", de
 );
 
 example.use <- 'Example:
-Rscript $HOME/Aimin/HomeAtCluster/Aimin_project/ChipSeqUMASS/inst/bin/Rscript/ChipSeqUMASS.r -i /Users/aiminyan/Aimin/Project/DropboxUmass/NADfinder/BedFiles -p ".bed$" -g "Mm" -o ~/Aimin/Project/DropboxUmass/NADfinder/Aimin/Output'
+Rscript $HOME/Aimin/HomeAtCluster/Project/ChipSeqUMASS/inst/bin/Rscript/ChipSeqUMASS.r -i ~/Aimin/DropboxUmass/NADfinder/BedFiles -p ".bed$" -g "Mm" -o ~/Aimin/DropboxUmass/NADfinder/Aimin/Output'
 
 opt_parser = OptionParser(option_list=option_list,epilogue=example.use);
 opt = parse_args(opt_parser);

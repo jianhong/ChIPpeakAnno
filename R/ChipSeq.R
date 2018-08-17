@@ -1,4 +1,4 @@
-#' AnnotatePeak
+#' AnnotatePeakUMASS
 #'
 #' @param input.file.dir 
 #' @param input.file.pattern 
@@ -15,10 +15,7 @@
 #' input.file.pattern="*.bed$"
 #' output.file.dir="/Users/aiminyan/Aimin/Project/DropboxUmass/NADfinder/Aimin/Output"
 #'
-#' AnnotatePeak(input.file.dir,input.file.pattern,8,output.file.dir,genome="Mm")
-#' AnnotatePeak(input.file.dir,input.file.pattern,7,output.file.dir,genome="Hs")
-#' 
-#' 
+#' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
 AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,genome) {
   
@@ -39,6 +36,13 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     #colnames(re)=c("Count","GeneName")
     re
   })
+  
+  re.out.L<-lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
+    
+    if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+    
+    x=re.out[[u]]
+    x_name=names(re.out)[u]
   
   if(genome=="Mm"){
     
@@ -72,13 +76,26 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     #library(GenomeInfoDb)
     #seqlevelsStyle(overlaps.trimmed) <- seqlevelsStyle(dd.GRCm39.mm10)
     
-    overlaps.trimmed<-trim(re.out[[1]],use.names=TRUE)
+    overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
-    annotatedPeak1 <- annotatePeakInBatch(re.out[[1]], AnnotationData=annoData)
+    annotatedPeak1 <- annotatePeakInBatch(x, AnnotationData=annoData)
     
-    if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
-    write.table(overlaps.anno,file=file.path(output.file.dir,"annotation.txt"),row.names = FALSE,quote=FALSE,sep="\t")
-    write.table(annotatedPeak1,file=file.path(output.file.dir,"annotationInBatch.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+    overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "entrez_id")
+    
+    over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
+                          maxP=0.5, minGOterm=10,
+                          multiAdjMethod="BH", condense=TRUE)
+    
+    print(over)
+    
+    write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
+  
+    pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
+    pie1(table(overlaps.anno.with.entrez.id$insideFeature))
+    dev.off()
+   
+    write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+    write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
   }else if(genome=="Hs"){
     
     library(EnsDb.Hsapiens.v75)
@@ -122,6 +139,8 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
   }
   
+    
+  },re.out,output.file.dir,genome)
 }
 
 #' AnnotatePeak2
