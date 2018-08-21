@@ -6448,13 +6448,10 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   #return(re.out)
 }
 
-#'
 #' input.bed.file <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/'Peric-Hupkes 2010 MEF LADs mm10.bed'"
 #' map.chain.file <- "~/Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
 #' hmm.file <- "/Volumes/Aimin4TB-2/Aimin_Project/Ubuntu_local/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed"
-
 #' useChromHMM(input.bed.file,map.chain.file,hmm.file,output.file.dir)
-
 useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) {
   
   output.dir <- file.path(output.file.dir,"histone_modification")
@@ -6465,13 +6462,10 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   temp2 <- tempfile()
   temp3 <- tempfile()
   
-  # write.table(peak.all,file ="~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed",col.names = F,row.names = F, sep="\t",quote = F)
   cmd0 = paste("liftOver",input.bed.file,map.chain.file,temp1,temp2)
-  #system("/home/aiminyan/kentUtils/bin/linux.x86_64/liftOver /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed ~/Downloads/mm10ToMm9.over.chain.gz /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_in_unMapped.bed")
   system(cmd0)
 
-  #peak.all.in.mm9 <- read.table(file ="/home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed")
-  
+
   peak.all.in.mm9 <- read.table(file = temp1)
   
   peak.all.in.mm9 <- peak.all.in.mm9[,1:3]
@@ -6480,66 +6474,7 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   
   cmd1 = paste("bedtools intersect -a",hmm.file,"-b",temp1,">",temp3)
   system(cmd1)  
-  #system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
-  
-  
-  #
-  #   mkdir ~/Dropbox/Test_chromhmm
-  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/download_chromhmm_data.sh ~/Dropbox/Test_chromhmm
-  #
-  #   cd ~/Dropbox/Test_chromhmm
-  #   java -mx1200M -jar /home/aiminyan/miniconda3/share/chromhmm-1.14-/ChromHMM.jar LearnModel SAMPLEDATA_HG18 OUTPUTSAMPLE 10 hg18
-  #   ls -lrth OUTPUTSAMPLE/
-  #     total 4.9M
-  #   -rw-rw-r-- 1 aiminyan aiminyan 1.9K Mar 23 14:52 transitions_10.txt
-  #   -rw-rw-r-- 1 aiminyan aiminyan 2.2K Mar 23 14:52 emissions_10.txt
-  #   -rw-rw-r-- 1 aiminyan aiminyan  70K Mar 23 14:52 emissions_10.svg
-  #   -rw-rw-r-- 1 aiminyan aiminyan  13K Mar 23 14:52 emissions_10.png
-  #   -rw-rw-r-- 1 aiminyan aiminyan  12K Mar 23 14:52 transitions_10.png
-  #   -rw-rw-r-- 1 aiminyan aiminyan  53K Mar 23 14:52 transitions_10.svg
-  #   -rw-rw-r-- 1 aiminyan aiminyan  14K Mar 23 14:52 model_10.txt
-  #   -rw-rw-r-- 1 aiminyan aiminyan 681K Mar 23 14:52 K562_10_segments.bed
-  #   -rw-rw-r-- 1 aiminyan aiminyan 599K Mar 23 14:52 GM12878_10_segments.bed
-  #   -rw-rw-r-- 1 aiminyan aiminyan 1.3M Mar 23 14:52 GM12878_10_dense.bed
-  #   -rw-rw-r-- 1 aiminyan aiminyan 304K Mar 23 14:52 GM12878_10_expanded.bed
-  #   -rw-rw-r-- 1 aiminyan aiminyan 1.5M Mar 23 14:52 K562_10_dense.bed
-  #   -rw-rw-r-- 1 aiminyan aiminyan 1.5K Mar 23 14:52 webpage_10.html
-  #   -rw-rw-r-- 1 aiminyan aiminyan 343K Mar 23 14:52 K562_10_expanded.bed
-  #
-  #   cd ~/enhancer-snakemake-demo/
-  #
-  #   snakemake -npr
-  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/COORDS/mm9/RefSeqTSS.mm9.bed.gz compare/links/RefSeqTSS.mm9.bed.gz
-  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/COORDS/mm9/RefSeqTES.mm9.bed.gz compare/links/RefSeqTES.mm9.bed.gz
-  #   Building DAG of jobs...
-  #   MissingInputException in line 73 of /home/aiminyan/enhancer-snakemake-demo/Snakefile:
-  #     Missing input files for rule to_compare:
-  #     compare/links/RefSeqTES.mm9.bed.gz
-  #   compare/links/RefSeqTSS.mm9.bed.gz
-  #
-  #   ln -sfn ~/Dropbox/Test_chromhmm/COORDS/mm9/RefSeqTSS.mm9.bed.gz RefSeqTSS.mm9.bed.gz
-  #   ln -sfn ~/Dropbox/Test_chromhmm/COORDS/mm9/RefSeqTES.mm9.bed.gz RefSeqTES.mm9.bed.gz
-  #
-  #
-  #
-  #   sort -k 1,1 -k2,2n /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments.bed > /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed
-  #
-  #   sort -k 1,1 -k2,2n /H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll.bed > /H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed
-  #
-  #   bedtools fisher -a /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed -g mm9
-  #
-  #   bedtools fisher -a ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed -b /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed -g mm9
-  #
-  #   system("intersectBed -a /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
-  
-  #  system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
-  
-  #system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
-  
-  #peakAll.anno <- read.table("~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
-  
-  #peakAll.anno <- read.table("~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
-  
+
   peakAll.anno <- read.table(temp3)
   
   head(peakAll.anno)
@@ -6632,19 +6567,6 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
     theme(plot.title=element_text(hjust=0.5),
           legend.title = element_text(hjust = 0.5,face="bold",size=10))
   dev.off()
-  
-  # ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
-  #   geom_bar(width = 1,stat="identity") +
-  #   scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
-  #   labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
-  #   geom_text(aes(x=c(1.2,1.2,1,1.2,1.3,1.2),y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
-  #   theme(plot.title=element_text(hjust=0.5),
-  #         legend.title = element_text(hjust = 0.5,face="bold",size=10))+ theme(axis.ticks = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), panel.background= element_blank())
-  # 
-  # +  theme_bw()
-  # + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-  #                             panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
-  
   
 }
 
