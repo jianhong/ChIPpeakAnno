@@ -22,10 +22,8 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   re.out<-lapply(file.name.4,function(u){
     
-    if(length(grep("header",u)) ==1){
-    peaks=read.table(u,skip=1)
-    }else if(length(grep("Peric",u)) ==1){
-    peaks=read.table(u)
+    if(length(grep("Peric",u)) ==1){
+      peaks=read.table(u)
     }else{
       peaks=read.table(u,skip=1)
     }
@@ -34,9 +32,12 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     peaks
   })
   
-  names(re.out) <- gsub(" ","-",basename(file.name.4))
-  head(re.out[[1]])
+  names(re.out) <- gsub(" ","-",tools::file_path_sans_ext(basename(file.name.4)))
+  
   ol <- findOverlapsOfPeaks(re.out[c(1,3)])
+  
+  peak.in.ciLAD <- ol$uniquePeaks[grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
+  peak.in.MEF_LAD <- ol$uniquePeaks[-grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   
   pdf(file.path(output.file.dir,paste0("ciLAD-vs-","MEF_LAD","_peak_overlap.pdf")))  
   ol.by.min <- makeVennDiagram(re.out[c(1,3)], NameOfPeaks=c("ciLAD","MEF_LAD"),
@@ -6447,6 +6448,195 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   #return(re.out)
 }
 
+
+#' input.bed.file <- 
+#' map.chain.file <- "~Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
+#' hmm.file <- "/Volumes/Aimin4TB-2/Aimin_Project/Ubuntu_local/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed"
+#' output.file.dir <-  
+#' useChromHMM(input.bed.file,map.chain.file,hmm.file,output.file.dir)
+
+useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) {
+  
+  output.dir <- file.path(output.file.dir,"histone_modification")
+  
+  if (!dir.exists(output.dir)){dir.create(output.dir, recursive = TRUE)}
+  
+  # write.table(peak.all,file ="~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed",col.names = F,row.names = F, sep="\t",quote = F)
+  cmd0 = paste("liftOver",input.bed.file,map.chain.file,temp1,temp2)
+  #system("/home/aiminyan/kentUtils/bin/linux.x86_64/liftOver /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed ~/Downloads/mm10ToMm9.over.chain.gz /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_in_unMapped.bed")
+  system(cmd0)
+
+  peak.all.in.mm9 <- read.table(file ="/home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed")
+  
+  colnames(peak.all.in.mm9) <- colnames(peak.all)
+  
+  cmd1 = paste("intersecBed -a",hmm.file,"-b",temp1,">",temp3)
+  system(cmd1)  
+  #system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
+  
+  
+  #
+  #   mkdir ~/Dropbox/Test_chromhmm
+  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/download_chromhmm_data.sh ~/Dropbox/Test_chromhmm
+  #
+  #   cd ~/Dropbox/Test_chromhmm
+  #   java -mx1200M -jar /home/aiminyan/miniconda3/share/chromhmm-1.14-/ChromHMM.jar LearnModel SAMPLEDATA_HG18 OUTPUTSAMPLE 10 hg18
+  #   ls -lrth OUTPUTSAMPLE/
+  #     total 4.9M
+  #   -rw-rw-r-- 1 aiminyan aiminyan 1.9K Mar 23 14:52 transitions_10.txt
+  #   -rw-rw-r-- 1 aiminyan aiminyan 2.2K Mar 23 14:52 emissions_10.txt
+  #   -rw-rw-r-- 1 aiminyan aiminyan  70K Mar 23 14:52 emissions_10.svg
+  #   -rw-rw-r-- 1 aiminyan aiminyan  13K Mar 23 14:52 emissions_10.png
+  #   -rw-rw-r-- 1 aiminyan aiminyan  12K Mar 23 14:52 transitions_10.png
+  #   -rw-rw-r-- 1 aiminyan aiminyan  53K Mar 23 14:52 transitions_10.svg
+  #   -rw-rw-r-- 1 aiminyan aiminyan  14K Mar 23 14:52 model_10.txt
+  #   -rw-rw-r-- 1 aiminyan aiminyan 681K Mar 23 14:52 K562_10_segments.bed
+  #   -rw-rw-r-- 1 aiminyan aiminyan 599K Mar 23 14:52 GM12878_10_segments.bed
+  #   -rw-rw-r-- 1 aiminyan aiminyan 1.3M Mar 23 14:52 GM12878_10_dense.bed
+  #   -rw-rw-r-- 1 aiminyan aiminyan 304K Mar 23 14:52 GM12878_10_expanded.bed
+  #   -rw-rw-r-- 1 aiminyan aiminyan 1.5M Mar 23 14:52 K562_10_dense.bed
+  #   -rw-rw-r-- 1 aiminyan aiminyan 1.5K Mar 23 14:52 webpage_10.html
+  #   -rw-rw-r-- 1 aiminyan aiminyan 343K Mar 23 14:52 K562_10_expanded.bed
+  #
+  #   cd ~/enhancer-snakemake-demo/
+  #
+  #   snakemake -npr
+  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/COORDS/mm9/RefSeqTSS.mm9.bed.gz compare/links/RefSeqTSS.mm9.bed.gz
+  #   /home/aiminyan/miniconda3/share/chromhmm-1.14-/COORDS/mm9/RefSeqTES.mm9.bed.gz compare/links/RefSeqTES.mm9.bed.gz
+  #   Building DAG of jobs...
+  #   MissingInputException in line 73 of /home/aiminyan/enhancer-snakemake-demo/Snakefile:
+  #     Missing input files for rule to_compare:
+  #     compare/links/RefSeqTES.mm9.bed.gz
+  #   compare/links/RefSeqTSS.mm9.bed.gz
+  #
+  #   ln -sfn ~/Dropbox/Test_chromhmm/COORDS/mm9/RefSeqTSS.mm9.bed.gz RefSeqTSS.mm9.bed.gz
+  #   ln -sfn ~/Dropbox/Test_chromhmm/COORDS/mm9/RefSeqTES.mm9.bed.gz RefSeqTES.mm9.bed.gz
+  #
+  #
+  #
+  #   sort -k 1,1 -k2,2n /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments.bed > /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed
+  #
+  #   sort -k 1,1 -k2,2n /H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll.bed > /H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed
+  #
+  #   bedtools fisher -a /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed -g mm9
+  #
+  #   bedtools fisher -a ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_sorted.bed -b /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments_sorted.bed -g mm9
+  #
+  #   system("intersectBed -a /home/aiminyan/enhancer-snakemake-demo/output/5-state/embryonic-liver_5_segments.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
+  
+  #  system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
+  
+  #system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
+  
+  #peakAll.anno <- read.table("~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno.bed")
+  
+  #peakAll.anno <- read.table("~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
+  
+  peakAll.anno <- read.table(temp3)
+  
+  head(peakAll.anno)
+  
+  ID <- paste(as.character(peakAll.anno[,1]),peakAll.anno[,2],peakAll.anno[,3],sep = "_")
+  
+  peakAll.anno.2 <- cbind.data.frame(peakAll.anno,ID=ID)
+  
+  ID2 <- paste(as.character(peak.all.in.mm9[,1]),peak.all.in.mm9[,2],peak.all.in.mm9[,3],sep = "_")
+  
+  
+  peakAll.anno.3 <- cbind.data.frame(peak.all.in.mm9,ID=ID2)
+  
+  peakAll.anno.4 <- merge.data.frame(peakAll.anno.2,peakAll.anno.3,by="ID")
+  
+  getState <- function(g){
+    
+    y <- lapply(g, function(u){
+      
+      if(!is.na(str_locate(u,"_")[1])){
+        x <- str_sub(u,1,str_locate(u,"_")[1]-1)
+      }else
+      {
+        x <- u
+      }
+      x
+    })
+    
+    gg <- unlist(y)
+    
+    ggg <- gg[!is.na(gg)]
+    ggg
+    
+  }
+  
+  getAnno <- function(g){
+    
+    y <- lapply(g, function(u){
+      
+      if(!is.na(str_locate(u,"_")[1])){
+        x <- str_sub(u,str_locate(u,"_")[1]+1,str_length(u))
+      }else
+      {
+        x <- u
+      }
+      x
+    })
+    
+    gg <- unlist(y)
+    
+    ggg <- gg[!is.na(gg)]
+    ggg
+    
+  }
+  
+  state <- getState(peakAll.anno.4$V4)
+  anno <- getAnno(peakAll.anno.4$V4)
+  
+  anno.6 <- anno
+  
+  anno.6[which(anno.6 %in% c("Active_Promoter","Poised_Promoter"))] <- "Promoter"
+  
+  anno.6[which(anno.6 %in% c("Strong_Enhancer","Poised_Enhancer"))] <- "Enhancer"
+  
+  anno.6[which(anno.6 %in% c("Txn_Transition","Txn_Elongation","Weak_Txn"))] <- "Transcribed"
+  
+  peakAll.anno.5 <- cbind.data.frame(peakAll.anno.4,state=state,anno=anno,anno.6 = anno.6)
+  
+  mytable <- table(peakAll.anno.5$anno.6)
+  
+  lbls <- paste(names(mytable),mytable, sep="-")
+  pie(mytable, labels = lbls,main="Annotation")
+  
+  mytable2 <- as.data.frame(mytable)
+  colnames(mytable2)= c("Function_Annotation","counts")
+  
+  table_lables <- mytable2 %>%
+    mutate(Function_Annotation=factor(Function_Annotation,levels=Function_Annotation[length(Function_Annotation):1]),
+           cumulative=cumsum(counts),
+           midpoint= cumulative-(counts/2),
+           labels=paste0(round((counts/sum(counts))*100,2),"%"," (",counts,") "))
+  
+  ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
+    geom_bar(width = 1,stat="identity") +
+    coord_polar(theta="y",start = 0,direction = 1) +
+    scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
+    labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
+    geom_text(aes(x=1.2,y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
+    theme(plot.title=element_text(hjust=0.5),
+          legend.title = element_text(hjust = 0.5,face="bold",size=10))
+  
+  ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
+    geom_bar(width = 1,stat="identity") +
+    scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
+    labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
+    geom_text(aes(x=c(1.2,1.2,1,1.2,1.3,1.2),y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
+    theme(plot.title=element_text(hjust=0.5),
+          legend.title = element_text(hjust = 0.5,face="bold",size=10))+ theme(axis.ticks = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), panel.background= element_blank())
+  
+  # +  theme_bw()
+  # + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+  #                             panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+  
+  
+}
 
 
 
