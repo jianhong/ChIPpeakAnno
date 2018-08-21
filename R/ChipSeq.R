@@ -11,9 +11,9 @@
 #'
 #' @examples
 #' 
-#' input.file.dir='/Users/aiminyan/Aimin/Project/DropboxUmass/NADfinder/BedFiles'
+#' input.file.dir='/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles'
 #' input.file.pattern="*.bed$"
-#' output.file.dir="/Users/aiminyan/Aimin/Project/DropboxUmass/NADfinder/Aimin/Output"
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output"
 #'
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
@@ -22,7 +22,14 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   file.name.4 <- list.files(input.file.dir,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
   re.out<-lapply(file.name.4,function(u){
+    
+    if(length(grep("header",u)) ==1){
     peaks=read.table(u,skip=1)
+    }else if(length(grep("Peric",u)) ==1){
+    peaks=read.table(u)
+    }else{
+      peaks=read.table(u,skip=1)
+    }
     colnames(peaks)[1:3]= c("chr","start","end")
     peaks=toGRanges(peaks)
     peaks
@@ -30,17 +37,39 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   names(re.out) <- gsub(" ","-",basename(file.name.4))
   head(re.out[[1]])
+  ol <- findOverlapsOfPeaks(re.out[c(1,3)])
   
-  re.out.L<-lapply(re.out,function(u){
-    re=length(u)
-    #colnames(re)=c("Count","GeneName")
-    re
-  })
+  pdf(file.path(output.file.dir,paste0("ciLAD-vs-","MEF_LAD","_peak_overlap.pdf")))  
+  ol.by.min <- makeVennDiagram(re.out[c(1,3)], NameOfPeaks=c("ciLAD","MEF_LAD"),
+                        totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
+                        alpha = 0.50,
+                        label.col = c(rep("black",3)),
+                        cex = 2,
+                        fontfamily = "serif",
+                        fontface = "bold",
+                        cat.col = c("red","blue"),connectedPeaks = "min")
+  dev.off()
   
-  re.out.L<-lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
+  # ol.by.keepAll <- makeVennDiagram(re.out[c(1,3)], NameOfPeaks=c("ciLAD","MEF_LAD"),
+  #                       totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
+  #                       alpha = 0.50,
+  #                       label.col = c(rep("black",3)),
+  #                       cex = 2,
+  #                       fontfamily = "serif",
+  #                       fontface = "bold",
+  #                       cat.col = c("red","blue"),connectedPeaks = "keepAll")
+  
+  # re.out.L<-lapply(re.out,function(u){
+  #   re=length(u)
+  #   #colnames(re)=c("Count","GeneName")
+  #   re
+  # })
+  
+  null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     
     if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
     
+    #u=1
     x=re.out[[u]]
     x_name=names(re.out)[u]
   
@@ -78,15 +107,91 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
     overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
-    annotatedPeak1 <- annotatePeakInBatch(x, AnnotationData=annoData)
+    annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
     
-    overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "entrez_id")
+    # overlaps.anno <- annotatePeakInBatch(overlaps.trimmed, 
+    #                                      AnnotationData=annoData, 
+    #                                      output="nearestBiDirectionalPromoters",
+    #                                      bindingRegion=c(-2000, 500))
+    
+    overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
     
     over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
                           maxP=0.5, minGOterm=10,
                           multiAdjMethod="BH", condense=TRUE)
     
-    print(over)
+    # path <- getEnrichedPATH(overlaps.anno, "org.Mm.eg.db", "reactome.db", maxP=.05)
+    # head(path)
+    
+    path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
+   # head(path)
+    
+    write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+
+    convert2geneSymbol <- function(over1) {
+      
+      geneSymbol <- lapply(over1$EntrezID, function(u){
+        
+        x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
+        x
+        
+      })
+      
+      list_to_df <- function(list_for_df)
+      {
+        list_for_df <- as.list(list_for_df)
+        
+        nm <- names(list_for_df)
+        if (is.null(nm)) 
+          nm <- seq_along(list_for_df)
+        
+        df <- data.frame(name = nm, stringsAsFactors = FALSE)
+        df$value <- unname(list_for_df)
+        df
+      }
+      
+      geneSymbol3 <- list_to_df(geneSymbol)
+      
+      over2 <- cbind(over1,geneSymbol3)
+      over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+      colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+      over3
+    }
+    
+    over$bp <- convert2geneSymbol(over$bp)
+    over$mf <- convert2geneSymbol(over$mf)
+    over$cc <- convert2geneSymbol(over$cc)
+    
+    over_bp <- as_tibble(over$bp)
+    over_mf <- as_tibble(over$mf)
+    over_cc <- as_tibble(over$cc)
+    
+    over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+    over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+    over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+    
+    writeTibble <- function(tibble.input, output.file.name = tempfile())
+    {
+      if (!dir.exists(dirname(output.file.name)))
+      {
+        dir.create(dirname(output.file.name), recursive = TRUE)
+      }
+      flatten_list = function(x)
+      {
+        if (typeof(x) != "list")
+        {
+          return(x)
+        }
+        sapply(x, function(y) paste(y, collapse = " ; "))
+      }
+      tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+    }
+    
+    writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+    writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+    writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+    
+    #print(over)
     
     write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
   
