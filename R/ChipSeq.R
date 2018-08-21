@@ -6448,11 +6448,11 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   #return(re.out)
 }
 
-
-#' input.bed.file <- 
-#' map.chain.file <- "~Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
+#'
+#' input.bed.file <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/'Peric-Hupkes 2010 MEF LADs mm10.bed'"
+#' map.chain.file <- "~/Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
 #' hmm.file <- "/Volumes/Aimin4TB-2/Aimin_Project/Ubuntu_local/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed"
-#' output.file.dir <-  
+
 #' useChromHMM(input.bed.file,map.chain.file,hmm.file,output.file.dir)
 
 useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) {
@@ -6461,16 +6461,24 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   
   if (!dir.exists(output.dir)){dir.create(output.dir, recursive = TRUE)}
   
+  temp1 <- tempfile()
+  temp2 <- tempfile()
+  temp3 <- tempfile()
+  
   # write.table(peak.all,file ="~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed",col.names = F,row.names = F, sep="\t",quote = F)
   cmd0 = paste("liftOver",input.bed.file,map.chain.file,temp1,temp2)
   #system("/home/aiminyan/kentUtils/bin/linux.x86_64/liftOver /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2.bed ~/Downloads/mm10ToMm9.over.chain.gz /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_in_unMapped.bed")
   system(cmd0)
 
-  peak.all.in.mm9 <- read.table(file ="/home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed")
+  #peak.all.in.mm9 <- read.table(file ="/home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed")
   
-  colnames(peak.all.in.mm9) <- colnames(peak.all)
+  peak.all.in.mm9 <- read.table(file = temp1)
   
-  cmd1 = paste("intersecBed -a",hmm.file,"-b",temp1,">",temp3)
+  peak.all.in.mm9 <- peak.all.in.mm9[,1:3]
+  
+  colnames(peak.all.in.mm9) <- c("chr","start","end")
+  
+  cmd1 = paste("bedtools intersect -a",hmm.file,"-b",temp1,">",temp3)
   system(cmd1)  
   #system("intersectBed -a /home/aiminyan/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed -b /home/aiminyan/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_2_in_mm9.bed > ~/H_driver/Aimin_project/ATAC-Seq/CountUseAllPeaks/peakAll_anno_in_mm9.bed")
   
@@ -6614,6 +6622,7 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
            midpoint= cumulative-(counts/2),
            labels=paste0(round((counts/sum(counts))*100,2),"%"," (",counts,") "))
   
+  pdf(file.path(output.dir,"annotation.pdf"))
   ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
     geom_bar(width = 1,stat="identity") +
     coord_polar(theta="y",start = 0,direction = 1) +
@@ -6622,15 +6631,16 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
     geom_text(aes(x=1.2,y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
     theme(plot.title=element_text(hjust=0.5),
           legend.title = element_text(hjust = 0.5,face="bold",size=10))
+  dev.off()
   
-  ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
-    geom_bar(width = 1,stat="identity") +
-    scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
-    labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
-    geom_text(aes(x=c(1.2,1.2,1,1.2,1.3,1.2),y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
-    theme(plot.title=element_text(hjust=0.5),
-          legend.title = element_text(hjust = 0.5,face="bold",size=10))+ theme(axis.ticks = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), panel.background= element_blank())
-  
+  # ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
+  #   geom_bar(width = 1,stat="identity") +
+  #   scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
+  #   labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
+  #   geom_text(aes(x=c(1.2,1.2,1,1.2,1.3,1.2),y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
+  #   theme(plot.title=element_text(hjust=0.5),
+  #         legend.title = element_text(hjust = 0.5,face="bold",size=10))+ theme(axis.ticks = element_blank(), panel.grid.minor = element_blank(), panel.grid.major = element_blank(), panel.background= element_blank())
+  # 
   # +  theme_bw()
   # + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
   #                             panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
