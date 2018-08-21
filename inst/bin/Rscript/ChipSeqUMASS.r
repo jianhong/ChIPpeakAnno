@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI","tidyverse","annotate",
-              "reactome.db")
+              "reactome.db","dplyr")
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
