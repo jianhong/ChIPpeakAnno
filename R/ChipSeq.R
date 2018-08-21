@@ -2,7 +2,6 @@
 #'
 #' @param input.file.dir 
 #' @param input.file.pattern 
-#' @param index.file 
 #' @param output.file.dir 
 #' @param genome 
 #'
@@ -50,26 +49,10 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                         cat.col = c("red","blue"),connectedPeaks = "min")
   dev.off()
   
-  # ol.by.keepAll <- makeVennDiagram(re.out[c(1,3)], NameOfPeaks=c("ciLAD","MEF_LAD"),
-  #                       totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
-  #                       alpha = 0.50,
-  #                       label.col = c(rep("black",3)),
-  #                       cex = 2,
-  #                       fontfamily = "serif",
-  #                       fontface = "bold",
-  #                       cat.col = c("red","blue"),connectedPeaks = "keepAll")
-  
-  # re.out.L<-lapply(re.out,function(u){
-  #   re=length(u)
-  #   #colnames(re)=c("Count","GeneName")
-  #   re
-  # })
-  
   null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     
     if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
     
-    #u=1
     x=re.out[[u]]
     x_name=names(re.out)[u]
   
@@ -77,42 +60,11 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
     annoData <- toGRanges(EnsDb.Mmusculus.v75, feature="gene")
     
-    #ol <- findOverlapsOfPeaks(re.out[[1]],re.out[[2]])
-    
-    #overlaps<-ol$peaklist$`11_2470IUPUI_WT_BM_SMC1_peaks.bed///13_2470IUPUI_WT_BM_Rad21_peaks.bed///10_WT_BM_ASXL1_peaks.bed`
-    
-    #binOverFeature(overlaps, annotationData=annoData,
-    #               radius=5000, nbins=20, FUN=length, errFun=0,
-    #               ylab="count",
-    #               main="Distribution of aggregated peak numbers around TSS")
-    
-    #overlaps.trimmed<-trim(overlaps, use.names=TRUE)
-    
-    #library(EnsDb.Mmusculus.v79)
     dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
-    #seqinfo(dd.GRCm39.mm10)
-    #seqlevels(dd.GRCm39.mm10)
-    
-    # seqlevels(dd.GRCm39.mm10,force=TRUE) <- c("chr1","chr10","chr11","chr12","chr13",
-    #                                           "chr14","chr15","chr16","chr17","chr18","chr19","chr2",
-    #                                           "chr3","chr4","chr5","chr6","chr7","chr8","chr9","chrX","chrY")
-    
-    #seqinfo(overlaps)<-seqinfo(dd.GRCm39.mm10)
-    #GRCm38/mm10
-    #dd<-toGRanges(EnsDb.Mmusculus.v79)
-    #seqinfo(dd)
-    #library(ensembldb)
-    #library(GenomeInfoDb)
-    #seqlevelsStyle(overlaps.trimmed) <- seqlevelsStyle(dd.GRCm39.mm10)
-    
+
     overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
     annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
-    
-    # overlaps.anno <- annotatePeakInBatch(overlaps.trimmed, 
-    #                                      AnnotationData=annoData, 
-    #                                      output="nearestBiDirectionalPromoters",
-    #                                      bindingRegion=c(-2000, 500))
     
     overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
     
@@ -120,11 +72,8 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                           maxP=0.5, minGOterm=10,
                           multiAdjMethod="BH", condense=TRUE)
     
-    # path <- getEnrichedPATH(overlaps.anno, "org.Mm.eg.db", "reactome.db", maxP=.05)
-    # head(path)
     
     path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
-   # head(path)
     
     write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
 
@@ -191,8 +140,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
     writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
     
-    #print(over)
-    
     write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
   
     pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
@@ -244,7 +191,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
   }
   
-    
   },re.out,output.file.dir,genome)
 }
 
