@@ -13,10 +13,14 @@
 #' input.file.dir='/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles'
 #' input.file.pattern="*.bed$"
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output"
+#' 
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded"
 #'
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
 AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,genome) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
   file.name.4 <- list.files(input.file.dir,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
@@ -34,7 +38,42 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   names(re.out) <- gsub(" ","-",tools::file_path_sans_ext(basename(file.name.4)))
   
+  pat1 <- "ciLAD"
+  pat2 <- "nonXL_MEF"
+  pat3 <- "XL_MEF"
+  
+  index.pat1 <- grep(paste("^",pat1, sep=""), names(re.out))
+  index.pat2 <- grep(paste("^",pat2, sep=""), names(re.out))
+  index.pat3 <- grep(paste("^",pat3, sep=""), names(re.out))
+  
   ol <- findOverlapsOfPeaks(re.out[c(1,3)])
+ 
+  makeNewListAndVenn <- function(re.out, index.pat1, index.pat2, output.file.dir, pat1, pat2) {
+    
+    pdf(file.path(output.file.dir,paste0(pat1,"-vs-",pat2,"_peak_overlap.pdf")))
+    ol.by.min <- makeVennDiagram(re.out[c(index.pat1,index.pat3)], NameOfPeaks=c(pat1,pat3),
+                                 totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
+                                 alpha = 0.50,
+                                 label.col = c(rep("black",3)),
+                                 cex = 2,
+                                 fontfamily = "serif",
+                                 fontface = "bold",
+                                 cat.col = c("red","blue"),connectedPeaks = "min")
+    dev.off()
+    
+    ol.ciLAD.nonXL <- findOverlapsOfPeaks(re.out[c(index.pat1,index.pat2)])
+    
+    addOverLapPeak2List <- function(ol.ciLAD.nonXL, re.out) {
+      overlapName <- gsub("///","-overlap-",names(ol.ciLAD.nonXL$peaklist)[3])
+      re.out[[overlapName]] <- ol.ciLAD.nonXL$peaklist[[3]]
+      re.out
+    }
+    
+    re.out <- addOverLapPeak2List(ol.ciLAD.nonXL, re.out)
+    re.out
+  }
+  
+  
   
   peak.in.ciLAD <- ol$uniquePeaks[grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   peak.in.MEF_LAD <- ol$uniquePeaks[-grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
@@ -49,6 +88,13 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                         fontface = "bold",
                         cat.col = c("red","blue"),connectedPeaks = "min")
   dev.off()
+  
+  
+  
+  
+  re.out1 <- makeNewListAndVenn(re.out, index.pat1, index.pat2, output.file.dir, pat1, pat2)
+  re.out <- makeNewListAndVenn(re.out1, index.pat1, index.pat3, output.file.dir, pat1, pat3)
+  
   
   null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     
@@ -6452,6 +6498,7 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
 #' map.chain.file <- "~/Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
 #' hmm.file <- "/Volumes/Aimin4TB-2/Aimin_Project/Ubuntu_local/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed"
 #' useChromHMM(input.bed.file,map.chain.file,hmm.file,output.file.dir)
+
 useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) {
   
   output.dir <- file.path(output.file.dir,"histone_modification")
@@ -6465,9 +6512,7 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   cmd0 = paste("liftOver",input.bed.file,map.chain.file,temp1,temp2)
   system(cmd0)
 
-
   peak.all.in.mm9 <- read.table(file = temp1)
-  
   peak.all.in.mm9 <- peak.all.in.mm9[,1:3]
   
   colnames(peak.all.in.mm9) <- c("chr","start","end")
@@ -6484,7 +6529,6 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   peakAll.anno.2 <- cbind.data.frame(peakAll.anno,ID=ID)
   
   ID2 <- paste(as.character(peak.all.in.mm9[,1]),peak.all.in.mm9[,2],peak.all.in.mm9[,3],sep = "_")
-  
   
   peakAll.anno.3 <- cbind.data.frame(peak.all.in.mm9,ID=ID2)
   
@@ -6569,6 +6613,3 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   dev.off()
   
 }
-
-
-
