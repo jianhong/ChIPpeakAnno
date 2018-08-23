@@ -16,6 +16,10 @@
 #' 
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded"
 #'
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded2"
+#' 
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results"
+#' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
 AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,genome) {
@@ -51,7 +55,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   makeNewListAndVenn <- function(re.out, index.pat1, index.pat2, output.file.dir, pat1, pat2) {
     
     pdf(file.path(output.file.dir,paste0(pat1,"-vs-",pat2,"_peak_overlap.pdf")))
-    ol.by.min <- makeVennDiagram(re.out[c(index.pat1,index.pat3)], NameOfPeaks=c(pat1,pat3),
+    ol.by.min <- makeVennDiagram(re.out[c(index.pat1,index.pat2)], NameOfPeaks=c(pat1,pat2),
                                  totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
                                  alpha = 0.50,
                                  label.col = c(rep("black",3)),
@@ -73,8 +77,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     re.out
   }
   
-  
-  
   peak.in.ciLAD <- ol$uniquePeaks[grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   peak.in.MEF_LAD <- ol$uniquePeaks[-grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   
@@ -88,14 +90,11 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                         fontface = "bold",
                         cat.col = c("red","blue"),connectedPeaks = "min")
   dev.off()
-  
-  
-  
-  
+
   re.out1 <- makeNewListAndVenn(re.out, index.pat1, index.pat2, output.file.dir, pat1, pat2)
   re.out <- makeNewListAndVenn(re.out1, index.pat1, index.pat3, output.file.dir, pat1, pat3)
   
-  
+ # genome = "Mm"
   null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     
     if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -111,90 +110,93 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
 
     overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
-    annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
-    
-    overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
-    
-    over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
-                          maxP=0.5, minGOterm=10,
-                          multiAdjMethod="BH", condense=TRUE)
-    
-    
-    path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
-    
-    write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
-
-    convert2geneSymbol <- function(over1) {
-      
-      geneSymbol <- lapply(over1$EntrezID, function(u){
-        
-        x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
-        x
-        
-      })
-      
-      list_to_df <- function(list_for_df)
-      {
-        list_for_df <- as.list(list_for_df)
-        
-        nm <- names(list_for_df)
-        if (is.null(nm)) 
-          nm <- seq_along(list_for_df)
-        
-        df <- data.frame(name = nm, stringsAsFactors = FALSE)
-        df$value <- unname(list_for_df)
-        df
-      }
-      
-      geneSymbol3 <- list_to_df(geneSymbol)
-      
-      over2 <- cbind(over1,geneSymbol3)
-      over3 <- over2[,-which(colnames(over2) %in% c("name"))]
-      colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
-      over3
-    }
-    
-    over$bp <- convert2geneSymbol(over$bp)
-    over$mf <- convert2geneSymbol(over$mf)
-    over$cc <- convert2geneSymbol(over$cc)
-    
-    over_bp <- as_tibble(over$bp)
-    over_mf <- as_tibble(over$mf)
-    over_cc <- as_tibble(over$cc)
-    
-    over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
-    over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
-    over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
-    
-    writeTibble <- function(tibble.input, output.file.name = tempfile())
-    {
-      if (!dir.exists(dirname(output.file.name)))
-      {
-        dir.create(dirname(output.file.name), recursive = TRUE)
-      }
-      flatten_list = function(x)
-      {
-        if (typeof(x) != "list")
-        {
-          return(x)
-        }
-        sapply(x, function(y) paste(y, collapse = " ; "))
-      }
-      tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
-    }
-    
-    writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
-    writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
-    writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
-    
-    write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
-  
-    pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
-    pie1(table(overlaps.anno.with.entrez.id$insideFeature))
-    dev.off()
-   
     write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
-    write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+    
+   # annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
+   #  overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
+  #  write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
+  #  pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
+  #  pie1(table(overlaps.anno.with.entrez.id$insideFeature))
+  #  dev.off()
+  #  write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+    
+    getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+      over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
+                            maxP=0.5, minGOterm=10,
+                            multiAdjMethod="BH", condense=TRUE)
+      
+      
+      path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
+      
+      write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+  
+      convert2geneSymbol <- function(over1) {
+        
+        geneSymbol <- lapply(over1$EntrezID, function(u){
+          
+          x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
+          x
+          
+        })
+        
+        list_to_df <- function(list_for_df)
+        {
+          list_for_df <- as.list(list_for_df)
+          
+          nm <- names(list_for_df)
+          if (is.null(nm)) 
+            nm <- seq_along(list_for_df)
+          
+          df <- data.frame(name = nm, stringsAsFactors = FALSE)
+          df$value <- unname(list_for_df)
+          df
+        }
+        
+        geneSymbol3 <- list_to_df(geneSymbol)
+        
+        over2 <- cbind(over1,geneSymbol3)
+        over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+        colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+        over3
+      }
+      
+      over$bp <- convert2geneSymbol(over$bp)
+      over$mf <- convert2geneSymbol(over$mf)
+      over$cc <- convert2geneSymbol(over$cc)
+      
+      over_bp <- as_tibble(over$bp)
+      over_mf <- as_tibble(over$mf)
+      over_cc <- as_tibble(over$cc)
+      
+      over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+      over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+      over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+      
+      writeTibble <- function(tibble.input, output.file.name = tempfile())
+      {
+        if (!dir.exists(dirname(output.file.name)))
+        {
+          dir.create(dirname(output.file.name), recursive = TRUE)
+        }
+        flatten_list = function(x)
+        {
+          if (typeof(x) != "list")
+          {
+            return(x)
+          }
+          sapply(x, function(y) paste(y, collapse = " ; "))
+        }
+        tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+      }
+      
+      writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+      writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+      writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+    }
+    
+    #getGoAndPath(overlaps.anno.with.entrez.id,output.file.dir,x_name)
+    getGoAndPath(overlaps.anno,output.file.dir,x_name)
+    
   }else if(genome=="Hs"){
     
     library(EnsDb.Hsapiens.v75)
@@ -6494,12 +6496,14 @@ getSummitSequence<-function(dir.name,input.file.pattern,genome,out.dir.name){
   #return(re.out)
 }
 
-#' input.bed.file <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/'Peric-Hupkes 2010 MEF LADs mm10.bed'"
+#' input.bed.file <- '/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles/"Peric-Hupkes 2010 MEF LADs mm10.bed"'
 #' map.chain.file <- "~/Aimin/DropboxUmass/Aimin/Project/ReferenceGenome/mm10ToMm9.over.chain"
 #' hmm.file <- "/Volumes/Aimin4TB-2/Aimin_Project/Ubuntu_local/chromatin_states_chromHMM_mm9/spleen_cStates_HMM.bed"
 #' useChromHMM(input.bed.file,map.chain.file,hmm.file,output.file.dir)
 
 useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) {
+  
+  x_name <- gsub(" ","-",tools::file_path_sans_ext(basename(input.bed.file)))
   
   output.dir <- file.path(output.file.dir,"histone_modification")
   
@@ -6601,15 +6605,20 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
            midpoint= cumulative-(counts/2),
            labels=paste0(round((counts/sum(counts))*100,2),"%"," (",counts,") "))
   
-  pdf(file.path(output.dir,"annotation.pdf"))
-  ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
+  sp1 <- ggplot(table_lables,aes(x="",y=counts,fill=Function_Annotation))+
     geom_bar(width = 1,stat="identity") +
     coord_polar(theta="y",start = 0,direction = 1) +
     scale_fill_manual(values = c("Lightblue","#AD7366","Lightgreen","Orange","Coral","Yellow"))+
-    labs(x="",y="",title="Peak functional annotations\n",fill="Function_Annotation")+
+    labs(x="",y="",title=x_name,fill="Function_Annotation")+
     geom_text(aes(x=1.2,y=midpoint,label=labels),color="black",fontface="bold",size=3.3) +
     theme(plot.title=element_text(hjust=0.5),
           legend.title = element_text(hjust = 0.5,face="bold",size=10))
-  dev.off()
+  
+  spp <- list(sp1=sp1)
+  
+  multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
+  
+  if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+  ggexport(multi.page, filename = file.path(output.dir,paste0(x_name,"_annotation.pdf")))
   
 }
