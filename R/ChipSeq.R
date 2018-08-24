@@ -12,13 +12,13 @@
 #' 
 #' input.file.dir='/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles'
 #' input.file.pattern="*.bed$"
+#' 
+#' Output:
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output"
-#' 
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded"
-#'
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded2"
-#' 
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results"
+#' 
 #' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
@@ -76,6 +76,95 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     re.out <- addOverLapPeak2List(ol.ciLAD.nonXL, re.out)
     re.out
   }
+  
+  ol.by.min <- makeVennDiagram(re.out[c(1,3)], NameOfPeaks=c("ciLAD","MEF_LAD"),
+                               totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue"),
+                               alpha = 0.50,
+                               label.col = c(rep("black",3)),
+                               cex = 2,
+                               fontfamily = "serif",
+                               fontface = "bold",
+                               cat.col = c("red","blue"),connectedPeaks = "min")
+  
+  ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)])
+  
+  orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name) {
+    chrOrder<-c(paste("chr",1:19,sep=""),"chrX","chrY")
+    
+    peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
+    
+    peakAll2 <- peakAll[order(peakAll$seqnames,peakAll$start),]
+    
+    write.table(peakAll2,file = file.path(output.file.dir,paste0(output.file.name,".bed")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
+  }
+  
+  overlap.with.ciLAD.but.XL_MEF_only_peaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[3]][,c(11:13)]
+  overlap.with.ciLAD.but.XL_MEF_only_peaks <- unique(overlap.with.ciLAD.but.XL_MEF_only_peaks)
+  overlap.with.ciLAD.but.XL_MEF_only_peaks
+  output.file.name ="overlap.with.ciLAD.but.XL_MEF_only_peaks"
+  orderPeakAndOutPut(overlap.with.ciLAD.but.XL_MEF_only_peaks,output.file.dir,output.file.name)
+    
+  overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[1]][,c(2:4)]
+  overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.XL_MEF_only_peaks)
+  output.file.name ="overlap.with.MEF_LAD.but.XL_MEF_only_peaks"
+  orderPeakAndOutPut(overlap.with.MEF_LAD.but.XL_MEF_only_peaks,output.file.dir,output.file.name)
+  
+  ol.ciLAD.non_XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,2,3)])
+
+  overlap.with.ciLAD.but.non_XL_MEF_only_peaks <- ol.ciLAD.non_XL.MEF_LAD$overlappingPeaks[[3]][,c(11:13)]
+  overlap.with.ciLAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.ciLAD.but.non_XL_MEF_only_peaks)
+  output.file.name ="overlap.with.ciLAD.but.non_XL_MEF_only_peaks"
+  orderPeakAndOutPut(overlap.with.ciLAD.but.non_XL_MEF_only_peaks,output.file.dir,output.file.name)
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- ol.ciLAD.non_XL.MEF_LAD$overlappingPeaks[[1]][,c(2:4)]
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  output.file.name ="overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks"
+  orderPeakAndOutPut(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks,output.file.dir,output.file.name)
+  
+  outPutGrange2Bed <- function(ol.ciLAD.XL.MEF_LAD,peak.index) {
+    
+    gr <- ol.ciLAD.XL.MEF_LAD$peaklist[[peak.index]]
+    
+    peakAll <- data.frame(seqnames=seqnames(gr),
+                     start=start(gr)-1,
+                     end=end(gr),
+                     names=c(rep(".", length(gr))),
+                     strands=strand(gr),peakNames=elementMetadata(gr))
+    peakAll 
+  }
+  
+  peak1 <- outPutGrange2Bed(ol.ciLAD.XL.MEF_LAD,6)
+  overlapName <- gsub("///","-overlap-",names(ol.ciLAD.XL.MEF_LAD$peaklist))[6]
+  overlapName <- gsub("<","_less_",overlapName)
+  orderPeakAndOutPut(peak1,output.file.dir,overlapName)
+  
+  peak2 <- outPutGrange2Bed(ol.ciLAD.XL.MEF_LAD,3)
+  overlapName <- gsub("///","-overlap-",names(ol.ciLAD.XL.MEF_LAD$peaklist))[3]
+  overlapName <- gsub("<","_less_",overlapName)
+  orderPeakAndOutPut(peak2,output.file.dir,overlapName)
+  
+  pdf(file.path(output.file.dir,paste0("ciLAD","-XL-","MEF_LAD","_peak_overlap.pdf")))  
+  venn.ciLAD.XL.MEF_LAD <- makeVennDiagram(re.out[c(1,4,3)], NameOfPeaks=c("ciLAD","XL","MEF_LAD"),
+                               totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue","green"),
+                               alpha = 0.50,
+                               label.col = c(rep("black",7)),
+                               cex = 2,
+                               fontfamily = "serif",
+                               fontface = "bold",
+                               cat.col = c("red","blue","green"),connectedPeaks = "min")
+  dev.off()
+  
+  
+  pdf(file.path(output.file.dir,paste0("ciLAD","-non_XL-","MEF_LAD","_peak_overlap.pdf")))  
+  venn.ciLAD.non_XL.MEF_LAD <- makeVennDiagram(re.out[c(1,2,3)], NameOfPeaks=c("ciLAD","non_XL","MEF_LAD"),
+                                           totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue","green"),
+                                           alpha = 0.50,
+                                           label.col = c(rep("black",7)),
+                                           cex = 2,
+                                           fontfamily = "serif",
+                                           fontface = "bold",
+                                           cat.col = c("red","blue","green"),connectedPeaks = "min")
+  dev.off()
   
   peak.in.ciLAD <- ol$uniquePeaks[grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   peak.in.MEF_LAD <- ol$uniquePeaks[-grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
@@ -6620,5 +6709,10 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
   
   if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
   ggexport(multi.page, filename = file.path(output.dir,paste0(x_name,"_annotation.pdf")))
-  
+}
+
+# input.file <- "~/Downloads/files.txt"
+downLoadHMMChipSeqData <- function(input.file) {
+  cmd ="xargs -n 1 curl -O -L < input.file"
+  system(cmd)
 }
