@@ -109,6 +109,38 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   output.file.name ="overlap.with.MEF_LAD.but.XL_MEF_only_peaks"
   orderPeakAndOutPut(overlap.with.MEF_LAD.but.XL_MEF_only_peaks,output.file.dir,output.file.name)
   
+  overlap.with.ciLAD.but.XL_MEF_only <- toGRanges(overlap.with.ciLAD.but.XL_MEF_only_peaks)
+  overlap.with.MEF_LAD.but.XL_MEF_only <- toGRanges(overlap.with.MEF_LAD.but.XL_MEF_only_peaks)
+  
+  ol2 <- findOverlapsOfPeaks(overlap.with.ciLAD.but.XL_MEF_only,overlap.with.MEF_LAD.but.XL_MEF_only)
+  
+  ol2.name <- str_sub(names(ol2$uniquePeaks),1,str_locate(names(ol2$uniquePeaks),"__")[,1]-1)
+  
+  overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD <- ol2$uniquePeaks[ol2.name=="overlap.with.MEF_LAD.but.XL_MEF_only",]
+  overlap.with.ciLAD.but.XL_MEF_only.exclude.MEF_LAD <- ol2$uniquePeaks[ol2.name=="overlap.with.ciLAD.but.XL_MEF_only",]
+  
+  Grange2DF <- function(overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD) {
+    
+    gr <- overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD
+    
+    peakAll <- data.frame(seqnames=seqnames(gr),
+                          start=start(gr)-1,
+                          end=end(gr),
+                          names=c(rep(".", length(gr))),
+                          strands=strand(gr),peakNames=names(gr))
+    peakAll 
+  }
+  
+  overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD.DF <- Grange2DF(overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD)
+  overlap.with.ciLAD.but.XL_MEF_only.exclude.MEF_LAD.DF <- Grange2DF(overlap.with.ciLAD.but.XL_MEF_only.exclude.MEF_LAD)
+  
+  output.file.name ="overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD_peaks"
+  orderPeakAndOutPut(overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD.DF,output.file.dir,output.file.name)
+  
+  output.file.name ="overlap.with.ciLAD.but.XL_MEF_only.exclude.MEF_LAD_peaks"
+  orderPeakAndOutPut(overlap.with.ciLAD.but.XL_MEF_only.exclude.MEF_LAD.DF,output.file.dir,output.file.name)
+  
+
   ol.ciLAD.non_XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,2,3)])
 
   overlap.with.ciLAD.but.non_XL_MEF_only_peaks <- ol.ciLAD.non_XL.MEF_LAD$overlappingPeaks[[3]][,c(11:13)]
@@ -120,6 +152,25 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
   output.file.name ="overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks"
   orderPeakAndOutPut(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks,output.file.dir,output.file.name)
+  
+  overlap.with.ciLAD.but.non_XL_MEF_only <- toGRanges(overlap.with.ciLAD.but.non_XL_MEF_only_peaks)
+  overlap.with.MEF_LAD.but.non_XL_MEF_only <- toGRanges(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  
+  ol3 <- findOverlapsOfPeaks(overlap.with.ciLAD.but.non_XL_MEF_only,overlap.with.MEF_LAD.but.non_XL_MEF_only)
+  
+  ol3.name <- str_sub(names(ol3$uniquePeaks),1,str_locate(names(ol3$uniquePeaks),"__")[,1]-1)
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only.exclude.ciLAD <- ol3$uniquePeaks[ol3.name=="overlap.with.MEF_LAD.but.non_XL_MEF_only",]
+  overlap.with.ciLAD.but.non_XL_MEF_only.exclude.MEF_LAD <- ol3$uniquePeaks[ol3.name=="overlap.with.ciLAD.but.non_XL_MEF_only",]
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only.exclude.ciLAD.DF <- Grange2DF(overlap.with.MEF_LAD.but.non_XL_MEF_only.exclude.ciLAD)
+  overlap.with.ciLAD.but.non_XL_MEF_only.exclude.MEF_LAD.DF <- Grange2DF(overlap.with.ciLAD.but.non_XL_MEF_only.exclude.MEF_LAD)
+  
+  output.file.name ="overlap.with.MEF_LAD.but.non_XL_MEF_only.exclude.ciLAD_peaks"
+  orderPeakAndOutPut(overlap.with.MEF_LAD.but.non_XL_MEF_only.exclude.ciLAD.DF,output.file.dir,output.file.name)
+  
+  output.file.name ="overlap.with.ciLAD.but.non_XL_MEF_only.exclude.MEF_LAD_peaks"
+  orderPeakAndOutPut(overlap.with.ciLAD.but.non_XL_MEF_only.exclude.MEF_LAD.DF,output.file.dir,output.file.name)
   
   outPutGrange2Bed <- function(ol.ciLAD.XL.MEF_LAD,peak.index) {
     
