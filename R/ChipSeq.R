@@ -19,6 +19,7 @@
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/OverLapPeakAdded2"
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results"
 #' 
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_5_2018"
 #' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
@@ -88,14 +89,18 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)])
   
-  orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name) {
+  orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeader= FALSE) {
     chrOrder<-c(paste("chr",1:19,sep=""),"chrX","chrY")
     
     peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
     
     peakAll2 <- peakAll[order(peakAll$seqnames,peakAll$start),]
     
+    if(outHeader == TRUE){
+    write.table(peakAll2,file = file.path(output.file.dir,paste0(output.file.name,".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+    }else{
     write.table(peakAll2,file = file.path(output.file.dir,paste0(output.file.name,".bed")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
+    }
   }
   
   overlap.with.ciLAD.but.XL_MEF_only_peaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[3]][,c(11:13)]
@@ -104,6 +109,40 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   output.file.name ="overlap.with.ciLAD.but.XL_MEF_only_peaks"
   orderPeakAndOutPut(overlap.with.ciLAD.but.XL_MEF_only_peaks,output.file.dir,output.file.name)
     
+  getOverLap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap,output.file.dir) {
+    X_name <- names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks)
+    #index_overlap <-1
+    overlappedPeaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[index_overlap]]
+    names(overlappedPeaks)
+    
+    XX_name <- gsub("///",",", X_name[index_overlap])
+  
+    XXX_name <- unlist(strsplit(XX_name,","))
+    
+    colnames(overlappedPeaks)[which(colnames(overlappedPeaks)=="peaks1")] <- XXX_name[1]
+    colnames(overlappedPeaks)[which(colnames(overlappedPeaks)=="peaks2")] <- XXX_name[2]
+    
+    overlappedPeaks <- data.frame(overlappedPeaks,overlaps=rep(0,dim(overlappedPeaks)[1]))
+    
+    overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),]$overlaps <- overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),])=="end.1")]-overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),])=="start.1")] +1
+  
+    overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),]$overlaps <- overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),])=="end")]-overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),])=="start")]+1
+    
+    overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",]$overlaps <- overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapStart"),])=="end")]-overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapStart"),])=="start.1")] +1
+    
+    overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",]$overlaps <- overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapEnd"),])=="end.1")]-overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapEnd"),])=="start")] +1
+    
+    output.file.name <- paste0(XXX_name[1],"-overlap-",XXX_name[2])
+    
+    output.file.name <- gsub("<","_", output.file.name)
+    
+    orderPeakAndOutPut(overlappedPeaks,output.file.dir,output.file.name,outHeader=T)
+  }
+  
+  getOverLap(ol.ciLAD.XL.MEF_LAD,3,output.file.dir)
+  getOverLap(ol.ciLAD.XL.MEF_LAD,2,output.file.dir)
+  getOverLap(ol.ciLAD.XL.MEF_LAD,1,output.file.dir)
+  
   overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[1]][,c(2:4)]
   overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.XL_MEF_only_peaks)
   output.file.name ="overlap.with.MEF_LAD.but.XL_MEF_only_peaks"
@@ -6766,4 +6805,35 @@ useChromHMM <- function(input.bed.file,map.chain.file,hmm.file,output.file.dir) 
 downLoadHMMChipSeqData <- function(input.file) {
   cmd ="xargs -n 1 curl -O -L < input.file"
   system(cmd)
+}
+
+#  input.file.dir <- "~/Aimin/ProjectAtCluster/umw_ingolf_bach/Aimin/MergedFq"
+#  input.file.pattern <- "*fastq$"
+#  output.file.dir <- "~/Aimin/ProjectAtCluster/umw_ingolf_bach/Aimin/MergedFq"
+#  output.file.name <- "fq4alignment.txt"
+#  
+#  readFqFiles(input.file.dir,input.file.pattern,output.file.dir,output.file.name)
+
+readFqFiles <- function(input.file.dir,input.file.pattern,output.file.dir,output.file.name) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  file.name.4 <- list.files(input.file.dir,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  x <- basename(file.name.4)
+  xx <- unique(str_sub(x,1,str_locate(x,"_R")[,1]-1))
+  
+  dfL <- lapply(xx, function(u,file.name.4){
+    
+    y <- basename(file.name.4)
+    yy <- str_sub(x,1,str_locate(x,"_R")[,1]-1)
+    
+    yyy <- data.frame(sampeName=u,fq1=file.name.4[c(which(u==yy))][1],fq2=file.name.4[c(which(u==yy))][2])
+    yyy
+  
+  },file.name.4)
+  
+  DF <- do.call(rbind.data.frame,dfL)
+  
+  write.table(DF,file = file.path(output.file.dir,output.file.name),append = FALSE, quote = F, sep = ",",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
 }
