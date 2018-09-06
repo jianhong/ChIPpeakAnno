@@ -114,7 +114,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
   getOverLap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap,output.file.dir) {
     X_name <- names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks)
-    #index_overlap <-1
+    
     overlappedPeaks <- data.frame(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[index_overlap]])
     names(overlappedPeaks)
     
@@ -127,7 +127,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
     overlap.peak.region <- apply(overlappedPeaks, 1, function(u){
       
-      #tu <- t(u)
       seqnames <- u["seqnames"]
       start <- max(u["start"],u["start.1"])
       end <- min(u["end"],u["end.1"])
@@ -143,16 +142,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     overlappedPeaks <- data.frame(overlappedPeaks,overlappedBasePairs=as.numeric(as.character(overlappedPeaks$end.olp))
                                   -as.numeric(as.character(overlappedPeaks$start.olp))+1)
     
-    # overlappedPeaks <- data.frame(overlappedPeaks,overlaps=rep(0,dim(overlappedPeaks)[1]))
-    # 
-    # overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),]$overlaps <- overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),])=="end.1")]-overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "includeFeature"),])=="start.1")] +1
-    # 
-    # overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),]$overlaps <- overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),])=="end")]-overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "inside"),])=="start")]+1
-    # 
-    # overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",]$overlaps <- overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapStart"),])=="end")]-overlappedPeaks[overlappedPeaks$overlapFeature == "overlapStart",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapStart"),])=="start.1")] +1
-    # 
-    # overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",]$overlaps <- overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapEnd"),])=="end.1")]-overlappedPeaks[overlappedPeaks$overlapFeature == "overlapEnd",which(colnames(overlappedPeaks[which(overlappedPeaks$overlapFeature == "overlapEnd"),])=="start")] +1
-    # 
+   
     output.file.name <- paste0(XXX_name[1],"-overlap-",XXX_name[2])
     
     output.file.name <- gsub("<","_", output.file.name)
