@@ -135,14 +135,15 @@ binOverGene <- function(cvglists, TxDb,
                                        levels = c("upstream", 
                                                   "gene", 
                                                   "downstream"))),
-                     ifelse(strand(features)=="-", -1, 1)*start(features))]
+                     start(features))]
   }else{
-    ## make sure features are sorted by 5' --> 3'
+    ## make sure features are sorted by position
     gene_id <- unique(features$gene_id)
+    features$feature_type <- "gene"
     features <- 
       features[order(as.numeric(factor(features$gene_id, 
                                        levels = gene_id)),
-                     ifelse(strand(features)=="-", -1, 1)*start(features))]
+                     start(features))]
   }
   ## split the features by seqnames and generate Views for cvglist
   seqn <- Reduce(intersect, lapply(cvglists, names))
@@ -182,7 +183,17 @@ binOverGene <- function(cvglists, TxDb,
       names(.ir) <- names(.cvg.sub)
       .cnt <- viewMeans(Views(.cvg.sub, .ir))
       .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
-      .cnt <- lapply(.cnt, do.call, what=rbind)
+      ## make sure 5'->3'
+      .cnt <- lapply(.cnt, function(x){
+        strd <- as.character(strand(features))[match(sub("^(.*?) (.*$)", "\\2", names(x)), 
+                                                    features$gene_id)]
+        x <- split(x, strd)
+        x <- lapply(x, do.call, what=rbind)
+        if("-" %in% names(x)){
+          x[["-"]] <- x[["-"]][, ncol(x[["-"]]):1, drop=FALSE]
+        }
+        do.call(rbind, x)
+      })
       lapply(.cnt, colSums)
     })
     cntByFeature <- swapList(cntByChr)

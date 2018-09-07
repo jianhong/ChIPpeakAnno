@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.15.2
+-------------------------
+
+    o fix the bug in binOverRegions and binOverGene
+
 CHANGES IN VERSION 3.15.1
 -------------------------
 

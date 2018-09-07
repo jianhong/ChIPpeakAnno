@@ -205,13 +205,13 @@ binOverRegions <- function(cvglists, TxDb,
     seqinfo(features.disjoin) <- seqinfo(features)[seqlevels(features.disjoin)]
     features <- features.disjoin
     rm(features.disjoin)
-    ## make sure features are sorted by 5' --> 3'
+    ## make sure features are sorted by pos
     features <- 
       features[order(as.numeric(factor(features$tx_name, 
                                        levels = txs)),
                      as.numeric(factor(features$feature_type,
                                        levels = feature_type[feature_type %in% unique(features$feature_type)])),
-                     ifelse(strand(features)=="-", -1, 1)*start(features))]
+                     start(features))]
     
     ## filter by minCDSLen, min5UTR, min3UTR
     filterByLen <- function(type, minlen, maxLen){
@@ -271,7 +271,17 @@ binOverRegions <- function(cvglists, TxDb,
         names(.ir) <- names(.cvg.sub)
         .cnt <- viewMeans(Views(.cvg.sub, .ir))
         .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
-        .cnt <- lapply(.cnt, do.call, what=rbind)
+        ## make sure 5'->3'
+        .cnt <- lapply(.cnt, function(x){
+          strd <- as.character(strand(features))[match(sub("^(.*?) (.*$)", "\\2", names(x)), 
+                                                       features$tx_name)]
+          x <- split(x, strd)
+          x <- lapply(x, do.call, what=rbind)
+          if("-" %in% names(x)){
+            x[["-"]] <- x[["-"]][, ncol(x[["-"]]):1, drop=FALSE]
+          }
+          do.call(rbind, x)
+        })
         lapply(.cnt, colSums)
       })
       cntByFeature <- swapList(cntByChr)
