@@ -23,6 +23,7 @@
 #' 
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_6_2018/XL"
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_6_2018/nonXL"
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_10_2018"
 #' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
@@ -148,11 +149,54 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     output.file.name <- gsub("<","_", output.file.name)
     
     orderPeakAndOutPut(overlappedPeaks,output.file.dir,output.file.name,outHeader=T)
+    overlappedPeaks
   }
   
-  getOverLap(ol.ciLAD.XL.MEF_LAD,3,output.file.dir)
+  ciLAD.XL <- getOverLap(ol.ciLAD.XL.MEF_LAD,3,output.file.dir)
   getOverLap(ol.ciLAD.XL.MEF_LAD,2,output.file.dir)
   getOverLap(ol.ciLAD.XL.MEF_LAD,1,output.file.dir)
+  
+  ciLAD.part.in.ciLAD.XL <- unique(toGRanges(ciLAD.XL[,c(2,3,4)]))
+  
+  re.out[["ciLAD.part.in.ciLAD.XL"]] <- ciLAD.part.in.ciLAD.XL
+  
+  ol.ciLAD_XL_MEFLAD <- findOverlapsOfPeaks(re.out[c(6,3)])
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- ol.ciLAD_XL_MEFLAD$overlappingPeaks[[1]][,c(2:4)]
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  dim(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  peak.in.ciLAD <- ol.ciLAD_XL_MEFLAD$uniquePeaks[grep("ciLAD.part.in.ciLAD.XL",names(ol.ciLAD_XL_MEFLAD$uniquePeaks)),]
+  length(peak.in.ciLAD)
+  
+  temp <- ciLAD.XL[,c(11,12,13)]
+  colnames(temp) <- c("seqnames","start","end")
+  XL.part.in.ciLAD.XL <- unique(toGRanges(temp))
+  
+  re.out[["XL.part.in.ciLAD.XL"]] <- XL.part.in.ciLAD.XL
+  
+  ol.ciLAD_XL_MEFLAD <- findOverlapsOfPeaks(re.out[c(5,3)])
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- ol.ciLAD_XL_MEFLAD$overlappingPeaks[[1]][,c(2:4)]
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  dim(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  
+  peak.in.ciLAD <- ol.ciLAD_XL_MEFLAD$uniquePeaks[grep("ciLAD.XL",names(ol.ciLAD_XL_MEFLAD$uniquePeaks)),]
+  length(peak.in.ciLAD)
+  
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- ol.ciLAD_XL_MEFLAD$overlappingPeaks[[1]][,c(8:10)]
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  dim(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  
+  
+  peak.in.ciLAD <- ol.ciLAD_XL_MEFLAD$uniquePeaks[grep("XL.part.in.ciLAD.XL",names(ol.ciLAD_XL_MEFLAD$uniquePeaks)),]
+  length(peak.in.ciLAD)
+  
+  peak.in.ciLAD <- unique(ol.ciLAD_XL_MEFLAD$uniquePeaks[grep("Peric-Hupkes-2010-MEF-LADs-mm10",names(ol.ciLAD_XL_MEFLAD$uniquePeaks)),])
+  length(peak.in.ciLAD)
+  
+  
+  
   
   overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[1]][,c(2:4)]
   overlap.with.MEF_LAD.but.XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.XL_MEF_only_peaks)
@@ -267,26 +311,160 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   pdf(file.path(output.file.dir,paste0("ciLAD","-XL-","MEF_LAD","_peak_overlap.pdf")))  
   venn.ciLAD.XL.MEF_LAD <- makeVennDiagram(re.out[c(1,4,3)], NameOfPeaks=c("ciLAD","XL","MEF_LAD"),
-                               totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue","green"),
+                               totalTest=5000,scaled=F,euler.d=F,by= "base",fill = c("red","blue","green"),
                                alpha = 0.50,
                                label.col = c(rep("black",7)),
                                cex = 2,
                                fontfamily = "serif",
                                fontface = "bold",
-                               cat.col = c("red","blue","green"),connectedPeaks = "min")
-  dev.off()
+                               cat.col = c("red","blue","green"))
   
   
-  pdf(file.path(output.file.dir,paste0("ciLAD","-non_XL-","MEF_LAD","_peak_overlap.pdf")))  
-  venn.ciLAD.non_XL.MEF_LAD <- makeVennDiagram(re.out[c(1,2,3)], NameOfPeaks=c("ciLAD","non_XL","MEF_LAD"),
-                                           totalTest=10000,scaled=F, euler.d=F,fill = c("red","blue","green"),
+  venn.ciLAD.XL.MEF_LAD <- makeVennDiagram(re.out[c(1,4)], NameOfPeaks=c("ciLAD","XL"),
+                                           totalTest=5000,scaled=F,euler.d=F,by= "base",fill = c("red","blue"),
+                                           alpha = 0.50,
+                                           label.col = c(rep("black",3)),
+                                           cex = 2,
+                                           fontfamily = "serif",
+                                           fontface = "bold",
+                                           cat.col = c("red","blue"))
+  
+  
+  
+  venn.ciLAD.XL.MEF_LAD <- makeVennDiagram(re.out[c(1,4,3)], NameOfPeaks=c("ciLAD","XL","MEF_LAD"),
+                                           totalTest=10000,scaled=F,euler.d=F,by= "base",fill = c("red","blue","green"),
                                            alpha = 0.50,
                                            label.col = c(rep("black",7)),
                                            cex = 2,
                                            fontfamily = "serif",
                                            fontface = "bold",
-                                           cat.col = c("red","blue","green"),connectedPeaks = "min")
+                                           cat.col = c("red","blue","green"),connectedPeaks = "keepAll")
+  
   dev.off()
+  
+          
+  pdf(file.path(output.file.dir,paste0("XL","-MEF_LAD","_peak_overlap.pdf"))) 
+  venn.XL.MEF_LAD <- makeVennDiagram(re.out[c(4,4)], NameOfPeaks=c("XL","MEF_LAD"),
+                                           totalTest=10000,scaled=F, euler.d=F,fill = c("blue","green"),
+                                           alpha = 0.50,
+                                           label.col = c(rep("black",3)),
+                                           cex = 2,
+                                           fontfamily = "serif",
+                                           fontface = "bold",
+                                           cat.col = c("blue","green"),connectedPeaks = "keepAll")
+  dev.off()
+  
+  u <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_6_2018/XL/ciLAD.mm10-bed-with-header-only-merged-in_overlap_peaks.bed"
+  
+  peaks=read.table(u)
+  colnames(peaks)[1:3]= c("chr","start","end")
+  peaks=toGRanges(peaks)
+
+  peaks
+
+  re.out[["ciLAD_XL"]] <- peaks
+  
+  ol.ciLAD_XL_MEFLAD <- findOverlapsOfPeaks(re.out[c(5,3)])
+  
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- ol.ciLAD_XL_MEFLAD$overlappingPeaks[[1]][,c(2:4)]
+  overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks <- unique(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks)
+  
+  peak.in.ciLAD <- ol.ciLAD_XL_MEFLAD$uniquePeaks[grep("ciLAD_XL",names(ol.ciLAD_XL_MEFLAD$uniquePeaks)),]
+  
+  output.file.name ="overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks"
+  orderPeakAndOutPut(overlap.with.MEF_LAD.but.non_XL_MEF_only_peaks,output.file.dir,output.file.name)
+  
+  venn.XL.MEF_LAD <- makeVennDiagram(re.out[c(5,3)], NameOfPeaks=c("MEF_LAD","ciLAD_XL"),
+                                     totalTest=10000,scaled=F, euler.d=F,fill = c("blue","green"),
+                                     alpha = 0.50,
+                                     label.col = c(rep("black",3)),
+                                     cex = 2,
+                                     fontfamily = "serif",
+                                     fontface = "bold",
+                                     cat.col = c("blue","green"),connectedPeaks = "keepAll")
+  
+  ol.ciLAD_XL <- findOverlapsOfPeaks(re.out[c(1,4)],connectedPeaks = "keepAll")
+  
+  getCount4MergedPeaks <- function(ol.ciLAD_XL) {
+    peak.name.involved.in.overlap <- ol.ciLAD_XL$mergedPeaks$peakNames
+    
+    X <- lapply(peak.name.involved.in.overlap, function(u){
+      
+      m <- length(grep("XL",u))
+      n <- length(grep("ciLAD",u))
+      p <- length(grep("MEF-LADs",u))
+      
+      x <- data.frame(XL=m,ciLAD=n,MEF_LADs=p,min_v=min(m,n,p))
+      x
+    })
+    
+    XX <- do.call(rbind.data.frame,X)
+    mergedPeakId<- paste0("mergedPeak.",seq(1,dim(XX)[1]))
+    
+    XX <- data.frame(mergedPeakId=mergedPeakId,XX)
+    XX
+  }
+  
+  XX <- getCount4MergedPeaks(ol.ciLAD_XL)
+  
+  
+  
+  num.of.overlap.peaks.in.keepAll <- sum(XX$min_v)
+
+  
+  ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
+  
+  YY <- getCount4MergedPeaks(ol.ciLAD.XL.MEF_LAD)
+  
+  ol.ciLAD.XL.MEF_LAD$mergedPeaks
+  
+  pdf(file.path(output.file.dir,paste0("ciLAD","-XL","_peak_overlap.pdf"))) 
+  venn.ciLAD.XL <- makeVennDiagram(re.out[c(1,4)], NameOfPeaks=c("ciLAD","XL"),
+                                   totalTest=10000,scaled=F,by="base", euler.d=F,fill = c("red","blue"),
+                                   alpha = 0.50,
+                                   label.col = c(rep("black",3)),
+                                   cex = 2,
+                                   fontfamily = "serif",
+                                   fontface = "bold",
+                                   cat.col = c("red","blue"),connectedPeaks = "keepAll")
+  dev.off()
+    
+  
+  pdf(file.path(output.file.dir,paste0("ciLAD","-non_XL-","MEF_LAD","_peak_overlap.pdf")))  
+  venn.ciLAD.non_XL.MEF_LAD <- makeVennDiagram(re.out[c(1,2,3)], NameOfPeaks=c("ciLAD","non_XL","MEF_LAD"),
+                                           totalTest=10000,scaled=F,euler.d=F,fill = c("red","blue","green"),
+                                           alpha = 0.50,
+                                           label.col = c(rep("black",7)),
+                                           cex = 2,
+                                           fontfamily = "serif",
+                                           fontface = "bold",
+                                           cat.col = c("red","blue","green"),connectedPeaks = "keepAll")
+  dev.off()
+  
+  pdf(file.path(output.file.dir,paste0("ciLAD","-non_XL","_peak_overlap.pdf")))  
+  venn.ciLAD.non_XL <- makeVennDiagram(re.out[c(1,2)], NameOfPeaks=c("ciLAD","non_XL"),
+                                               totalTest=10000,scaled=F,euler.d=F,fill = c("red","blue"),
+                                               alpha = 0.50,
+                                               label.col = c(rep("black",3)),
+                                               cex = 2,
+                                               fontfamily = "serif",
+                                               fontface = "bold",
+                                               cat.col = c("red","blue"),connectedPeaks = "keepAll")
+  dev.off()
+  
+  pdf(file.path(output.file.dir,paste0("non_XL-","MEF_LAD","_peak_overlap.pdf")))  
+  venn.non_XL.MEF_LAD <- makeVennDiagram(re.out[c(2,3)], NameOfPeaks=c("non_XL","MEF_LAD"),
+                                               totalTest=10000,scaled=F,euler.d=F,fill = c("blue","green"),
+                                               alpha = 0.50,
+                                               label.col = c(rep("black",3)),
+                                               cex = 2,
+                                               fontfamily = "serif",
+                                               fontface = "bold",
+                                               cat.col = c("blue","green"),connectedPeaks = "keepAll")
+  
+  dev.off()
+  
+  
   
   peak.in.ciLAD <- ol$uniquePeaks[grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
   peak.in.MEF_LAD <- ol$uniquePeaks[-grep("ciLAD.mm10-bed-with-header",names(ol$uniquePeaks)),]
