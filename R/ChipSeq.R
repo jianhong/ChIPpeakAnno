@@ -218,7 +218,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     gr <- overlap.with.MEF_LAD.but.XL_MEF_only.exclude.ciLAD
     
     peakAll <- data.frame(seqnames=seqnames(gr),
-                          start=start(gr)-1,
+                          start=start(gr),
                           end=end(gr),
                           names=c(rep(".", length(gr))),
                           strands=strand(gr),peakNames=names(gr))
@@ -630,6 +630,94 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   }
   
   },re.out,output.file.dir,genome)
+  
+  
+  peaks1 <- GRanges(seqnames=c("1", "2", "3"),
+                    IRanges(start=c(967654, 2010897, 2496704),
+                            end=c(967754, 2010997, 2496804), 
+                            names=c("Site1", "Site2", "Site3")),
+                    strand="+",
+                    feature=c("a","a","a"))
+  peaks2 = GRanges(seqnames=c("1", "2", "3", "1", "2"), 
+                   IRanges(start = c(967659, 2010898,2496700,
+                                     3075866,3123260),
+                           end = c(967869, 2011108, 2496920, 
+                                   3076166, 3123470),
+                           names = c("t1", "t2", "t3", "t4", "t5")), 
+                   strand = c("+", "+", "+", "+", "+"), 
+                   feature=c("a","a","a","a","a"))
+  
+  
+  peaks1 <- GRanges(seqnames=c("1"),
+                    IRanges(start=c(2),
+                            end=c(10), 
+                            names=c("Site1")),
+                    strand="+",
+                    feature=c("a"))
+  peaks2 = GRanges(seqnames=c("1"), 
+                   IRanges(start = c(8,30),
+                           end = c(20,40),
+                           names = c("t1","t2")), 
+                   strand = c("+","+"), 
+                   feature=c("a","a"))
+  
+  
+  
+  
+  peaks1 <- re.out[[1]]
+  peaks2 <- re.out[[4]]
+  
+  getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
+    
+    grl <- GRangesList(re.out[peak.index])
+    names(grl) <- name
+    
+    Z <- ChIPpeakAnno:::vennCounts(grl,length(peak.index),names=names(grl),by="base") 
+    
+    if(length(peak.index)==2){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="00"),]
+    }
+    
+    if(length(peak.index)==3){
+      ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="000"),]
+    }
+    
+    y <- ZZ[,"Counts"]
+    names(y) <- row.names(ZZ)
+    
+    labels = name
+    pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
+    plot.new()
+    colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
+    dev.off()
+    
+    y
+  }
+  
+  peak.index <-c(1,4)
+  name <- c("ciLAD","XL_MEF") 
+  YY <- getCount4Venn(re.out,peak.index,name,output.file.dir) 
+  
+  peak.index <-c(1,4,3)
+  name <- c("ciLAD","XL_MEF","LAD") 
+  YY <- getCount4Venn(re.out,peak.index,name,output.file.dir) 
+  
+  
+  peak.index <-c(1,2,3)
+  name <- c("ciLAD","nonXL_MEF","LAD") 
+  YY <- getCount4Venn(re.out,peak.index,name,output.file.dir) 
+  
+  labels <- names(grl)
+  
+  plot.new()
+  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
+  
+  
+  test.ol.2 <- makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF2", "TF1"),
+                               totalTest=100000,scaled=FALSE, euler.d=FALSE, by="base")
+ 
+  test.ol.2$vennCounts
+  
 }
 
 #' AnnotatePeak2
@@ -1488,7 +1576,7 @@ plotBam <- function(input.file.dir,file.type,output.file.dir,job.option = "gener
 #'
 DrawVenn <- function(out.dir.name) {
   
-  devtools::install_github("js229/Vennerable");
+  devtools::install_github("js229/Vennerable")
   library(Vennerable)
   
   BB=c(1:6153,6154:25736)
@@ -1499,7 +1587,18 @@ DrawVenn <- function(out.dir.name) {
   
   Vstem <- Venn(list(ASXL1=AA,SMC1A=BB,RAD21=CC))
   
-  SetLabels <- VennGetSetLabels(Vstem)
+  Indicator <- (data.matrix(do.call(expand.grid, lapply(seq(1, 
+                                                            length = 2), function(x) {
+                                                              c(0, 1)
+                                                            })))) == 1
+  
+  
+  
+  colnames(Indicator) <- SetNames
+  
+  class(Vstem@IndicatorWeight) <- 
+  
+  #SetLabels <- VennGetSetLabels(Vstem)
   
   Cstem3 <- compute.Venn(Vstem,doWeights=TRUE)
   
@@ -1559,6 +1658,8 @@ DrawVenn <- function(out.dir.name) {
   
   c.3.set=sum(Cstem3@IndicatorWeight[,4])
   Cstem3@IndicatorWeight[which(row.names(Cstem3@IndicatorWeight)=="000"),4]=35000-c.3.set
+  
+  library(grid)
   
   grid.newpage()
   
@@ -7047,3 +7148,123 @@ readFqFiles <- function(input.file.dir,input.file.pattern,output.file.dir,output
   
   write.table(DF,file = file.path(output.file.dir,output.file.name),append = FALSE, quote = F, sep = ",",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
 }
+
+plotVenn<-function(venn_cnt, vennx, otherCounts=NULL, 
+                   cat.cex = 1, cat.col = "black", 
+                   cat.fontface = "plain", cat.fontfamily = "serif", ...){
+  op=par(mar=c(0,0,0,0))
+  on.exit(par(op))
+  plot.new()
+  venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = cat.cex,
+                           cat.col = cat.col, cat.fontface = cat.fontface, 
+                           cat.fontfamily = cat.fontfamily, ...)
+  unlink(dir(pattern="^VennDiagram[0-9_\\-]+.log$")) ## delete the log file
+  if(grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)]) && 
+     connectedPeaks=="keepAll"){
+    n <- which(colnames(venn_cnt)=="Counts")-1
+    venn_cnt.Counts.gt.1 <- rowSums(venn_cnt[ ,1:n]) > 1
+    counts <- venn_cnt[-1,"Counts"]
+    counts <- counts[counts!=0]
+    if(!any(duplicated(counts))){## there is no duplicated counts number
+      w <- 1
+      for(i in 1:length(venngrid)){
+        if(inherits(venngrid[[i]], what="text") && w<nrow(venn_cnt)){
+          w <- w+1
+          cnt <- as.numeric(venngrid[[i]]$label)
+          if(!is.na(cnt) && cnt!=0){
+            j <- which(venn_cnt[,n+1]==cnt)
+            if(venn_cnt.Counts.gt.1[j]){
+              labels <- venn_cnt[j, -(1:(n+1))]
+              if(nrow(venn_cnt)==4 && sum(venn_cnt[,4]) < 
+                 sum(venn_cnt[,5])){
+                labels <- rev(labels)
+              }
+              labels <- paste(as.character(labels[labels>0]),
+                              collapse="/", sep="")
+              if(labels!="") venngrid[[i]]$label <- 
+                paste(venngrid[[i]]$label, "(", 
+                      labels, ")", sep="")
+            }
+          }
+        }
+      }
+    }else{##otherwise guess the order of the number, 
+      ##Bugs, the map order maybe wrong
+      j <- 1
+      map <- switch(as.character(nrow(venn_cnt)),
+                    '4'=c(3, 4, 2),
+                    '8'=c(5, 7, 3, 6, 8, 4, 2),
+                    '16'=c(3, 4, 2, 11, 12, 16, 8, 6, 9, 10, 
+                           14, 15, 7, 5, 13),
+                    '32'=c(17, 9, 5, 3, 2, 6, 18, 19, 25, 10, 13, 21, 7, 
+                           11, 4, 8, 22, 20, 27, 26, 30, 29, 23, 
+                           15, 12, 16, 24, 28, 30, 31, 32))
+      for(i in 1:length(venngrid)){
+        if(inherits(venngrid[[i]], what="text") && j<length(map)){
+          while(j < length(map) && as.numeric(venngrid[[i]]$label) != 
+                venn_cnt[map[j],n+1]) j <- j+1
+          if(as.numeric(venngrid[[i]]$label) == venn_cnt[map[j],
+                                                         n+1] && 
+             j <= length(map)){
+            if(venn_cnt.Counts.gt.1[map[j]]){
+              labels <- venn_cnt[map[j], -(1:(n+1))]
+              labels <- paste(as.character(labels[labels>0]), 
+                              collapse="/", sep="")
+              if(labels!="") 
+                venngrid[[i]]$label <- 
+                paste(venngrid[[i]]$label, "(", 
+                      labels, ")", sep="")
+            }
+            j <- j+1
+          }
+        }
+      }
+    }
+  }
+  if(!is.null(otherCounts)){
+    tmp <- textGrob(label=otherCounts, x=0.9, y=0.1, 
+                    gp=gpar(col = cat.col, cex = cat.cex, 
+                            fontface = cat.fontface, 
+                            fontfamily = cat.fontfamily))
+    venngrid <- gList(venngrid, tmp)
+  }
+  grid.draw(venngrid)
+}
+
+testvenneuler <- function(){
+A <- c("gene1", "gene2", "gene3", "gene5", "gene12", "", "")
+B <- c("gene1", "gene2", "gene6", "gene7", "", "", "")
+C <- c("gene2", "gene6", "gene7", "gene8", "gene9", "gene13", "gene14")
+D <- c("gene7", "gene8", "gene9", "gene10", "gene11", "gene12", "")
+dat <- data.frame(A,B,C,D)
+
+vennfun <- function(x) { 
+  x$id <- seq(1, nrow(x))  #add a column of numbers (required for melt)
+  xm <- melt(x, id.vars="id", na.rm=TRUE)  #melt table into two columns (value & variable)
+  xc <- dcast(xm, value~variable, fun.aggregate=length)  #remove NA's, list presence/absence of each value for each variable (1 or 0)
+  rownames(xc) <- xc$value  #value column = rownames (required for Venneuler)
+  xc$value <- NULL  #remove redundent value column
+  xc  #output the new dataframe
+}
+
+library(reshape2)
+install.packages("rJava")
+library(rJava)
+install.packages("venneuler")
+library(venneuler)
+
+VennDat <- vennfun(dat)
+genes.venn <- venneuler(VennDat)
+plot(genes.venn)
+
+}
+
+testColofulVenn <- function(){
+
+  y <- c(6,856,297)
+  names(y) <- c("01","10","11")
+  labels <- c("TF1","TF2")
+  plot.new()
+  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
+}
+
