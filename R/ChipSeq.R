@@ -647,6 +647,18 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                    strand = c("+", "+", "+", "+", "+"), 
                    feature=c("a","a","a","a","a"))
   
+   venn.plot <- venn.diagram(
+         x = list(
+               A = c(1:10),
+               B = c(11:90),
+               C = c(81:90)
+           ),
+         euler.d = TRUE,
+         scaled = TRUE, 
+         filename = "Euler_3set_scaled.tiff",
+         cex = 2.5,
+         cat.cex = 2.5,
+         cat.pos = 0);
   
   peaks1 <- GRanges(seqnames=c("1"),
                     IRanges(start=c(2),
@@ -660,9 +672,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                            names = c("t1","t2")), 
                    strand = c("+","+"), 
                    feature=c("a","a"))
-  
-  
-  
   
   peaks1 <- re.out[[1]]
   peaks2 <- re.out[[4]]
@@ -691,6 +700,49 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
     dev.off()
     
+    fit1 <- euler(c("ciLAD" = 785, "LAD" = 565, "nonXL_MEF" = 167,
+                    "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
+                    "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
+    
+    ZZZZ <- round(ZZZ/1000000,0) 
+    fit2 <- euler(ZZZZ)
+    plot(fit2,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    
+    colorfulVennPlot::plotVenn(ZZ, labels=names(ZZZZ)[1:3], Colors=rainbow(7))
+    
+    fit1 <- euler(c("ciLAD" = 785, "LAD" = 565, "nonXL_MEF" = 167,
+                    "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
+                    "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
+    
+    plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    grid.ls()
+    t <- grid.get("quantities.grob")
+    names(t)
+    
+    t$label
+    t$x
+    t$y
+    t$just
+  
+    grid.edit("quantities.grob",check.overlap=FALSE)
+    grid.edit("quantities.grob",x=unit.c(unit(-14.9884684724791, "native"),
+                                         unit(-14.883684319653, "native"),
+                                         unit(13.9805892820006, "native"),
+                                         unit(-12.8808987356981, "native"),
+                                         unit(-11.488226371243, "native"),
+                                         unit(-9.51474016085318, "native"),
+                                         unit(-1.00436055190216, "native")))
+                
+    grid.edit("quantities.grob",y=unit.c(unit(-8.07672595120493, "native"),
+                                         unit(4.78718651828883, "native"),
+                                         unit(0.25941593099694, "native"),
+                                         unit(-4.32200781461293, "native"),
+                                         unit(25.7349463488991, "native"),
+                                         unit(-22.7610031110325, "native"),
+                                         unit(14.5001560838519, "native")))
+    
+    dev.off()
+  
     y
   }
   
@@ -700,8 +752,29 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   peak.index <-c(1,4,3)
   name <- c("ciLAD","XL_MEF","LAD") 
-  YY <- getCount4Venn(re.out,peak.index,name,output.file.dir) 
   
+
+  g1 <- unique(combn(name,1,simplify=FALSE))
+  g2 <- unique(combn(name,2,simplify=FALSE))
+  g3 <- unique(combn(name,3,simplify=FALSE))
+  
+  g2 <- unlist(lapply(g2, function(u){paste(u,collapse = "&")}))
+  g3 <- unlist(lapply(g3, function(u){paste(u,collapse = "&")}))
+  
+  LabelName <- unlist(c(g1,g2,g3))
+  
+  xx <- c(4,2,1,6,5,3,7)
+  names(xx) <- LabelName
+  
+  ZZ <- unlist(lapply(xx, function(u){
+    z <- paste0(as.binary(u,n=3), collapse = "")
+    z
+  }))
+  
+  ZZZ <- Z$venn_cnt[match(ZZ,row.names(Z$venn_cnt)),'Counts']
+  names(ZZZ) <- names(ZZ)
+  
+  YY <- getCount4Venn(re.out,peak.index,name,output.file.dir) 
   
   peak.index <-c(1,2,3)
   name <- c("ciLAD","nonXL_MEF","LAD") 
@@ -713,9 +786,15 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
   
   
-  test.ol.2 <- makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF2", "TF1"),
-                               totalTest=100000,scaled=FALSE, euler.d=FALSE, by="base")
+  test.ol.2 <- makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"),
+                               totalTest=100000,scaled=TRUE, euler.d=TRUE, by="base")
  
+  test.ol.2 <- makeVennDiagram(list(re.out[[1]],re.out[[4]],re.out[[3]]), NameOfPeaks=c("ciLAD", "XL_MEF","MEF_LAD"),
+                               totalTest=100000,scaled=TRUE, euler.d=TRUE, by="base")
+  
+  test.ol.2 <- makeVennDiagram(list(re.out[[1]],re.out[[4]]), NameOfPeaks=c("ciLAD", "XL_MEF"),
+                               totalTest=100000,scaled=TRUE, euler.d=TRUE, by="base")
+  
   test.ol.2$vennCounts
   
 }
