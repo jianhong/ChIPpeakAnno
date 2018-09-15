@@ -714,32 +714,74 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                     "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
                     "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
     
-    plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
-    grid.ls()
+    grid.newpage()
+    fit1.plot <- plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    fit1.plot
+    grid.ls(fit1.plot)
     t <- grid.get("quantities.grob")
     names(t)
-    
     t$label
     t$x
     t$y
-    t$just
-  
+    
+    ChangeXY4CertainLabel <- function(x,which.label){
+      
+      Y <- lapply(1:length(x),function(u,x,which.label){
+        
+        if(u == which.label){
+          cat("old_value is",x[u],"\n")
+          
+          cat('new value you want:', '\n')
+          
+          m<-scan("",n=1, quiet=TRUE)
+          
+          z = m 
+        }else
+        {
+          z=x[u]
+        }
+        
+        z      
+        
+      },x,which.label)
+      
+      Y <- as.array(unlist(Y))
+      Y
+    }
+    
+    
+    x <- c(-14.988468472479,
+      -14.883684319653,
+      13.980589282000,
+      -12.880898735698,
+      -11.488226371243,
+      -9.51474016085318,
+      -1.00436055190216)
+    
+    new.x <- ChangeXY4CertainLabel(x,4)
+    
+    # Try to change the x and y value of the 4th label "2"
+    grid.edit("quantities.grob",gp=gpar(x[[4]]=unit(-11.8262244206465, "native")))
+    grid.edit("quantities.grob",y[[4]]=unit(-5.19720701058398, "native"))
+    
+    gp=gpar(col="grey"))
+    
     grid.edit("quantities.grob",check.overlap=FALSE)
-    grid.edit("quantities.grob",x=unit.c(unit(-14.9884684724791, "native"),
-                                         unit(-14.883684319653, "native"),
-                                         unit(13.9805892820006, "native"),
-                                         unit(-12.8808987356981, "native"),
-                                         unit(-11.488226371243, "native"),
-                                         unit(-9.51474016085318, "native"),
-                                         unit(-1.00436055190216, "native")))
-                
-    grid.edit("quantities.grob",y=unit.c(unit(-8.07672595120493, "native"),
-                                         unit(4.78718651828883, "native"),
-                                         unit(0.25941593099694, "native"),
-                                         unit(-4.32200781461293, "native"),
-                                         unit(25.7349463488991, "native"),
-                                         unit(-22.7610031110325, "native"),
-                                         unit(14.5001560838519, "native")))
+    grid.edit("quantities.grob",x=unit(c(-14.988468472479,
+                                         -14.883684319653,
+                                         13.980589282000,
+                                         -12.880898735698,
+                                         -11.488226371243,
+                                         -9.51474016085318,
+                                         -1.00436055190216),"native"))
+
+    grid.edit("quantities.grob",y=unit(c(-8.07672595120493,
+                                       4.78718651828883,
+                                       0.25941593099694,
+                                       -4.32200781461293,
+                                       25.7349463488991,
+                                       -22.7610031110325,
+                                       14.5001560838519) "native"))
     
     dev.off()
   
@@ -7346,4 +7388,198 @@ testColofulVenn <- function(){
   plot.new()
   colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
 }
+
+orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeader= FALSE) {
+  chrOrder<-c(paste("chr",1:19,sep=""),"chrX","chrY")
+  
+  peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
+  
+  peakAll2 <- peakAll[order(peakAll$seqnames,peakAll$start),]
+  
+  if(outHeader == TRUE){
+    write.table(peakAll2,file = file.path(output.file.dir,paste0(output.file.name,".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  }else{
+    write.table(peakAll2,file = file.path(output.file.dir,paste0(output.file.name,".bed")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
+  }
+}
+
+getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD,sample.Name,output.file.dir) {
+  
+  peaks.name <- names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)
+  uniquePeaks.name <- unique(str_sub(peaks.name,1,str_locate(peaks.name,"__")[,1]-1))
+  
+  Up <- lapply(uniquePeaks.name, function(u,ol.ciLAD.XL.MEF_LAD){
+    
+    unique.peaks <- ol.ciLAD.XL.MEF_LAD$uniquePeaks[grep(u,names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)),] 
+    unique.peaks
+  },ol.ciLAD.XL.MEF_LAD)
+  names(Up) <- uniquePeaks.name
+  
+  ol2 <- findOverlapsOfPeaks(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[c(1,2,3)],connectedPeaks = "keepAll")
+  
+  output.file.name = paste0(ol.ciLAD.XL.MEF_LAD.uniquePeaks.name[index.sample],"_unique_peaks")
+  output.file.name <- gsub("<","_", output.file.name)
+  orderPeakAndOutPut(XL.unique.peaks,output.file.dir,output.file.name)
+}
+
+
+# Given a list of peaks, to get enriched GO and pathway
+
+peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
+
+  
+  ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
+  
+  
+  
+# genome = "Mm"
+null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  x=re.out[[u]]
+  x_name=names(re.out)[u]
+  
+  if(genome=="Mm"){
+    
+    annoData <- toGRanges(EnsDb.Mmusculus.v75, feature="gene")
+    
+    dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
+    
+    overlaps.trimmed<-trim(x,use.names=TRUE)
+    overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+    write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+    
+    # annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
+    #  overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
+    #  write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
+    #  pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
+    #  pie1(table(overlaps.anno.with.entrez.id$insideFeature))
+    #  dev.off()
+    #  write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+    
+    getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+      over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
+                            maxP=0.5, minGOterm=10,
+                            multiAdjMethod="BH", condense=TRUE)
+      
+      
+      path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
+      
+      write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+      
+      convert2geneSymbol <- function(over1) {
+        
+        geneSymbol <- lapply(over1$EntrezID, function(u){
+          
+          x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
+          x
+          
+        })
+        
+        list_to_df <- function(list_for_df)
+        {
+          list_for_df <- as.list(list_for_df)
+          
+          nm <- names(list_for_df)
+          if (is.null(nm)) 
+            nm <- seq_along(list_for_df)
+          
+          df <- data.frame(name = nm, stringsAsFactors = FALSE)
+          df$value <- unname(list_for_df)
+          df
+        }
+        
+        geneSymbol3 <- list_to_df(geneSymbol)
+        
+        over2 <- cbind(over1,geneSymbol3)
+        over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+        colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+        over3
+      }
+      
+      over$bp <- convert2geneSymbol(over$bp)
+      over$mf <- convert2geneSymbol(over$mf)
+      over$cc <- convert2geneSymbol(over$cc)
+      
+      over_bp <- as_tibble(over$bp)
+      over_mf <- as_tibble(over$mf)
+      over_cc <- as_tibble(over$cc)
+      
+      over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+      over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+      over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+      
+      writeTibble <- function(tibble.input, output.file.name = tempfile())
+      {
+        if (!dir.exists(dirname(output.file.name)))
+        {
+          dir.create(dirname(output.file.name), recursive = TRUE)
+        }
+        flatten_list = function(x)
+        {
+          if (typeof(x) != "list")
+          {
+            return(x)
+          }
+          sapply(x, function(y) paste(y, collapse = " ; "))
+        }
+        tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+      }
+      
+      writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+      writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+      writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+    }
+    
+    #getGoAndPath(overlaps.anno.with.entrez.id,output.file.dir,x_name)
+    getGoAndPath(overlaps.anno,output.file.dir,x_name)
+    
+  }else if(genome=="Hs"){
+    
+    library(EnsDb.Hsapiens.v75)
+    #annoData<-toGRanges(EnsDb.Hsapiens.v75, feature="gene")
+    
+    dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
+    
+    print(seqinfo(dd.hs))
+    print(seqlevels(dd.hs))
+    
+    #print(seqlevels(dd.hs)[,1])
+    
+    #print(seqlevels(re.out[[1]])[,1])
+    
+    # seqlevels(dd.hs,force=TRUE) <- c("chr1","chr10","chr11","chr12","chr13",
+    #                                           "chr14","chr15","chr16","chr17","chr18","chr19","chr2",
+    #                                           "chr3","chr4","chr5","chr6","chr7","chr8","chr9","chrX","chrY")
+    
+    #temp4=
+    
+    re.out.L<-lapply(1:length(re.out),function(u,re.out,dd.hs){
+      
+      x=re.out[[u]]
+      x_name=names(re.out)[u]
+      
+      seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
+      #print(seqinfo(re.out.trimmed))
+      #print(seqlevels(re.out.trimmed))
+      seqinfo(x)<-seqinfo(dd.hs)
+      #GRCm38/mm10
+      #dd<-toGRanges(EnsDb.Mmusculus.v79)
+      #seqinfo(dd)
+      #library(ensembldb)
+      #library(GenomeInfoDb)
+      seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
+      re.out.trimmed<-trim(x, use.names=TRUE)
+      overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
+      
+      write.table(overlaps.anno,file=paste0(temp3,"/",x_name,"_annotation.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+    },re.out,dd.hs)
+    
+  }
+  
+},re.out,output.file.dir,genome)
+
+}
+
 
