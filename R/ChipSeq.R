@@ -725,7 +725,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     t$y
     
     ChangeXY4CertainLabel <- function(x,which.label){
-      
+      options(digits=15)
       Y <- lapply(1:length(x),function(u,x,which.label){
         
         if(u == which.label){
@@ -745,43 +745,12 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
         
       },x,which.label)
       
-      Y <- as.array(unlist(Y))
+      Y <- unit(as.array(unlist(Y)),"native")
       Y
     }
     
-    
-    x <- c(-14.988468472479,
-      -14.883684319653,
-      13.980589282000,
-      -12.880898735698,
-      -11.488226371243,
-      -9.51474016085318,
-      -1.00436055190216)
-    
-    new.x <- ChangeXY4CertainLabel(x,4)
-    
-    # Try to change the x and y value of the 4th label "2"
-    grid.edit("quantities.grob",gp=gpar(x[[4]]=unit(-11.8262244206465, "native")))
-    grid.edit("quantities.grob",y[[4]]=unit(-5.19720701058398, "native"))
-    
-    gp=gpar(col="grey"))
-    
-    grid.edit("quantities.grob",check.overlap=FALSE)
-    grid.edit("quantities.grob",x=unit(c(-14.988468472479,
-                                         -14.883684319653,
-                                         13.980589282000,
-                                         -12.880898735698,
-                                         -11.488226371243,
-                                         -9.51474016085318,
-                                         -1.00436055190216),"native"))
-
-    grid.edit("quantities.grob",y=unit(c(-8.07672595120493,
-                                       4.78718651828883,
-                                       0.25941593099694,
-                                       -4.32200781461293,
-                                       25.7349463488991,
-                                       -22.7610031110325,
-                                       14.5001560838519) "native"))
+    new.y <- ChangeXY4CertainLabel(t$y,4)
+    grid.edit("quantities.grob",y=new.y)
     
     dev.off()
   
