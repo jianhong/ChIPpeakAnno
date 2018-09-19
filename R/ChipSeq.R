@@ -7428,7 +7428,7 @@ orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeade
 }
 
 # 
-getUniquePeaksFrom2peakSetsOverlapping <- function(ol.ciLAD.XL.MEF_LAD) {
+getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
   
   peaks.name <- names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)
   uniquePeaks.name <- unique(str_sub(peaks.name,1,str_locate(peaks.name,"__")[,1]-1))
@@ -7440,7 +7440,7 @@ getUniquePeaksFrom2peakSetsOverlapping <- function(ol.ciLAD.XL.MEF_LAD) {
   },ol.ciLAD.XL.MEF_LAD)
   names(Up) <- uniquePeaks.name
   
-  cat("peak names are: ",names(Up),"\n")
+  cat("peak names in unique regions are: ",names(Up),"\n")
   
   cat('The peak you select:', '\n')
   
@@ -7462,11 +7462,12 @@ getUniquePeaksFrom2peakSetsOverlapping <- function(ol.ciLAD.XL.MEF_LAD) {
   names(unique.part.l) <- unique.part.name.l
   
   unique.part.l
+  
 }
 
 getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
   
-  ol.unique.0 <- getUniquePeaksFrom2peakSetsOverlapping(ol.ciLAD.XL.MEF_LAD)
+  ol.unique.0 <- getPeaksInUnique(ol.ciLAD.XL.MEF_LAD)
   
   cat("peak names in overlapping are:",names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks),"\n")
   
@@ -7479,18 +7480,12 @@ getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
   
   ol <- findOverlapsOfPeaks(part.in.overlap.MEF_LADS.unique,part.in.overlap.ciLAD.unique,connectedPeaks = "keepAll")
   
-  ol.unique.1 <- getUniquePeaksFrom2peakSetsOverlapping(ol)
-  
-  
+  ol.unique.1 <- getPeaksInUnique(ol)
+
   XL.3.subsets <- c(ol.unique.0,ol.unique.1)
   
   XL.3.subsets
   
-  # ol2 <- findOverlapsOfPeaks(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[c(1,2,3)],connectedPeaks = "keepAll")
-  # 
-  # output.file.name = paste0(ol.ciLAD.XL.MEF_LAD.uniquePeaks.name[index.sample],"_unique_peaks")
-  # output.file.name <- gsub("<","_", output.file.name)
-  # orderPeakAndOutPut(XL.unique.peaks,output.file.dir,output.file.name)
 }
 
 
@@ -7688,6 +7683,13 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
 
 }
 
+# This function uses the overlapping peaks from findOverlapsOfPeak, and gets the 
+# overlapping regions of two peak sets, and returns a GenomicRangesList including the
+# following 3 GRanges object:
+#  1: overlaping GRanges peaks
+#  2: The peak1 GRanges peaks involoving overlapping  
+#  3: The peak2 GRanges peaks involoving overlapping
+
 getOverLap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap,output.file.dir) {
 
   #index_overlap <- 1
@@ -7809,10 +7811,9 @@ writeGrlInUnique2Bed <- function(grl,output.file.dir) {
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/F121_9-vs-XL_MEF"
 # peaks.in.overlapping.region <- getOverLap(ol.F121_9.XL_MEF,1,output.file.dir)
 # writeGrl2Bed(peaks.in.overlapping.region,output.file.dir)
-# peaks.in.unique.regions.4.ol.F121_9.XL_MEF <- getUniquePeaksFrom2peakSetsOverlapping(ol.F121_9.XL_MEF)
+# peaks.in.unique.regions.4.ol.F121_9.XL_MEF <- getPeaksInUnique(ol.F121_9.XL_MEF)
 # writeGrlInUnique2Bed(peaks.in.unique.regions.4.ol.F121_9.XL_MEF,output.file.dir)
 
-  
 # names(nonXL.3.subsets) <- gsub("XL","nonXL",names(nonXL.3.subsets))
 # 
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/F121_9-vs-XL_MEF"
