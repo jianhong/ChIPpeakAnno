@@ -11,6 +11,9 @@
 #' @examples
 #' 
 #' input.file.dir='/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles'
+#' 
+#' input.file.dir='~/Aimin/DropboxUmass/NADfinder/BedFiles/Aizhan\ F121-9\ comparisons'
+#' 
 #' input.file.pattern="*.bed$"
 #' 
 #' Output:
@@ -25,13 +28,15 @@
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_6_2018/nonXL"
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_10_2018"
 #' 
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_10_2018/F121_9-vs-XL_MEF"
+#' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
 AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,genome) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
-  file.name.4 <- list.files(input.file.dir,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  file.name.4 <- list.files(input.file.dir,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
   
   re.out<-lapply(file.name.4,function(u){
     
@@ -678,6 +683,9 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
     
+    name <- c("F121-9","XL_MEFs")
+    
+    peak.index <- c(1,2)
     grl <- GRangesList(re.out[peak.index])
     names(grl) <- name
     
@@ -704,9 +712,50 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                     "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
                     "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
     
-    ZZZZ <- round(ZZZ/1000000,0) 
-    fit2 <- euler(ZZZZ)
-    plot(fit2,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    ZZZZ <- round(ZZZ/1000000,0)
+    
+    fit2 <- euler(ZZZZ,shape = "ellipse")
+    fit2.plot <- plot(fit2,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    title <- textGrob("F121_9-vs-XL_MEF", x= unit(250,"native"),y= unit(30,"native"))
+    footnote <- textGrob("Numbers are nucleotides in MB", x=unit(380,"native"),y=unit(500,"native"))
+    gt <- gTree(children=gList(fit2.plot, title, footnote))
+    gt2 <- grid.draw(gt)
+    
+    grid.newpage()
+    pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+    
+    png("g.png",width = 1000, height = 600, units = "px") 
+    grid.draw(g) 
+    dev.off()
+    
+    png("F121_9-vs-XL_MEF_overlapping.png",width = 1000, height = 600)
+    grid.newpage()
+    grid.draw(gt)
+    dev.off()
+    
+    grid.arrange(gt,ncol=1,nrow=1)
+    ggsave("saving.pdf")
+
+    pdf(file="filename.pdf", onefile=FALSE) # or other device
+   
+    dev.off()
+    
+    grid.ls(gt)
+    
+    t <- grid.get("GRID.text.73")
+    t$label <- "F121-9-vs-XLMEF"
+    t$x <- unit(250,"native")
+    t$y <- unit(40,"native")
+    grid.edit("GRID.text.73",label=t$label, x=t$x,y=t$y)
+    
+    s <- grid.get("GRID.text.74")
+    s$label <- "Numbers are nucleotides in MB"
+    s$x <- unit(250,"native")
+    s$y <- unit(10,"native")
+    grid.edit("GRID.text.74",label=s$label,x=s$x,s=s$y)
+    
+    
+    
     
     colorfulVennPlot::plotVenn(ZZ, labels=names(ZZZZ)[1:3], Colors=rainbow(7))
     
@@ -774,11 +823,14 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   
   LabelName <- unlist(c(g1,g2,g3))
   
+  LabelName <- unlist(c(g1,g2))
+  
   xx <- c(4,2,1,6,5,3,7)
+  xx <- c(2,1,3)
   names(xx) <- LabelName
   
   ZZ <- unlist(lapply(xx, function(u){
-    z <- paste0(as.binary(u,n=3), collapse = "")
+    z <- paste0(as.binary(u,n=2), collapse = "")
     z
   }))
   
@@ -7359,6 +7411,9 @@ testColofulVenn <- function(){
 }
 
 orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeader= FALSE) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
   chrOrder<-c(paste("chr",1:19,sep=""),"chrX","chrY")
   
   peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
@@ -7372,32 +7427,106 @@ orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeade
   }
 }
 
-getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD,sample.Name,output.file.dir) {
+# 
+getUniquePeaksFrom2peakSetsOverlapping <- function(ol.ciLAD.XL.MEF_LAD) {
   
   peaks.name <- names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)
   uniquePeaks.name <- unique(str_sub(peaks.name,1,str_locate(peaks.name,"__")[,1]-1))
   
   Up <- lapply(uniquePeaks.name, function(u,ol.ciLAD.XL.MEF_LAD){
     
-    unique.peaks <- ol.ciLAD.XL.MEF_LAD$uniquePeaks[grep(u,names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)),] 
+    unique.peaks <- ol.ciLAD.XL.MEF_LAD$uniquePeaks[grep(u,names(ol.ciLAD.XL.MEF_LAD$uniquePeaks)),]
     unique.peaks
   },ol.ciLAD.XL.MEF_LAD)
   names(Up) <- uniquePeaks.name
   
-  ol2 <- findOverlapsOfPeaks(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[c(1,2,3)],connectedPeaks = "keepAll")
+  cat("peak names are: ",names(Up),"\n")
   
-  output.file.name = paste0(ol.ciLAD.XL.MEF_LAD.uniquePeaks.name[index.sample],"_unique_peaks")
-  output.file.name <- gsub("<","_", output.file.name)
-  orderPeakAndOutPut(XL.unique.peaks,output.file.dir,output.file.name)
+  cat('The peak you select:', '\n')
+  
+  m<-scan("",quiet=TRUE)
+  
+  unique.part.l <- unlist(lapply(1:length(m), function(u,m,Up){
+    x= m[u]
+    unique.part = Up[[x]]
+    unique.part
+  },m,Up))
+
+  unique.part.name.l <- unlist(lapply(1:length(m), function(u,m,Up){
+    x= m[u]
+    unique.part.name = names(Up)[x]
+    unique.part.name
+  },m,Up))
+  
+  
+  names(unique.part.l) <- unique.part.name.l
+  
+  unique.part.l
+}
+
+getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
+  
+  ol.unique.0 <- getUniquePeaksFrom2peakSetsOverlapping(ol.ciLAD.XL.MEF_LAD)
+  
+  cat("peak names in overlapping are:",names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks),"\n")
+  
+  XL.part.in.overlap.MEF_LADS <- toGRanges(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[1]][,1:7])
+  
+  XL.part.in.overlap.ciLAD <- toGRanges(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[3]][,10:16])
+  
+  part.in.overlap.MEF_LADS.unique <- unique(XL.part.in.overlap.MEF_LADS) 
+  part.in.overlap.ciLAD.unique <- unique(XL.part.in.overlap.ciLAD)
+  
+  ol <- findOverlapsOfPeaks(part.in.overlap.MEF_LADS.unique,part.in.overlap.ciLAD.unique,connectedPeaks = "keepAll")
+  
+  ol.unique.1 <- getUniquePeaksFrom2peakSetsOverlapping(ol)
+  
+  
+  XL.3.subsets <- c(ol.unique.0,ol.unique.1)
+  
+  XL.3.subsets
+  
+  # ol2 <- findOverlapsOfPeaks(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[c(1,2,3)],connectedPeaks = "keepAll")
+  # 
+  # output.file.name = paste0(ol.ciLAD.XL.MEF_LAD.uniquePeaks.name[index.sample],"_unique_peaks")
+  # output.file.name <- gsub("<","_", output.file.name)
+  # orderPeakAndOutPut(XL.unique.peaks,output.file.dir,output.file.name)
 }
 
 
 # Given a list of peaks, to get enriched GO and pathway
 
+# ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
+#
+# 
+# XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_17_2018"
+# genome = "Mm"
+# 
+# null <- peaksToEnrichedGO(XL.3.subsets,output.file.dir,genome)
+
+# ol.ciLAD.non_XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,2,3)])
+
+# nonXL.3.subsets <- getUniquePeaks(ol.ciLAD.non_XL.MEF_LAD)
+# names(nonXL.3.subsets) <- gsub("XL","nonXL",names(nonXL.3.subsets))
+# 
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_17_2018/nonXL"
+# null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
+ 
+
+# XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/XL"
+# genome = "Mm"
+# null <- peaksToEnrichedGO(XL.3.subsets,output.file.dir,genome)
+
+# nonXL.3.subsets <- getUniquePeaks(ol.ciLAD.non_XL.MEF_LAD)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/nonXL"
+# null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
+
 peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
 
   
-  ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
+ # ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
   
   
   
@@ -7406,20 +7535,26 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
+  #u <- 1
+  #re.out <- XL.3.subsets
+  
   x=re.out[[u]]
   x_name=names(re.out)[u]
   
   if(genome=="Mm"){
     
-    annoData <- toGRanges(EnsDb.Mmusculus.v75, feature="gene")
+    #annoData <- toGRanges(EnsDb.Mmusculus.v75, feature="gene")
     
     dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
     
     overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+    
+    #overlaps.anno<-annoPeaks(overlaps.trimmed,annoData)
+    
     write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
     
-    # annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
+     #annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
     #  overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
     #  write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
     #  pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
@@ -7428,6 +7563,8 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     #  write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
     
     getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+      
+      overlaps.anno.with.entrez.id <- overlaps.anno
       over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
                             maxP=0.5, minGOterm=10,
                             multiAdjMethod="BH", condense=TRUE)
@@ -7550,5 +7687,135 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
 },re.out,output.file.dir,genome)
 
 }
+
+getOverLap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap,output.file.dir) {
+
+  #index_overlap <- 1
+  overlappedPeaks <- ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[index_overlap]]
+  print(names(overlappedPeaks))
+  
+  X_name <- names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks)[index_overlap]
+  
+  XX_name <- gsub("-","_", X_name)
+  
+  XX_name <- gsub("///",",",XX_name)
+  
+  XXX_name <- unlist(strsplit(XX_name,","))
+  
+  print(XXX_name)
+  
+  colnames(overlappedPeaks)[which(colnames(overlappedPeaks)=="peaks1")] <- XXX_name[1]
+  colnames(overlappedPeaks)[which(colnames(overlappedPeaks)=="peaks2")] <- XXX_name[2]
+  
+  overlap.peak.region <- apply(overlappedPeaks, 1, function(u){
+    
+    seqnames <- u["seqnames"]
+    #start <- max(u["start"],u["start.1"])
+    start <- max(u[names(u) %in% "start"])
+    #end <- min(u["end"],u["end.1"])
+    
+    end <- min(u[names(u) %in% "end"])
+    
+    
+    x <- data.frame(seqnames.olp=seqnames,start.olp=start,end.olp=end)      
+    x
+    
+  })
+  overlap.peak.region <- do.call(rbind.data.frame,overlap.peak.region)
+  
+  overlappedPeaks <- data.frame(overlappedPeaks,overlap.peak.region,check.names=F)
+  
+  overlappedPeaks <- data.frame(overlappedPeaks,overlappedBasePairs=as.numeric(as.character(overlappedPeaks$end.olp))
+                                -as.numeric(as.character(overlappedPeaks$start.olp))+1,check.names=F)
+
+  cat(colnames(overlappedPeaks),"\n")  
+  
+  output.file.name <- paste0(XXX_name[1],"-overlap-",XXX_name[2])
+  
+  output.file.name <- gsub("<","_", output.file.name)
+  
+  orderPeakAndOutPut(overlappedPeaks,output.file.dir,output.file.name,outHeader=T)
+  
+  #overlappedPeaks <- peaks.in.overlapping.region
+  
+  sample.index <- which(colnames(overlappedPeaks) == XXX_name[2])
+  cat(sample.index,"\n")
+  
+  end <- sample.index-1
+  peak1 <- unique(toGRanges(overlappedPeaks[,1:end],use.mcols=FALSE))
+  
+  overlap.index <- which(colnames(overlappedPeaks) == "seqnames.olp")
+  end <- overlap.index-1
+  peak2 <- unique(toGRanges(overlappedPeaks[,sample.index:end]))
+  
+  temp <- overlappedPeaks[,overlap.index:dim(overlappedPeaks)[2]]
+  colnames(temp) <- c("seqnames","start","end","overlappedBasePairs")
+  overlappingPeaks <- unique(toGRanges(temp))
+  
+  grl <- GenomicRangesList(peak1,peak2,overlappingPeaks)
+  
+  names(grl) <- c(XXX_name[1],XXX_name[2],X_name)
+  grl
+  
+}
+
+writeGrl2Bed <- function(grl,output.file.dir) {
+  
+  null <- lapply(1:length(grl), function(u,grl,output.file.dir){
+    
+     x <- names(grl)[u]
+     y <- as.data.frame(grl[[u]])
+     
+     if(length(grep("///",x))==0){
+       output.file.name  <- paste0(x,"_part.in.overlapping")
+     }else{
+       xx <- gsub("///","-overlaps-",x)
+       output.file.name  <- paste0(xx,"_region")
+     }
+     
+     orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
+     
+  },grl,output.file.dir)
+  
+}
+
+writeGrlInUnique2Bed <- function(grl,output.file.dir) {
+  
+  null <- lapply(1:length(grl), function(u,grl,output.file.dir){
+    
+    x <- names(grl)[u]
+    y <- as.data.frame(grl[[u]])
+    
+    if(length(grep("///",x))==0){
+      output.file.name  <- paste0(x,"_part.in.unique")
+    }else{
+      xx <- gsub("///","-overlaps-",x)
+      output.file.name  <- paste0(xx,"_region")
+    }
+    
+    orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
+    
+  },grl,output.file.dir)
+  
+}
+
+# names(re.out)
+# [1] "F121_9_all_1.5FC_F200_minp_adjPval-copy" "XL_MEF_1.5FC_minp_countF200_AvgSig-copy"
+
+# ol.F121_9.XL_MEF <- findOverlapsOfPeaks(re.out[c(1,2)])
+
+# ol.F121_9.XL_MEF.subsets <- getUniquePeaks(ol.F121_9.XL_MEF)
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/F121_9-vs-XL_MEF"
+# peaks.in.overlapping.region <- getOverLap(ol.F121_9.XL_MEF,1,output.file.dir)
+# writeGrl2Bed(peaks.in.overlapping.region,output.file.dir)
+# peaks.in.unique.regions.4.ol.F121_9.XL_MEF <- getUniquePeaksFrom2peakSetsOverlapping(ol.F121_9.XL_MEF)
+# writeGrlInUnique2Bed(peaks.in.unique.regions.4.ol.F121_9.XL_MEF,output.file.dir)
+
+  
+# names(nonXL.3.subsets) <- gsub("XL","nonXL",names(nonXL.3.subsets))
+# 
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/F121_9-vs-XL_MEF"
+# null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
 
 
