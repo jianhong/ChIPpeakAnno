@@ -7842,9 +7842,7 @@ getPeaksInOverlap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap) {
   overlap.peak.region <- apply(overlappedPeaks, 1, function(u){
     
     seqnames <- u["seqnames"]
-    #start <- max(u["start"],u["start.1"])
     start <- max(u[names(u) %in% "start"])
-    #end <- min(u["end"],u["end.1"])
     end <- min(u[names(u) %in% "end"])
     
     x <- data.frame(seqnames.olp=seqnames,start.olp=start,end.olp=end)      
@@ -7858,19 +7856,9 @@ getPeaksInOverlap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap) {
   overlappedPeaks <- data.frame(overlappedPeaks,overlappedBasePairs=as.numeric(as.character(overlappedPeaks$end.olp))
                                 -as.numeric(as.character(overlappedPeaks$start.olp))+1,check.names=F)
   
-  #cat(colnames(overlappedPeaks),"\n")  
-  
-  #output.file.name <- paste0(XXX_name[1],"-overlap-",XXX_name[2])
-  
-  #output.file.name <- gsub("<","_", output.file.name)
-  
-  #orderPeakAndOutPut(overlappedPeaks,output.file.dir,output.file.name,outHeader=T)
-  
-  #overlappedPeaks <- peaks.in.overlapping.region
-  
+
   sample.index <- which(colnames(overlappedPeaks) == XXX_name[2])
-  #cat(sample.index,"\n")
-  
+
   end <- sample.index-1
   peak1 <- unique(toGRanges(overlappedPeaks[,1:end],use.mcols=FALSE))
   
