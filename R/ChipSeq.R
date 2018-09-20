@@ -7933,16 +7933,8 @@ getUniquePeaks2 <- function(ol.ciLAD.XL.MEF_LAD) {
   
   w <- list(x=zz[[m[1]]][[m[2]]],y= zz[[m[3]]][[m[4]]])
   names(w) <- c(x,y)
-  #w
-  #part.in.overlap.MEF_LADS.unique <- zz[[m[1]]][[m[2]]] 
-  #part.in.overlap.ciLAD.unique <- zz[[m[3]]][[m[4]]]
-  
+ 
   ol <- findOverlapsOfPeaks(w[c(1,2)],connectedPeaks = "keepAll")
-  #x
-  
-  #ol <- findOverlapsOfPeaks(w[[1]],w[[2]],connectedPeaks = "keepAll")
-  
-  #ol <- findOverlapsOfPeaks(part.in.overlap.MEF_LADS.unique,part.in.overlap.ciLAD.unique,connectedPeaks = "keepAll")
   
   ol.unique.1 <- getPeaksInUnique(ol)
   
@@ -7951,4 +7943,3 @@ getUniquePeaks2 <- function(ol.ciLAD.XL.MEF_LAD) {
   XL.3.subsets
   
 }
-
