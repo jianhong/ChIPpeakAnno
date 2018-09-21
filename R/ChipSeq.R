@@ -7467,30 +7467,6 @@ getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
 
 # XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
 
-getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
-  
-  ol.unique.0 <- getPeaksInUnique(ol.ciLAD.XL.MEF_LAD)
-  
-  cat("peak names in overlapping are:",names(ol.ciLAD.XL.MEF_LAD$overlappingPeaks),"\n")
-  
-  XL.part.in.overlap.MEF_LADS <- toGRanges(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[1]][,1:7])
-  
-  XL.part.in.overlap.ciLAD <- toGRanges(ol.ciLAD.XL.MEF_LAD$overlappingPeaks[[3]][,10:16])
-  
-  part.in.overlap.MEF_LADS.unique <- unique(XL.part.in.overlap.MEF_LADS) 
-  part.in.overlap.ciLAD.unique <- unique(XL.part.in.overlap.ciLAD)
-  
-  ol <- findOverlapsOfPeaks(part.in.overlap.MEF_LADS.unique,part.in.overlap.ciLAD.unique,connectedPeaks = "keepAll")
-  
-  ol.unique.1 <- getPeaksInUnique(ol)
-
-  XL.3.subsets <- c(ol.unique.0,ol.unique.1)
-  
-  XL.3.subsets
-  
-}
-
-
 # Given a list of peaks, to get enriched GO and pathway
 
 # ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
@@ -7894,9 +7870,11 @@ getPeaksInAllOverlap <- function(ol.ciLAD.XL.MEF_LAD) {
   
 }
 
-# XL.3.subsets.2 <- getUniquePeaks2(ol.ciLAD.XL.MEF_LAD)
+# XL.3.subsets.2 <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
+# ciLAD.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
+# LAD.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
 
-getUniquePeaks2 <- function(ol.ciLAD.XL.MEF_LAD) {
+getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
   
   ol.unique.0 <- getPeaksInUnique(ol.ciLAD.XL.MEF_LAD)
   
@@ -7906,6 +7884,8 @@ getUniquePeaks2 <- function(ol.ciLAD.XL.MEF_LAD) {
   
   print(zz_name)
   
+  if(length(zz) > 1) {
+    
   cat('Select the peak you want to overlap again:', '\n')
   m<-scan("",quiet=TRUE)
   
@@ -7927,6 +7907,18 @@ getUniquePeaks2 <- function(ol.ciLAD.XL.MEF_LAD) {
   ol.unique.1 <- getPeaksInUnique(ol)
   
   XL.3.subsets <- c(ol.unique.0,ol.unique.1)
+  } else{
+        cat('Select the peak you want to include:', '\n')
+        m<-scan("",quiet=TRUE)
+        cat("The peak names you selected are:",names(zz[[m[1]]])[m[2]],"\n")
+        x <- paste0(toString((names(zz[[m[1]]])[m[2]])),"_in_",toString(names(zz[[m[1]]])[3]))
+        x <- gsub("///","_overlaps_",x)
+        cat(x,"\n")
+        w <- zz[[m[1]]][[m[2]]]
+        XL.3.subsets <- c(ol.unique.0,w)
+        names(XL.3.subsets)[2] <- x
+        XL.3.subsets
+  }
   
   XL.3.subsets
   
