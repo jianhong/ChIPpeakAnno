@@ -8126,17 +8126,11 @@ generateRegionDB <- function(ctcf.input.file,selected.peak.index,dpPath) {
   regionDB
 }
 
-
 # output.file.dir <-  "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_28_2018"
-
 # dbPath = "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10"
-
 # regionDB = loadRegionDB(dbLocation=dbPath)
-
 # XL.nonXL.subset <- c(XL.3.subsets,nonXL.3.subsets)
-
 # getOverlapWithOther(XL.nonXL.subset,regionDB,output.file.dir)
-
 getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -8158,10 +8152,6 @@ getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
   
   locResults = runLOLA(grl2,userUniverse,regionDB,cores=4)
   
-  # res <- locResults
-  
-  #plotTopLOLAEnrichments(res)
-  
   userSetName <- unique(locResults$userSet)
   
   locResults[which(locResults$userSet==userSetName[1]),]$userSet <- "XL_LAD"
@@ -8176,29 +8166,3 @@ getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
               quote = FALSE,row.names = FALSE,col.names = TRUE)
   locResults
 }
-
-# grlT <- grl[[1]]
-# 
-# ex <- extractEnrichmentOverlaps(res[2,],grl2,regionDB)
-# 
-# dbPath = system.file("extdata", "hg19", package="LOLA")
-# regionDB = loadRegionDB(dbLocation=dbPath)
-# data("sample_universe", package="LOLA")
-# data("sample_input", package="LOLA")
-# 
-# getRegionSet(regionDB, collections="ucsc_example", filenames="vistaEnhancers.bed")
-# getRegionSet(dbPath, collections="ucsc_example", filenames="vistaEnhancers.bed")
-# getRegionFile(dbPath, collections="ucsc_example", filenames="vistaEnhancers.bed")
-# 
-# 
-# res = runLOLA(userSets, userUniverse, regionDB, cores=1)
-# locResult = res[2,]
-# extractEnrichmentOverlaps(locResult, userSets, regionDB)
-# writeCombinedEnrichment(locResult, "temp_outfolder")
-# 
-# userSetsRedefined =	redefineUserSets(userSets, userUniverse)
-# resRedefined = runLOLA(userSetsRedefined, userUniverse, regionDB, cores=1)
-# 
-# g = plotTopLOLAEnrichments(resRedefined)
-
-
