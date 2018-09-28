@@ -8096,5 +8096,109 @@ dev.off()
 
 }
 
+# ProcessUsingLOLA
+
+# ctcf.input.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection"
+# selected.peak.index <- c(4,7:10)
+# dbPath = "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10"
+# regionDB <- generateRegionDB(ctcf.input.file,selected.peak.index,dpPath)
+
+generateRegionDB <- function(ctcf.input.file,selected.peak.index,dpPath) {
+  
+  ctcf.input.file.name <- list.files(ctcf.input.file,all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  ctcf.input.file.name.1 <- ctcf.input.file.name[selected.peak.index]
+  ctcf.bed.collection.dir <- file.path(dbPath,"/ucsc_example/regions")
+
+  if(!dir.exists(ctcf.bed.collection.dir)){dir.create(ctcf.bed.collection.dir,recursive = TRUE)}
+  
+  null <- lapply(1:length(ctcf.input.file.name.1), function(u,ctcf.input.file.name.1,ctcf.bed.collection.dir){
+    
+    x <- tools::file_path_sans_ext(basename(ctcf.input.file.name.1[u]))
+    
+    cmd = paste("grep -v track",ctcf.input.file.name.1[u],"| awk -v OFS='\t' -F'\t' '{print $1,$2,$3}'",">",file.path(ctcf.bed.collection.dir,paste0(x,".bed")),collapse= " ")
+    system(cmd)  
+    
+  },ctcf.input.file.name.1,ctcf.bed.collection.dir)
+  
+  #dbPath = "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10"
+  
+  regionDB = loadRegionDB(dbLocation=dbPath)
+  regionDB
+}
+
+
+# output.file.dir <-  "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_28_2018"
+
+# dbPath = "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10"
+
+# regionDB = loadRegionDB(dbLocation=dbPath)
+
+# XL.nonXL.subset <- c(XL.3.subsets,nonXL.3.subsets)
+
+# getOverlapWithOther(XL.nonXL.subset,regionDB,output.file.dir)
+
+getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  grl <- lapply(1:length(XL.nonXL.subset), function(u,XL.nonXL.subset){
+     
+    gr <- XL.nonXL.subset[[u]]
+    mcols(gr) <- NULL
+    gr
+      
+  },XL.nonXL.subset)
+  names(grl) <- names(XL.nonXL.subset)
+  
+  grl2 <- GRangesList(grl)
+  
+  grl3 <- c(regionDB$regionGRL,grl2)
+  
+  userUniverse <- buildRestrictedUniverse(grl3)
+  
+  locResults = runLOLA(grl2,userUniverse,regionDB,cores=4)
+  
+  # res <- locResults
+  
+  #plotTopLOLAEnrichments(res)
+  
+  userSetName <- unique(locResults$userSet)
+  
+  locResults[which(locResults$userSet==userSetName[1]),]$userSet <- "XL_LAD"
+  locResults[which(locResults$userSet==userSetName[2]),]$userSet <- "nonXL_LAD"
+  locResults[which(locResults$userSet==userSetName[3]),]$userSet <- "XL_ciLAD"
+  locResults[which(locResults$userSet==userSetName[4]),]$userSet <- "nonXL_ciLAD"
+  locResults[which(locResults$userSet==userSetName[5]),]$userSet <- "XL"
+  locResults[which(locResults$userSet==userSetName[6]),]$userSet <- "nonXL"
+  
+  write.table(locResults,
+              file=file.path(output.file.dir,"OverlapWith.other.CTCF.data.set.txt"),sep="\t",
+              quote = FALSE,row.names = FALSE,col.names = TRUE)
+  locResults
+}
+
+# grlT <- grl[[1]]
+# 
+# ex <- extractEnrichmentOverlaps(res[2,],grl2,regionDB)
+# 
+# dbPath = system.file("extdata", "hg19", package="LOLA")
+# regionDB = loadRegionDB(dbLocation=dbPath)
+# data("sample_universe", package="LOLA")
+# data("sample_input", package="LOLA")
+# 
+# getRegionSet(regionDB, collections="ucsc_example", filenames="vistaEnhancers.bed")
+# getRegionSet(dbPath, collections="ucsc_example", filenames="vistaEnhancers.bed")
+# getRegionFile(dbPath, collections="ucsc_example", filenames="vistaEnhancers.bed")
+# 
+# 
+# res = runLOLA(userSets, userUniverse, regionDB, cores=1)
+# locResult = res[2,]
+# extractEnrichmentOverlaps(locResult, userSets, regionDB)
+# writeCombinedEnrichment(locResult, "temp_outfolder")
+# 
+# userSetsRedefined =	redefineUserSets(userSets, userUniverse)
+# resRedefined = runLOLA(userSetsRedefined, userUniverse, regionDB, cores=1)
+# 
+# g = plotTopLOLAEnrichments(resRedefined)
 
 
