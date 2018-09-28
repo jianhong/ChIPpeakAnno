@@ -30,6 +30,8 @@
 #' 
 #' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_10_2018/F121_9-vs-XL_MEF"
 #' 
+#' output.file.dir="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_27_2018" 
+#' 
 #' AnnotatePeakUMASS(input.file.dir,input.file.pattern,output.file.dir,genome="Mm")
 #' 
 AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,genome) {
@@ -42,7 +44,10 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     
     if(length(grep("Peric",u)) ==1){
       peaks=read.table(u)
-    }else{
+    }else if(length(grep("GSM",u)) ==1){
+      peaks=read.table(u)
+    }else
+    {
       peaks=read.table(u,skip=1)
     }
     colnames(peaks)[1:3]= c("chr","start","end")
@@ -50,7 +55,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     peaks
   })
   
-  names(re.out) <- gsub(" ","-",tools::file_path_sans_ext(basename(file.name.4)))
+  names(re.out) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.4)))
   
   pat1 <- "ciLAD"
   pat2 <- "nonXL_MEF"
@@ -637,17 +642,18 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   },re.out,output.file.dir,genome)
   
   
-  peaks1 <- GRanges(seqnames=c("1", "2", "3"),
-                    IRanges(start=c(967654, 2010897, 2496704),
-                            end=c(967754, 2010997, 2496804), 
+  peaks1 <- GRanges(seqnames=c("1", "1", "1"),
+                    IRanges(start=c(8, 15, 60),
+                            end=c(20, 50, 100), 
                             names=c("Site1", "Site2", "Site3")),
                     strand="+",
                     feature=c("a","a","a"))
+  
   peaks2 = GRanges(seqnames=c("1", "2", "3", "1", "2"), 
-                   IRanges(start = c(967659, 2010898,2496700,
-                                     3075866,3123260),
-                           end = c(967869, 2011108, 2496920, 
-                                   3076166, 3123470),
+                   IRanges(start = c(10, 30,90,
+                                     100,200),
+                           end = c(20,50, 200, 
+                                   150, 500),
                            names = c("t1", "t2", "t3", "t4", "t5")), 
                    strand = c("+", "+", "+", "+", "+"), 
                    feature=c("a","a","a","a","a"))
@@ -7923,3 +7929,172 @@ getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
   XL.3.subsets
   
 }
+
+# fpkm.file <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/GSM1621026_WT_fpkm.csv"
+# fpkm.value <- dealWithRnaSeqFpkm(fpkm.file)
+
+dealWithRnaSeqFpkm <- function(fpkm.file) {
+
+    fpkm <- read.table(fpkm.file,sep = "\t",header = T)
+  
+    dat <- readLines(fpkm.file)
+    dat <- strsplit(dat, ",")
+  
+  xx <- lapply(dat, function(u){
+    
+    n <- length(u)
+    
+    gene.name <- paste(u[1:n-1],collapse = ":")
+    fpkm <- u[n]
+    
+    x <- data.frame(gene.name=gene.name,fpkm=fpkm)
+    x 
+       
+  })
+  xxx <- do.call(rbind,xx)
+  xxx <- xxx[-1,]
+  
+#  class(fpkm$WT_FPKM)
+  
+#  which(is.na(fpkm$WT_FPKM))
+  
+  #fpkm.value <- as.numeric(as.character(xxx$fpkm))
+  
+  #hist(fpkm.value)
+  #boxplot(fpkm.value)
+  xxx
+}
+
+# peak.index <- c(2,5)
+# name <- c("H3K27me3","nonXL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(3,5)
+# name <- c("H3K9me3","nonXL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(4,5)
+# name <- c("PML","nonXL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(2,7)
+# name <- c("H3K27me3","XL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(3,7)
+# name <- c("H3K9me3","XL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(4,7)
+# name <- c("PML","XL")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
+  
+  grl <- GRangesList(re.out[peak.index])
+  names(grl) <- name
+  
+  Z <- ChIPpeakAnno:::vennCounts(grl,length(peak.index),names=names(grl),by="base") 
+  
+  if(length(peak.index)==2){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="00"),]
+  }
+  
+  if(length(peak.index)==3){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="000"),]
+  }
+  
+  y <- ZZ[,"Counts"]
+  names(y) <- row.names(ZZ)
+  
+  labels = name
+  pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
+  plot.new()
+  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
+  dev.off()
+  
+}
+
+# ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,7,6)])
+# XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
+# XL.3.subsets.anno <- getAnnotatedGene(XL.3.subsets,"Mm")
+
+# ol.ciLAD.non_XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,5,6)])
+# nonXL.3.subsets <- getUniquePeaks(ol.ciLAD.non_XL.MEF_LAD)
+# nonXL.3.subsets.anno <- getAnnotatedGene(nonXL.3.subsets,"Mm")
+
+getAnnotatedGene <- function(re.out,genome){
+  
+  y <- lapply(1:length(re.out),function(u,re.out,genome){
+    
+    x=re.out[[u]]
+    x_name=names(re.out)[u]
+    
+    if(genome=="Mm"){
+      
+      dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
+      
+      overlaps.trimmed<-trim(x,use.names=TRUE)
+      overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+     
+    }
+    overlaps.anno
+  },re.out,genome)
+
+  names(y) <- names(re.out)
+  y
+  
+}
+
+# YYY1 <- getFPKM4DiffSet(XL.3.subsets.anno,fpkm.value)
+# YYY2 <- getFPKM4DiffSet(nonXL.3.subsets.anno,fpkm.value)
+# YYY <- rbind(YYY1,YYY2)
+
+getFPKM4DiffSet <- function(XL.3.subsets.anno,fpkm.value) {
+  YY <- lapply(1:length(XL.3.subsets.anno), function(u,XL.3.subsets.anno,fpkm.value){
+  
+    index.matched.2.fpkm <- match(XL.3.subsets.anno[[u]]$gene_name,fpkm.value$gene.name)
+    index1 <- index.matched.2.fpkm[which(!is.na(index.matched.2.fpkm))]
+    fpkm.value.4.oneset <- fpkm.value[index1,]
+    set.name <- names(XL.3.subsets.anno)[u]
+    y <- cbind.data.frame(rep(set.name,dim(fpkm.value.4.oneset)[1]),fpkm.value.4.oneset)
+    colnames(y) <- c("SetName","GeneName","FPKM")
+    y
+  },XL.3.subsets.anno,fpkm.value)
+  
+  YYY <- do.call(rbind,YY)
+  YYY
+}
+
+# getBoxPlot4FPKMOfSubsetPeaks(YYY,output.file.dir)
+
+getBoxPlot4FPKMOfSubsetPeaks <- function(YYY,output.file.dir){
+  
+YYY.set.name <- unique(as.character(YYY$SetName))
+
+index <- which(levels(YYY$SetName)==YYY.set.name[1])
+levels(YYY$SetName)[index] <- "XL_Uniq"
+
+index <- which(levels(YYY$SetName)==YYY.set.name[2])
+levels(YYY$SetName)[index] <- "XL_ciLAD"
+
+index <- which(levels(YYY$SetName)==YYY.set.name[3])
+levels(YYY$SetName)[index] <- "XL_LAD"
+
+index <- which(levels(YYY$SetName)==YYY.set.name[4])
+levels(YYY$SetName)[index] <- "nonXL_Uniq"
+
+index <- which(levels(YYY$SetName)==YYY.set.name[5])
+levels(YYY$SetName)[index] <- "nonXL_ciLAD"
+
+index <- which(levels(YYY$SetName)==YYY.set.name[6])
+levels(YYY$SetName)[index] <- "nonXL_LAD"
+
+pdf(file = file.path(output.file.dir,paste0(paste(levels(YYY$SetName),collapse = "-"),".pdf")))
+boxplot(log10(as.numeric(as.character(YYY$FPKM))+1)~YYY$SetName,ylab = "log10(FPKM+1)")
+dev.off()
+
+}
+
+
+
