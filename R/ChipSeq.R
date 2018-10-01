@@ -8134,7 +8134,11 @@ generateRegionDB <- function(ctcf.input.file,selected.peak.index,dpPath) {
 # regionDB = loadRegionDB(dbLocation=dbPath)
 # XL.nonXL.subset <- c(XL.3.subsets,nonXL.3.subsets)
 # getOverlapWithOther(XL.nonXL.subset,regionDB,output.file.dir)
-getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
+
+# select.query.peak.index <- c(1,2,3)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_1_2018_WithCTCF"
+
+getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,regionDB,output.file.dir) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
@@ -8149,10 +8153,12 @@ getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
   
   grl2 <- GRangesList(grl)
   
-  grl3 <- c(regionDB$regionGRL,grl2)
-  
-  userUniverse <- buildRestrictedUniverse(grl3)
-  
+  if(is.null(select.query.peak.index)){
+    
+    grl3 <- c(regionDB$regionGRL,grl2)
+    
+    userUniverse <- buildRestrictedUniverse(grl3)
+    
   locResults = runLOLA(grl2,userUniverse,regionDB,cores=4)
   
   userSetName <- unique(locResults$userSet)
@@ -8167,7 +8173,47 @@ getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
   write.table(locResults,
               file=file.path(output.file.dir,"OverlapWith.other.CTCF.data.set.txt"),sep="\t",
               quote = FALSE,row.names = FALSE,col.names = TRUE)
+  }else{
+    
+    select.query.peak.index <- c(1,2,3)
+    
+    grl3 <- c(regionDB$regionGRL,grl2[select.query.peak.index])
+    
+    userUniverse <- buildRestrictedUniverse(grl3)
+    
+    
+    locResults = runLOLA(grl2[select.query.peak.index],userUniverse,regionDB,cores=4)
+    
+    userSetName <- unique(locResults$userSet)
+    
+    locResults[which(locResults$userSet==userSetName[1]),]$userSet <- "XL_LAD"
+    locResults[which(locResults$userSet==userSetName[2]),]$userSet <- "XL_ciLAD"
+    locResults[which(locResults$userSet==userSetName[3]),]$userSet <- "XL"
+
+    write.table(locResults,
+                file=file.path(output.file.dir,"XL_OverlapWith.other.CTCF.data.set.txt"),sep="\t",
+                quote = FALSE,row.names = FALSE,col.names = TRUE)
+    
+    select.query.peak.index <- c(4,5,6)
+    
+    grl3 <- c(regionDB$regionGRL,grl2[select.query.peak.index])
+    
+    userUniverse <- buildRestrictedUniverse(grl3)
+    
+    locResults = runLOLA(grl2[select.query.peak.index],userUniverse,regionDB,cores=4)
+    
+    userSetName <- unique(locResults$userSet)
+    
+    locResults[which(locResults$userSet==userSetName[1]),]$userSet <- "nonXL_LAD"
+    locResults[which(locResults$userSet==userSetName[2]),]$userSet <- "nonXL_ciLAD"
+    locResults[which(locResults$userSet==userSetName[3]),]$userSet <- "nonXL"
+    
+    write.table(locResults,
+                file=file.path(output.file.dir,"nonXL_OverlapWith.other.CTCF.data.set.txt"),sep="\t",
+                quote = FALSE,row.names = FALSE,col.names = TRUE)
+    
+  }
+
   locResults
 }
-
 
