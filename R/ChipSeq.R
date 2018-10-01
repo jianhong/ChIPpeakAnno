@@ -7965,6 +7965,7 @@ dealWithRnaSeqFpkm <- function(fpkm.file) {
   xxx
 }
 
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_30_2018_reOrder_venn"  
 # peak.index <- c(2,5)
 # name <- c("H3K27me3","nonXL")
 # getCount4Venn(re.out,peak.index,name,output.file.dir)
@@ -7991,6 +7992,8 @@ dealWithRnaSeqFpkm <- function(fpkm.file) {
 
 getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
   grl <- GRangesList(re.out[peak.index])
   names(grl) <- name
   
@@ -8007,7 +8010,7 @@ getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   y <- ZZ[,"Counts"]
   names(y) <- row.names(ZZ)
   
-  labels = name
+  labels = rev(name)
   pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
   plot.new()
   colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
@@ -8166,3 +8169,5 @@ getOverlapWithOther <- function(XL.nonXL.subset,regionDB,output.file.dir) {
               quote = FALSE,row.names = FALSE,col.names = TRUE)
   locResults
 }
+
+
