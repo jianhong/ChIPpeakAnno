@@ -7990,6 +7990,51 @@ dealWithRnaSeqFpkm <- function(fpkm.file) {
 # name <- c("PML","XL")
 # getCount4Venn(re.out,peak.index,name,output.file.dir)
 
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_1_2018_venn_with_ATAC"
+# peak.index <- c(6,5)
+# name <- c("nonXL","ATAC")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# peak.index <- c(8,5)
+# name <- c("XL","ATAC")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# names(XL.nonXL.subset)
+# names(re.out)
+
+# NAD_class.ATAC <-  list(XL_uniq=XL.nonXL.subset[[1]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("XL_uniq","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+# NAD_class.ATAC <-  list(XL_ciLAD=XL.nonXL.subset[[2]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("XL_ciLAD","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+# NAD_class.ATAC <-  list(XL_LAD=XL.nonXL.subset[[3]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("XL_LAD","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+# NAD_class.ATAC <-  list(nonXL_uniq=XL.nonXL.subset[[4]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("nonXL_uniq","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+# NAD_class.ATAC <-  list(nonXL_ciLAD=XL.nonXL.subset[[5]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("nonXL_ciLAD","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+# NAD_class.ATAC <-  list(nonXL_LAD=XL.nonXL.subset[[6]],ATAC=re.out[[5]])
+# peak.index <- c(1,2)
+# name <- c("nonXL_LAD","ATAC")
+# getCount4Venn(NAD_class.ATAC,peak.index,name,output.file.dir)
+
+
+
+
 getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -8001,16 +8046,20 @@ getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   
   if(length(peak.index)==2){
     ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="00"),]
+    labels = rev(name)
   }
   
   if(length(peak.index)==3){
     ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="000"),]
+    labels = name
   }
   
   y <- ZZ[,"Counts"]
+  
+  print(ZZ)
+  
   names(y) <- row.names(ZZ)
   
-  labels = rev(name)
   pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
   plot.new()
   colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
@@ -8070,8 +8119,12 @@ getFPKM4DiffSet <- function(XL.3.subsets.anno,fpkm.value) {
 }
 
 # getBoxPlot4FPKMOfSubsetPeaks(YYY,output.file.dir)
-
-getBoxPlot4FPKMOfSubsetPeaks <- function(YYY,output.file.dir){
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_2_2018_boxplot_include_whole_genome"
+# getBoxPlot4FPKMOfSubsetPeaks(YYY,fpkm.value,output.file.dir)
+ 
+getBoxPlot4FPKMOfSubsetPeaks <- function(YYY,fpkm.value,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
 YYY.set.name <- unique(as.character(YYY$SetName))
 
@@ -8093,8 +8146,17 @@ levels(YYY$SetName)[index] <- "nonXL_ciLAD"
 index <- which(levels(YYY$SetName)==YYY.set.name[6])
 levels(YYY$SetName)[index] <- "nonXL_LAD"
 
-pdf(file = file.path(output.file.dir,paste0(paste(levels(YYY$SetName),collapse = "-"),".pdf")))
-boxplot(log10(as.numeric(as.character(YYY$FPKM))+1)~YYY$SetName,ylab = "log10(FPKM+1)")
+fpkm.value.ref <- data.frame(SetName=rep("wholeGenome",dim(fpkm.value)[1]),GeneName=fpkm.value$gene.name,FPKM=fpkm.value$fpkm)
+
+NAD.fpkm.value <- fpkm.value.ref[which(fpkm.value.ref$GeneName %in% YYY$GeneName),]
+NAD.fpkm.value$SetName <- "NAD"
+nonNAD.fpkm.value <- fpkm.value.ref[-which(fpkm.value.ref$GeneName %in% YYY$GeneName),]
+nonNAD.fpkm.value$SetName <- "nonNAD"
+
+YYYY <- rbind(YYY,NAD.fpkm.value,nonNAD.fpkm.value,fpkm.value.ref)
+
+png(file = file.path(output.file.dir,paste0(paste(levels(YYYY$SetName),collapse = "-"),".png")),width = 1500, height = 480)
+boxplot(log10(as.numeric(as.character(YYYY$FPKM))+1)~YYYY$SetName,ylab = "log10(FPKM+1)")
 dev.off()
 
 }
@@ -8217,3 +8279,131 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
   locResults
 }
 
+# Make venns for the following:
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_1_2018_venn_with_modifications"
+
+# nonXL, H3K27me3, ciLAD
+# peak.index <- c(5,2,1)
+# name <- c("nonXL","H3K27me3","ciLAD")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# nonXL, H3K27me3, LAD
+# peak.index <- c(5,2,6)
+# name <- c("nonXL","H3K27me3","LAD")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# nonXL, H3K9me3, ciLAD
+# peak.index <- c(5,3,1)
+# name <- c("nonXL","H3K9me3","ciLAD")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+# nonXL, H3K9me3, LAD
+# peak.index <- c(5,3,6)
+# name <- c("nonXL","H3K9me3", "LAD")
+# getCount4Venn(re.out,peak.index,name,output.file.dir)
+
+overLapWithOtherFeatures <- function(toGRanges, K27me3.bam.dir, .Platform, import, rtracklayer, mean, sig) {
+  cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
+                                      sample.int(300, 100))), 
+                   B=RleList(chr1=Rle(sample.int(5000, 100), 
+                                      sample.int(300, 100))))
+  
+  feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+  
+  featureAlignedSignal(cvglists, feature.gr)
+  
+  path <- system.file("extdata", package="ChIPpeakAnno")
+  files <- dir(path, "broadPeak")
+  data <- sapply(file.path(path, files), toGRanges, format="broadPeak")
+  
+  names(data) <- gsub(".broadPeak", "", files)
+  
+  ol <- findOverlapsOfPeaks(data)
+  
+  
+  features <- ol$peaklist[[length(ol$peaklist)]]
+  
+  wid <- width(features)
+  feature.recentered <- feature.center <- features
+  
+  start(feature.center) <- start(features) + floor(wid/2)
+  
+  width(feature.center) <- 1
+  
+  
+  start(feature.recentered) <- start(feature.center) - 2000
+  end(feature.recentered) <- end(feature.center) + 2000
+  
+  # /project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles
+  
+  # K27me3.bam.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles"
+    
+  files <- dir(K27me3.bam.dir, "bam")[c(1,3)]
+  
+  if(.Platform$OS.type != "windows"){
+    cvglists <- sapply(file.path(K27me3.bam.dir, files), import, 
+                       format="BAM", 
+                       as="RleList")
+  }else{## rtracklayer can not import bigWig files on Windows
+    load(file.path(path, "cvglist.rds"))
+  }
+  
+  
+  library(rtracklayer)
+  files <- dir(path, "bigWig")
+  if(.Platform$OS.type != "windows"){
+    cvglists <- sapply(file.path(path, files), import, 
+                       format="BigWig", 
+                       which=feature.recentered, 
+                       as="RleList")
+  }else{## rtracklayer can not import bigWig files on Windows
+    load(file.path(path, "cvglist.rds"))
+  }
+  
+  cvglists1 <- sapply(file.path(path, files), import, 
+                     format="BigWig", 
+                     which=feature.recentered, 
+                     as="RleList")
+  
+  cvglists2 <- sapply(file.path(path, files), import, 
+                     format="BigWig",as="RleList")
+  
+  identical(cvglists1,cvglists2)
+  
+  rl <- Rle(c(1,1,1,1,2,2,3,3,2,2))
+  rl
+  
+  ir <- IRanges(start = c(2,6), width = 2)
+  aggregate(rl, ir, FUN = mean)
+  
+  ir <- IRanges(start = 1:10, width = 3)
+  rl <- coverage(ir)
+  rl
+  slice(rl, 2)
+  
+  vi <- Views(rl, start = c(3,7), width = 3)
+  vi
+  
+  
+  names(cvglists1) <- gsub(".bigWig", "", files)
+  sig1 <- featureAlignedSignal(cvglists1, feature.center, 
+                              upstream=2000, downstream=2000) 
+  
+  names(cvglists2) <- gsub(".bigWig", "", files)
+  sig2 <- featureAlignedSignal(cvglists2, feature.center, 
+                              upstream=2000, downstream=2000) 
+  
+  identical(sig1,sig2)
+  
+  heatmap <- featureAlignedHeatmap(sig1, feature.center, 
+                                   upstream=2000, downstream=2000,
+                                   upper.extreme=c(3,.5,4))
+  
+  heatmap <- featureAlignedHeatmap(sig2, feature.center, 
+                                   upstream=2000, downstream=2000,
+                                   upper.extreme=c(3,.5,4))
+  
+  featureAlignedDistribution(sig, feature.center, 
+                             upstream=2000, downstream=2000,
+                             type="l")
+}
