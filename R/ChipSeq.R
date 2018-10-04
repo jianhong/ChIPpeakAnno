@@ -8120,7 +8120,7 @@ getFPKM4DiffSet <- function(XL.3.subsets.anno,fpkm.value) {
 
 # getBoxPlot4FPKMOfSubsetPeaks(YYY,output.file.dir)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_2_2018_boxplot_include_whole_genome"
-# getBoxPlot4FPKMOfSubsetPeaks(YYY,fpkm.value,output.file.dir)
+# YYYY <- getBoxPlot4FPKMOfSubsetPeaks(YYY,fpkm.value,output.file.dir)
  
 getBoxPlot4FPKMOfSubsetPeaks <- function(YYY,fpkm.value,output.file.dir){
   
@@ -8159,12 +8159,14 @@ png(file = file.path(output.file.dir,paste0(paste(levels(YYYY$SetName),collapse 
 boxplot(log10(as.numeric(as.character(YYYY$FPKM))+1)~YYYY$SetName,ylab = "log10(FPKM+1)")
 dev.off()
 
+YYYY
+
 }
 
 # ProcessUsingLOLA
 
 # ctcf.input.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection"
-# selected.peak.index <- c(4,7:10)
+# selected.peak.index <- c(4,7:10,13)
 # dbPath = "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10"
 # regionDB <- generateRegionDB(ctcf.input.file,selected.peak.index,dpPath)
 
@@ -8199,6 +8201,13 @@ generateRegionDB <- function(ctcf.input.file,selected.peak.index,dpPath) {
 
 # select.query.peak.index <- c(1,2,3)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_1_2018_WithCTCF"
+
+
+# output.file.dir <-  "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_3_2018_include_Non_CTCF"
+# XL.nonXL.subset <- c(XL.3.subsets,nonXL.3.subsets)
+# 
+
+
 
 getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,regionDB,output.file.dir) {
   
@@ -8407,3 +8416,108 @@ overLapWithOtherFeatures <- function(toGRanges, K27me3.bam.dir, .Platform, impor
                              upstream=2000, downstream=2000,
                              type="l")
 }
+
+getNonCtcfBed <- function(re.out, BSgenome.Mmusculus.UCSC.mm10) {
+  #paul.dir <- "/project/umw_paul_kaufman"
+  pau.dir <- "~/Aimin/ProjectAtCluster/umw_paul_kaufman/Aimin"
+  
+  if(!dir.exists(pau.dir)){dir.create(pau.dir,recursive = TRUE)}
+  
+  null <- lapply(1:length(re.out), function(u,re.out){
+    export(re.out[[u]],file.path(pau.dir,paste0(names(re.out)[u],".bed")),format="BED")},re.out)
+  
+  gr.whole.genome <- GRanges(seqinfo(BSgenome.Mmusculus.UCSC.mm10))
+  
+  bed.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection"
+  export(gr.whole.genome,file.path(bed.dir,"WholeGenome.bed"),format="BED")
+  
+  ref.bed <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/WholeGenome.bed"
+  exclude.bed.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection/mm10/ucsc_example/regions"
+  
+  exclude.bed.file.name <- list.files(exclude.bed.dir,all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  exclude.bed <- paste(exclude.bed.file.name[4:7],collapse = " ")
+  
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/CtcfCollection"
+  cmd = paste("bedops -d",ref.bed,exclude.bed,">",file.path(output.file.dir,"NonCTCF.bed"))
+  
+  system(cmd)
+}
+
+getGeneDensityPlot <- function() {
+  # whole genome in MB
+  whole.genome.MB <- sum(width(gr.whole.genome))/1000000
+  
+  NAD <- unique(c(re.out[[6]],re.out[[8]]))
+  
+  bed.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Results_10_4_2018_gene_density"
+  if(!dir.exists(bed.dir)){dir.create(bed.dir,recursive = TRUE)}
+  
+  export(NAD,file.path(bed.dir,"NAD.bed"),format="BED")
+  
+  
+  cmd = paste("bedops -d",ref.bed,file.path(bed.dir,"NAD.bed"),">",file.path(bed.dir,"nonNAD.bed"))
+  
+  system(cmd)
+  
+  peaks=read.table(file.path(bed.dir,"nonNAD.bed"))
+  
+  colnames(peaks)[1:3]= c("chr","start","end")
+  nonNAD=toGRanges(peaks)
+  
+  mcols(NAD) <- NULL
+  nonNAD <- setdiff(gr.whole.genome,NAD)
+  
+  NAD.MB <- sum(width(NAD))/1000000
+  nonNAD.MB <- sum(width(nonNAD))/1000000
+  
+  mbl <- lapply(1:length(XL.nonXL.subset),function(u,XL.nonXL.subset){
+    
+    mb <- sum(width(XL.nonXL.subset[[u]]))/1000000
+    mb
+  },XL.nonXL.subset)
+  names(mbl) <- names(XL.nonXL.subset)
+  names(mbl) <- unique(as.character(YYYY$SetName))[1:6]
+  
+  mbl2 <- do.call(rbind,mbl)
+  colnames(mbl2) <- "MB"
+  
+  mbl3 <- as.data.frame(c(NAD.MB,nonNAD.MB,whole.genome.MB))
+  row.names(mbl3) <- unique(as.character(YYYY$SetName))[7:9]
+  colnames(mbl3) <- "MB"
+  mbl4 <- rbind.data.frame(mbl2,mbl3)
+  
+  num.gene <- lapply(unique(as.character(YYYY$SetName)), function(u,YYYY){
+    num.gene <- length(unique(as.character(YYYY[which(YYYY$SetName==u),]$GeneName)))
+    num.gene
+  },YYYY)
+  names(num.gene) <- unique(as.character(YYYY$SetName))
+  num.gene.1 <- do.call(rbind,num.gene)
+  
+  mb.gene.num <- cbind(mbl4,num.gene.1,num.gene.1/mbl4)
+  
+  group.colors <-  rainbow(9)
+  
+  mb.gene.num <- data.frame(mb.gene.num,Category=row.names(mb.gene.num))
+  
+  colnames(mb.gene.num) <- c("MB","num.gene","Density","Category")
+  
+  DF <- mb.gene.num
+  
+  DF$Category <- factor(DF$Category, levels = DF$Category[order(DF$Density,decreasing = T)])
+  
+  sp <- ggplot(DF, aes(x = Category, y = Density, fill = Category)) +
+    geom_bar(stat="identity", position = "dodge") +
+    ggtitle(paste("Gene density(#Gene/MB)")) +
+    theme(plot.title=element_text(hjust=0.5))
+  spp <- list(sp=sp)
+  multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
+  
+  if(!dir.exists(bed.dir)){dir.create(output.dir,recursive = TRUE)}
+  ggexport(multi.page, width = 1000, height = 480,filename = file.path(bed.dir,"GeneDensity.png"))
+  
+}
+
+
+
+
