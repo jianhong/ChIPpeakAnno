@@ -51,3 +51,4 @@ print(input.file.dir)
 print(out.dir)
 
 AnnotatePeakUMASS(input.file.dir,input.file.pattern,out.dir,genome=input.genome)
+
