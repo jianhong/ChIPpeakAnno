@@ -8415,6 +8415,9 @@ overLapWithOtherFeatures <- function(toGRanges, K27me3.bam.dir, .Platform, impor
   featureAlignedDistribution(sig, feature.center, 
                              upstream=2000, downstream=2000,
                              type="l")
+  
+  dir("~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/")
+  
 }
 
 getNonCtcfBed <- function(re.out, BSgenome.Mmusculus.UCSC.mm10) {
@@ -8542,4 +8545,37 @@ getGeneDensityPlot <- function() {
   
 }
 
-
+getCTCFDB <- function() {
+  LOLA.collection.folder <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/MouseCollection"
+  
+  db.info <- read.table("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/MouseCollection/TF_mouse_data_information.txt",header = F,sep ="\t")
+  colnames(db.info) <- c("Index","dataSource","Organism","None","cellType","tissue","antibody","filename")
+  
+  db.info.1 <- db.info[,c(8,5,6,7,2)]
+  
+  db.info.2 <- db.info[which(db.info.1[,4]=="CTCF"),]
+  
+  write.table(db.info.2,file = file.path(LOLA.collection.folder,paste0("index",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  ctcf.files <- file.path(LOLA.collection.folder,"TF_mouse",db.info.2$filename)
+  ctcf.Mm.collection <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/MouseCtcf/regions"
+  
+  if(!dir.exists(ctcf.Mm.collection)){dir.create(ctcf.Mm.collection,recursive = TRUE)}
+  
+  cmd = paste("cp",ctcf.files,file.path(ctcf.Mm.collection,"."))
+  
+  null <- lapply(cmd, function(u){system(u)})
+  
+  
+  RegionDB.ctcf <- loadRegionDB("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin")
+  
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Results_10_6_with_other_178_CTCF"
+  getOverlapWithOther(XL.nonXL.subset,select.query.peak.index= NULL,RegionDB.ctcf,output.file.dir)
+  
+  output.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_paul_kaufman/Aimin/Results_10_6_2018_ctcf"
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+    
+  saveRDS(XL.nonXL.subset,file.path(output.file.dir,"XL_nonXL.rds"))
+  saveRDS(RegionDB.ctcf,file.path(output.file.dir,"ctcfRegionDB.rds"))
+}
