@@ -8448,7 +8448,19 @@ getGeneDensityPlot <- function() {
   # whole genome in MB
   whole.genome.MB <- sum(width(gr.whole.genome))/1000000
   
-  NAD <- unique(c(re.out[[6]],re.out[[8]]))
+  export(re.out[[6]],file.path(bed.dir,"nonXL.bed"),format="BED")
+  export(re.out[[8]],file.path(bed.dir,"XL.bed"),format="BED")
+  
+  nad.bed <- paste(file.path(bed.dir,"nonXL.bed"),file.path(bed.dir,"XL.bed"),sep= " ")
+  
+  cmd = paste("bedops -u",nad.bed,">",file.path(bed.dir,"NAD.bed"))
+  
+  peaks=read.table(file.path(bed.dir,"NAD.bed"))
+  
+  colnames(peaks)[1:3]= c("chr","start","end")
+  NAD=toGRanges(peaks)
+  
+  NAD.before <- unique(c(re.out[[6]],re.out[[8]]))
   
   bed.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Results_10_4_2018_gene_density"
   if(!dir.exists(bed.dir)){dir.create(bed.dir,recursive = TRUE)}
@@ -8465,8 +8477,8 @@ getGeneDensityPlot <- function() {
   colnames(peaks)[1:3]= c("chr","start","end")
   nonNAD=toGRanges(peaks)
   
-  mcols(NAD) <- NULL
-  nonNAD <- setdiff(gr.whole.genome,NAD)
+  #mcols(NAD) <- NULL
+  #nonNAD <- setdiff(gr.whole.genome,NAD)
   
   NAD.MB <- sum(width(NAD))/1000000
   nonNAD.MB <- sum(width(nonNAD))/1000000
@@ -8496,28 +8508,38 @@ getGeneDensityPlot <- function() {
   
   mb.gene.num <- cbind(mbl4,num.gene.1,num.gene.1/mbl4)
   
-  group.colors <-  rainbow(9)
-  
   mb.gene.num <- data.frame(mb.gene.num,Category=row.names(mb.gene.num))
   
   colnames(mb.gene.num) <- c("MB","num.gene","Density","Category")
   
   DF <- mb.gene.num
   
-  DF$Category <- factor(DF$Category, levels = DF$Category[order(DF$Density,decreasing = T)])
+  #create a colour scheme based on grouping variable 'zone'
+  Category<- c("XL_Uniq","XL_ciLAD","XL_LAD","nonXL_Uniq","nonXL_ciLAD","nonXL_LAD","NAD","nonNAD","wholeGenome")
+  color.codes<-as.character(c("#3399FF", "#FF0000","#9633FF","#3399FF", "#FF0000","#9633FF","#0000FF","#C71585","#FFC0CB"))
   
-  sp <- ggplot(DF, aes(x = Category, y = Density, fill = Category)) +
-    geom_bar(stat="identity", position = "dodge") +
-    ggtitle(paste("Gene density(#Gene/MB)")) +
-    theme(plot.title=element_text(hjust=0.5))
+  df2=data.frame(Category, color.codes)
+  
+  # merge color specifications with data
+  df <-merge(DF,df2, by=("Category"), all.x=TRUE, all.y=TRUE)
+  
+  df$Category <- factor(df$Category, levels = df$Category[order(df$Density,decreasing = T)])
+  
+  sp <- ggplot(df, aes(x = Category, y = Density, fill = color.codes)) +
+    geom_bar(stat="identity",position = "dodge")  +
+    theme(plot.title=element_text(hjust=0.5)) +  
+    ylab("Gene density (# of genes/MB)")  +  theme(legend.position="none")
+  
   spp <- list(sp=sp)
   multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
   
-  if(!dir.exists(bed.dir)){dir.create(output.dir,recursive = TRUE)}
+  if(!dir.exists(bed.dir)){dir.create(bed.dir,recursive = TRUE)}
   ggexport(multi.page, width = 1000, height = 480,filename = file.path(bed.dir,"GeneDensity.png"))
   
+  write.table(df[,1:4],file = file.path(bed.dir,paste0("Density",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  
 }
-
-
 
 
