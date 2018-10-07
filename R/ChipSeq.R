@@ -8555,6 +8555,9 @@ getCTCFDB <- function() {
   
   db.info.2 <- db.info[which(db.info.1[,4]=="CTCF"),]
   
+  write.table(db.info.1,file = file.path(LOLA.collection.folder,paste0("all",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
   write.table(db.info.2,file = file.path(LOLA.collection.folder,paste0("index",".txt")),
               append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
