@@ -8592,6 +8592,13 @@ getGeneDensityPlot <- function(bed.dir) {
   
   YYYY <- rbind.data.frame(YYYY.XLNAD.3.class,YYYY.XLNAD,YYYY.XL_nonNAD,YYYY.nonXLNAD.3.class,YYYY.nonXLNAD,YYYY.nonXL_nonNAD,YYYY.wholeGenome)
   
+  YYYY$SetName <- droplevels(YYYY$SetName)
+  
+  png(file = file.path(bed.dir,paste0(paste(levels(YYYY$SetName),collapse = "-"),".png")),width = 1500, height = 480)
+  boxplot(log10(as.numeric(as.character(YYYY$FPKM))+1)~YYYY$SetName,ylab = "log10(FPKM+1)")
+  dev.off()
+  
+  
   num.gene <- lapply(unique(as.character(YYYY$SetName)), function(u,YYYY){
     num.gene <- length(unique(as.character(YYYY[which(YYYY$SetName==u),]$GeneName)))
     num.gene
@@ -8708,3 +8715,71 @@ getCTCFDB <- function() {
   saveRDS(XL.nonXL.subset,file.path(output.file.dir,"XL_nonXL.rds"))
   saveRDS(RegionDB.ctcf,file.path(output.file.dir,"ctcfRegionDB.rds"))
 }
+
+# input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles"
+# re.out.rt.mef <- getMoreBedFiles(input.file.dir,re.out)
+
+getMoreBedFiles <- function(input.file.dir,re.out) {
+  file.name.bedgraph <- list.files(input.file.dir,pattern="bedgraph",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  bedgraph.in<-lapply(file.name.bedgraph,function(u){
+    
+    if(length(grep("Peric",u)) ==1){
+      peaks=read.table(u)
+    }else if(length(grep("GSM",u)) ==1){
+      peaks=read.table(u)
+    }else
+    {
+      peaks=read.table(u,skip=1)
+    }
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
+  
+  names(bedgraph.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+  names(bedgraph.in) <- gsub("_mm10_copy","",names(bedgraph.in))
+  re.out.rt.mef <- c(re.out,bedgraph.in)
+  re.out.rt.mef
+}
+
+# Late RT/NAD/LAD
+# Early RT/NAD/LAD
+# Late RT/NAD/ciLAD
+# Early RT/NAD/ciLAD
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_8_2018_venn_with_RT_MEF"
+# Late_RT
+# peak.index <- c(10,8,7)
+# name <- c("Late_RT","XL","LAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(10,6,7)
+# name <- c("Late_RT","nonXL","LAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(10,8,1)
+# name <- c("Late_RT","XL","ciLAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(10,6,1)
+# name <- c("Late_RT","nonXL","ciLAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# Early_RT
+# peak.index <- c(9,8,7)
+# name <- c("Early_RT","XL","LAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(9,6,7)
+# name <- c("Early_RT","nonXL","LAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(9,8,1)
+# name <- c("Early_RT","XL","ciLAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+# peak.index <- c(9,6,1)
+# name <- c("Early_RT","nonXL","ciLAD")
+# getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
