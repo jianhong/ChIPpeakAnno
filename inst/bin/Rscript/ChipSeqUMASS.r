@@ -50,5 +50,7 @@ source(other.name)
 print(input.file.dir)
 print(out.dir)
 
-AnnotatePeakUMASS(input.file.dir,input.file.pattern,out.dir,genome=input.genome)
+#AnnotatePeakUMASS(input.file.dir,input.file.pattern,out.dir,genome=input.genome)
 
+getCvg(input.file.dir,out.dir)
+  

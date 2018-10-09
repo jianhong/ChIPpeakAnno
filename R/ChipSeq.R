@@ -8054,6 +8054,11 @@ getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
     labels = name
   }
   
+  if(length(peak.index)==4){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="0000"),]
+    labels = name
+  }
+  
   y <- ZZ[,"Counts"]
   
   print(ZZ)
@@ -8062,7 +8067,7 @@ getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   
   pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
   plot.new()
-  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
+  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(18))
   dev.off()
   
 }
@@ -8347,11 +8352,15 @@ overLapWithOtherFeatures <- function(toGRanges, K27me3.bam.dir, .Platform, impor
   
   # K27me3.bam.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles"
     
-  files <- dir(K27me3.bam.dir, "bam")[c(1,3)]
+  
+  K27me3.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+  NR2F2kd.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
+  
+  files <- dir(K27me3.bw.dir, "bw")
   
   if(.Platform$OS.type != "windows"){
-    cvglists <- sapply(file.path(K27me3.bam.dir, files), import, 
-                       format="BAM", 
+    cvglists <- sapply(file.path(K27me3.bw.dir, files), import, 
+                       format="BigWig", 
                        as="RleList")
   }else{## rtracklayer can not import bigWig files on Windows
     load(file.path(path, "cvglist.rds"))
@@ -8782,4 +8791,91 @@ getMoreBedFiles <- function(input.file.dir,re.out) {
 # peak.index <- c(9,6,1)
 # name <- c("Early_RT","nonXL","ciLAD")
 # getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+
+
+# input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/Aizhan\ F121-9\ comparisons"
+# re.out.rt.mef.add.more.bed <-getMoreBedFiles2(input.file.dir,re.out.rt.mef)
+
+getMoreBedFiles2 <- function(input.file.dir,re.out) {
+  file.name.bedgraph <- list.files(input.file.dir,pattern="bed",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  bedgraph.in<-lapply(file.name.bedgraph,function(u){
+    
+    if(length(grep("Peric",u)) ==1){
+      peaks=read.table(u)
+    }else if(length(grep("GSM",u)) ==1){
+      peaks=read.table(u)
+    }else
+    {
+      peaks=read.table(u,skip=1)
+    }
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
+  
+  names(bedgraph.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+  names(bedgraph.in) <- gsub("_mm10_copy","",names(bedgraph.in))
+  re.out.rt.mef <- c(re.out,bedgraph.in)
+  re.out.rt.mef
+}
+
+# ciLAD
+# cLAD
+# F121-9 ESC NAD
+# XL MEF NAD
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_9_2018_venn_with_F121_9_XL_MEF"
+
+# peak.index <- c(1,7,12,14)
+# name <- c("ciLAD","LAD","F121-9","XL_MEF")
+# getCount4Venn(re.out.rt.mef.add.more.bed,peak.index,name,output.file.dir)
+
+# peak.index <- c(11,13)
+# name <- c("F121-129","F121_cast")
+# getCount4Venn(re.out.rt.mef.add.more.bed,peak.index,name,output.file.dir)
+
+
+getLADs <- function() {
+  GSE17051 <- read.table("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/GSE17051_HMM_state_calls_per_probe.txt",header = T)
+  
+  GSE17051.1 <- GSE17051[which(GSE17051$LaminB1_in_mouse_ESC==1),]
+  
+  GSE17051.2 <- GSE17051.1[which(GSE17051.1$LaminB1_in_mouse_NPC==0|GSE17051.1$LaminB1_in_mouse_AC==0|GSE17051.1$LaminB1_in_mouse_MEF==0),]
+  
+  LADs.out.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output"
+  
+  write.table(GSE17051.2,file = file.path(LADs.out.dir,paste0("fLADs",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  GSE17051.3 <- GSE17051[-which(GSE17051$LaminB1_in_mouse_ESC==1),]
+  
+  GSE17051.4 <- GSE17051.3[which(GSE17051.3$LaminB1_in_mouse_NPC==1|GSE17051.3$LaminB1_in_mouse_AC==1|GSE17051.3$LaminB1_in_mouse_MEF==1),]
+  
+  write.table(GSE17051.4,file = file.path(LADs.out.dir,paste0("fiLADs",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+}
+
+# path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+# path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
+
+getCvg <- function(path,output.file.dir) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  # K27me3.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+  # NR2F2kd.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
+  
+  files <- dir(path, "bw")
+  
+  if(.Platform$OS.type != "windows"){
+    cvglists <- sapply(file.path(path, files), import, 
+                       format="BigWig", 
+                       as="RleList")
+  }else{## rtracklayer can not import bigWig files on Windows
+    load(file.path(path, "cvglist.rds"))
+  }
+  
+  saveRDS(cvglists,file = file.path(output.file.dir,"cvglist.rds"))
+  
+}
 
