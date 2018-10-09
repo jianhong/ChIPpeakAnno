@@ -15,7 +15,7 @@ option_list = list(make_option(c("-i", "--input_file_dir"), type="character", de
                                help="Input file dir", metavar="character"),
                    make_option(c("-w", "--input_bw_file_dir"), type="character", default=NULL,
                                help="Input BigWig files", metavar="character"),
-                   ake_option(c("-o", "--out_dir"), type="character", default=".",
+                   make_option(c("-o", "--out_dir"), type="character", default=".",
                                help="output fir[default= %default]", metavar="character")
 );
 
