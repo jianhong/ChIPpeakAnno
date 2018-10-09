@@ -7,7 +7,7 @@ packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI"
               "reactome.db","dplyr","ggplot2","ggpubr","stringr","grid","Vennerable","devtools","reshape2",
               "binaryLogic","org.Hs.eg.db","org.Mm.eg.db","eulerr","DiffBind","LOLA",
               "TxDb.Hsapiens.UCSC.hg38.knownGene","EnsDb.Hsapiens.v75","BSgenome.Hsapiens.UCSC.hg19",
-              "BSgenome.Mmusculus.UCSC.mm10")
+              "BSgenome.Mmusculus.UCSC.mm10","rtracklayer")
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
@@ -23,6 +23,8 @@ option_list = list(make_option(c("-i", "--input_file_dir"), type="character", de
 
 example.use <- 'Example:
 Rscript $HOME/Aimin/HomeAtCluster/Project/ChipSeqUMASS/inst/bin/Rscript/ChipSeqUMASS.r -i ~/Aimin/DropboxUmass/NADfinder/BedFiles -p ".bed$" -g "Mm" -o ~/Aimin/DropboxUmass/NADfinder/Aimin/Output'
+
+example.use <- 'Example: Rscript /home/ay64w/Project/ChipSeqUMASS/inst/bin/Rscript/ChipSeqUMASS.r -i /project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig -p ".bed$" -g "Mm" -o /project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_cvg'
 
 opt_parser = OptionParser(option_list=option_list,epilogue=example.use);
 opt = parse_args(opt_parser);
