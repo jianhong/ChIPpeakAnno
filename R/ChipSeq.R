@@ -8316,116 +8316,162 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # name <- c("nonXL","H3K9me3", "LAD")
 # getCount4Venn(re.out,peak.index,name,output.file.dir)
 
-overLapWithOtherFeatures <- function(toGRanges, K27me3.bam.dir, .Platform, import, rtracklayer, mean, sig) {
-  cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
-                                      sample.int(300, 100))), 
-                   B=RleList(chr1=Rle(sample.int(5000, 100), 
-                                      sample.int(300, 100))))
+# input.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+# output.file.dir <- "/project/umw_nathan_lawson/Aimin/H3K27me3_cvg_2"
+# overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
+
+overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir) {
+  # cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
+  #                                     sample.int(300, 100))), 
+  #                  B=RleList(chr1=Rle(sample.int(5000, 100), 
+  #                                     sample.int(300, 100))))
+  # 
+  # feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+  # 
+  # featureAlignedSignal(cvglists, feature.gr)
   
-  feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+  #input.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+    
+  file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+    
+  # path <- system.file("extdata", package="ChIPpeakAnno")
+  # files <- dir(path, "broadPeak")
+  data <- sapply(file.name.4, toGRanges, format="BED")
   
-  featureAlignedSignal(cvglists, feature.gr)
+  names(data) <- gsub(".bed", "", basename(names(data)))
   
-  path <- system.file("extdata", package="ChIPpeakAnno")
-  files <- dir(path, "broadPeak")
-  data <- sapply(file.path(path, files), toGRanges, format="broadPeak")
+  tss <- c("class1tss_2KplMin","class2tss_2KplMin","class3tss_2KplMin","EndoRefTSS_2KplMin")
   
-  names(data) <- gsub(".broadPeak", "", files)
+  tss.bed <- data[which(names(data) %in% tss)]
   
-  ol <- findOverlapsOfPeaks(data)
+  #ol <- findOverlapsOfPeaks(data)
+  
+  feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed){
+    
+    features <- tss.bed[[u]]
+    
+    wid <- width(features)
+    feature.recentered <- feature.center <- features
+    
+    start(feature.center) <- start(features) + floor(wid/2)
+    
+    width(feature.center) <- 1
+    
+    start(feature.recentered) <- start(feature.center) - 3000
+    end(feature.recentered) <- end(feature.center) + 3000
+    
+    feature.recentered
+    
+  },tss.bed)
   
   
-  features <- ol$peaklist[[length(ol$peaklist)]]
+  #features <- tss.bed
   
-  wid <- width(features)
-  feature.recentered <- feature.center <- features
+  #wid <- width(features)
+  #feature.recentered <- feature.center <- features
   
-  start(feature.center) <- start(features) + floor(wid/2)
+  #start(feature.center) <- start(features) + floor(wid/2)
   
-  width(feature.center) <- 1
+  #width(feature.center) <- 1
   
   
-  start(feature.recentered) <- start(feature.center) - 2000
-  end(feature.recentered) <- end(feature.center) + 2000
+  #start(feature.recentered) <- start(feature.center) - 2000
+  #end(feature.recentered) <- end(feature.center) + 2000
   
   # /project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles
   
   # K27me3.bam.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles"
     
   
-  K27me3.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
-  NR2F2kd.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
+  #K27me3.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+  #NR2F2kd.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
   
-  files <- dir(K27me3.bw.dir, "bw")
+  #files <- dir(K27me3.bw.dir, "bw")
   
-  if(.Platform$OS.type != "windows"){
-    cvglists <- sapply(file.path(K27me3.bw.dir, files), import, 
-                       format="BigWig", 
-                       as="RleList")
-  }else{## rtracklayer can not import bigWig files on Windows
-    load(file.path(path, "cvglist.rds"))
-  }
+  #if(.Platform$OS.type != "windows"){
+  #  cvglists <- sapply(file.path(K27me3.bw.dir, files), import, 
+  #                     format="BigWig", 
+  #                     as="RleList")
+  #}else{## rtracklayer can not import bigWig files on Windows
+  #  load(file.path(path, "cvglist.rds"))
+  #}
   
-  
-  library(rtracklayer)
-  files <- dir(path, "bigWig")
-  if(.Platform$OS.type != "windows"){
-    cvglists <- sapply(file.path(path, files), import, 
-                       format="BigWig", 
-                       which=feature.recentered, 
-                       as="RleList")
-  }else{## rtracklayer can not import bigWig files on Windows
-    load(file.path(path, "cvglist.rds"))
-  }
-  
-  cvglists1 <- sapply(file.path(path, files), import, 
-                     format="BigWig", 
-                     which=feature.recentered, 
-                     as="RleList")
-  
-  cvglists2 <- sapply(file.path(path, files), import, 
-                     format="BigWig",as="RleList")
-  
-  identical(cvglists1,cvglists2)
-  
-  rl <- Rle(c(1,1,1,1,2,2,3,3,2,2))
-  rl
-  
-  ir <- IRanges(start = c(2,6), width = 2)
-  aggregate(rl, ir, FUN = mean)
-  
-  ir <- IRanges(start = 1:10, width = 3)
-  rl <- coverage(ir)
-  rl
-  slice(rl, 2)
-  
-  vi <- Views(rl, start = c(3,7), width = 3)
-  vi
+  cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
+    
+    files <- dir(path, "bigWig")
+    if(.Platform$OS.type != "windows"){
+      cvglists <- sapply(input.bw.path, import, 
+                         format="BigWig", 
+                         which=feature.recentered[[u]], 
+                         as="RleList")
+    }else{## rtracklayer can not import bigWig files on Windows
+      load(file.path(input.bw.path, "cvglist.rds"))
+    }
+    
+  },feature.recentered.l,input.bw.path)
   
   
-  names(cvglists1) <- gsub(".bigWig", "", files)
-  sig1 <- featureAlignedSignal(cvglists1, feature.center, 
-                              upstream=2000, downstream=2000) 
+  saveRDS(cvglists.l,file = file.path(output.file.dir,"cvglist.rds"))
   
-  names(cvglists2) <- gsub(".bigWig", "", files)
-  sig2 <- featureAlignedSignal(cvglists2, feature.center, 
-                              upstream=2000, downstream=2000) 
-  
-  identical(sig1,sig2)
-  
-  heatmap <- featureAlignedHeatmap(sig1, feature.center, 
-                                   upstream=2000, downstream=2000,
-                                   upper.extreme=c(3,.5,4))
-  
-  heatmap <- featureAlignedHeatmap(sig2, feature.center, 
-                                   upstream=2000, downstream=2000,
-                                   upper.extreme=c(3,.5,4))
-  
-  featureAlignedDistribution(sig, feature.center, 
-                             upstream=2000, downstream=2000,
-                             type="l")
-  
-  dir("~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/")
+  # files <- dir(path, "bigWig")
+  # if(.Platform$OS.type != "windows"){
+  #   cvglists <- sapply(file.path(path, files), import, 
+  #                      format="BigWig", 
+  #                      which=feature.recentered, 
+  #                      as="RleList")
+  # }else{## rtracklayer can not import bigWig files on Windows
+  #   load(file.path(path, "cvglist.rds"))
+  # }
+  # 
+  # cvglists1 <- sapply(file.path(path, files), import, 
+  #                    format="BigWig", 
+  #                    which=feature.recentered, 
+  #                    as="RleList")
+  # 
+  # cvglists2 <- sapply(file.path(path, files), import, 
+  #                    format="BigWig",as="RleList")
+  # 
+  # identical(cvglists1,cvglists2)
+  # 
+  # rl <- Rle(c(1,1,1,1,2,2,3,3,2,2))
+  # rl
+  # 
+  # ir <- IRanges(start = c(2,6), width = 2)
+  # aggregate(rl, ir, FUN = mean)
+  # 
+  # ir <- IRanges(start = 1:10, width = 3)
+  # rl <- coverage(ir)
+  # rl
+  # slice(rl, 2)
+  # 
+  # vi <- Views(rl, start = c(3,7), width = 3)
+  # vi
+  # 
+  # 
+  # names(cvglists1) <- gsub(".bigWig", "", files)
+  # sig1 <- featureAlignedSignal(cvglists1, feature.center, 
+  #                             upstream=2000, downstream=2000) 
+  # 
+  # names(cvglists2) <- gsub(".bigWig", "", files)
+  # sig2 <- featureAlignedSignal(cvglists2, feature.center, 
+  #                             upstream=2000, downstream=2000) 
+  # 
+  # identical(sig1,sig2)
+  # 
+  # heatmap <- featureAlignedHeatmap(sig1, feature.center, 
+  #                                  upstream=2000, downstream=2000,
+  #                                  upper.extreme=c(3,.5,4))
+  # 
+  # heatmap <- featureAlignedHeatmap(sig2, feature.center, 
+  #                                  upstream=2000, downstream=2000,
+  #                                  upper.extreme=c(3,.5,4))
+  # 
+  # featureAlignedDistribution(sig, feature.center, 
+  #                            upstream=2000, downstream=2000,
+  #                            type="l")
+  # 
+  # dir("~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/")
   
 }
 
