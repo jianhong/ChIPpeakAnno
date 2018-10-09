@@ -8334,7 +8334,8 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   #input.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
     
   file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
-    
+  #files.bw <- list.files(input.bw.dir,pattern=".bw$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+       
   # path <- system.file("extdata", package="ChIPpeakAnno")
   # files <- dir(path, "broadPeak")
   data <- sapply(file.name.4, toGRanges, format="BED")
@@ -8399,11 +8400,11 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
     
-    files <- dir(path, "bigWig")
+    files <- dir(input.bw.path, "bw")
     if(.Platform$OS.type != "windows"){
-      cvglists <- sapply(input.bw.path, import, 
+      cvglists <- sapply(file.path(input.bw.path,files), import, 
                          format="BigWig", 
-                         which=feature.recentered[[u]], 
+                         which=feature.recentered.l[[u]], 
                          as="RleList")
     }else{## rtracklayer can not import bigWig files on Windows
       load(file.path(input.bw.path, "cvglist.rds"))
