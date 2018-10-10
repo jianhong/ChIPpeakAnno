@@ -8316,7 +8316,9 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # name <- c("nonXL","H3K9me3", "LAD")
 # getCount4Venn(re.out,peak.index,name,output.file.dir)
 
-# input.file.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+
+# input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+
 # input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
 # output.file.dir <- "~/Aimin/umw_nathan_lawson/Aimin/H3K27me3_cvg_3"
 # cvglists.l <- overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
