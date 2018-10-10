@@ -8480,9 +8480,13 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     legend("topright", legend=colnames(density), col=col,
            lty=lty, lwd=lwd)
   }
-  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", 
+  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
               ylab="Averaged coverage",xlab="Distance to TSS(bp)",main="H3K27me3")
   
+  
+  dd = data.frame(School_ID = c("A", "B", "C", "A", "B"),
+                  Year = c(1998, 1998, 1999, 2000, 2005),
+                  Value = c(5, 10, 15, 7, 15))
   
   sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
   
