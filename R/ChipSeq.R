@@ -8322,27 +8322,17 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
 # output.file.dir <- "~/Aimin/umw_nathan_lawson/Aimin/H3K27me3_cvg_3"
 # cvglists.l <- overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
+# 
+# output.file.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/Aimin/DensityPlot"
+
+
 
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
-  # cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
-  #                                     sample.int(300, 100))), 
-  #                  B=RleList(chr1=Rle(sample.int(5000, 100), 
-  #                                     sample.int(300, 100))))
-  # 
-  # feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
-  # 
-  # featureAlignedSignal(cvglists, feature.gr)
-  
-  #input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
-    
   file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
-  #files.bw <- list.files(input.bw.dir,pattern=".bw$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
-       
-  # path <- system.file("extdata", package="ChIPpeakAnno")
-  # files <- dir(path, "broadPeak")
+  
   data <- sapply(file.name.4, toGRanges, format="BED")
   
   names(data) <- gsub(".bed", "", basename(names(data)))
@@ -8350,9 +8340,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   tss <- c("class1tss_2KplMin","class2tss_2KplMin","class3tss_2KplMin","EndoRefTSS_2KplMin")
   
   tss.bed <- data[which(names(data) %in% tss)]
-  
-  #ol <- findOverlapsOfPeaks(data)
-  
+
   feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed){
     
     features <- tss.bed[[u]]
@@ -8373,37 +8361,6 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   names(feature.recentered.l) <- names(tss.bed)
   
-  #features <- tss.bed
-  
-  #wid <- width(features)
-  #feature.recentered <- feature.center <- features
-  
-  #start(feature.center) <- start(features) + floor(wid/2)
-  
-  #width(feature.center) <- 1
-  
-  
-  #start(feature.recentered) <- start(feature.center) - 2000
-  #end(feature.recentered) <- end(feature.center) + 2000
-  
-  # /project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles
-  
-  # K27me3.bam.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3bamFiles"
-    
-  
-  #K27me3.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
-  #NR2F2kd.bw.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
-  
-  #files <- dir(K27me3.bw.dir, "bw")
-  
-  #if(.Platform$OS.type != "windows"){
-  #  cvglists <- sapply(file.path(K27me3.bw.dir, files), import, 
-  #                     format="BigWig", 
-  #                     as="RleList")
-  #}else{## rtracklayer can not import bigWig files on Windows
-  #  load(file.path(path, "cvglist.rds"))
-  #}
-  
   cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
     
     files <- dir(input.bw.path, "bw")
@@ -8418,9 +8375,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     
   },feature.recentered.l,input.bw.path)
   
-  
   saveRDS(cvglists.l,file = file.path(output.file.dir,"cvglist.rds"))
-  cvglists.l
   
   cvglists.ul <- unlist(cvglists.l)
   
@@ -8480,9 +8435,29 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     legend("topright", legend=colnames(density), col=col,
            lty=lty, lwd=lwd)
   }
-  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
-              ylab="Averaged coverage",xlab="Distance to TSS(bp)",main="H3K27me3")
+
   
+  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
+              ylab="log2(averaged coverage)",xlab="Distance to TSS(bp)",main="H3K27me3")
+  
+  x.pos <- seq(-3000,3000,length.out = dim(out)[1])
+  out.m <- data.frame(x.pos=x.pos,out)
+  
+  outLong <- melt(data          = out.m,
+                  id.vars       = c("x.pos"),
+                  measure.vars  = c("Class1","Class2","Class3","Endo"),
+                  variable.name = "TSSByClass",
+                  value.name    = "value")
+  
+  ggplot(outLong, aes(x.pos, value,colour=TSSByClass)) + 
+    geom_line() + labs(x="Distance to TSS(bp)",y="log2(averaged coverage)",title="H3K27me3") +
+    theme(plot.title=element_text(hjust=0.5)) + scale_x_continuous(name="Distance to TSS(bp)", limits=c(-3000, 3000))
+ 
+  write.table(out.m,file = file.path(output.file.dir,paste0("Density_matrix_short",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  write.table(outLong,file = file.path(output.file.dir,paste0("Density_matrix_long",".txt")),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
   dd = data.frame(School_ID = c("A", "B", "C", "A", "B"),
                   Year = c(1998, 1998, 1999, 2000, 2005),
@@ -8497,79 +8472,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   names(sigs.log2) <- c("H3K27me3_1","H3K27me3_2")
   featureAlignedHeatmap(sigs.log2, reCenterPeaks(feature.center[[1]], width=3000+3000),zeroAt=.5)
-  
-  names(sig1) <- c("H3K27me3_1","H3K27me3_2")
-  
-  out <- featureAlignedDistribution(sig1, 
-                                    reCenterPeaks(feature.center[[1]], width=3000+3000),
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage")
-  
-  x <- sig1[[1]]
-  y <- sig1[[2]]
-  z <- log2((x+y)/2)
-  
-  featureAlignedDistribution(sigs.log2, feature.center[[1]], upstream=3000, downstream=3000,type="l")
-                             
-  # files <- dir(path, "bigWig")
-  # if(.Platform$OS.type != "windows"){
-  #   cvglists <- sapply(file.path(path, files), import, 
-  #                      format="BigWig", 
-  #                      which=feature.recentered, 
-  #                      as="RleList")
-  # }else{## rtracklayer can not import bigWig files on Windows
-  #   load(file.path(path, "cvglist.rds"))
-  # }
-  # 
-  # cvglists1 <- sapply(file.path(path, files), import, 
-  #                    format="BigWig", 
-  #                    which=feature.recentered, 
-  #                    as="RleList")
-  # 
-  # cvglists2 <- sapply(file.path(path, files), import, 
-  #                    format="BigWig",as="RleList")
-  # 
-  # identical(cvglists1,cvglists2)
-  # 
-  # rl <- Rle(c(1,1,1,1,2,2,3,3,2,2))
-  # rl
-  # 
-  # ir <- IRanges(start = c(2,6), width = 2)
-  # aggregate(rl, ir, FUN = mean)
-  # 
-  # ir <- IRanges(start = 1:10, width = 3)
-  # rl <- coverage(ir)
-  # rl
-  # slice(rl, 2)
-  # 
-  # vi <- Views(rl, start = c(3,7), width = 3)
-  # vi
-  # 
-  # 
-  # names(cvglists1) <- gsub(".bigWig", "", files)
-  # sig1 <- featureAlignedSignal(cvglists1, feature.center, 
-  #                             upstream=2000, downstream=2000) 
-  # 
-  # names(cvglists2) <- gsub(".bigWig", "", files)
-  # sig2 <- featureAlignedSignal(cvglists2, feature.center, 
-  #                             upstream=2000, downstream=2000) 
-  # 
-  # identical(sig1,sig2)
-  # 
-  # heatmap <- featureAlignedHeatmap(sig1, feature.center, 
-  #                                  upstream=2000, downstream=2000,
-  #                                  upper.extreme=c(3,.5,4))
-  # 
-  # heatmap <- featureAlignedHeatmap(sig2, feature.center, 
-  #                                  upstream=2000, downstream=2000,
-  #                                  upper.extreme=c(3,.5,4))
-  # 
-  # featureAlignedDistribution(sig, feature.center, 
-  #                            upstream=2000, downstream=2000,
-  #                            type="l")
-  # 
-  # dir("~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/")
-  
+
 }
 
 getNonCtcfBed <- function(re.out, BSgenome.Mmusculus.UCSC.mm10) {
@@ -8803,6 +8706,8 @@ getGeneDensityPlot <- function(bed.dir) {
   c.3 <- color.codes[which(Category %in% c("nonXL_LAD" ,"XL_LAD"))][1]
   color.codes[which(Category %in% c("nonXL_LAD" ,"XL_LAD"))] <- c.3
     
+  c.4 <- color.codes[which(Category %in% c("nonXLNAD" ,"XLNAD"))][1]
+  color.codes[which(Category %in% c("nonXLNAD" ,"XLNAD"))] <- c.4
   
   #color.codes<-as.character(c("#3399FF", "#FF0000","#9633FF","#3399FF", "#FF0000","#9633FF","#0000FF","#C71585","#FFC0CB","#FF0000FF","#00FFFFFF"))
   
@@ -9022,3 +8927,29 @@ getCvg <- function(path,output.file.dir) {
   
 }
 
+# input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles"
+# bed.in <- getBedFiles(input.file.dir)
+
+getBedFiles <- function(input.file.dir) {
+  file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  bed.in<-lapply(file.name.bedgraph,function(u){
+    
+    if(length(grep("Peric",u)) ==1){
+      peaks=read.table(u)
+    }else if(length(grep("GSM",u)) ==1){
+      peaks=read.table(u)
+    }else
+    {
+      peaks=read.table(u,skip=1)
+    }
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
+  
+  names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+  names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
+  bed.in
+  
+}
