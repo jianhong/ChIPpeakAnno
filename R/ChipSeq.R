@@ -8316,12 +8316,15 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # name <- c("nonXL","H3K9me3", "LAD")
 # getCount4Venn(re.out,peak.index,name,output.file.dir)
 
-# input.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# input.file.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
 # input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
-# output.file.dir <- "/project/umw_nathan_lawson/Aimin/H3K27me3_cvg_2"
-# overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
+# output.file.dir <- "~/Aimin/umw_nathan_lawson/Aimin/H3K27me3_cvg_3"
+# cvglists.l <- overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
 
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
   # cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
   #                                     sample.int(300, 100))), 
   #                  B=RleList(chr1=Rle(sample.int(5000, 100), 
@@ -8331,7 +8334,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   # 
   # featureAlignedSignal(cvglists, feature.gr)
   
-  #input.file.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+  #input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
     
   file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
   #files.bw <- list.files(input.bw.dir,pattern=".bw$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
@@ -8366,6 +8369,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     
   },tss.bed)
   
+  names(feature.recentered.l) <- names(tss.bed)
   
   #features <- tss.bed
   
@@ -8414,7 +8418,93 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   
   saveRDS(cvglists.l,file = file.path(output.file.dir,"cvglist.rds"))
+  cvglists.l
   
+  cvglists.ul <- unlist(cvglists.l)
+  
+  Class1 <- (cvglists.ul[[1]]+cvglists.ul[[2]])/2
+  
+  Class2 <- (cvglists.ul[[3]]+cvglists.ul[[4]])/2
+  
+  Class3 <- (cvglists.ul[[5]]+cvglists.ul[[6]])/2
+  
+  Endo <- (cvglists.ul[[7]]+cvglists.ul[[8]])/2
+  
+  cvglists.ave <- list(Class1=Class1,Class2=Class2,Class3=Class3, Endo=Endo)
+  
+  
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[1]], upstream=3000, downstream=3000) 
+  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))   
+  out.1 <- featureAlignedDistribution(sigs.log2, 
+                                    feature.center[[1]],upstream=3000, downstream=3000,
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage")
+  
+  
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[2]], upstream=3000, downstream=3000) 
+  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  out.2 <- featureAlignedDistribution(sigs.log2, 
+                                    feature.center[[2]],upstream=3000, downstream=3000,
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage",add=TRUE)
+  
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[3]], upstream=3000, downstream=3000) 
+  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  out.3 <- featureAlignedDistribution(sigs.log2, 
+                                    feature.center[[3]],upstream=3000, downstream=3000,
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage",add=TRUE)
+  
+  
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[4]], upstream=3000, downstream=3000) 
+  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  out.4 <- featureAlignedDistribution(sigs.log2, 
+                                    feature.center[[4]],upstream=3000, downstream=3000,
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage",add=TRUE)
+  
+  out <- cbind(out.1$density[,1],out.2$density[,2],out.3$density[,3],out.4$density[,4])
+  
+  head(out)
+  colnames(out) <- colnames(out.1$density)
+  
+  drowDensity <- function(density,grWidAt,grWidLab,...) {
+    dots <- list(...)
+    matplot(density, ..., xaxt="n")
+    axis(1, at = grWidAt, labels = grWidLab)
+    lty <- if(!is.null(dots$lty)) dots$lty else 1:5
+    lwd <- if(!is.null(dots$lwd)) dots$lwd else 1
+    col <- if(!is.null(dots$col)) dots$col else 1:6
+    legend("topright", legend=colnames(density), col=col,
+           lty=lty, lwd=lwd)
+  }
+  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", 
+              ylab="Averaged coverage",xlab="Distance to TSS(bp)",main="H3K27me3")
+  
+  
+  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  
+  out <- featureAlignedDistribution(sigs.log2, 
+                                    feature.center[[1]],upstream=3000, downstream=3000,
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage")
+  
+  names(sigs.log2) <- c("H3K27me3_1","H3K27me3_2")
+  featureAlignedHeatmap(sigs.log2, reCenterPeaks(feature.center[[1]], width=3000+3000),zeroAt=.5)
+  
+  names(sig1) <- c("H3K27me3_1","H3K27me3_2")
+  
+  out <- featureAlignedDistribution(sig1, 
+                                    reCenterPeaks(feature.center[[1]], width=3000+3000),
+                                    zeroAt=.5,type="l", 
+                                    ylab="Averaged coverage")
+  
+  x <- sig1[[1]]
+  y <- sig1[[2]]
+  z <- log2((x+y)/2)
+  
+  featureAlignedDistribution(sigs.log2, feature.center[[1]], upstream=3000, downstream=3000,type="l")
+                             
   # files <- dir(path, "bigWig")
   # if(.Platform$OS.type != "windows"){
   #   cvglists <- sapply(file.path(path, files), import, 
