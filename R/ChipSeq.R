@@ -8436,6 +8436,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     legend("topright", legend=colnames(density), col=col,
            lty=lty, lwd=lwd)
   }
+
   
   drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
               ylab="log2(averaged coverage)",xlab="Distance to TSS(bp)",main="H3K27me3")
@@ -8459,6 +8460,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   write.table(outLong,file = file.path(output.file.dir,paste0("Density_matrix_long",".txt")),
               append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
+
   d <- 10000
   null <- lapply(1:length(cvglists.l), function(u,cvglists.l,feature.center,d){
   sig1.4.heatmap <- featureAlignedSignal(cvglists.l[[u]], feature.center[[u]], upstream=d, downstream=d) 
@@ -8468,7 +8470,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   x_name_0 <- tools::file_path_sans_ext(basename(names(cvglists.l[[u]])))  
   x_name_start <- str_locate_all(x_name_0,"_")[[1]][2,2] + 1
   x_name_end <- str_locate_all(x_name_0,"_")[[1]][3,2] - 1
-  
+
   x_name <- paste0(unique(str_sub(x_name_0,x_name_start,x_name_end)),"_",names(feature.center)[u])
   
   #str_locate_all("S14_V37_H3K27me3_1.bw","_")[[1]][2,2]
