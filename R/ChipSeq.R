@@ -8341,7 +8341,8 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   tss.bed <- data[which(names(data) %in% tss)]
 
-  feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed){
+   d <- 10000
+  feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,d){
     
     features <- tss.bed[[u]]
     
@@ -8352,12 +8353,12 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     
     width(feature.center) <- 1
     
-    start(feature.recentered) <- start(feature.center) - 3000
-    end(feature.recentered) <- end(feature.center) + 3000
+    start(feature.recentered) <- start(feature.center) - d
+    end(feature.recentered) <- end(feature.center) + d
     
     feature.recentered
     
-  },tss.bed)
+  },tss.bed,d)
   
   names(feature.recentered.l) <- names(tss.bed)
   
@@ -8458,16 +8459,28 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   write.table(outLong,file = file.path(output.file.dir,paste0("Density_matrix_long",".txt")),
               append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
-  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
-  
-  out <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[1]],upstream=3000, downstream=3000,
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage")
-  
-  names(sigs.log2) <- c("H3K27me3_1","H3K27me3_2")
-  featureAlignedHeatmap(sigs.log2, reCenterPeaks(feature.center[[1]], width=3000+3000),zeroAt=.5)
+  d <- 10000
+  null <- lapply(1:length(cvglists.l), function(u,cvglists.l,feature.center,d){
+  sig1.4.heatmap <- featureAlignedSignal(cvglists.l[[u]], feature.center[[u]], upstream=d, downstream=d) 
+  sig1.4.heatmap.log2 <- lapply(sig1.4.heatmap, function(.ele) log2(.ele+1))
+  names(sig1.4.heatmap.log2) <- c("H3K27me3_1","H3K27me3_2")
 
+  x_name_0 <- tools::file_path_sans_ext(basename(names(cvglists.l[[u]])))  
+  x_name_start <- str_locate_all(x_name_0,"_")[[1]][2,2] + 1
+  x_name_end <- str_locate_all(x_name_0,"_")[[1]][3,2] - 1
+  
+  x_name <- paste0(unique(str_sub(x_name_0,x_name_start,x_name_end)),"_",names(feature.center)[u])
+  
+  #str_locate_all("S14_V37_H3K27me3_1.bw","_")[[1]][2,2]
+  
+  #x_name <- "H3K27me3_class1"
+  jpeg(file.path(output.file.dir,paste0(x_name,"_",d,"_heatmap.jpeg")))
+  featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],upstream=d, downstream=d,zeroAt=.5,res=300)
+  dev.off()
+  
+  },cvglists.l,feature.center,d)
+  
+  #featureAlignedHeatmap(sig1.4.heatmap.log2[[1]], feature.center[[1]],upstream=3000, downstream=3000,zeroAt=.5)
 }
 
 getNonCtcfBed <- function(re.out, BSgenome.Mmusculus.UCSC.mm10) {
