@@ -8325,8 +8325,6 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # 
 # output.file.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/Aimin/DensityPlot"
 
-
-
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -8473,16 +8471,12 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
 
   x_name <- paste0(unique(str_sub(x_name_0,x_name_start,x_name_end)),"_",names(feature.center)[u])
   
-  #str_locate_all("S14_V37_H3K27me3_1.bw","_")[[1]][2,2]
-  
-  #x_name <- "H3K27me3_class1"
   jpeg(file.path(output.file.dir,paste0(x_name,"_",d,"_heatmap.jpeg")))
   featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],upstream=d, downstream=d,zeroAt=.5,res=300)
   dev.off()
   
   },cvglists.l,feature.center,d)
   
-  #featureAlignedHeatmap(sig1.4.heatmap.log2[[1]], feature.center[[1]],upstream=3000, downstream=3000,zeroAt=.5)
 }
 
 getNonCtcfBed <- function(re.out, BSgenome.Mmusculus.UCSC.mm10) {
