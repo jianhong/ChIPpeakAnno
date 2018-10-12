@@ -8320,12 +8320,36 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
 
 # input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+
 # output.file.dir <- "~/Aimin/umw_nathan_lawson/Aimin/H3K27me3_cvg_3"
 # cvglists.l <- overLapWithOtherFeatures(input.file.dir,input.bw.path,output.file.dir)
 # 
 # output.file.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/Aimin/DensityPlot"
 
-overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir) {
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/test"
+
+# input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+# dd <- 3000
+# dd <- 10000
+# class_pattern <- "tss"
+# output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",class_pattern)
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern)
+
+# dd <- 3000
+# dd <- 10000
+# class_pattern <- "enh"
+# output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",class_pattern)
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern)
+
+# dd <- 3000
+# dd <- 10000
+# class_pattern <- "DHS"
+# output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",class_pattern)
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern)
+
+
+overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
@@ -8335,12 +8359,23 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   names(data) <- gsub(".bed", "", basename(names(data)))
   
-  tss <- c("class1tss_2KplMin","class2tss_2KplMin","class3tss_2KplMin","EndoRefTSS_2KplMin")
+  #tss <- c("class1tss_2KplMin","class2tss_2KplMin","class3tss_2KplMin","EndoRefTSS_2KplMin")
+  
+  #tss <- names(data)[grep("tss",names(data),ignore.case = T)]
+  
+  tss <- names(data)[grep(class_pattern,names(data),ignore.case = T)]
   
   tss.bed <- data[which(names(data) %in% tss)]
 
-   d <- 10000
-  feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,d){
+  feature.center <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
+    x <- tss.bed[[u]]
+    x
+  },tss.bed,dd)
+  
+  names(feature.center) <- names(tss.bed)
+  
+  # get the regions of around feature middle +/- dd 
+  feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
     
     features <- tss.bed[[u]]
     
@@ -8351,14 +8386,22 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     
     width(feature.center) <- 1
     
-    start(feature.recentered) <- start(feature.center) - d
-    end(feature.recentered) <- end(feature.center) + d
+    start(feature.recentered) <- start(feature.center) - dd
+    end(feature.recentered) <- end(feature.center) + dd
     
     feature.recentered
     
-  },tss.bed,d)
+  },tss.bed,dd)
   
   names(feature.recentered.l) <- names(tss.bed)
+  
+  # feature.test <- tss.bed[[1]]
+  # wid.test <- width(feature.test)
+  # feature.recentered.test <- feature.center.test <- feature.test
+  # start(feature.center.test) <- start(feature.test) + floor(wid.test/2)
+  # width(feature.center.test) <- 1
+  # start(feature.recentered.test) <- start(feature.center.test) - dd
+  # end(feature.recentered.test) <- end(feature.center.test) + dd
   
   cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
     
@@ -8388,34 +8431,33 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   cvglists.ave <- list(Class1=Class1,Class2=Class2,Class3=Class3, Endo=Endo)
   
-  
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[1]], upstream=3000, downstream=3000) 
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[1]], upstream=dd, downstream=dd) 
   sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))   
   out.1 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[1]],upstream=3000, downstream=3000,
+                                    feature.center[[1]],upstream=dd, downstream=dd,
                                     zeroAt=.5,type="l", 
                                     ylab="Averaged coverage")
   
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[2]], upstream=3000, downstream=3000) 
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[2]], upstream=dd, downstream=dd) 
   sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
   out.2 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[2]],upstream=3000, downstream=3000,
+                                    feature.center[[2]],upstream=dd, downstream=dd,
                                     zeroAt=.5,type="l", 
                                     ylab="Averaged coverage",add=TRUE)
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[3]], upstream=3000, downstream=3000) 
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[3]], upstream=dd, downstream=dd) 
   sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
   out.3 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[3]],upstream=3000, downstream=3000,
+                                    feature.center[[3]],upstream=dd, downstream=dd,
                                     zeroAt=.5,type="l", 
                                     ylab="Averaged coverage",add=TRUE)
   
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[4]], upstream=3000, downstream=3000) 
+  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[4]], upstream=dd, downstream=dd) 
   sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
   out.4 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[4]],upstream=3000, downstream=3000,
+                                    feature.center[[4]],upstream=dd, downstream=dd,
                                     zeroAt=.5,type="l", 
                                     ylab="Averaged coverage",add=TRUE)
   
@@ -8436,10 +8478,18 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   }
 
   
-  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
-              ylab="log2(averaged coverage)",xlab="Distance to TSS(bp)",main="H3K27me3")
+  x_name_0 <- tools::file_path_sans_ext(basename(names(cvglists.l[[1]])))  
+  x_name_start <- str_locate_all(x_name_0,"_")[[1]][2,2] + 1
+  x_name_end <- str_locate_all(x_name_0,"_")[[1]][3,2] - 1
   
-  x.pos <- seq(-3000,3000,length.out = dim(out)[1])
+  x_name <- paste0(unique(str_sub(x_name_0,x_name_start,x_name_end)),"_",dd,"_",paste(tss,collapse = "_"))
+  
+  jpeg(file.path(output.file.dir,paste0(x_name,"_density.jpeg")))
+  drowDensity(out,out.1$grWidAt,out.1$grWidLab,type="l", lty=1,
+              ylab="log2(averaged coverage)",xlab=paste0("Distance to ",class_pattern,"(bp)"),main="H3K27me3")
+  dev.off()
+  
+  x.pos <- seq(-dd,dd,length.out = dim(out)[1])
   out.m <- data.frame(x.pos=x.pos,out)
   
   outLong <- melt(data          = out.m,
@@ -8450,18 +8500,17 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   ggplot(outLong, aes(x.pos, value,colour=TSSByClass)) + 
     geom_line() + labs(x="Distance to TSS(bp)",y="log2(averaged coverage)",title="H3K27me3") +
-    theme(plot.title=element_text(hjust=0.5)) + scale_x_continuous(name="Distance to TSS(bp)", limits=c(-3000, 3000))
+    theme(plot.title=element_text(hjust=0.5)) + scale_x_continuous(name=paste0("Distance to ",class_pattern,"(bp)"), limits=c(-dd, dd))
  
-  write.table(out.m,file = file.path(output.file.dir,paste0("Density_matrix_short",".txt")),
+  write.table(out.m,file = file.path(output.file.dir,paste0(x_name,"_Density_matrix_short",".txt")),
               append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
-  write.table(outLong,file = file.path(output.file.dir,paste0("Density_matrix_long",".txt")),
+  write.table(outLong,file = file.path(output.file.dir,paste0(x_name,"_Density_matrix_long",".txt")),
               append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
-
-  d <- 10000
-  null <- lapply(1:length(cvglists.l), function(u,cvglists.l,feature.center,d){
-  sig1.4.heatmap <- featureAlignedSignal(cvglists.l[[u]], feature.center[[u]], upstream=d, downstream=d) 
+  null <- lapply(1:length(cvglists.l), function(u,cvglists.l,feature.center,dd){
+  #  u <- 1
+  sig1.4.heatmap <- featureAlignedSignal(cvglists.l[[u]], feature.center[[u]], upstream=dd, downstream=dd) 
   sig1.4.heatmap.log2 <- lapply(sig1.4.heatmap, function(.ele) log2(.ele+1))
   names(sig1.4.heatmap.log2) <- c("H3K27me3_1","H3K27me3_2")
 
@@ -8471,11 +8520,11 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
 
   x_name <- paste0(unique(str_sub(x_name_0,x_name_start,x_name_end)),"_",names(feature.center)[u])
   
-  jpeg(file.path(output.file.dir,paste0(x_name,"_",d,"_heatmap.jpeg")))
-  featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],upstream=d, downstream=d,zeroAt=.5,res=300)
+  jpeg(file.path(output.file.dir,paste0(x_name,"_",dd,"_heatmap.jpeg")))
+  featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],upstream=dd, downstream=dd,zeroAt=.5,res=300)
   dev.off()
   
-  },cvglists.l,feature.center,d)
+  },cvglists.l,feature.center,dd)
   
 }
 
