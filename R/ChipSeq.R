@@ -8333,8 +8333,9 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # dd <- 3000
 # dd <- 10000
 # class_pattern <- "tss"
+# tssType <- c("Class1","Class2","Class3","Endo")
 # output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",class_pattern)
-# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern)
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType)
 
 # dd <- 3000
 # dd <- 10000
@@ -8349,7 +8350,31 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern)
 
 
-overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern) {
+# ArteryTSS.bed
+# VeinTSS.bed
+# CommonTSS.bed
+# ArteryEnh.bed
+# VeinEnh.bed
+# CommonEnh.bed
+
+# input.bed.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/AllElementsByCellType/"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/H3K27me3_bigwig"
+# dd <- 3000
+# dd <- 10000
+# class_pattern <- "TSS"
+# tssType <- c("Artery","Common","Vein")
+# output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",paste0("Big_",class_pattern))
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType)
+
+# dd <- 3000
+# dd <- 10000
+# class_pattern <- "Enh"
+# tssType <- c("Artery","Common","Vein")
+# output.file.dir <- paste0("~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/H3K27me3_",paste0("Big_",class_pattern))
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType)
+
+
+overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
@@ -8421,51 +8446,85 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   cvglists.ul <- unlist(cvglists.l)
   
-  Class1 <- (cvglists.ul[[1]]+cvglists.ul[[2]])/2
+  #lapply(1:length(tss.bed),function(u){
   
-  Class2 <- (cvglists.ul[[3]]+cvglists.ul[[4]])/2
+  #Class1 <- (cvglists.ul[[1]]+cvglists.ul[[2]])/2
   
-  Class3 <- (cvglists.ul[[5]]+cvglists.ul[[6]])/2
+  #Class2 <- (cvglists.ul[[3]]+cvglists.ul[[4]])/2
   
-  Endo <- (cvglists.ul[[7]]+cvglists.ul[[8]])/2
+  #Class3 <- (cvglists.ul[[5]]+cvglists.ul[[6]])/2
   
-  cvglists.ave <- list(Class1=Class1,Class2=Class2,Class3=Class3, Endo=Endo)
+  #Endo <- (cvglists.ul[[7]]+cvglists.ul[[8]])/2
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[1]], upstream=dd, downstream=dd) 
-  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))   
-  out.1 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[1]],upstream=dd, downstream=dd,
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage")
+  #}
   
+  #cvglists.ave <- list(Class1=Class1,Class2=Class2,Class3=Class3, Endo=Endo)
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[2]], upstream=dd, downstream=dd) 
-  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
-  out.2 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[2]],upstream=dd, downstream=dd,
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage",add=TRUE)
+  cvglists.ave <- lapply(1:length(tss.bed),function(u){
+    
+    Class1 <- (cvglists.ul[[2*u-1]]+cvglists.ul[[2*u]])/2
+    
+    Class1
+    
+  })
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[3]], upstream=dd, downstream=dd) 
-  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
-  out.3 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[3]],upstream=dd, downstream=dd,
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage",add=TRUE)
+  #cvglists.ave <- list(Class1=Class1,Class2=Class2,Class3=Class3, Endo=Endo)
+  
+  names(cvglists.ave) <- names(tss.bed)
   
   
-  sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[4]], upstream=dd, downstream=dd) 
-  sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
-  out.4 <- featureAlignedDistribution(sigs.log2, 
-                                    feature.center[[4]],upstream=dd, downstream=dd,
-                                    zeroAt=.5,type="l", 
-                                    ylab="Averaged coverage",add=TRUE)
   
-  out <- cbind(out.1$density[,1],out.2$density[,2],out.3$density[,3],out.4$density[,4])
+  
+  # sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[1]], upstream=dd, downstream=dd) 
+  # sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))   
+  # out.1 <- featureAlignedDistribution(sigs.log2, 
+  #                                   feature.center[[1]],upstream=dd, downstream=dd,
+  #                                   zeroAt=.5,type="l", 
+  #                                   ylab="Averaged coverage")
+  # 
+  # 
+  # sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[2]], upstream=dd, downstream=dd) 
+  # sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  # out.2 <- featureAlignedDistribution(sigs.log2, 
+  #                                   feature.center[[2]],upstream=dd, downstream=dd,
+  #                                   zeroAt=.5,type="l", 
+  #                                   ylab="Averaged coverage",add=TRUE)
+  # 
+  # sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[3]], upstream=dd, downstream=dd) 
+  # sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  # out.3 <- featureAlignedDistribution(sigs.log2, 
+  #                                   feature.center[[3]],upstream=dd, downstream=dd,
+  #                                   zeroAt=.5,type="l", 
+  #                                   ylab="Averaged coverage",add=TRUE)
+  # 
+  # 
+  # sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[4]], upstream=dd, downstream=dd) 
+  # sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+  # out.4 <- featureAlignedDistribution(sigs.log2, 
+  #                                   feature.center[[4]],upstream=dd, downstream=dd,
+  #                                   zeroAt=.5,type="l", 
+  #                                   ylab="Averaged coverage",add=TRUE)
+  # 
+  # out <- cbind(out.1$density[,1],out.2$density[,2],out.3$density[,3],out.4$density[,4])
+  
+  XX <- lapply(1:length(feature.center),function(u,feature.center){
+    
+    sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[u]], upstream=dd, downstream=dd) 
+    sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
+    out.4 <- featureAlignedDistribution(sigs.log2, 
+                                       feature.center[[u]],upstream=dd, downstream=dd,
+                                       zeroAt=.5,type="l", 
+                                       ylab="Averaged coverage",add=TRUE)
+    x <- out.4$density[,u]
+    x 
+  },feature.center)
+  
+  out <- do.call(cbind,XX)
+  
   
   head(out)
-  colnames(out) <- colnames(out.1$density)
-  
+  colnames(out) <- tssType
+
   drowDensity <- function(density,grWidAt,grWidLab,...) {
     dots <- list(...)
     matplot(density, ..., xaxt="n")
@@ -8494,7 +8553,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   outLong <- melt(data          = out.m,
                   id.vars       = c("x.pos"),
-                  measure.vars  = c("Class1","Class2","Class3","Endo"),
+                  measure.vars  = tssType,
                   variable.name = "TSSByClass",
                   value.name    = "value")
   
