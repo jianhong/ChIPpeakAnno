@@ -8417,15 +8417,39 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
 # null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
 
-
-
 # tfType <- "shNR2F2"
 # class_pattern <- "tss"
 # tssType <- c("Class1","Class2","Class3","Endo")
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
 # null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
 
+# input.bed.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/AllElementsByCellType/"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/NR2F2kd_bigwig"
+# dd <- 3000
+# dd <- 10000
+# tfType <- "TRC-NS"
 
+# class_pattern <- "TSS"
+# tssType <- c("Artery","Common","Vein")
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+# class_pattern <- "Enh"
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+# dd <- 3000
+# dd <- 10000
+# tfType <- "shNR2F2"
+
+# class_pattern <- "TSS"
+# tssType <- c("Artery","Common","Vein")
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+# class_pattern <- "Enh"
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
 
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType) {
   
@@ -8530,7 +8554,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     z
   },cvglists.l)
   
-  names(cvglists.l[[4]])
+  #names(cvglists.l[[4]])
   
   cvglists.ul <- unlist(cvglists.l)
   
