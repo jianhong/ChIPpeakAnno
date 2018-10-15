@@ -8451,6 +8451,43 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2"
 # null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
 
+# input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/Aimin/EZH2bam_ENCODE_bw"
+# 
+# dd <- 3000
+# dd <- 10000
+# tfType <- "EZH2"
+# class_pattern <- "tss"
+# class_pattern <- "enh"
+# class_pattern <- "DHS"
+# tssType <- c("Class1","Class2","Class3","Endo")
+
+
+# input.bed.dir <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/AllElementsByCellType/"
+#
+# class_pattern <- "TSS"
+# tssType <- c("Artery","Common","Vein")
+
+#
+# class_pattern <- "Enh"
+# tssType <- c("Artery","Common","Vein")
+
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/EZH2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+# input.bed.dir <- "/Users/aiminyan/Aimin/ProjectAtCluster/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# input.bw.path <- "~/Aimin/ProjectAtCluster/umw_nathan_lawson/Aimin/HDAC1cr_bw"
+# 
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/HDAC1"
+# dd <- 3000
+# dd <- 10000
+# tfType <- "HDAC1"
+# class_pattern <- "tss"
+# class_pattern <- "enh"
+# class_pattern <- "DHS"
+# tssType <- c("Class1","Class2","Class3","Endo")
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -9192,3 +9229,5 @@ getBedFiles <- function(input.file.dir) {
   bed.in
   
 }
+
+
