@@ -646,7 +646,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                     IRanges(start=c(8, 15, 60),
                             end=c(20, 50, 100), 
                             names=c("Site1", "Site2", "Site3")),
-                    strand="+",
+                            strand="+",
                     feature=c("a","a","a"))
   
   peaks2 = GRanges(seqnames=c("1", "2", "3", "1", "2"), 
@@ -9204,6 +9204,9 @@ getCvg <- function(path,output.file.dir) {
 }
 
 # input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/BedFiles"
+# bed.in <- getBedFiles(input.file.dir)
+
+# input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BedFiles4GO"
 # bed.in <- getBedFiles(input.file.dir)
 
 getBedFiles <- function(input.file.dir) {
