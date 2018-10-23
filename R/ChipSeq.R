@@ -7484,6 +7484,18 @@ getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
 # 
 # null <- peaksToEnrichedGO(XL.3.subsets,output.file.dir,genome)
 
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/XL"
+# genome = "Mm"
+# null <- peaksToEnrichedGO(XL.3.subsets,output.file.dir,genome)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/XL/Bed"
+# outGrl(XL.3.subsets,output.file.dir)
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/nonXL"
+# genome = "Mm"
+# null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/nonXL/Bed"
+# outGrl(nonXL.3.subsets,output.file.dir)
+
 # ol.ciLAD.non_XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,2,3)])
 
 # nonXL.3.subsets <- getUniquePeaks(ol.ciLAD.non_XL.MEF_LAD)
@@ -7779,6 +7791,20 @@ writeGrlInUnique2Bed <- function(grl,output.file.dir) {
       output.file.name  <- paste0(xx,"_region")
     }
     
+    orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
+    
+  },grl,output.file.dir)
+  
+}
+
+outGrl <- function(grl,output.file.dir) {
+
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  null <- lapply(1:length(grl), function(u,grl,output.file.dir){
+    x <- names(grl)[u]
+    y <- as.data.frame(grl[[u]])
+    output.file.name  <- x
     orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
     
   },grl,output.file.dir)
@@ -9233,4 +9259,133 @@ getBedFiles <- function(input.file.dir) {
   
 }
 
+#findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(1,2,3)])
 
+#  dir.name="~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/nonXL/Bed"
+#' input.file.pattern="*.bed$"
+#' out.dir.name="~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/nonXL2"
+#' txdb="mm10"
+#' DD=5000
+#'
+#' anno.res <- AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=10000)
+
+AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38","mm10"),DD,distanceToTSS_cutoff=5000,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
+  
+  file.1 <- list.files(dir.name,pattern=input.file.pattern,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  re.peaks.only.bed.2 <- file.1
+  
+  # txdb<-match.arg(txdb)
+  
+  txdb<-match.arg(txdb,c("hg19","hg38","mm10"),several.ok=TRUE)
+  
+  
+  APpath <- paste(AP,collapse = "_")
+  
+  temp3=file.path(out.dir.name,"Annotation",APpath)
+  
+  if(!dir.exists(temp3)){dir.create(temp3,recursive = TRUE)}
+  
+  d=DD
+  res <- lapply(1:length(re.peaks.only.bed.2),function(u,re.peaks.only.bed.2,d){
+    u <- 3
+    peaks=readPeakFile(re.peaks.only.bed.2[[u]],as="data.frame")
+    
+    print(head(peaks))
+    
+    switch (txdb,
+            hg38 = {
+              cat("Use hg38\n")
+              txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+              peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
+                                       TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,
+                                       genomicAnnotationPriority=AP,annoDb="org.Hs.eg.db")
+            },
+            hg19 = {
+              cat("Use hg19\n")
+              txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+              peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
+                                       TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,
+                                       genomicAnnotationPriority=AP,annoDb="org.Hs.eg.db")
+            },
+            mm10 = {
+              cat("Use mm10\n")
+              txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+              peakAnno <- annotatePeak(re.peaks.only.bed.2[[u]], tssRegion=c(-d, d),
+                                       TxDb=txdb,assignGenomicAnnotation=assignGenomicAnnotation,
+                                       genomicAnnotationPriority=AP,annoDb="org.Mm.eg.db")
+            }
+            
+    )
+    
+    dropAnnoM <- function (csAnno, distanceToTSS_cutoff)
+    {
+      idx <- which(abs(mcols(csAnno@anno)[["distanceToTSS"]]) <
+                     distanceToTSS_cutoff)
+      csAnno@anno <- csAnno@anno[idx]
+      csAnno@peakNum <- length(idx)
+      if (csAnno@hasGenomicAnnotation) {
+        csAnno@annoStat <- ChIPseeker:::getGenomicAnnoStat(csAnno@anno)
+        csAnno@detailGenomicAnnotation = csAnno@detailGenomicAnnotation[idx,                                                                        ]
+      }
+      csAnno
+    }
+    
+    peakAnno <- dropAnnoM(peakAnno,distanceToTSS_cutoff = distanceToTSS_cutoff)
+    
+    x_name=basename(re.peaks.only.bed.2[[u]])
+    cat(x_name)
+    
+    png(file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_pie.png")))
+    plotAnnoPie(peakAnno)
+    dev.off()
+    
+    peaks.anno=as.data.frame(peakAnno)
+    
+    print(head(peaks.anno))
+    
+    print(colnames(peaks.anno))
+    
+    peaks.anno.1 <- data.frame(peakName=rownames(peaks.anno),peaks.anno)
+    
+    write.table(peaks.anno.1,file=file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_4_only_mapped_peaks.xls")),
+                row.names = FALSE,quote=FALSE,sep="\t")
+    
+    
+    unmapped.peaks<-peaks[-which(paste0(peaks[,1],"_",peaks[,2],"_",peaks[,3]) %in% paste0(peaks.anno[,1],"_",peaks.anno[,2],"_",peaks.anno[,3])),]
+    
+    cat(dim(peaks)[1]," ",dim(peaks.anno)[1]," ",dim(unmapped.peaks)[1],"\n")
+    
+    if(dim(unmapped.peaks)[1]!=0){
+      
+      colnames(unmapped.peaks)=colnames(peaks.anno)[1:3]
+      
+      unmapped.peaks.3<-smartbind(peaks.anno,unmapped.peaks)
+      
+      unmapped.peaks.4<-unmapped.peaks.3[order(unmapped.peaks.3[,1],unmapped.peaks.3[,2]),]
+      
+      unmapped.peaks.4[which(is.na(unmapped.peaks.4$annotation)),6] <- "NotAnno"
+      
+      row.names(unmapped.peaks.4) <- seq(1,dim(unmapped.peaks.4)[1])
+      
+      unmapped.peaks.5 <- data.frame(peakName=rownames(unmapped.peaks.4),unmapped.peaks.4)
+      
+      write.table(unmapped.peaks.5,file=file.path(temp3,paste0(x_name,"_",d,"_around_tss_annotation_4_all_peaks.xls")),row.names = FALSE,quote=FALSE,sep="\t")
+      
+      f.only <- file.path(temp3,paste0(x_name,"_",d,"_Pie_peaksMappedOnly.pdf"))
+      f.all <- file.path(temp3,paste0(x_name,"_",d,"_Pie_peaksAll.pdf"))
+      
+      makePieChart(peaks.anno,f.only)
+      makePieChart(unmapped.peaks.4,f.all)
+      
+      re <- list(peaksMappedOnly=peaks.anno,peaksAll=unmapped.peaks.4)
+      re
+    }else
+    {
+      re <- list(peaksMappedOnly=peaks.anno,peaksAll=peaks.anno)
+      re
+    }
+    
+  },re.peaks.only.bed.2,d)
+  res
+}
