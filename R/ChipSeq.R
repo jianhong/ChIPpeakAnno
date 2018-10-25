@@ -7801,10 +7801,15 @@ outGrl <- function(grl,output.file.dir) {
 
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
+  #grl <- peaks.in.overlap.ciLAD.F121.9
+  #u <- 3
+  
   null <- lapply(1:length(grl), function(u,grl,output.file.dir){
     x <- names(grl)[u]
+    x <- gsub("///","_ol_",x)
     y <- as.data.frame(grl[[u]])
     output.file.name  <- x
+   # output.file.dir <- "~/"
     orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
     
   },grl,output.file.dir)
@@ -9190,7 +9195,30 @@ getMoreBedFiles2 <- function(input.file.dir,re.out) {
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_23_2018_129_cast_unique_peaks_bed"
 # outGrl(unique.peaks.in.overlap.129.cast,output.file.dir)
 
+# overlap.ciLAD.F121.9 <- findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(1,12)])
+# peaks.in.overlap.ciLAD.F121.9 <- getPeaksInOverlap(overlap.ciLAD.F121.9,1)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/peaks_in_overlaps_ciLAD_F121_9_bed"
+# outGrl(peaks.in.overlap.ciLAD.F121.9,output.file.dir)
 
+# overlap.ciLAD.XL.MEF <- findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(1,14)])
+# peaks.in.overlap.ciLAD.XL.MEF <- getPeaksInOverlap(overlap.ciLAD.XL.MEF,1)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/peaks_in_overlaps_ciLAD_XL_MEF_10_25_2018_bed"
+# outGrl(peaks.in.overlap.ciLAD.XL.MEF,output.file.dir)
+
+# overlap.ciLAD.F121.9.XL.MEF <- findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(1,12,14)])
+
+# peaks.in.overlap.F121.9.XL.MEF <- getPeaksInOverlap(overlap.ciLAD.F121.9.XL.MEF,1)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/peaks_in_overlaps_F121_9_XL_MEF_10_25_2018_bed"
+# outGrl(peaks.in.overlap.F121.9.XL.MEF,output.file.dir)
+
+# peaks.in.overlap.ciLAD.XL.MEF <- getPeaksInOverlap(overlap.ciLAD.F121.9.XL.MEF,2)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/peaks_in_overlaps_ciLAD_XL_MEF_10_25_2018_bed"
+# outGrl(peaks.in.overlap.ciLAD.XL.MEF,output.file.dir)
+
+# peaks.in.ol.F121.9.ciLAD.XL.MEF <- findOverlapsOfPeaks(peaks.in.overlap.F121.9.XL.MEF[[3]],peaks.in.overlap.ciLAD.XL.MEF[[3]])
+# peaks.in.ol.F121.9.ciLAD.XL.MEF.2 <- getPeaksInOverlap(peaks.in.ol.F121.9.ciLAD.XL.MEF,1)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/peaks_in_overlaps_ciLAD_F121_9_XL_MEF_10_25_2018_bed"
+# outGrl(peaks.in.ol.F121.9.ciLAD.XL.MEF.2,output.file.dir)
 
 getLADs <- function() {
   GSE17051 <- read.table("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/GSE17051_HMM_state_calls_per_probe.txt",header = T)
