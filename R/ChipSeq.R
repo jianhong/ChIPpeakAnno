@@ -9185,6 +9185,12 @@ getMoreBedFiles2 <- function(input.file.dir,re.out) {
 # name <- c("F121-129","F121_cast")
 # getCount4Venn(re.out.rt.mef.add.more.bed,peak.index,name,output.file.dir)
 
+# overlap.129.cast <- findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(11,13)])
+# unique.peaks.in.overlap.129.cast <- getPeaksInUnique(overlap.129.cast)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_23_2018_129_cast_unique_peaks_bed"
+# outGrl(unique.peaks.in.overlap.129.cast,output.file.dir)
+
+
 
 getLADs <- function() {
   GSE17051 <- read.table("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/GSE17051_HMM_state_calls_per_probe.txt",header = T)
