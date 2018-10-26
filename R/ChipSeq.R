@@ -8519,6 +8519,53 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 # tssType <- c("Class1","Class2","Class3","Endo")
 # null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
 
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/HDAC2"
+# input.bed.dir <- "~/Aimin/project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/AllElementsByCellType"
+# input.bw.path <- "~/Aimin/project/umw_nathan_lawson/Aimin/HDAC2cr_bw"
+# class_pattern <- "TSS"
+# tssType <- c("Artery","Common","Vein")
+# dd <- 3000
+# tfType <- "HDAC2"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+## dd <- 10000
+## null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+# class_pattern <- "Enh"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+# dd <- 3000
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+
+# input.bed.dir <- "/Users/aiminyan/Aimin/project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
+# class_pattern <- "tss"
+# tssType <- c("Class1","Class2","Class3","Endo")
+# dd <-3000
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+# class_pattern <- "enh"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+# class_pattern <- "DHS"
+# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+ tfType <- "HDAC2"
+ tssType <- c("Class1","Class2","Class3","Endo")
+ dd <- c(3000,10000)
+ class_pattern <- c("tss","enh","DHS")
+
+ null <- lapply(1:length(dd), function(u,input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType){
+   
+    x <- dd[u]
+    null <- lapply(1:length(class_pattern),function(v,input.bed.dir,input.bw.path,output.file.dir,x,class_pattern,tssType,tfTyp){
+      
+    y <- class_pattern[v]
+    
+    null <-overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,x,y,tssType,tfType)
+      
+    },input.bed.dir,input.bw.path,output.file.dir,x,class_pattern,tssType,tfType)
+    
+ },input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+
+
+
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
