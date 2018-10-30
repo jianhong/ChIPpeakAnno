@@ -9339,6 +9339,15 @@ getCvg <- function(path,output.file.dir) {
 # input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BedFiles4GO"
 # bed.in <- getBedFiles(input.file.dir)
 
+# input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul"
+# bed.in <- getBedFiles(input.file.dir)
+# bed.in[c(2,4,6,8)] <- NULL
+
+# output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation"
+# genome <- "Mm"
+# null <- peaksToEnrichedGO(bed.in,output.file.dir,genome)
+
+
 getBedFiles <- function(input.file.dir) {
   file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
@@ -9372,6 +9381,13 @@ getBedFiles <- function(input.file.dir) {
 #' DD=5000
 #'
 #' anno.res <- AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=10000)
+
+# dir.name <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul"
+# input.file.pattern="*.bed$"
+# out.dir.name="/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul_ChipSeeker"
+# txdb="mm10"
+# DD=5000
+# anno.res <- AnntationUsingChipSeeker(dir.name,input.file.pattern,out.dir.name,txdb=txdb,DD,distanceToTSS_cutoff=10000)
 
 AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,txdb=c("hg19","hg38","mm10"),DD,distanceToTSS_cutoff=5000,assignGenomicAnnotation=TRUE,AP=c("Promoter", "5UTR", "3UTR", "Exon", "Intron","Downstream", "Intergenic")) {
   
@@ -9492,4 +9508,42 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
     
   },re.peaks.only.bed.2,d)
   res
+}
+
+# tempDS3 <- read.csv("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation/ciLAD.overlap-nonXL_MEF_1.5FC_qe-3_chrX_qe-2_igv_GO_BP.csv")
+# tempDS3 <- tempDS3[,-1]
+# Draw4GO(tempDS3)
+# go.id.2.go.term <-read.table("~/Downloads/results.csv",header=F,sep=",")
+# colnames(go.id.2.go.term) <- c("go.id","go.term","Ontology","Definition")
+# tempDS3.1 <-  merge.data.frame(tempDS3,go.id.2.go.term,by="go.id") 
+# tempDS3.2 <- tempDS3.1[,c(1,13,14,15,5:12)]
+# colnames(tempDS3.2)[c(2,3,4)] <- c("go.term","Ontology","Definition")
+# output.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation"
+# Draw4GO(tempDS3.2,0.05,10,output.dir)
+  
+Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir) {
+  x=tempDS3.2
+  y=x[order(x$BH.adjusted.p.value,decreasing = FALSE),]
+  
+  z=y[which(y$BH.adjusted.p.value<0.05),]
+  
+  z<- z[1:10,c(1:3,5:10)]
+  
+  #Function<-z$Definition
+  
+  #negative_log10p=-log10(z$BH.adjusted.p.value)
+  
+  #ggplot(z, aes(x=z$go.id, y=negative_log10p,fill=factor(z$go.id)))+geom_bar(stat="identity")+geom_hline(yintercept = -log10(0.05))+coord_flip()
+  
+  z$go.term <- factor(z$go.term, levels = z$go.term[order(z$BH.adjusted.p.value,decreasing = T)])
+  
+  sp <- ggplot(z, aes(x=go.term,y=BH.adjusted.p.value)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=z$count.InDataset), hjust=0)+ coord_flip()+ggtitle("nonXL MEF ciLAD-overlapped NAD:GO Biol.Processes")+labs(x="GO term",y="BH adjusted p-value") + theme(plot.title=element_text(hjust=0.5))
+  
+  spp <- list(sp=sp)
+  multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
+  
+  if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+  ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,"GO_bar.png"))
+  
+
 }
