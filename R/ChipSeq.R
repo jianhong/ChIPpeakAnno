@@ -7515,43 +7515,21 @@ getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
 # null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
 
 peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
-
-  
- # ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,4,3)],connectedPeaks = "keepAll")
-  
-  
-  
-# genome = "Mm"
 null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
-  
-  #u <- 1
-  #re.out <- XL.3.subsets
   
   x=re.out[[u]]
   x_name=names(re.out)[u]
   
   if(genome=="Mm"){
     
-    #annoData <- toGRanges(EnsDb.Mmusculus.v75, feature="gene")
-    
     dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
     
     overlaps.trimmed<-trim(x,use.names=TRUE)
     overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
     
-    #overlaps.anno<-annoPeaks(overlaps.trimmed,annoData)
-    
     write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
-    
-     #annotatedPeak1 <- annotatePeakInBatch(overlaps.trimmed, AnnotationData=annoData)
-    #  overlaps.anno.with.entrez.id <- addGeneIDs(annotatedPeak1,"org.Mm.eg.db",IDs2Add = "symbol")
-    #  write.csv(as.data.frame(unname(overlaps.anno.with.entrez.id)), file.path(output.file.dir,paste0(x_name,"_other_anno.csv")))
-    #  pdf(file.path(output.file.dir,paste0(x_name,"_annotation_pie_plot.pdf")))  
-    #  pie1(table(overlaps.anno.with.entrez.id$insideFeature))
-    #  dev.off()
-    #  write.table(annotatedPeak1,file=file.path(output.file.dir,paste0(x_name,"_annotationInBatch.txt")),row.names = FALSE,quote=FALSE,sep="\t")
     
     getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
       
@@ -7559,36 +7537,27 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
       over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
                             maxP=0.5, minGOterm=10,
                             multiAdjMethod="BH", condense=TRUE)
-      
-      
       path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
-      
       write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
-      
       convert2geneSymbol <- function(over1) {
         
         geneSymbol <- lapply(over1$EntrezID, function(u){
-          
           x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
           x
-          
         })
         
         list_to_df <- function(list_for_df)
         {
           list_for_df <- as.list(list_for_df)
-          
           nm <- names(list_for_df)
           if (is.null(nm)) 
             nm <- seq_along(list_for_df)
-          
           df <- data.frame(name = nm, stringsAsFactors = FALSE)
           df$value <- unname(list_for_df)
           df
         }
         
         geneSymbol3 <- list_to_df(geneSymbol)
-        
         over2 <- cbind(over1,geneSymbol3)
         over3 <- over2[,-which(colnames(over2) %in% c("name"))]
         colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
@@ -7629,7 +7598,6 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
       writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
     }
     
-    #getGoAndPath(overlaps.anno.with.entrez.id,output.file.dir,x_name)
     getGoAndPath(overlaps.anno,output.file.dir,x_name)
     
   }else if(genome=="Hs"){
@@ -9525,16 +9493,8 @@ Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir) {
   x=tempDS3.2
   y=x[order(x$BH.adjusted.p.value,decreasing = FALSE),]
   
-  z=y[which(y$BH.adjusted.p.value<0.05),]
-  
-  z<- z[1:10,c(1:3,5:10)]
-  
-  #Function<-z$Definition
-  
-  #negative_log10p=-log10(z$BH.adjusted.p.value)
-  
-  #ggplot(z, aes(x=z$go.id, y=negative_log10p,fill=factor(z$go.id)))+geom_bar(stat="identity")+geom_hline(yintercept = -log10(0.05))+coord_flip()
-  
+  z=y[which(y$BH.adjusted.p.value<threshold.p),]
+  z<- z[1:topGo.n,c(1:3,5:10)]
   z$go.term <- factor(z$go.term, levels = z$go.term[order(z$BH.adjusted.p.value,decreasing = T)])
   
   sp <- ggplot(z, aes(x=go.term,y=BH.adjusted.p.value)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=z$count.InDataset), hjust=0)+ coord_flip()+ggtitle("nonXL MEF ciLAD-overlapped NAD:GO Biol.Processes")+labs(x="GO term",y="BH adjusted p-value") + theme(plot.title=element_text(hjust=0.5))
@@ -9545,5 +9505,4 @@ Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir) {
   if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
   ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,"GO_bar.png"))
   
-
 }
