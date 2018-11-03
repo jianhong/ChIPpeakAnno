@@ -9559,6 +9559,7 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
     z
   },len,df.2.gr)
   ZZZ <- do.call(c,ZZ)
+  
   if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
   test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
   export.bw(ZZZ,test_bw_out)
