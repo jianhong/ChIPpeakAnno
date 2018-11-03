@@ -9480,16 +9480,16 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
 
 # tempDS3 <- read.csv("/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation/ciLAD.overlap-nonXL_MEF_1.5FC_qe-3_chrX_qe-2_igv_GO_BP.csv")
 # tempDS3 <- tempDS3[,-1]
-# Draw4GO(tempDS3)
-# go.id.2.go.term <-read.table("~/Downloads/results.csv",header=F,sep=",")
-# colnames(go.id.2.go.term) <- c("go.id","go.term","Ontology","Definition")
-# tempDS3.1 <-  merge.data.frame(tempDS3,go.id.2.go.term,by="go.id") 
-# tempDS3.2 <- tempDS3.1[,c(1,13,14,15,5:12)]
-# colnames(tempDS3.2)[c(2,3,4)] <- c("go.term","Ontology","Definition")
+# xx <- as.list(GOTERM)
+# foo <- function(x) c(GOID(x), Term(x),Definition(x), Ontology(x))
+# gomat <- t(sapply(xx, foo, simplify=TRUE))
+# gomat <- as.data.frame(gomat)
+# colnames(gomat) <- c("ID","Term","Definition","Ontology")
+# tempDS3$go.term <- gomat[which(gomat$ID %in% tempDS3$go.id),1:2]$Term
 # output.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation"
-# Draw4GO(tempDS3.2,0.05,10,output.dir)
-  
-Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir) {
+# Draw4GO(tempDS3,0.05,10,output.dir,"GO_bar.png")
+
+Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir,file.name) {
   x=tempDS3.2
   y=x[order(x$BH.adjusted.p.value,decreasing = FALSE),]
   
@@ -9503,6 +9503,67 @@ Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir) {
   multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
   
   if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
-  ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,"GO_bar.png"))
+  ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,file.name))
+  
+}
+
+getNonOverLappingPeakIndex <- function(gr) {
+  
+  hits <- findOverlaps(gr)
+  
+  net.hits <- hits[!(isSelfHit(hits) | isRedundantHit(hits))]
+  
+  all.peak.id <- seq(1,length(gr),1)
+  keep.peak.id <- length(all.peak.id)
+  
+  while(length(all.peak.id)!=0){
+    keep.peak.id <- c(keep.peak.id,all.peak.id[1])
+    rm.peak.id <- c(keep.peak.id,subjectHits(net.hits[which(queryHits(net.hits)==keep.peak.id[length(keep.peak.id)])]))
+    all.peak.id <- setdiff(all.peak.id,rm.peak.id)
+  }
+  keep.peak.id <- keep.peak.id[-1]
+  keep.peak.id
+}
+
+# rds.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BigWig_F121_9/forCreatingWIG/baseLineCorrectedRatioF121_9rep1and2.RDS"
+# output.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BigWig_F121_9"
+# sample.name <- "nusDNA_1" 
+# getBigWig(rds.file,sample.name,output.dir)
+  
+getBigWig <- function(rds.file,sample.name,output.dir) {
+  seList <- readRDS(rds.file)
+  
+  range.rato.s <- lapply(1:length(seList), function(u,seList){
+    range.ratio <- cbind(as.data.frame(ranges(seList[[u]])),assays(seList[[u]])$bcRatio)
+    range.ratio
+  },seList)
+  
+  range.rato.ss <- do.call(rbind,range.rato.s)
+  range.rato.ss$names <- tools::file_path_sans_ext(range.rato.ss$names)
+  
+  s.index <- grep(sample.name,colnames(range.rato.ss))
+  
+  df.2.gr.temp <- range.rato.ss[,c(4,1,2,s.index)]
+  colnames(df.2.gr.temp) <- c("seqnames","start","end","score")
+  
+  df.2.gr <-  GRanges(df.2.gr.temp)
+  seqlengths(df.2.gr) <- seqlengths(BSgenome.Mmusculus.UCSC.mm10)[match(names(seqlengths(df.2.gr)),names(seqlengths(BSgenome.Mmusculus.UCSC.mm10)))] 
+  
+  test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
+  
+  len <- unlist(lapply(seList, length))
+  
+  ZZ <- lapply(1:length(len), function(u,len,df.2.gr){
+    x <- names(len)[u]
+    y <- len[u]
+    z <- df.2.gr[which(seqnames(df.2.gr)==x)]
+    non.olp.index <- getNonOverLappingPeakIndex(z)
+    z <- z[non.olp.index]
+    z
+  },len,df.2.gr)
+  
+  ZZZ <- do.call(c,ZZ)
+  
+  export.bw(ZZZ,test_bw_out)
   
 }
