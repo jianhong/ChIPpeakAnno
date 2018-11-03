@@ -9528,11 +9528,12 @@ getNonOverLappingPeakIndex <- function(gr) {
 # rds.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BigWig_F121_9/forCreatingWIG/baseLineCorrectedRatioF121_9rep1and2.RDS"
 # output.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BigWig_F121_9"
 # sample.name <- "nusDNA_1" 
+# sample.name <- "nusDNA_2"
 # getBigWig(rds.file,sample.name,output.dir)
-  
+
 getBigWig <- function(rds.file,sample.name,output.dir) {
-  seList <- readRDS(rds.file)
   
+  seList <- readRDS(rds.file)
   range.rato.s <- lapply(1:length(seList), function(u,seList){
     range.ratio <- cbind(as.data.frame(ranges(seList[[u]])),assays(seList[[u]])$bcRatio)
     range.ratio
@@ -9542,17 +9543,13 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
   range.rato.ss$names <- tools::file_path_sans_ext(range.rato.ss$names)
   
   s.index <- grep(sample.name,colnames(range.rato.ss))
-  
   df.2.gr.temp <- range.rato.ss[,c(4,1,2,s.index)]
   colnames(df.2.gr.temp) <- c("seqnames","start","end","score")
   
   df.2.gr <-  GRanges(df.2.gr.temp)
   seqlengths(df.2.gr) <- seqlengths(BSgenome.Mmusculus.UCSC.mm10)[match(names(seqlengths(df.2.gr)),names(seqlengths(BSgenome.Mmusculus.UCSC.mm10)))] 
   
-  test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
-  
   len <- unlist(lapply(seList, length))
-  
   ZZ <- lapply(1:length(len), function(u,len,df.2.gr){
     x <- names(len)[u]
     y <- len[u]
@@ -9561,9 +9558,9 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
     z <- z[non.olp.index]
     z
   },len,df.2.gr)
-  
   ZZZ <- do.call(c,ZZ)
-  
+  if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+  test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
   export.bw(ZZZ,test_bw_out)
   
 }
