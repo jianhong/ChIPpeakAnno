@@ -9565,3 +9565,41 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
   export.bw(ZZZ,test_bw_out)
   
 }
+
+sra.run.table <- read.table("/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Tessa_Simone/SraRunTable.txt",sep="\t",header = T)
+
+sample.info <- read.table(text="GSM2040031	A549_ChIP_WCE_NA_NA_EtOH_60min_Rep1
+GSM2040032	A549_ChIP_NIPBL_A301-779A_NA_EtOH_60min_Rep1
+GSM2040033	A549_ChIP_MED1_A300-793A_NA_EtOH_60min_Rep1
+GSM2040034	A549_ChIP_SMC1_A300-055A_NA_EtOH_60min_Rep1
+GSM2040035	A549_ChIP_WCE_NA_NA_EtOH_60min_Rep2
+GSM2040036	A549_ChIP_NIPBL_A301-779A_NA_EtOH_60min_Rep2
+GSM2040037	A549_ChIP_MED1_A300-793A_NA_EtOH_60min_Rep2
+GSM2040038	A549_ChIP_SMC1_A300-055A_NA_EtOH_60min_Rep2",header=FALSE) 
+colnames(sample.info) <- c("Sample_Name","Condition")
+
+sample.info.sra <- merge(sample.info,sra.run.table,by="Sample_Name")
+input.fq <- "~/Aimin/project/umw_pgfe_michael_green/Aimin/TessaSimone/Fq"
+input.p <- "*.fastq$"
+  
+fq.files <- list.files(input.fq,pattern=input.p,all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+x <- tools::file_path_sans_ext(basename(fq.files))
+fq.files.2 <- data.frame(fq=fq.files,Run=x)
+
+sample.info.sra.fq <- merge(sample.info.sra,fq.files.2,by="Run")
+XX <- sample.info.sra.fq[,c(3,32)]
+
+XX$Condition <- gsub("A549_ChIP_","",XX$Condition)
+XX$Condition <- gsub("_NA_EtOH_60min","",XX$Condition)
+
+# output to dropbox
+XX$fq <- gsub("/Users/aiminyan/Aimin","",XX$fq)
+output.file <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Tessa_Simone/fq.txt"
+write.table(XX,file = output.file , sep = ",",row.names = F, col.names = F,quote=F)
+
+# output to HPC
+XX$fq <- gsub("/Users/aiminyan/Aimin","",XX$fq)
+output.file <- "/Users/aiminyan/Aimin/project/umw_pgfe_michael_green/Aimin/TessaSimone/fq.txt"
+write.table(XX,file = output.file , sep = ",",row.names = F, col.names = F,quote=F)
+
+
