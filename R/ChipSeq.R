@@ -9316,6 +9316,52 @@ getCvg <- function(path,output.file.dir) {
 # null <- peaksToEnrichedGO(bed.in,output.file.dir,genome)
 
 
+# input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/crossLinkAndNoncrossLink"
+# bed.in <- getBedFiles(input.file.dir)
+
+# peak.index <- c(1,2)
+# name <- c("nonXL","XL")
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/crossLinkAndNoncrossLink/Results"
+# getCount4Venn(bed.in,peak.index,name,output.file.dir)
+
+getDistributionWidth <- function(bed.in, length, width) {
+  len.nad <- data.frame(unlist(lapply(bed.in, length)))
+  NAD.class <- c(rep("nonXL",len.nad[1,1]),rep("XL",len.nad[2,1]))
+  NAD.class.len <- data.frame(nad=NAD.class,length=unlist(lapply(bed.in, width)))
+  boxplot(NAD.class.len$length~NAD.class.len$nad)
+}
+
+useEulerAPE <- function() {
+  cmd = "java -Duser.language=en -Duser.region=US -jar ~/Applications/eulerAPE_3.0.0.jar -i els.file -o eld.file -l yes  -c yes  --curves ellipses  -s"
+  
+  library("venneuler")
+  vd <- venneuler(c(nonXL=57.00, XL=383.00, "nonXL&XL"=754.00))
+  plot(vd)
+}
+
+# Coverage.NAD <- as.data.frame(unlist(lapply(bed.in,getCoverage4GrOngenome,"mm10")))
+# Coverage.NAD.1 <- data.frame(nad=c("nonXL","XL"),coverage=Coverage.NAD[,1])
+
+# Coverage.NAD.1$nad <- factor(Coverage.NAD.1$nad, levels = Coverage.NAD.1$nad[order(Coverage.NAD.1$coverage,decreasing = T)])
+
+# sp <- ggplot(Coverage.NAD.1, aes(x=nad,y=coverage)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=paste0(Coverage.NAD.1$coverage,"%")), vjust=0)+ggtitle("non-repetitive genome coverage on mm10")+labs(x="NAD",y="Coverage") + theme(plot.title=element_text(hjust=0.5))
+
+getCoverage4GrOngenome <- function(gr, genome)
+{
+  if(genome == "mm10")
+  {gr.whole.genome <- GRanges(seqinfo(BSgenome.Mmusculus.UCSC.mm10))}
+  
+  if(isDisjoint(gr)){
+  coverage <- sum(width(gr))/sum(width(gr.whole.genome))*100
+  }else
+  {
+  coverage <- sum(width(IRanges::disjoin(gr)))/sum(width(gr.whole.genome))*100
+  }
+
+  coverage <- round(coverage,2)
+  coverage
+}
+
 getBedFiles <- function(input.file.dir) {
   file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
