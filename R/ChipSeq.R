@@ -714,9 +714,12 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
     colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(7))
     dev.off()
     
-    fit1 <- euler(c("ciLAD" = 785, "LAD" = 565, "nonXL_MEF" = 167,
-                    "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
-                    "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
+   
+    
+    
+    fit1.plot <- plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+    
+    
     
     ZZZZ <- round(ZZZ/1000000,0)
     
@@ -9315,7 +9318,6 @@ getCvg <- function(path,output.file.dir) {
 # genome <- "Mm"
 # null <- peaksToEnrichedGO(bed.in,output.file.dir,genome)
 
-
 # input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/crossLinkAndNoncrossLink"
 # bed.in <- getBedFiles(input.file.dir)
 
@@ -9650,4 +9652,23 @@ parser4Tessa <- function() {
   write.table(XX,file = output.file , sep = ",",row.names = F, col.names = F,quote=F)
 }
 
-
+eulerPlot <- function() {
+  fit1 <- euler(c("ciLAD" = 785, "LAD" = 565, "nonXL_MEF" = 167,
+                  "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
+                  "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
+  
+  fit1.plot <- plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
+  
+  fit.new <- euler(c("XL" = 383, "nonXL" = 57, "XL&nonXL" = 754),shape = "ellipse")
+  fit.new.plot <- plot(fit.new,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 0.5),alpha=0.7)
+  grid.ls(fit.new.plot)
+  t <- grid.get("quantities.grob")
+  names(t)
+  t$label
+  t$x
+  t$y
+  title <- textGrob("XL-vs-nonXL", x= unit(250,"native"),y= unit(30,"native"))
+  footnote <- textGrob("Numbers are nucleotides in MB", x=unit(450,"native"),y=unit(390,"native"))
+  gt <- gTree(children=gList(fit.new.plot, title, footnote))
+  gt2 <- grid.draw(gt)
+}
