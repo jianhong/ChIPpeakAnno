@@ -9653,11 +9653,6 @@ parser4Tessa <- function() {
 }
 
 eulerPlot <- function() {
-  fit1 <- euler(c("ciLAD" = 785, "LAD" = 565, "nonXL_MEF" = 167,
-                  "ciLAD&LAD" = 3, "ciLAD&nonXL_MEF" = 101, "LAD&nonXL_MEF" = 541,
-                  "ciLAD&LAD&nonXL_MEF" = 2),shape = "ellipse")
-  
-  fit1.plot <- plot(fit1,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 1),alpha=0.7)
   
   fit.new <- euler(c("XL" = 383, "nonXL" = 57, "XL&nonXL" = 754),shape = "ellipse")
   fit.new.plot <- plot(fit.new,quantities = TRUE,fill = rainbow(7),lty = 1:2,labels = list(font = 0.5),alpha=0.7)
@@ -9671,4 +9666,5 @@ eulerPlot <- function() {
   footnote <- textGrob("Numbers are nucleotides in MB", x=unit(450,"native"),y=unit(390,"native"))
   gt <- gTree(children=gList(fit.new.plot, title, footnote))
   gt2 <- grid.draw(gt)
+  
 }
