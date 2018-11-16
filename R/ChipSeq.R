@@ -7778,7 +7778,7 @@ outGrl <- function(grl,output.file.dir) {
   null <- lapply(1:length(grl), function(u,grl,output.file.dir){
     x <- names(grl)[u]
     x <- gsub("///","_ol_",x)
-    y <- as.data.frame(grl[[u]])
+    y <- as.data.frame(grl[[u]])[,1:3]
     output.file.name  <- x
    # output.file.dir <- "~/"
     orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
@@ -7840,22 +7840,23 @@ getPeaksInOverlap <- function(ol.ciLAD.XL.MEF_LAD,index_overlap) {
   overlappedPeaks <- data.frame(overlappedPeaks,overlappedBasePairs=as.numeric(as.character(overlappedPeaks$end.olp))
                                 -as.numeric(as.character(overlappedPeaks$start.olp))+1,check.names=F)
   
-
+  overlappedPeaks
+  
   sample.index <- which(colnames(overlappedPeaks) == XXX_name[2])
 
   end <- sample.index-1
   peak1 <- unique(toGRanges(overlappedPeaks[,1:end],use.mcols=FALSE))
-  
+
   overlap.index <- which(colnames(overlappedPeaks) == "seqnames.olp")
   end <- overlap.index-1
   peak2 <- unique(toGRanges(overlappedPeaks[,sample.index:end]))
-  
+
   temp <- overlappedPeaks[,overlap.index:dim(overlappedPeaks)[2]]
   colnames(temp) <- c("seqnames","start","end","overlappedBasePairs")
   overlappingPeaks <- unique(toGRanges(temp))
-  
+
   grl <- GenomicRangesList(peak1,peak2,overlappingPeaks)
-  
+
   names(grl) <- c(XXX_name[1],XXX_name[2],X_name)
   grl
   
@@ -7924,7 +7925,7 @@ getUniquePeaks <- function(ol.ciLAD.XL.MEF_LAD) {
         cat(x,"\n")
         w <- zz[[m[1]]][[m[2]]]
         XL.3.subsets <- c(ol.unique.0,w)
-        names(XL.3.subsets)[2] <- x
+        names(XL.3.subsets)[length(XL.3.subsets)] <- x
         XL.3.subsets
   }
   
@@ -9615,7 +9616,8 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
 }
 
 parser4Tessa <- function() {
-  sra.run.table <- read.table("/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Tessa_Simone/SraRunTable.txt",sep="\t",header = T)
+
+    sra.run.table <- read.table("/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Tessa_Simone/SraRunTable.txt",sep="\t",header = T)
   
   sample.info <- read.table(text="GSM2040031	A549_ChIP_WCE_NA_NA_EtOH_60min_Rep1
   GSM2040032	A549_ChIP_NIPBL_A301-779A_NA_EtOH_60min_Rep1
@@ -9668,3 +9670,53 @@ eulerPlot <- function() {
   gt2 <- grid.draw(gt)
   
 }
+
+# input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/BedFiles/Aizhan\ F121-9\ comparisons"
+# Aizhan.bed.in <- getBedFiles(input.file.dir)
+
+# ol.4.Aizhan.bed.in <- findOverlapsOfPeaks(Aizhan.bed.in[c(2,4)],connectedPeaks = "keepAll")
+#
+# 
+# Aizhan.peaks.in.unique <- getPeaksInUnique(ol.4.Aizhan.bed.in)
+# Aizhan.peaks.in.overlap <- getPeaksInOverlap(ol.4.Aizhan.bed.in,1)
+# Aizhan.3.sets.of.peaks <- c(Aizhan.peaks.in.unique,Aizhan.peaks.in.overlap[[3]])
+# names(Aizhan.3.sets.of.peaks)[3] <- names(Aizhan.peaks.in.overlap)[3]
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed"
+# outGrl(Aizhan.3.sets.of.peaks,output.file.dir)
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2"
+# outGrl(Aizhan.peaks.in.overlap,output.file.dir)
+
+# Aizhan.3.sets.of.peaks.1 <- getUniquePeaks(ol.4.Aizhan.bed.in)
+
+getNonoverLappingBed <- function(output.file.dir) {
+ 
+   bed.files <- list.files(output.file.dir,pattern="*bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  overlapping.file <- bed.files[grep("ol",bed.files)]
+  files.2.be.converted <- bed.files[-c(grep("only",bed.files),grep("ol",bed.files))]
+  
+  lapply(files.2.be.converted, function(u,overlapping.file){
+    
+    out <- file.path(output.file.dir,paste0(tools::file_path_sans_ext(basename(u)),"_only.bed"))
+    
+    cmd <- paste('bedtools subtract -a',u,'-b',overlapping.file,">",out,collapse = " ")
+    print(cmd)
+    system(cmd)
+  },overlapping.file)
+  
+}
+
+# cmd.bed.subtract <- 'bedtools subtract -a /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/F121_9_all_1.5FC_F200_minp_adjPval_copy.bed -b /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/"F121_9_all_1.5FC_F200_minp_adjPval_copy_ol_XL_MEF_1.5FC_minp_countF200_auto_q<e-3_chrX_q<e-2_adjPval_copy.bed" > /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/F121_9_all_1.5FC_F200_minp_adjPval_copy_only.bed'
+
+# cmd.bed.subtract <- 'bedtools subtract -a /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/"XL_MEF_1.5FC_minp_countF200_auto_q<e_3_chrX_q<e_2_adjPval_copy.bed" -b /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/"F121_9_all_1.5FC_F200_minp_adjPval_copy_ol_XL_MEF_1.5FC_minp_countF200_auto_q<e-3_chrX_q<e-2_adjPval_copy.bed" > /Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_2/"XL_MEF_1.5FC_minp_countF200_auto_q<e_3_chrX_q<e_2_adjPval_copy_only.bed"'
+
+## 11_16_2018
+# input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BedFiles_11_16_2018"
+# Aizhan.bed.in.1 <- getBedFiles(input.file.dir)
+# ol.4.Aizhan.bed.in.1 <- findOverlapsOfPeaks(Aizhan.bed.in.1[c(1,2)],connectedPeaks = "keepAll")
+# Aizhan.peaks.in.overlap.1 <- getPeaksInOverlap(ol.4.Aizhan.bed.in.1,1)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_3"
+# outGrl(Aizhan.peaks.in.overlap.1,output.file.dir)
+# getNonoverLappingBed(output.file.dir)
