@@ -7,7 +7,7 @@ packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI"
               "reactome.db","dplyr","ggplot2","ggpubr","stringr","grid","Vennerable","devtools","reshape2",
               "binaryLogic","org.Hs.eg.db","org.Mm.eg.db","eulerr","DiffBind","LOLA",
               "TxDb.Hsapiens.UCSC.hg38.knownGene","EnsDb.Hsapiens.v75","BSgenome.Hsapiens.UCSC.hg19",
-              "BSgenome.Mmusculus.UCSC.mm10","rtracklayer")
+              "BSgenome.Mmusculus.UCSC.mm10","rtracklayer","bedr")
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 

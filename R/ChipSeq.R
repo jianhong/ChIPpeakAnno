@@ -658,6 +658,32 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                    strand = c("+", "+", "+", "+", "+"), 
                    feature=c("a","a","a","a","a"))
   
+  peaks1 <- GRanges(seqnames=c("1"),
+                    IRanges(start=c(8),
+                            end=c(20), 
+                            names=c("Site1")),
+                    strand="+",
+                    feature=c("a"))
+  
+  peaks2 = GRanges(seqnames=c("1"), 
+                   IRanges(start = c(10),
+                           end = c(30),
+                           names = c("Site1")), 
+                   strand = c("+"), 
+                   feature=c("a"))
+  
+  #grl <- GRangesList(gr1=peaks1,gr2=peaks2)
+  #isDisjoint(grl)
+  #disjointBins(c(peaks1,peaks2))
+  
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  #peaks1[!peaks1 %over% peaks2]
+  
+  #bedr.subtract.region(peaks1,peaks2)
+  
    venn.plot <- venn.diagram(
          x = list(
                A = c(1:10),
@@ -9720,3 +9746,23 @@ getNonoverLappingBed <- function(output.file.dir) {
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_3"
 # outGrl(Aizhan.peaks.in.overlap.1,output.file.dir)
 # getNonoverLappingBed(output.file.dir)
+
+# Aizhan.bed.in.3 <- getBedFiles(output.file.dir)
+# Aizhan.peaks.in.unique.1 <- getPeaksInUnique(ol.4.Aizhan.bed.in.1)
+
+# names(Aizhan.peaks.in.unique.1)
+# names(Aizhan.bed.in.3)
+# 
+# cm.unique.only <- list(XL_MEF_only_and_unique=c(Aizhan.bed.in.3[[4]],Aizhan.peaks.in.unique.1[[1]]),F121_9_only_and_unique=c(Aizhan.bed.in.3[[2]],Aizhan.peaks.in.unique.1[[2]]))
+# outGrl(cm.unique.only,output.file.dir)
+# 
+
+### Should use this one:
+
+# F121.only <- GenomicRanges::setdiff(Aizhan.bed.in.1[[1]],Aizhan.bed.in.1[[2]])
+# F121.and.XL <- GenomicRanges::intersect(Aizhan.bed.in.1[[1]],Aizhan.bed.in.1[[2]])
+# XL.only <- GenomicRanges::setdiff(Aizhan.bed.in.1[[2]],Aizhan.bed.in.1[[1]])
+# cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL)
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4"
+# outGrl(cm.unique.only.1,output.file.dir)
+
