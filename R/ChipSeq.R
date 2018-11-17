@@ -9415,6 +9415,23 @@ getBedFiles <- function(input.file.dir) {
   
 }
 
+getBedFiles2 <- function(input.file.dir) {
+  file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  bed.in<-lapply(file.name.bedgraph,function(u){
+    
+    peaks=read.table(u)
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
+  
+  names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+  names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
+  bed.in
+  
+}
+
 #findOverlapsOfPeaks(re.out.rt.mef.add.more.bed[c(1,2,3)])
 
 #  dir.name="~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_22_2018/nonXL/Bed"
@@ -9747,13 +9764,13 @@ getNonoverLappingBed <- function(output.file.dir) {
 # outGrl(Aizhan.peaks.in.overlap.1,output.file.dir)
 # getNonoverLappingBed(output.file.dir)
 
-# Aizhan.bed.in.3 <- getBedFiles(output.file.dir)
+# Aizhan.bed.in.3 <- getBedFiles2(output.file.dir)
 # Aizhan.peaks.in.unique.1 <- getPeaksInUnique(ol.4.Aizhan.bed.in.1)
 
 # names(Aizhan.peaks.in.unique.1)
 # names(Aizhan.bed.in.3)
 # 
-# cm.unique.only <- list(XL_MEF_only_and_unique=c(Aizhan.bed.in.3[[4]],Aizhan.peaks.in.unique.1[[1]]),F121_9_only_and_unique=c(Aizhan.bed.in.3[[2]],Aizhan.peaks.in.unique.1[[2]]))
+# cm.unique.only <- list(XL_MEF_only_and_unique=c(Aizhan.bed.in.3[[5]],Aizhan.peaks.in.unique.1[[1]]),F121_9_only_and_unique=c(Aizhan.bed.in.3[[2]],Aizhan.peaks.in.unique.1[[2]]))
 # outGrl(cm.unique.only,output.file.dir)
 # 
 
