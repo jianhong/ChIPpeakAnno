@@ -9582,20 +9582,23 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
 # Draw4GO(tempDS3,0.05,10,output.dir,"GO_bar.png")
 
 Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir,file.name) {
-  x=tempDS3.2
+  x=tempDS3
   y=x[order(x$BH.adjusted.p.value,decreasing = FALSE),]
+  threshold.p <- 0.05
   
-  z=y[which(y$BH.adjusted.p.value<threshold.p),]
-  z<- z[1:topGo.n,c(1:3,5:10)]
   z$go.term <- factor(z$go.term, levels = z$go.term[order(z$BH.adjusted.p.value,decreasing = T)])
-  
   sp <- ggplot(z, aes(x=go.term,y=BH.adjusted.p.value)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=z$count.InDataset), hjust=0)+ coord_flip()+ggtitle("nonXL MEF ciLAD-overlapped NAD:GO Biol.Processes")+labs(x="GO term",y="BH adjusted p-value") + theme(plot.title=element_text(hjust=0.5))
+  
+z$go.term <- factor(z$go.term, levels = z$go.term[order(z$count.InDataset,decreasing = T)])
+#file.name <- "x"
+sp <- ggplot(z, aes(x=go.term,y=count.InDataset)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=formatC(z$BH.adjusted.p.value, format = "e", digits = 1)), hjust=0) + coord_flip() + ggtitle(file.name)+labs(x="GO term",y="Gene couns in GO term") + theme(plot.title=element_text(hjust=0.5))
   
   spp <- list(sp=sp)
   multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
   
   if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
-  ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,file.name))
+  output.file <- paste0(file.name,"_bar.png")
+  ggexport(multi.page,width= 1000,height=500,filename = file.path(output.dir,output.file))
   
 }
 
@@ -9782,4 +9785,118 @@ getNonoverLappingBed <- function(output.file.dir) {
 # cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4"
 # outGrl(cm.unique.only.1,output.file.dir)
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4/GO"
+# null <- peaksToEnrichedGO(cm.unique.only.1,output.file.dir,"Mm")
+
+
+# library(GO.db)
+# xx <- as.list(GOTERM)
+# foo <- function(x) c(GOID(x), Term(x),Definition(x), Ontology(x))
+# gomat <- t(sapply(xx, foo, simplify=TRUE))
+# gomat <- as.data.frame(gomat)
+# colnames(gomat) <- c("ID","Term","Definition","Ontology")
+
+
+batchDraw4GO <- function(output.file.dir,gomat) {
+  
+  go.files <- list.files(output.file.dir,pattern="*csv$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  null <- lapply(1:length(go.files), function(u,go.files,gomat,output.file.dir){
+    
+     tempDS3 <- read.csv(go.files[u])
+    
+     tempDS3 <- tempDS3[,-1]
+    
+     tempDS3$go.term <- gomat[which(gomat$ID %in% tempDS3$go.id),1:2]$Term
+    
+     file.name <- gsub(".csv","",basename(go.files)[u])
+     Draw4GO(tempDS3,0.05,10,output.file.dir,file.name)
+  },go.files,gomat,output.file.dir)
+  
+}
+
+# tempDS3 <- read.csv("~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4/GO/ciLAD.overlap-nonXL_MEF_1.5FC_qe-3_chrX_qe-2_igv_GO_BP.csv")
+
+# tempDS3 <- tempDS3[,-1]
+# library(GO.db)
+# xx <- as.list(GOTERM)
+# foo <- function(x) c(GOID(x), Term(x),Definition(x), Ontology(x))
+# gomat <- t(sapply(xx, foo, simplify=TRUE))
+# gomat <- as.data.frame(gomat)
+# colnames(gomat) <- c("ID","Term","Definition","Ontology")
+# tempDS3$go.term <- gomat[which(gomat$ID %in% tempDS3$go.id),1:2]$Term
+# output.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/BedFromPaul/annotation"
+
+# file.name <- gsub(".csv","",basename(go.files)[1])
+# Draw4GO(tempDS3,0.05,10,output.file.dir,file.name)
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BedFiles_11_16_2018/GO"
+# null <- peaksToEnrichedGO(Aizhan.bed.in.1,output.file.dir,"Mm")
+# batchDraw4GO(output.file.dir,gomat)
+  
+# names(Aizhan.bed.in.1)
+# Coverage.NAD <- as.data.frame(unlist(lapply(Aizhan.bed.in.1,getCoverage4GrOngenome,"mm10")))
+# Coverage.NAD.1 <- data.frame(nad=c("F121_9","XL"),coverage=Coverage.NAD[,1])
+
+# Coverage.NAD.1$nad <- factor(Coverage.NAD.1$nad, levels = Coverage.NAD.1$nad[order(Coverage.NAD.1$coverage,decreasing = T)])
+
+# sp <- ggplot(Coverage.NAD.1, aes(x=nad,y=coverage)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=paste0(Coverage.NAD.1$coverage,"%")), vjust=0)+ggtitle("non-repetitive genome coverage on mm10")+labs(x="NAD",y="Coverage") + theme(plot.title=element_text(hjust=0.5))
+
+f121.rna.seq.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/F121_9_RNA_Seq_data"
+rna.seq.files <- list.files(f121.rna.seq.file,pattern=c("*xlsx$","*csv$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+
+rna.seq.data <- read_xlsx(rna.seq.files[2])
+
+fpkm <- exp(rna.seq.data$logCPM)*(10^3/rna.seq.data$Length)
+rna.seq.data.1 <- data.frame(gene.name = rna.seq.data$external_gene_name,fpkm= fpkm)
+dim(rna.seq.data.1)
+
+rna.seq.files.1 <- list.files(f121.rna.seq.file,pattern=c("*csv$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+rna.seq.data.WT <- read.csv(rna.seq.files.1[1])
+colnames(rna.seq.data.WT) <- c("gene.name","fpkm")
+
+# cm.unique.only.1.anno <- getAnnotatedGene(cm.unique.only.1,"Mm")
+YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.1)
+
+output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/F121_boxplot"
+  
+getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.1,output.file.dir)
+  
+getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  YYY.set.name <- unique(as.character(YYY$SetName))
+  
+  index <- which(levels(YYY$SetName)==YYY.set.name[1])
+  levels(YYY$SetName)[index] <- "F121.only"
+  
+  index <- which(levels(YYY$SetName)==YYY.set.name[2])
+  levels(YYY$SetName)[index] <- "XL.only"
+  
+  index <- which(levels(YYY$SetName)==YYY.set.name[3])
+  levels(YYY$SetName)[index] <- "F121.and.XL"
+  
+  fpkm.value.ref <- data.frame(SetName=rep("wholeGenome",dim(fpkm.value)[1]),GeneName=fpkm.value$gene.name,FPKM=fpkm.value$fpkm)
+  
+  NAD.fpkm.value <- fpkm.value.ref[which(fpkm.value.ref$GeneName %in% YYY$GeneName),]
+  NAD.fpkm.value$SetName <- "NAD"
+  nonNAD.fpkm.value <- fpkm.value.ref[-which(fpkm.value.ref$GeneName %in% YYY$GeneName),]
+  nonNAD.fpkm.value$SetName <- "nonNAD"
+  
+  YYYY <- rbind(YYY,NAD.fpkm.value,nonNAD.fpkm.value,fpkm.value.ref)
+  
+  png(file = file.path(output.file.dir,paste0(paste(levels(YYYY$SetName),collapse = "-"),".png")),width = 1500, height = 480)
+  boxplot(log10(as.numeric(as.character(YYYY$FPKM))+1)~YYYY$SetName,ylab = "log10(FPKM+1)")
+  dev.off()
+  
+  YYYY
+  
+}
+
+YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.WT)
+output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot"
+getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.WT,output.file.dir)
+
 
