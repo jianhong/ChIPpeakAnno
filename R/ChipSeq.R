@@ -9843,24 +9843,26 @@ batchDraw4GO <- function(output.file.dir,gomat) {
 
 # sp <- ggplot(Coverage.NAD.1, aes(x=nad,y=coverage)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=paste0(Coverage.NAD.1$coverage,"%")), vjust=0)+ggtitle("non-repetitive genome coverage on mm10")+labs(x="NAD",y="Coverage") + theme(plot.title=element_text(hjust=0.5))
 
-f121.rna.seq.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/F121_9_RNA_Seq_data"
-rna.seq.files <- list.files(f121.rna.seq.file,pattern=c("*xlsx$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
-
-rna.seq.data <- read_xlsx(rna.seq.files[2])
-fpkm <- exp(rna.seq.data$logCPM)*(10^3/rna.seq.data$Length)
-rna.seq.data.1 <- data.frame(gene.name = rna.seq.data$external_gene_name,fpkm= fpkm)
-dim(rna.seq.data.1)
-
-rna.seq.files.1 <- list.files(f121.rna.seq.file,pattern=c("*csv$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
-rna.seq.data.WT <- read.csv(rna.seq.files.1[1])
-colnames(rna.seq.data.WT) <- c("gene.name","fpkm")
-
-# cm.unique.only.1.anno <- getAnnotatedGene(cm.unique.only.1,"Mm")
-YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.1)
-
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/F121_boxplot"
+getBoxplot4DiffRNA1 <- function(cm.unique.only.1.anno) {
+  f121.rna.seq.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/F121_9_RNA_Seq_data"
+  rna.seq.files <- list.files(f121.rna.seq.file,pattern=c("*xlsx$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
   
-getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.1,output.file.dir)
+  rna.seq.data <- read_xlsx(rna.seq.files[2])
+  fpkm <- exp(rna.seq.data$logCPM)*(10^3/rna.seq.data$Length)
+  rna.seq.data.1 <- data.frame(gene.name = rna.seq.data$external_gene_name,fpkm= fpkm)
+  dim(rna.seq.data.1)
+  
+  rna.seq.files.1 <- list.files(f121.rna.seq.file,pattern=c("*csv$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  rna.seq.data.WT <- read.csv(rna.seq.files.1[1])
+  colnames(rna.seq.data.WT) <- c("gene.name","fpkm")
+  
+  # cm.unique.only.1.anno <- getAnnotatedGene(cm.unique.only.1,"Mm")
+  YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.1)
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/F121_boxplot"
+    
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.1,output.file.dir)
+}
   
 getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
   
@@ -9894,90 +9896,88 @@ getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
   
 }
 
-YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.WT)
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.WT,output.file.dir)
+getBoxplot4DiffRnaSeq <- function() {
+  YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.WT)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.WT,output.file.dir)
+  
+  tT.rna.seq.data <- read_xlsx(rna.seq.files[4])
+  tT.fpkm <- exp(tT.rna.seq.data$logCPM)*(10^3/tT.rna.seq.data$Length)
+  tT.rna.seq.data.1 <- data.frame(gene.name = tT.rna.seq.data$external_gene_name,fpkm= tT.fpkm)
+  
+  YYY.tT <- getFPKM4DiffSet(cm.unique.only.1.anno,tT.rna.seq.data.1)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/NPC_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY.tT,tT.rna.seq.data.1,output.file.dir)
+  
+  rna.seq.data.GSE90894 <- read_xlsx(rna.seq.files[4])
+  rna.seq.data.GSE90894.data <- rna.seq.data.GSE90894[-(1:4),]
+  colnames(rna.seq.data.GSE90894.data) <- rna.seq.data.GSE90894[4,]
+  
+  rna.seq.data.MEFs <- data.frame(gene.name = rna.seq.data.GSE90894.data$name,fpkm= rna.seq.data.GSE90894.data$MEFs)
+  YYY.MEFs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.MEFs)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEFs_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY.MEFs,rna.seq.data.MEFs,output.file.dir)
+  
+  rna.seq.data.ESCs <- data.frame(gene.name = rna.seq.data.GSE90894.data$name,fpkm= rna.seq.data.GSE90894.data$ESCs)
+  YYY.ESCs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.ESCs)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ESCs_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY.ESCs,rna.seq.data.ESCs,output.file.dir)
+  
+  ES1.counts.1 <- list.files(f121.rna.seq.file,pattern=c("*txt$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  rna.seq.data.ES1 <- read.table(ES1.counts.1[1],header = FALSE)
+  colnames(rna.seq.data.ES1) <- c("external_gene_name","count")
+  
+  colnames(rna.seq.data.WT) <- c("gene.name","fpkm")
+  
+  ensembl=useMart("ensembl", dataset="mmusculus_gene_ensembl")
+  gene_coords=getBM(attributes=c("external_gene_name","ensembl_gene_id", "start_position","end_position", "transcript_length"), filters="external_gene_name", values=rna.seq.data.ES1$V1, mart=ensembl)
+  gene_coords$Length=gene_coords$end_position - gene_coords$start_position
+  
+  rna.seq.data.ES1.more <- merge.data.frame(rna.seq.data.ES1,gene_coords,by="external_gene_name")
+  
+  rna.seq.data.ES1.more.1 <- unique(data.frame(gene.name=rna.seq.data.ES1.more$external_gene_name,Length=rna.seq.data.ES1.more$Length,count=rna.seq.data.ES1.more$count))
+  total.count <- sum(rna.seq.data.ES1.more.1$count)
+  fpkm <- (rna.seq.data.ES1.more.1$count*(10^9))/(9757048*(rna.seq.data.ES1.more.1$Length))
+  rna.seq.data.ES1.rpkm <- data.frame(gene.name=rna.seq.data.ES1.more.1$gene.name,fpkm=fpkm)
+  
+  YYY.ESCs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.ES1.rpkm)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ES1_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY.ESCs,rna.seq.data.ES1.rpkm,output.file.dir)
+}
 
-tT.rna.seq.data <- read_xlsx(rna.seq.files[4])
-tT.fpkm <- exp(tT.rna.seq.data$logCPM)*(10^3/tT.rna.seq.data$Length)
-tT.rna.seq.data.1 <- data.frame(gene.name = tT.rna.seq.data$external_gene_name,fpkm= tT.fpkm)
+# z.score.input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/tileCount-NADfinder1.5.2"
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/NormalizedBigWig"
+# getZscoreBigWig(z.score.input.file.dir,output.file.dir)
 
-YYY.tT <- getFPKM4DiffSet(cm.unique.only.1.anno,tT.rna.seq.data.1)
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/NPC_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY.tT,tT.rna.seq.data.1,output.file.dir)
+getZscoreBigWig <- function(z.score.input.file.dir,output.file.dir) {
+  
+  z.score.rds.files <- list.files(z.score.input.file.dir,pattern=c("*RDS$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  g129.1 <- readRDS(z.score.rds.files[grep("1.tileCounts.g129Rep1.RDS",z.score.rds.files)])
+  g129.2 <- readRDS(z.score.rds.files[grep("1.tileCounts.g129Rep2.RDS",z.score.rds.files)])
+  
+  se <- cbind(g129.1, g129.2)
+  metadata(se)$lib.size.chrom <- cbind(metadata(g129.1)$lib.size.chrom,
+                                       metadata(g129.2)$lib.size.chrom)
+  
+  nuc.cols <- colnames(se)[c(2,4)]
+  gen.cols <- colnames(se)[c(1,3)]
 
-rna.seq.data.GSE90894 <- read_xlsx(rna.seq.files[4])
-rna.seq.data.GSE90894.data <- rna.seq.data.GSE90894[-(1:4),]
-colnames(rna.seq.data.GSE90894.data) <- rna.seq.data.GSE90894[4,]
-
-rna.seq.data.MEFs <- data.frame(gene.name = rna.seq.data.GSE90894.data$name,fpkm= rna.seq.data.GSE90894.data$MEFs)
-YYY.MEFs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.MEFs)
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEFs_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY.MEFs,rna.seq.data.MEFs,output.file.dir)
-
-rna.seq.data.ESCs <- data.frame(gene.name = rna.seq.data.GSE90894.data$name,fpkm= rna.seq.data.GSE90894.data$ESCs)
-YYY.ESCs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.ESCs)
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ESCs_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY.ESCs,rna.seq.data.ESCs,output.file.dir)
-
-
-ES1.counts.1 <- list.files(f121.rna.seq.file,pattern=c("*txt$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
-rna.seq.data.ES1 <- read.table(ES1.counts.1[1],header = FALSE)
-colnames(rna.seq.data.ES1) <- c("external_gene_name","count")
-
-colnames(rna.seq.data.WT) <- c("gene.name","fpkm")
-
-ensembl=useMart("ensembl", dataset="mmusculus_gene_ensembl")
-gene_coords=getBM(attributes=c("external_gene_name","ensembl_gene_id", "start_position","end_position", "transcript_length"), filters="external_gene_name", values=rna.seq.data.ES1$V1, mart=ensembl)
-gene_coords$Length=gene_coords$end_position - gene_coords$start_position
-
-rna.seq.data.ES1.more <- merge.data.frame(rna.seq.data.ES1,gene_coords,by="external_gene_name")
-
-rna.seq.data.ES1.more.1 <- unique(data.frame(gene.name=rna.seq.data.ES1.more$external_gene_name,Length=rna.seq.data.ES1.more$Length,count=rna.seq.data.ES1.more$count))
-total.count <- sum(rna.seq.data.ES1.more.1$count)
-fpkm <- (rna.seq.data.ES1.more.1$count*(10^9))/(9757048*(rna.seq.data.ES1.more.1$Length))
-rna.seq.data.ES1.rpkm <- data.frame(gene.name=rna.seq.data.ES1.more.1$gene.name,fpkm=fpkm)
-
-YYY.ESCs <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.ES1.rpkm)
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ES1_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY.ESCs,rna.seq.data.ES1.rpkm,output.file.dir)
-
-
-
-
-z.score.input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/tileCount-NADfinder1.5.2"
-z.score.rds.files <- list.files(z.score.input.file.dir,pattern=c("*RDS$"),all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
-
-g129.1 <- readRDS(z.score.rds.files[grep("1.tileCounts.g129Rep1.RDS",z.score.rds.files)])
-g129.2 <- readRDS(z.score.rds.files[grep("1.tileCounts.g129Rep2.RDS",z.score.rds.files)])
-
-se <- cbind(g129.1, g129.2)
-metadata(se)$lib.size.chrom <- cbind(metadata(g129.1)$lib.size.chrom,
-                                     metadata(g129.2)$lib.size.chrom)
-
-nuc.cols <- colnames(se)[c(2,4)]
-gen.cols <- colnames(se)[c(1,3)]
-## Calculate ratios for nucleoloar vs genomic samples.
-library(NADfinder)
-se <- log2se(se,nucleolusCols = nuc.cols,genomeCols = gen.cols,transformation = "log2CPMRatio")
-zs <- zscoreOverBck(assays(se)$ratio)
-
-names(assays(g129.1))
-
-colData <- DataFrame(row.names=row.names(colData(se))[c(2,4)])
-
-nusDNA1 <- SummarizedExperiment(assays=SimpleList(zscore=zs),rowRanges=rowRanges(se),colData=colData)
-
-
-nrows <- 200; ncols <- 6
-counts <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
-rowRanges <- GRanges(rep(c("chr1", "chr2"), c(50, 150)),
-                     IRanges(floor(runif(200, 1e5, 1e6)), width=100),
-                     strand=sample(c("+", "-"), 200, TRUE),
-                     feature_id=sprintf("ID%03d", 1:200))
-colData <- DataFrame(Treatment=rep(c("ChIP", "Input"), 3),
-                     row.names=LETTERS[1:6])
-
-rse <- SummarizedExperiment(assays=SimpleList(counts=counts),
-                            rowRanges=rowRanges, colData=colData)
-
+    ## Calculate ratios for nucleoloar vs genomic samples.
+  library(NADfinder)
+  se <- log2se(se,nucleolusCols = nuc.cols,genomeCols = gen.cols,transformation = "log2CPMRatio")
+  
+  zs <- zscoreOverBck(assays(se)$ratio)
+  
+  names(assays(g129.1))
+  
+  colData <- DataFrame(row.names=row.names(colData(se))[c(2,4)])
+  
+  nusDNA12 <- SummarizedExperiment(assays=SimpleList(zscore=zs),rowRanges=rowRanges(se),colData=colData)
+  
+  exportSignals(nusDNA12, "zscore", 
+                "nusDNA_1.genome1.markDup.bam", file.path(output.file.dir,"nusDNA_1.bw"), format="bigWig")
+  
+  exportSignals(nusDNA12, "zscore", 
+                "nusDNA_2.genome1.markDup.bam", file.path(output.file.dir,"nusDNA_2.bw"), format="bigWig")
+}
