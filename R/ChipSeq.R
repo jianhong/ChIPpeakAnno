@@ -658,19 +658,19 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                    strand = c("+", "+", "+", "+", "+"), 
                    feature=c("a","a","a","a","a"))
   
-  peaks1 <- GRanges(seqnames=c("1"),
-                    IRanges(start=c(8),
-                            end=c(20), 
-                            names=c("Site1")),
-                    strand="+",
-                    feature=c("a"))
+  peaks1 <- GRanges(seqnames=c("1","1"),
+                    IRanges(start=c(6,15),
+                            end=c(20,30), 
+                            names=c("Site1","Site1")),
+                    strand=c("+","+"),
+                    feature=c("a","a"))
   
-  peaks2 = GRanges(seqnames=c("1"), 
-                   IRanges(start = c(10),
-                           end = c(30),
-                           names = c("Site1")), 
-                   strand = c("+"), 
-                   feature=c("a"))
+  peaks2 = GRanges(seqnames=c("1","1"), 
+                   IRanges(start = c(9,30),
+                           end = c(10,50),
+                           names = c("Site1","Site1")), 
+                   strand = c("+","+"), 
+                   feature=c("a","a"))
   
   #grl <- GRangesList(gr1=peaks1,gr2=peaks2)
   #isDisjoint(grl)
@@ -679,6 +679,17 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
   peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
   peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  sum(width(peaks1.only))
+  sum(width(peaks2.only))
+  sum(width(peaks1.and.peaks2))
+  
+  test.peaks <- list(peaks1=peaks1,peaks2=peaks2)
+  name <- c("peaks1","peaks2")
+  peak.index <- c(1,2)
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  getCount4Venn(test.peaks,peak.index,name,output.file.dir)
+  
   
   #peaks1[!peaks1 %over% peaks2]
   
@@ -9849,6 +9860,9 @@ getBoxplot4DiffRNA1 <- function(cm.unique.only.1.anno) {
   
   rna.seq.data <- read_xlsx(rna.seq.files[2])
   fpkm <- exp(rna.seq.data$logCPM)*(10^3/rna.seq.data$Length)
+  
+  fpkm <- (10^(rna.seq.data$logCPM))*(10^3/rna.seq.data$Length)
+  
   rna.seq.data.1 <- data.frame(gene.name = rna.seq.data$external_gene_name,fpkm= fpkm)
   dim(rna.seq.data.1)
   
@@ -9861,7 +9875,10 @@ getBoxplot4DiffRNA1 <- function(cm.unique.only.1.anno) {
   
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/F121_boxplot"
     
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/F121_boxplot_base_10"
+  
   getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.1,output.file.dir)
+  
 }
   
 getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
@@ -9981,3 +9998,102 @@ getZscoreBigWig <- function(z.score.input.file.dir,output.file.dir) {
   exportSignals(nusDNA12, "zscore", 
                 "nusDNA_2.genome1.markDup.bam", file.path(output.file.dir,"nusDNA_2.bw"), format="bigWig")
 }
+
+F121_9rep1and2 <- readRDS("/Users/aiminyan/Aimin/DropboxUmass/NADfinder//forCreatingWIG/baseLineCorrectedRatioF121_9rep1and2.RDS")
+
+input.file <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BamFile_From_Aizhan/count2.txt"
+
+count.data<- read.table(input.file,header= T)
+mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
+genes <- count.data$Geneid
+  
+count.data.1 <- data.frame(count.data,ensembl_gene_id = genes)
+G_list <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","mgi_symbol"),values=count.data.1$ensembl_gene_id,mart= mart)
+count.data.2 <- merge(count.data.1,G_list,by="ensembl_gene_id")
+count.data.2[which(count.data.2$mgi_symbol %in% ""),]$mgi_symbol <- paste0(count.data.2[which(count.data.2$mgi_symbol %in% ""),]$ensembl_gene_id,"-No_match")
+
+countToFpkm <- function(counts, effLen)
+{
+  N <- sum(counts)
+  exp( log(counts) + log(1e9) - log(effLen) - log(N) )
+}
+
+fpkm <- data.frame(fpkm.8=countToFpkm(count.data.2[,8],count.data.2[,7]),fpkm.9=countToFpkm(count.data.2[,9],count.data.2[,7]))
+
+rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm=apply(fpkm,1,mean))
+
+YYY.Aizhan <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.from.Aizhan)
+
+output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot"
+getBoxPlot4FPKMOfSubsetPeaks1(YYY.Aizhan,rna.seq.data.from.Aizhan,output.file.dir)
+
+input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+
+file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+
+H3K27me3.bed <- getBedFiles3(input.file.dir,c(5,9))
+
+bed.in<-lapply(file.name.bedgraph[c(5,9)],function(u){
+  
+  peaks=read.table(u)
+  colnames(peaks)[1:3]= c("chr","start","end")
+  peaks=toGRanges(peaks)
+  peaks
+})
+
+getBedFiles3 <- function(input.file.dir,select.index) {
+  file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  bed.in<-lapply(file.name.bedgraph[select.index],function(u){
+    
+    peaks=read.table(u)
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
+  
+  names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph[select.index])))
+  names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
+  bed.in
+  
+()}
+
+overlapWithHiston <- function(H3K27me3.bed, Aizhan.bed.in.1, GenomicRanges, intersect, setdiff) {
+  names(H3K27me3.bed)
+  F121.histone <- list(H3K9me3=H3K27me3.bed[[2]],H3K27me3=H3K27me3.bed[[1]],F121_9=Aizhan.bed.in.1[[1]])
+  name <- c("H3K9me3","H3K27me3","F121_9")
+  peak.index <- c(1,2,3)
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  getCount4Venn(F121.histone,peak.index,name,output.file.dir)
+  
+  
+  name <- c("H3K9me3","H3K27me3")
+  peak.index <- c(1,2)
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  getCount4Venn(F121.histone,peak.index,name,output.file.dir)
+  
+  name <- c("H3K9me3","F121_9")
+  peak.index <- c(1,3)
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  getCount4Venn(F121.histone,peak.index,name,output.file.dir)
+  
+  name <- c("H3K27me3","F121_9")
+  peak.index <- c(2,3)
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  getCount4Venn(F121.histone,peak.index,name,output.file.dir)
+  
+  
+  
+  H3K9me3.and.H3K27me3 <- GenomicRanges::intersect(F121.histone[[1]],F121.histone[[2]])
+  
+  sum(width(H3K9me3.and.H3K27me3))
+  
+  sum(width(GenomicRanges::intersect(F121.histone[[1]],F121.histone[[2]])))
+  sum(width(GenomicRanges::setdiff(F121.histone[[1]],F121.histone[[2]])))
+  sum(width(GenomicRanges::setdiff(F121.histone[[2]],F121.histone[[1]])))
+  
+  sum(width(GenomicRanges::intersect(F121.histone[[2]],F121.histone[[3]])))
+  
+  sum(width(GenomicRanges::intersect(F121.histone[[1]],F121.histone[[3]])))
+}
+
