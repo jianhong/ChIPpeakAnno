@@ -8563,6 +8563,8 @@ getOverlapWithOther <- function(XL.nonXL.subset,select.query.peak.index= NULL,re
 
 # input.bw.path <- "~/Aimin/project/umw_nathan_lawson/Aimin/Alignment"
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/SOX17"
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/SOX17_unsort"
+
 # input.bed.dir <- "/Users/aiminyan/Aimin/project/umw_nathan_lawson/toDoForAVpaper/1_DensityPlots/bedFilesforDensityPlots/byClass"
 # tfType <- "SOX17"
 # tssType <- c("Class1","Class2","Class3","Endo")
@@ -8599,6 +8601,10 @@ batchOverLapWithOtherFeatures <- function(dd, input.bed.dir, input.bw.path, outp
 }
 
 overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType) {
+  
+  dd <- 3000
+  class_pattern <- "tss"
+  tssType <- "Class1"
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
@@ -8770,7 +8776,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   # 
   # out <- cbind(out.1$density[,1],out.2$density[,2],out.3$density[,3],out.4$density[,4])
   
-  XX <- lapply(1:length(feature.center),function(u,feature.center){
+  XX <- lapply(1:length(feature.center),function(u,feature.center,cvglists.ave,dd){
     
     sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[u]], upstream=dd, downstream=dd) 
     sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
@@ -8781,7 +8787,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
     
     x <- list(density=out.4$density[,u],grWidAt=out.4$grWidAt,grWidLab=out.4$grWidLab)
     x 
-  },feature.center)
+  },feature.center,cvglists.ave,dd)
   
   den.l <-lapply(1:length(XX),function(u,XX){
     Z <- XX[[u]]$density
@@ -8854,7 +8860,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   x_name <- paste0(tfType,"_",names(feature.center)[u])
   
   jpeg(file.path(output.file.dir,paste0(x_name,"_",dd,"_heatmap.jpeg")))
-  featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],upstream=dd, downstream=dd,zeroAt=.5,res=300)
+  featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],sortBy=NULL,upstream=dd, downstream=dd,zeroAt=.5,res=300)
   dev.off()
   
   },cvglists.l,feature.center,dd,n,tfType)
@@ -9999,47 +10005,49 @@ getZscoreBigWig <- function(z.score.input.file.dir,output.file.dir) {
                 "nusDNA_2.genome1.markDup.bam", file.path(output.file.dir,"nusDNA_2.bw"), format="bigWig")
 }
 
-F121_9rep1and2 <- readRDS("/Users/aiminyan/Aimin/DropboxUmass/NADfinder//forCreatingWIG/baseLineCorrectedRatioF121_9rep1and2.RDS")
-
-input.file <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BamFile_From_Aizhan/count2.txt"
-
-count.data<- read.table(input.file,header= T)
-mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
-genes <- count.data$Geneid
+getFPKM4F121 <- function() {
+  F121_9rep1and2 <- readRDS("/Users/aiminyan/Aimin/DropboxUmass/NADfinder//forCreatingWIG/baseLineCorrectedRatioF121_9rep1and2.RDS")
   
-count.data.1 <- data.frame(count.data,ensembl_gene_id = genes)
-G_list <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","mgi_symbol"),values=count.data.1$ensembl_gene_id,mart= mart)
-count.data.2 <- merge(count.data.1,G_list,by="ensembl_gene_id")
-count.data.2[which(count.data.2$mgi_symbol %in% ""),]$mgi_symbol <- paste0(count.data.2[which(count.data.2$mgi_symbol %in% ""),]$ensembl_gene_id,"-No_match")
-
-countToFpkm <- function(counts, effLen)
-{
-  N <- sum(counts)
-  exp( log(counts) + log(1e9) - log(effLen) - log(N) )
+  input.file <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BamFile_From_Aizhan/count2.txt"
+  
+  count.data<- read.table(input.file,header= T)
+  mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
+  genes <- count.data$Geneid
+    
+  count.data.1 <- data.frame(count.data,ensembl_gene_id = genes)
+  G_list <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","mgi_symbol"),values=count.data.1$ensembl_gene_id,mart= mart)
+  count.data.2 <- merge(count.data.1,G_list,by="ensembl_gene_id")
+  count.data.2[which(count.data.2$mgi_symbol %in% ""),]$mgi_symbol <- paste0(count.data.2[which(count.data.2$mgi_symbol %in% ""),]$ensembl_gene_id,"-No_match")
+  
+  countToFpkm <- function(counts, effLen)
+  {
+    N <- sum(counts)
+    exp( log(counts) + log(1e9) - log(effLen) - log(N) )
+  }
+  
+  fpkm <- data.frame(fpkm.8=countToFpkm(count.data.2[,8],count.data.2[,7]),fpkm.9=countToFpkm(count.data.2[,9],count.data.2[,7]))
+  
+  rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm=apply(fpkm,1,mean))
+  
+  YYY.Aizhan <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.from.Aizhan)
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot"
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY.Aizhan,rna.seq.data.from.Aizhan,output.file.dir)
+  
+  input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+  
+  file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+  
+  H3K27me3.bed <- getBedFiles3(input.file.dir,c(5,9))
+  
+  bed.in<-lapply(file.name.bedgraph[c(5,9)],function(u){
+    
+    peaks=read.table(u)
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  })
 }
-
-fpkm <- data.frame(fpkm.8=countToFpkm(count.data.2[,8],count.data.2[,7]),fpkm.9=countToFpkm(count.data.2[,9],count.data.2[,7]))
-
-rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm=apply(fpkm,1,mean))
-
-YYY.Aizhan <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.from.Aizhan)
-
-output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot"
-getBoxPlot4FPKMOfSubsetPeaks1(YYY.Aizhan,rna.seq.data.from.Aizhan,output.file.dir)
-
-input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
-
-file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
-
-H3K27me3.bed <- getBedFiles3(input.file.dir,c(5,9))
-
-bed.in<-lapply(file.name.bedgraph[c(5,9)],function(u){
-  
-  peaks=read.table(u)
-  colnames(peaks)[1:3]= c("chr","start","end")
-  peaks=toGRanges(peaks)
-  peaks
-})
 
 getBedFiles3 <- function(input.file.dir,select.index) {
   file.name.bedgraph <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
@@ -10055,8 +10063,7 @@ getBedFiles3 <- function(input.file.dir,select.index) {
   names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph[select.index])))
   names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
   bed.in
-  
-()}
+}
 
 overlapWithHiston <- function(H3K27me3.bed, Aizhan.bed.in.1, GenomicRanges, intersect, setdiff) {
   names(H3K27me3.bed)
