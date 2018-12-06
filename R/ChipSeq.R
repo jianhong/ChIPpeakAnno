@@ -8778,6 +8778,7 @@ overLapWithOtherFeatures <- function(input.bed.dir,input.bw.path,output.file.dir
   
   XX <- lapply(1:length(feature.center),function(u,feature.center,cvglists.ave,dd){
     
+    u <- 1
     sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[u]], upstream=dd, downstream=dd) 
     sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
     out.4 <- featureAlignedDistribution(sigs.log2, 
