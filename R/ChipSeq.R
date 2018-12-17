@@ -10372,66 +10372,45 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
     
   }
   
-  class_pattern <- "Ve_NoChange"
+  class_patterns <- c("Ve_NoChange","Ve_K27acUp","Ve_K27acDwn")
+  file_name <- "Ve_"
   
-  sig1.4.heatmap.log2.ck.tr.no.change <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt") 
+  heatmap4UpNoChangeDown <- function(class_patterns,file_name,data, dd, input.bw.path, output.file.dir) {
+    class_pattern <- class_patterns[1]
+    sig1.4.heatmap.log2.ck.tr.no.change <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt") 
+    
+    class_pattern <- class_patterns[2]
+    sig1.4.heatmap.log2.ck.tr.Up <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt")
+    
+    class_pattern <- class_patterns[3]
+    sig1.4.heatmap.log2.ck.tr.Down <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="CK")
+    
+    sig1.4.heatmap.log2.ck.tr.1 <- rbind(sig1.4.heatmap.log2.ck.tr.no.change,sig1.4.heatmap.log2.ck.tr.Up,sig1.4.heatmap.log2.ck.tr.Down)
+    
+    z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
+    
+    n.no.change <- dim(sig1.4.heatmap.log2.ck.tr.no.change)[1]
+    n.Up <- dim(sig1.4.heatmap.log2.ck.tr.Up)[1]
+    n.Down <- dim(sig1.4.heatmap.log2.ck.tr.Down)[1]
+    
+    #z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.Down), center=TRUE, scale=TRUE))
+    ht_list <- Heatmap(z.mat.0, name = "z-score",
+                       col = rev(redgreen(30))[-seq(35, 35)],            
+                       show_row_name = FALSE,
+                       cluster_columns = F,
+                       cluster_rows = F,column_names_gp = gpar(fontsize = 6),column_split = rep(c("Control", "NR2F2KD"),c(100,100)),row_split = factor(rep(c("NoChange","Up","Down"),c(n.no.change,n.Up,n.Down)),levels = c("Up","NoChange","Down")))
+    gb = grid.grabExpr(draw(ht_list))
+    g <- plot_grid(gb)
+    save_plot(file.path(output.file.dir,paste0(file_name,"_heatmap.png")),g,base_width = 10,base_height = 40)
+  }
   
-  class_pattern <- "Ve_K27acUp"
-  sig1.4.heatmap.log2.ck.tr.Up <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt")
+  class_patterns <- c("Com_NoChange","Com_K27acUp","Com_K27acDwn")
+  file_name <- "Com_"
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir)
   
-  class_pattern <- "Ve_K27acDwn"
-  sig1.4.heatmap.log2.ck.tr.Down <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="CK")
-  
-  sig1.4.heatmap.log2.ck.tr.1 <- rbind(sig1.4.heatmap.log2.ck.tr.no.change,sig1.4.heatmap.log2.ck.tr.Up,sig1.4.heatmap.log2.ck.tr.Down)
-  
-  z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
-  
-  dim(sig1.4.heatmap.log2.ck.tr.no.change)
-  dim(sig1.4.heatmap.log2.ck.tr.Up)
-  dim(sig1.4.heatmap.log2.ck.tr.Down)
-  dim(z.mat.0)
-  
-  z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.Down), center=TRUE, scale=TRUE))
-  
-  ht_list <- Heatmap(z.mat.0, name = "density",
-                     col = rev(redgreen(50))[-seq(35, 35)],            
-                     show_row_name = FALSE,
-                     cluster_columns = F,
-                     cluster_rows = F,column_names_gp = gpar(fontsize = 10))
-  
-  groups <- c("Control","NR2F2KD")
-  
-  ha = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 2:3),labels = groups))
-  
-  ht_list <- Heatmap(z.mat.0, name = "z-score",
-                     col = rev(redgreen(30))[-seq(35, 35)],            
-                     show_row_name = FALSE,
-                     cluster_columns = F,
-                     cluster_rows = F,column_names_gp = gpar(fontsize = 10),column_split = rep(c("Control", "NR2F2KD"),c(100,100)),row_split = rep(c("NoChange","Up","Down"),c(1621,82,219)))
-  
-  ht_list <- Heatmap(z.mat.0, name = "z-score",
-                     col = rev(redgreen(30))[-seq(35, 35)],            
-                     show_row_name = FALSE,
-                     cluster_columns = F,
-                     cluster_rows = F,column_names_gp = gpar(fontsize = 6),column_split = rep(c("Control", "NR2F2KD"),c(100,100)),row_split = factor(rep(c("NoChange","Up","Down"),c(1621,82,219)),levels = c("Up","NoChange","Down")))
-  
-  gb = grid.grabExpr(draw(ht_list))
-  g <- plot_grid(gb)        
-  
-  save_plot(file.path(output.file.dir,paste0("Ve_","_heatmap.png")),g,base_width = 10,base_height = 40)
-  
-  
-  Heatmap(matrix(rnorm(100), 10), 
-          top_annotation = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 2:4),
-                                                              labels = c("group1", "group2", "group3"), labels_gp = gpar(col = "white"))),
-          column_km = 3,
-          left_annotation = rowAnnotation(foo = anno_block(gp = gpar(fill = 2:4),
-                                                           labels = c("group1", "group2", "group3"), labels_gp = gpar(col = "white"))),
-          row_km = 3)
-  
-  
-  
-  
+  class_patterns <- c("Art_NoChange","Art_K27acUp","Art_K27acDown")
+  file_name <- "Art_"
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir)
   
   heatmap.33 <- function(mydata,rowName,geneSymbol,selected.genes,groups,out.dir.name,out.file.name,w,h) {
     
@@ -10466,15 +10445,6 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
     save_plot(file.path(out.dir.name,paste0(out.file.name,"_heatmap.png")), g,base_width = w,base_height = h)
     
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   n <- length(cvglists.ul)/length(tss.bed)
   
@@ -11199,3 +11169,15 @@ fromCount2FPKM <- function(input.file,toBeReplace,sampleIndex,output.file.dir,x_
   
 }
 
+# Minggang's HiC data:
+parserHiCdata <- function(head) {
+  gse111170 <- getGEO(filename='/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/umw_minggang_fang/GSE111170_family.soft.gz')
+  
+  dim(pData(gse111170[[1]]))
+  
+  dfl = getGSEDataTables("GSE111170")
+  
+  Columns(gse111170)
+  
+  lapply(dfl,head)
+}
