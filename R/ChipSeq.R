@@ -10258,27 +10258,22 @@ getBedFiles4 <- function(input.file.dir,select.index) {
 # input.bed.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/newBedFiles"
 # input.bw.path <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2kd_bigwig"
 # dd <- 3000
-# tfType <- "TRC-NS"
-# class_pattern <- "Art_NoChange"
-# tssType <- c("Class1","Class2","Class3","Endo")
-
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2_new"
-# null <- overLapWithOtherFeatures(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType)
+# null <- overLapWithOtherFeatures1(input.bed.dir,input.bw.path,output.file.dir,dd)
 
-overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.dir,dd,class_pattern,tssType,tfType) {
+overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.dir,dd) {
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
   file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
-  
   data <- sapply(file.name.4, toGRanges, format="BED")
   
   names(data) <- gsub(".bed", "", basename(names(data)))
   
   generateMatrix4heatmap <- function(class_pattern,data,dd,input.bw.path,sortBy) {
-    # class_pattern <- "Art_NoChange"
-    
+  
     tss <- names(data)[grep(class_pattern,names(data),ignore.case = T)]
+    print(tss)
     
     tss.bed <- data[which(names(data) %in% tss)]
     
@@ -10290,7 +10285,7 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
     names(feature.center) <- names(tss.bed)
     
     # get the regions of around feature middle +/- dd 
-    feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,dd,n){
+    feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
       
       features <- tss.bed[[u]]
       
@@ -10307,7 +10302,6 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
       feature.recentered
       
     },tss.bed,dd)
-    
     names(feature.recentered.l) <- names(tss.bed)
     
     cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
@@ -10324,13 +10318,6 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
       
     },feature.recentered.l,input.bw.path)
     
-    #dd <- 3000
-    #x_name <- paste0(tfType,"_",dd,"_",paste(tss,collapse = "_"))
-    
-    #saveRDS(cvglists.l,file = file.path(output.file.dir,paste0(x_name,"_cvglist.rds")))
-    
-    #n <-3
-    
     tfType <- "TRC-NS"
     cvglists.ck <- lapply(1:length(cvglists.l), function(u,cvglists.l){
       z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
@@ -10338,42 +10325,51 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
     },cvglists.l)
     cvglists.ul.ck <- unlist(cvglists.ck)
     
+    
+    print(names(cvglists.ul.ck))
+    
+    n <- length(cvglists.ul.ck)
+    
     sig1.4.heatmap.ck <- featureAlignedSignal(cvglists.ck[[1]], feature.center[[1]], upstream=dd, downstream=dd)
     sig1.4.heatmap.log2.ck <- lapply(sig1.4.heatmap.ck, function(.ele) log2(.ele+1))
     names(sig1.4.heatmap.log2.ck) <- paste0(tfType,"_",seq(1,n))
+    print(names(sig1.4.heatmap.log2.ck))
     
-  
     tfType <- "shNR2F2"
     cvglists.tr <- lapply(1:length(cvglists.l), function(u,cvglists.l){
       z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
       z
     },cvglists.l)
     cvglists.ul.tr <- unlist(cvglists.tr)
+    print(names(cvglists.ul.tr))
+    n <- length(cvglists.ul.tr)
     
     sig1.4.heatmap.tr <- featureAlignedSignal(cvglists.tr[[1]], feature.center[[1]], upstream=dd, downstream=dd)
     sig1.4.heatmap.log2.tr <- lapply(sig1.4.heatmap.tr, function(.ele) log2(.ele+1))
     names(sig1.4.heatmap.log2.tr) <- paste0(tfType,"_",seq(1,n))
+    print(names(sig1.4.heatmap.log2.tr))
     
     dim(sig1.4.heatmap.log2.tr[[1]])
     
-    if(sortBy=="Trt"){
-    density.sum <- apply(sig1.4.heatmap.log2.tr[[1]],1,sum)
-    sig1.4.heatmap.log2.tr.sorted<- sig1.4.heatmap.log2.tr[[1]][order(density.sum,decreasing = T),]        
-    sig1.4.heatmap.log2.ck.sorted <- sig1.4.heatmap.log2.ck[[1]][match(rownames(sig1.4.heatmap.log2.tr.sorted),rownames(sig1.4.heatmap.log2.ck[[1]])),]
+    #sortBy = "Trt"
+    sig1.4.heatmap.log2.ck.tr.l <- lapply(1:length(sig1.4.heatmap.log2.tr),function(u,sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy){
+        if(sortBy=="Trt"){
+    density.sum <- apply(sig1.4.heatmap.log2.tr[[u]],1,sum)
+    sig1.4.heatmap.log2.tr.sorted<- sig1.4.heatmap.log2.tr[[u]][order(density.sum,decreasing = T),]        
+    sig1.4.heatmap.log2.ck.sorted <- sig1.4.heatmap.log2.ck[[u]][match(rownames(sig1.4.heatmap.log2.tr.sorted),rownames(sig1.4.heatmap.log2.ck[[u]])),]
     sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
     }else{
-      density.sum <- apply(sig1.4.heatmap.log2.ck[[1]],1,sum)
-      sig1.4.heatmap.log2.ck.sorted<- sig1.4.heatmap.log2.ck[[1]][order(density.sum,decreasing = T),]        
-      sig1.4.heatmap.log2.tr.sorted <- sig1.4.heatmap.log2.tr[[1]][match(rownames(sig1.4.heatmap.log2.ck.sorted),rownames(sig1.4.heatmap.log2.tr[[1]])),]
+      density.sum <- apply(sig1.4.heatmap.log2.ck[[u]],1,sum)
+      sig1.4.heatmap.log2.ck.sorted<- sig1.4.heatmap.log2.ck[[u]][order(density.sum,decreasing = T),]        
+      sig1.4.heatmap.log2.tr.sorted <- sig1.4.heatmap.log2.tr[[u]][match(rownames(sig1.4.heatmap.log2.ck.sorted),rownames(sig1.4.heatmap.log2.tr[[u]])),]
       sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
     }
-    
     sig1.4.heatmap.log2.ck.tr
+  },sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy)
+    
+    sig1.4.heatmap.log2.ck.tr.l
     
   }
-  
-  class_patterns <- c("Ve_NoChange","Ve_K27acUp","Ve_K27acDwn")
-  file_name <- "Ve_"
   
   heatmap4UpNoChangeDown <- function(class_patterns,file_name,data, dd, input.bw.path, output.file.dir) {
     class_pattern <- class_patterns[1]
@@ -10385,175 +10381,44 @@ overLapWithOtherFeatures1 <- function(input.bed.dir,input.bw.path,output.file.di
     class_pattern <- class_patterns[3]
     sig1.4.heatmap.log2.ck.tr.Down <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="CK")
     
-    sig1.4.heatmap.log2.ck.tr.1 <- rbind(sig1.4.heatmap.log2.ck.tr.no.change,sig1.4.heatmap.log2.ck.tr.Up,sig1.4.heatmap.log2.ck.tr.Down)
+   ht_list <- lapply(1:length(sig1.4.heatmap.log2.ck.tr.no.change), function(u,sig1.4.heatmap.log2.ck.tr.no.change,sig1.4.heatmap.log2.ck.tr.Up,sig1.4.heatmap.log2.ck.tr.Down){
+    
+    sig1.4.heatmap.log2.ck.tr.1 <- rbind(sig1.4.heatmap.log2.ck.tr.no.change[[u]],sig1.4.heatmap.log2.ck.tr.Up[[u]],sig1.4.heatmap.log2.ck.tr.Down[[u]])
     
     z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
     
-    n.no.change <- dim(sig1.4.heatmap.log2.ck.tr.no.change)[1]
-    n.Up <- dim(sig1.4.heatmap.log2.ck.tr.Up)[1]
-    n.Down <- dim(sig1.4.heatmap.log2.ck.tr.Down)[1]
+    n.no.change <- dim(sig1.4.heatmap.log2.ck.tr.no.change[[u]])[1]
+    n.Up <- dim(sig1.4.heatmap.log2.ck.tr.Up[[u]])[1]
+    n.Down <- dim(sig1.4.heatmap.log2.ck.tr.Down[[u]])[1]
     
-    #z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.Down), center=TRUE, scale=TRUE))
-    ht_list <- Heatmap(z.mat.0, name = "z-score",
+    ht <- Heatmap(z.mat.0, name = paste0("z-score","-rep",u),
                        col = rev(redgreen(30))[-seq(35, 35)],            
                        show_row_name = FALSE,
                        cluster_columns = F,
                        cluster_rows = F,column_names_gp = gpar(fontsize = 6),column_split = rep(c("Control", "NR2F2KD"),c(100,100)),row_split = factor(rep(c("NoChange","Up","Down"),c(n.no.change,n.Up,n.Down)),levels = c("Up","NoChange","Down")))
-    gb = grid.grabExpr(draw(ht_list))
+    
+    ht
+    
+    },sig1.4.heatmap.log2.ck.tr.no.change,sig1.4.heatmap.log2.ck.tr.Up,sig1.4.heatmap.log2.ck.tr.Down)
+    
+    htList = ht_list[[1]] + ht_list[[2]] + ht_list[[3]]
+    
+    gb = grid.grabExpr(draw(htList))
     g <- plot_grid(gb)
     save_plot(file.path(output.file.dir,paste0(file_name,"_heatmap.png")),g,base_width = 10,base_height = 40)
   }
   
   class_patterns <- c("Com_NoChange","Com_K27acUp","Com_K27acDwn")
-  file_name <- "Com_"
+  file_name <- "Com_3_reps"
   heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir)
   
   class_patterns <- c("Art_NoChange","Art_K27acUp","Art_K27acDown")
-  file_name <- "Art_"
+  file_name <- "Art_3_reps"
   heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir)
   
-  heatmap.33 <- function(mydata,rowName,geneSymbol,selected.genes,groups,out.dir.name,out.file.name,w,h) {
-    
-    mat <- as.matrix(mydata)
-    rownames(mat) <- rowName
-    
-    z.mat.0 <- t(scale(t(mat), center=TRUE, scale=TRUE))
-    
-    ha = HeatmapAnnotation(foo = anno_block(gp = gpar(fill = 2:3),labels = groups))
-    
-    labels <- as.character(rownames(mat))
-    selected.index <- match(selected.genes,geneSymbol)
-    markers <- geneSymbol[selected.index]
-    
-    marker_idx <- selected.index
-    
-    print(labels[marker_idx])
-    
-    print(colnames(z.mat.0))
-    
-    ht_list <- Heatmap(z.mat.0, name = "z-score",
-                       col = rev(redgreen(50))[-seq(35, 35)],            
-                       show_row_name = FALSE,
-                       cluster_columns = F,
-                       cluster_rows = F,column_names_gp = gpar(fontsize = 10),top_annotation = ha,column_split = rep(c("MDS", "nonLeukemia"), c(164,69))) +
-      rowAnnotation(link = anno_mark(at = marker_idx, labels = markers),
-                    width = unit(5, "mm") +
-                      max_text_width(markers))
-    
-    gb = grid.grabExpr(draw(ht_list))
-    g <- plot_grid(gb)
-    save_plot(file.path(out.dir.name,paste0(out.file.name,"_heatmap.png")), g,base_width = w,base_height = h)
-    
-  }
-  
-  n <- length(cvglists.ul)/length(tss.bed)
-  
-  if(n==2){
-    cvglists.ave <- lapply(1:length(tss.bed),function(u,cvglists.ul){
-      
-      Class1 <- (cvglists.ul[[2*u-1]]+cvglists.ul[[2*u]])/n
-      
-      Class1
-      
-    },cvglists.ul)
-  }
-  
-  if(n==3){
-    cvglists.ave <- lapply(1:length(tss.bed),function(u,cvglists.ul){
-      
-      Class1 <- (cvglists.ul[[3*u-2]]+cvglists.ul[[3*u-1]]+cvglists.ul[[3*u]])/n
-      
-      Class1
-      
-    },cvglists.ul)
-  }
-  
-  names(cvglists.ave) <- names(tss.bed)
-  
-  XX <- lapply(1:length(feature.center),function(u,feature.center,cvglists.ave,dd){
-    
-    u <- 1
-    sig1 <- featureAlignedSignal(cvglists.ave, feature.center[[u]], upstream=dd, downstream=dd) 
-    sigs.log2 <- lapply(sig1, function(.ele) log2(.ele+1))
-    out.4 <- featureAlignedDistribution(sigs.log2, 
-                                        feature.center[[u]],upstream=dd, downstream=dd,
-                                        zeroAt=.5,type="l", 
-                                        ylab="Averaged coverage",add=TRUE)
-    
-    x <- list(density=out.4$density[,u],grWidAt=out.4$grWidAt,grWidLab=out.4$grWidLab)
-    x 
-  },feature.center,cvglists.ave,dd)
-  
-  den.l <-lapply(1:length(XX),function(u,XX){
-    Z <- XX[[u]]$density
-    Z
-  },XX)
-  out <- do.call(cbind,den.l)
-  
-  grWidAt.l <-lapply(1:length(XX),function(u,XX){
-    Z <- XX[[u]]$grWidAt
-    Z
-  },XX)
-  grWidAt <- do.call(cbind,grWidAt.l)
-  
-  grWidLab.l <-lapply(1:length(XX),function(u,XX){
-    Z <- XX[[u]]$grWidLab
-    Z
-  },XX)
-  grWidLab <- do.call(cbind,grWidLab.l)
-  
-  
-  head(out)
-  colnames(out) <- tssType
-  
-  drowDensity <- function(density,grWidAt,grWidLab,...) {
-    dots <- list(...)
-    matplot(density, ..., xaxt="n")
-    axis(1, at = grWidAt, labels = grWidLab)
-    lty <- if(!is.null(dots$lty)) dots$lty else 1:5
-    lwd <- if(!is.null(dots$lwd)) dots$lwd else 1
-    col <- if(!is.null(dots$col)) dots$col else 1:6
-    legend("topright", legend=colnames(density), col=col,
-           lty=lty, lwd=lwd)
-  }
-  
-  jpeg(file.path(output.file.dir,paste0(x_name,"_density.jpeg")))
-  drowDensity(out,grWidAt[,1],grWidLab[,1],type="l", lty=1,
-              ylab="log2(averaged coverage)",xlab=paste0("Distance to ",class_pattern,"(bp)"),main=tfType)
-  dev.off()
-  
-  x.pos <- seq(-dd,dd,length.out = dim(out)[1])
-  out.m <- data.frame(x.pos=x.pos,out)
-  
-  outLong <- melt(data          = out.m,
-                  id.vars       = c("x.pos"),
-                  measure.vars  = tssType,
-                  variable.name = "TSSByClass",
-                  value.name    = "value")
-  
-  ggplot(outLong, aes(x.pos, value,colour=TSSByClass)) + 
-    geom_line() + labs(x="Distance to TSS(bp)",y="log2(averaged coverage)",title=tfType) +
-    theme(plot.title=element_text(hjust=0.5)) + scale_x_continuous(name=paste0("Distance to ",class_pattern,"(bp)"), limits=c(-dd, dd))
-  
-  write.table(out.m,file = file.path(output.file.dir,paste0(x_name,"_Density_matrix_short",".txt")),
-              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
-  
-  write.table(outLong,file = file.path(output.file.dir,paste0(x_name,"_Density_matrix_long",".txt")),
-              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
-  
-  null <- lapply(1:length(cvglists.l), function(u,cvglists.l,feature.center,dd,n,tfType){
-    u <- 1
-    sig1.4.heatmap <- featureAlignedSignal(cvglists.l[[u]], feature.center[[u]], upstream=dd, downstream=dd) 
-    sig1.4.heatmap.log2 <- lapply(sig1.4.heatmap, function(.ele) log2(.ele+1))
-    names(sig1.4.heatmap.log2) <- paste0(tfType,"_",seq(1,n))
-    
-    x_name <- paste0(tfType,"_",names(feature.center)[u])
-    
-    jpeg(file.path(output.file.dir,paste0(x_name,"_",dd,"_heatmap.jpeg")))
-    featureAlignedHeatmap(sig1.4.heatmap.log2, feature.center[[u]],sortBy=NULL,upstream=dd, downstream=dd,zeroAt=.5,res=300)
-    dev.off()
-    
-  },cvglists.l,feature.center,dd,n,tfType)
+  class_patterns <- c("Ve_NoChange","Ve_K27acUp","Ve_K27acDwn")
+  file_name <- "Ve_3_reps"
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir)
   
 }
 
