@@ -11045,4 +11045,22 @@ parserHiCdata <- function(head) {
   Columns(gse111170)
   
   lapply(dfl,head)
+  
+  peaks <- read.table("/Users/aiminyan/Aimin/DropboxUmass/PeaksNov2018/ann.commonInFMR1RepNotInGAL4vsInput_peaks_pvalue10e-5.xls", sep ="\t", header = TRUE)
+  
+  in.edge <- gsub("chr", "", as.character(peaks$seqnames))
+  out.edge <- rep("X", length(peaks$seqnames))
+  dat <- data.frame(in.edge, out.edge)
+  #dat <- with(dat, table(out.edge, in.edge))
+  dat <- with(dat, table(in.edge, out.edge))
+  
+  # Charge the circlize library
+  library(circlize)
+  
+  # Make the circular plot
+  chordDiagram(as.data.frame(dat), transparency = 0.5)
+  
+  dat <- data.frame(in.edge, out.edge)
+  chordDiagram(as.data.frame(dat), transparency = 0.5)
+
 }
