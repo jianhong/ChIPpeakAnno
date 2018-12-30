@@ -11064,3 +11064,535 @@ parserHiCdata <- function(head) {
   chordDiagram(as.data.frame(dat), transparency = 0.5)
 
 }
+
+fromGr2Anno <- function() {
+
+  genome <- "Hs"
+  re.out <- bed.in[-8]
+  
+  null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
+    
+    if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+    
+    x=re.out[[u]]
+    x_name=names(re.out)[u]
+    
+    if(genome=="Mm"){
+    
+      dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
+      overlaps.trimmed<-trim(x,use.names=TRUE)
+      overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+      write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+      
+      getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+        over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
+                              maxP=0.5, minGOterm=10,
+                              multiAdjMethod="BH", condense=TRUE)
+        path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
+        write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+        
+        convert2geneSymbol <- function(over1) {
+          geneSymbol <- lapply(over1$EntrezID, function(u){
+            x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Mm.eg') 
+            x
+          })
+          
+          list_to_df <- function(list_for_df)
+          {
+            list_for_df <- as.list(list_for_df)
+            nm <- names(list_for_df)
+            if (is.null(nm)) 
+              nm <- seq_along(list_for_df)
+            df <- data.frame(name = nm, stringsAsFactors = FALSE)
+            df$value <- unname(list_for_df)
+            df
+          }
+          
+          geneSymbol3 <- list_to_df(geneSymbol)
+          over2 <- cbind(over1,geneSymbol3)
+          over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+          colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+          over3
+        }
+        
+        over$bp <- convert2geneSymbol(over$bp)
+        over$mf <- convert2geneSymbol(over$mf)
+        over$cc <- convert2geneSymbol(over$cc)
+        
+        over_bp <- as_tibble(over$bp)
+        over_mf <- as_tibble(over$mf)
+        over_cc <- as_tibble(over$cc)
+        
+        over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+        over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+        over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+        
+        writeTibble <- function(tibble.input, output.file.name = tempfile())
+        {
+          if (!dir.exists(dirname(output.file.name)))
+          {
+            dir.create(dirname(output.file.name), recursive = TRUE)
+          }
+          flatten_list = function(x)
+          {
+            if (typeof(x) != "list")
+            {
+              return(x)
+            }
+            sapply(x, function(y) paste(y, collapse = " ; "))
+          }
+          tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+        }
+        
+        writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+        writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+        writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+      }
+      
+      getGoAndPath(overlaps.anno,output.file.dir,x_name)
+      
+    }else if(genome=="Hs"){
+      
+      #library(EnsDb.Hsapiens.v75)
+      #annoData<-toGRanges(EnsDb.Hsapiens.v75, feature="gene")
+      
+      dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
+      
+      #print(seqinfo(dd.hs))
+      #print(seqlevels(dd.hs))
+      
+      
+      #dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
+      overlaps.trimmed<-trim(x,use.names=TRUE)
+      overlaps.anno<-annoPeaks(overlaps.trimmed,dd.hs)
+      write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+      
+      
+      #print(seqlevels(dd.hs)[,1])
+      
+      #print(seqlevels(re.out[[1]])[,1])
+      
+      # seqlevels(dd.hs,force=TRUE) <- c("chr1","chr10","chr11","chr12","chr13",
+      #                                           "chr14","chr15","chr16","chr17","chr18","chr19","chr2",
+      #                                           "chr3","chr4","chr5","chr6","chr7","chr8","chr9","chrX","chrY")
+      
+      #temp4=
+      
+      # re.out.L<-lapply(1:length(re.out),function(u,re.out,dd.hs){
+      #   
+      #   x=re.out[[u]]
+      #   x_name=names(re.out)[u]
+      #   
+      #   seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
+      #   #print(seqinfo(re.out.trimmed))
+      #   #print(seqlevels(re.out.trimmed))
+      #   seqinfo(x)<-seqinfo(dd.hs)
+      #   #GRCm38/mm10
+      #   #dd<-toGRanges(EnsDb.Mmusculus.v79)
+      #   #seqinfo(dd)
+      #   #library(ensembldb)
+      #   #library(GenomeInfoDb)
+      #   seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
+      #   re.out.trimmed<-trim(x, use.names=TRUE)
+      #   overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
+      #   
+      #   write.table(overlaps.anno,file=paste0(temp3,"/",x_name,"_annotation.txt"),row.names = FALSE,quote=FALSE,sep="\t")
+      # },re.out,dd.hs)
+      
+    }
+    
+  },re.out,output.file.dir,genome)
+}
+
+
+# nathan_lawson new data 1(exclude no change ones)
+
+# input.bed.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/BedWithLabel"
+
+# input.bw.path <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2kd_bigwig"
+# dd <- 3000
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/NR2F2_exclude_no_change"
+# null <- overLapWithOtherFeatures1(input.bed.dir,input.bw.path,output.file.dir,dd)
+
+overLapWithOtherFeatures2 <- function(input.bed.dir,input.bw.path,output.file.dir,dd) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  xx <- lapply(file.name.4, function(u){
+    x <- readLines(u)
+    x
+  })
+  
+  yy <- lapply(xx, function(u){
+    y <- as.data.frame(do.call(rbind,strsplit(u,split="\t")),stringsAsFactors=FALSE)
+    y
+  })
+  
+  yy[[2]] <- yy[[2]][-140,]
+  yy[[4]] <- yy[[4]][-83,]
+  
+  names(yy) <- tools::file_path_sans_ext(basename(file.name.4))
+  
+  zz <- lapply(yy, function(u){
+    if(dim(u)[2]<=3){
+    z <- data.frame(u,paste0("no_",u[,1],"_",u[,2],"_",u[,3]))
+    }
+    else
+    {
+      u[grep("yes",u[,4]),4] <- paste0("yes_",u[grep("yes",u[,4]),1],"_",u[grep("yes",u[,4]),2],"_",u[grep("yes",u[,4]),3])
+      
+      u[-grep("yes",u[,4]),4] <- paste0("no_",u[-grep("yes",u[,4]),1],"_",u[-grep("yes",u[,4]),2],"_",u[-grep("yes",u[,4]),3])
+      
+      z <- u
+    }
+    
+    colnames(z)=c("seqnames","start","end","label")
+    
+    z <- GRanges(z)
+    z
+  })
+  
+  generateMatrix4heatmap <- function(class_pattern,data,dd,input.bw.path,sortBy) {
+    
+    tss <- names(data)[grep(class_pattern,names(data),ignore.case = T)]
+    print(tss)
+    
+    tss.bed <- data[which(names(data) %in% tss)]
+    
+    feature.center <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
+      x <- tss.bed[[u]]
+      x
+    },tss.bed,dd)
+    
+    names(feature.center) <- names(tss.bed)
+    
+    # get the regions of around feature middle +/- dd 
+    feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
+      
+      features <- tss.bed[[u]]
+      
+      wid <- width(features)
+      feature.recentered <- feature.center <- features
+      
+      start(feature.center) <- start(features) + floor(wid/2)
+      
+      width(feature.center) <- 1
+      
+      start(feature.recentered) <- start(feature.center) - dd
+      end(feature.recentered) <- end(feature.center) + dd
+      
+      feature.recentered
+      
+    },tss.bed,dd)
+    names(feature.recentered.l) <- names(tss.bed)
+    
+    cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
+      
+      files <- dir(input.bw.path, "bw")
+      if(.Platform$OS.type != "windows"){
+        cvglists <- sapply(file.path(input.bw.path,files), import, 
+                           format="BigWig", 
+                           which=feature.recentered.l[[u]], 
+                           as="RleList")
+      }else{## rtracklayer can not import bigWig files on Windows
+        load(file.path(input.bw.path, "cvglist.rds"))
+      }
+      
+    },feature.recentered.l,input.bw.path)
+    
+    tfType <- "TRC-NS"
+    cvglists.ck <- lapply(1:length(cvglists.l), function(u,cvglists.l){
+      z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
+      z
+    },cvglists.l)
+    cvglists.ul.ck <- unlist(cvglists.ck)
+    
+    print(names(cvglists.ul.ck))
+    
+    n <- length(cvglists.ul.ck)
+    
+    sig1.4.heatmap.ck <- featureAlignedSignal2(cvglists.ck[[1]], feature.center[[1]], upstream=dd, downstream=dd)
+    sig1.4.heatmap.log2.ck <- lapply(sig1.4.heatmap.ck, function(.ele) log2(.ele+1))
+    names(sig1.4.heatmap.log2.ck) <- paste0(tfType,"_",seq(1,n))
+    print(names(sig1.4.heatmap.log2.ck))
+    
+    tfType <- "shNR2F2"
+    cvglists.tr <- lapply(1:length(cvglists.l), function(u,cvglists.l){
+      z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
+      z
+    },cvglists.l)
+    cvglists.ul.tr <- unlist(cvglists.tr)
+    print(names(cvglists.ul.tr))
+    n <- length(cvglists.ul.tr)
+    
+    sig1.4.heatmap.tr <- featureAlignedSignal2(cvglists.tr[[1]], feature.center[[1]], upstream=dd, downstream=dd)
+    sig1.4.heatmap.log2.tr <- lapply(sig1.4.heatmap.tr, function(.ele) log2(.ele+1))
+    names(sig1.4.heatmap.log2.tr) <- paste0(tfType,"_",seq(1,n))
+    print(names(sig1.4.heatmap.log2.tr))
+    
+    dim(sig1.4.heatmap.log2.tr[[1]])
+    
+    #sortBy = "Trt"
+    sig1.4.heatmap.log2.ck.tr.l <- lapply(1:length(sig1.4.heatmap.log2.tr),function(u,sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy){
+      if(sortBy=="Trt"){
+        density.sum <- apply(sig1.4.heatmap.log2.tr[[u]],1,sum)
+        sig1.4.heatmap.log2.tr.sorted<- sig1.4.heatmap.log2.tr[[u]][order(density.sum,decreasing = T),]        
+        sig1.4.heatmap.log2.ck.sorted <- sig1.4.heatmap.log2.ck[[u]][match(rownames(sig1.4.heatmap.log2.tr.sorted),rownames(sig1.4.heatmap.log2.ck[[u]])),]
+        sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
+      }else{
+        density.sum <- apply(sig1.4.heatmap.log2.ck[[u]],1,sum)
+        sig1.4.heatmap.log2.ck.sorted<- sig1.4.heatmap.log2.ck[[u]][order(density.sum,decreasing = T),]        
+        sig1.4.heatmap.log2.tr.sorted <- sig1.4.heatmap.log2.tr[[u]][match(rownames(sig1.4.heatmap.log2.ck.sorted),rownames(sig1.4.heatmap.log2.tr[[u]])),]
+        sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
+      }
+      sig1.4.heatmap.log2.ck.tr
+    },sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy)
+    
+    sig1.4.heatmap.log2.ck.tr.l
+    
+  }
+  
+  heatmap4UpNoChangeDown <- function(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,selected.genes=NULL,cols=colorpanel(30,"white","white","red")) {
+
+    class_pattern <- class_patterns[1]
+    sig1.4.heatmap.log2.ck.tr.Up <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt")
+    
+    lbsUp <- as.character(mcols(data[[grep(class_pattern,names(data))]])$label)
+  
+    #print(names(sig1.4.heatmap.log2.ck.tr.Up))
+    
+    class_pattern <- class_patterns[2]
+    sig1.4.heatmap.log2.ck.tr.Down <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="CK")
+    
+    lbsDown <- as.character(mcols(data[[grep(class_pattern,names(data))]])$label)
+    #data[[grep(class_pattern,names(data))]]
+    
+    lbs <- c(lbsUp,lbsDown)
+    
+    if(is.null(selected.genes)) {selected.genes <- lbs[grep("yes",lbs)]}
+    
+    ht_list <- lapply(1:length(sig1.4.heatmap.log2.ck.tr.Up), function(u,sig1.4.heatmap.log2.ck.tr.Down,selected.genes){
+      
+      sig1.4.heatmap.log2.ck.tr.1 <- rbind(sig1.4.heatmap.log2.ck.tr.Up[[u]],sig1.4.heatmap.log2.ck.tr.Down[[u]])
+      
+      
+      z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
+      
+      print(rownames(z.mat.0))
+      
+      labels <- as.character(rownames(z.mat.0))
+      selected.index <- match(selected.genes,labels)
+      markers <- labels[selected.index]
+      
+      marker_idx <- selected.index
+      
+      print(labels[marker_idx])
+      
+      n.Up <- dim(sig1.4.heatmap.log2.ck.tr.Up[[u]])[1]
+      n.Down <- dim(sig1.4.heatmap.log2.ck.tr.Down[[u]])[1]
+      
+      ht <- Heatmap(z.mat.0, name = paste0("z-score","-rep",u),
+                    #col = rev(redblue(30))[-seq(35, 35)],  
+                    #col = rev(redblue(30)),
+                    # col = colorpanel(30,"white","white","red"),
+                    col = cols,
+                    show_row_name = FALSE,
+                    cluster_columns = F,
+                    cluster_rows = F,column_names_gp = gpar(fontsize = 6),column_split = rep(c("Control", "NR2F2KD"),c(100,100)),row_split = factor(rep(c("Up","Down"),c(n.Up,n.Down)),levels = c("Up","Down"))) + rowAnnotation(link = anno_mark(at = marker_idx, labels = markers),width = unit(5, "mm") +        max_text_width(markers))
+      
+      ht
+      
+    },sig1.4.heatmap.log2.ck.tr.Down,selected.genes)
+    
+    htList = ht_list[[1]] + ht_list[[2]] + ht_list[[3]]
+    
+    gb = grid.grabExpr(draw(htList))
+    g <- plot_grid(gb)
+    save_plot(file.path(output.file.dir,paste0(file_name,"_heatmap.png")),g,base_width = 25,base_height = 40)
+  }
+  
+  library(ComplexHeatmap)
+  library(gplots)
+  library(cowplot)
+  
+  class_patterns <- c("Art_K27acUp","Art_K27acDwn")
+  file_name <- "Art_3_reps"
+  data <- zz
+  
+  #[grep("Art",names(data))
+  selected.genes <- c("yes_chr4_77370192_77371689")
+  # for artery elements, let’s try red for the maximum density, ranging to white for the lowest;
+  cols= colorpanel(100,"white","pink","red")
+  
+ # cols= colorpanel(100,"white","orange","red")
+  
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,cols=cols)
+  
+  # for vein let’s go with blue for max, white for minimum.
+  
+  class_patterns <- c("Vein_K27acUp","Vein_K27acDwn")
+  file_name <- "Vein_3_reps"
+  cols= colorpanel(100,"white","lightblue","blue")
+  
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,cols=cols)
+  
+}
+
+fb <- function(n) {
+  
+  if(n == 0){x = 1}
+  
+  if(n ==1){x = 1}
+  
+  if(n >=2){ x = fb(n-1) + fb(n-2)}
+ 
+  x  
+}
+
+featureAlignedSignal2 <- function(cvglists, feature.gr, 
+                                 upstream, downstream, 
+                                 n.tile=100, ...){
+  stopifnot(is(feature.gr, "GRanges"))
+  
+  grWidr <- unique(width(feature.gr))
+  if(missing(upstream) || missing(downstream)){
+    if(length(grWidr)!=1){
+      stop("The width of feature.gr is not identical.")
+    }
+  }else{
+    if(!is.numeric(upstream) || !is.numeric(downstream)){
+      stop("upstream and downstream must be integers")
+    }
+    if(upstream<0 || downstream<0){
+      stop("upstream and downstream must be not less than 0")
+    }
+    upstream <- as.integer(upstream)
+    downstream <- as.integer(downstream)
+    if(length(grWidr)!=1 || any(grWidr!=1)){
+      start(feature.gr) <- start(feature.gr)+floor(width(feature.gr)/2)
+      width(feature.gr) <- 1
+      warning("feature.gr is set to the center of feature.gr")
+    }
+    feature.gr <- promoters(feature.gr, upstream = upstream,
+                            downstream = downstream + 1)
+    grWidr <- unique(width(feature.gr))
+  }
+  if(any(start(feature.gr)<1)){
+    warning("Some start position of the peaks are less than 1!",
+            "They will be filtered.")
+    feature.gr <- feature.gr[start(feature.gr)>0]
+  }
+  if(length(feature.gr)<2){
+    stop("Length of feature.gr less than 2.")
+  }
+  if(inherits(cvglists, c("SimpleRleList", "RleList", "CompressedRleList"))){
+    cvglistsName <- substitute(deparse(cvglists))
+    cvglists <- list(cvglists)
+    names(cvglists) <- cvglistsName
+  }
+  if(!is(cvglists, "list")){
+    stop("cvglists must be a list of SimpleRleList or RleList")
+  }
+  cls <- sapply(cvglists, class)
+  if(any(!cls %in% c("SimpleRleList", "RleList", "CompressedRleList")))
+    stop("cvglists must be a list of SimpleRleList or RleList")
+  seqLen <-  lapply(cvglists, function(.ele) 
+    sapply(.ele, function(.e) sum(runLength(.e))))
+  seqLen.keep <- table(unlist(sapply(seqLen, names)))==length(cvglists)
+  seqLen <- seqLen[[1]][seqLen.keep]
+  seqLen <- seqLen[!is.na(seqLen)]
+  if(length(seqLen)>0){
+    feature.gr.subset <- 
+      feature.gr[seqnames(feature.gr) %in% names(seqLen)]
+    if(any(end(feature.gr.subset)>seqLen[as.character(seqnames(feature.gr.subset))])){
+      warning("Some end position of the peaks are out of bound!",
+              "They will be filtered.")
+      feature.gr <- 
+        feature.gr.subset[end(feature.gr.subset) <=
+                            seqLen[as.character(seqnames(feature.gr.subset))]]
+    }
+  }
+  #feature.gr.bck <- feature.gr
+  stopifnot(is.numeric(n.tile))
+  n.tile <- round(n.tile)
+  grL <- tile(feature.gr, n=n.tile)
+  idx <- as.character(strand(feature.gr))=="-"
+  if(sum(idx)>0) {
+    grL.rev <- grL[idx]
+    grL.rev.len <- lengths(grL.rev)
+    grL.rev <- unlist(grL.rev, use.names = FALSE)
+    grL.rev$oid <- rep(seq.int(length(grL[idx])), grL.rev.len)
+    grL.rev <- rev(grL.rev)
+    grL.rev.oid <- grL.rev$oid
+    grL.rev$oid <- NULL
+    grL.rev <- split(grL.rev, grL.rev.oid)
+    grL[idx] <- as(grL.rev, "CompressedGRangesList")
+    rm(grL.rev, grL.rev.len, grL.rev.oid)
+  }
+  grL.len <- lengths(grL)
+  grL <- unlist(grL)
+  grL$oid <- rep(seq_along(feature.gr), grL.len)
+  grL$nid <- unlist(lapply(grL.len, seq.int))
+  grL.len <- length(grL)
+  grL.s <- split(grL, as.character(seqnames(grL)))
+  grL <- unlist(grL.s) ## make sure grL and grL.s keep the same order
+  seqn <- names(grL.s)
+  seql <- seqlengths(feature.gr)
+  seql <- seql[seqn]
+  seql.f <- range(feature.gr)
+  seql.f <- seql.f[match(seqn, seqnames(seql.f))]
+  seql[is.na(seql)] <- width(seql.f)[is.na(seql)] + 1
+  trimChar <- function(x, width){
+    len <- nchar(x)
+    if(len <= width) return(x)
+    return(paste0(strtrim(x, width=width), "..."))
+  }
+  
+  #rowname.feature.gr <- paste0(as.character(seqnames(feature.gr)), ":",
+  #                             start(feature.gr), "-",
+  #                             end(feature.gr))
+  
+  rowname.feature.gr <- as.character(mcols(feature.gr)$label)
+    
+    cov <- lapply(cvglists, function(.dat){
+      .dat <- .dat[seqn[seqn %in% names(.dat)]]
+      if(length(.dat)!=length(seqn)){
+        warning(paste(seqn[!seqn %in% names(.dat)], collapse=", "), 
+                ifelse(length(seqn[!seqn %in% names(.dat)])>1, " are", " is"), 
+                " not in cvglists. seqlevels of cvglist are ", 
+                trimChar(paste(names(.dat), collapse=", "), width=60))
+        for(i in seqn[!seqn %in% names(.dat)]){
+          .dat[[i]] <- Rle(0, seql[i])
+        }
+      }
+      warn <- sapply(.dat, function(.ele){
+        any(is.na(runValue(.ele)))
+      })
+      if(any(warn)){
+        warning("cvglists contain NA values.")
+      }
+      .dat <- sapply(.dat, function(.ele){
+        if(any(is.infinite(runValue(.ele)))){
+          warning("cvglists contain infinite values. ", 
+                  "infinite value will be converted to NA.")
+          runValue(.ele)[is.infinite(runValue(.ele))] <- NA
+        }
+        .ele
+      })
+      .dat <- .dat[seqn]
+      vw <- Views(as(.dat, "RleList"), grL.s)
+      vm <- viewMeans(vw)
+      vm <- unlist(vm)
+      stopifnot(length(vm)==grL.len)
+      mm <- matrix(0, nrow=length(feature.gr), ncol=n.tile)
+      mm[grL$oid+length(feature.gr)*(grL$nid-1)] <- vm
+      rownames(mm) <- rowname.feature.gr
+      mm
+    })
+  
+  cov
+}
+
+
