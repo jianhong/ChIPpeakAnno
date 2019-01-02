@@ -11595,4 +11595,7 @@ featureAlignedSignal2 <- function(cvglists, feature.gr,
   cov
 }
 
+ivanPlay <- function(){
+  cat("hi my name is Ivan Yan!")
+}
 
