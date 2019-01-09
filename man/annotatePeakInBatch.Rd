@@ -84,6 +84,7 @@ annotation will based on \link{annoPeaks}. Here is how to use it together with t
         \item To obtain peaks with nearest bi-directional promoters within 5kb upstream and 3kb downstream of TSS, set  output = "nearestBiDirectionalPromoters" and bindingRegion = c(-5000, 3000)
         \item To obtain peaks within 5kb upstream and up to 3kb downstream of TSS within the gene body, set output="overlapping", FeatureLocForDistance="TSS" and bindingRegion = c(-5000, 3000)
         \item To obtain  peaks  up to 5kb upstream within the gene body and 3kb downstream of gene/Exon End, set output="overlapping", FeatureLocForDistance="geneEnd" and bindingRegion = c(-5000, 3000)
+        \item To obtain peaks from 5kb upstream to 3kb downstream of genes/Exons, set output="overlapping",  bindingType = "fullRange" and bindingRegion = c(-5000, 3000)
     }
 For details, see \link{annoPeaks}.}
 \item{...}{Parameters could be passed to \link{annoPeaks}}

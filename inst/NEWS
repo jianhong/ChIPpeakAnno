@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.17.1
+-------------------------
+
+    o fix the bug in annotatePeakInBatch which can not accept bindingType parameter.
+    
 CHANGES IN VERSION 3.15.2
 -------------------------
 
