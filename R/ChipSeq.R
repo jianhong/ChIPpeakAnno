@@ -11782,6 +11782,8 @@ overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.di
     
     class_patterns <- c("VeNR2F2repsFinal")
     
+    class_patterns <- c("VeERGrepsFINAL")
+    
     class_pattern <- class_patterns[1]
     sig1.4.heatmap.log2.ck.tr.Up <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt")
     
@@ -11865,7 +11867,7 @@ overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.di
    
    grl <- zz[peak.index]
    pdf(file.path(output.file.dir,paste0(paste(name,collapse ="_"),".pdf")))
-   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green"),cat.col = c("red", "red"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
+   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green"),cat.col = c("blue", "green"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
    dev.off()
    
    getCount4Venn2(zz,peak.index,name,output.file.dir)
@@ -11891,6 +11893,12 @@ overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.di
    getCount4Venn(zz,peak.index,name,output.file.dir)
    
    
+   grl <- zz[peak.index]
+   pdf(file.path(output.file.dir,paste0(paste(name,collapse ="_"),".pdf")))
+   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green","red"),cat.col = c("blue", "green","red"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
+   dev.off() 
+   
+   
    # VeERGrepsFINAL.bed
    # VeNR2F2repsFinal.bed
    # VeinAll.bed
@@ -11898,7 +11906,10 @@ overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.di
    name <- c("VeERGrepsFINAL","VeNR2F2repsFinal","VeinAll")
    getCount4Venn(zz,peak.index,name,output.file.dir)
    
-  
+   grl <- zz[peak.index]
+   pdf(file.path(output.file.dir,paste0(paste(name,collapse ="_"),".pdf")))
+   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green","red"),cat.col = c("blue", "green","red"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
+   dev.off() 
   
 }
 
