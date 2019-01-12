@@ -8130,6 +8130,44 @@ getCount4Venn <- function(re.out,peak.index,name,output.file.dir) {
   
 }
 
+
+getCount4Venn2 <- function(re.out,peak.index,name,output.file.dir) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  grl <- GRangesList(re.out[peak.index])
+  names(grl) <- name
+  
+  Z <- ChIPpeakAnno:::vennCounts(grl,length(peak.index),names=names(grl)) 
+  
+  if(length(peak.index)==2){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="00"),]
+    labels = rev(name)
+  }
+  
+  if(length(peak.index)==3){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="000"),]
+    labels = name
+  }
+  
+  if(length(peak.index)==4){
+    ZZ <- Z$venn_cnt[-which(row.names(Z$venn_cnt)=="0000"),]
+    labels = name
+  }
+  
+  y <- ZZ[,"Counts"]
+  
+  print(ZZ)
+  
+  names(y) <- row.names(ZZ)
+  
+  pdf(file = file.path(output.file.dir,paste0(paste(name,collapse = "-"),".pdf")))
+  plot.new()
+  colorfulVennPlot::plotVenn(y, labels, Colors=rainbow(18))
+  dev.off()
+  
+}
+
 # ol.ciLAD.XL.MEF_LAD <- findOverlapsOfPeaks(re.out[c(1,7,6)])
 # XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
 # XL.3.subsets.anno <- getAnnotatedGene(XL.3.subsets,"Mm")
@@ -11598,4 +11636,270 @@ featureAlignedSignal2 <- function(cvglists, feature.gr,
 ivanPlay <- function(){
   cat("hi my name is Ivan Yan!")
 }
+
+# input.bed.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/2019_1_7_forHeatMapsAndVennDiagrams"
+# input.bw.path <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/ERGChipSeq_bigwig/bigwig"
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/Results_4_VeNR2F2repsFinal"
+# dd <- 3000
+
+overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.dir,dd) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  file.name.4 <- list.files(input.bed.dir,pattern=".bed$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  xx <- lapply(file.name.4, function(u){
+    x <- readLines(u)
+    x
+  })
+  
+  yy <- lapply(xx, function(u){
+    y <- as.data.frame(do.call(rbind,strsplit(u,split="\t")),stringsAsFactors=FALSE)
+    y
+  })
+  
+  yy[[2]] <- yy[[2]][-140,]
+  yy[[4]] <- yy[[4]][-83,]
+  
+  names(yy) <- tools::file_path_sans_ext(basename(file.name.4))
+  
+  zz <- lapply(yy, function(u){
+    z <- u[,c(1:3)]
+    
+    z <- data.frame(u[,c(1:3)],paste0(as.character(u[,1]), ":",u[,2], "-",u[,3]))
+    
+    colnames(z)=c("seqnames","start","end","label")
+    
+    z <- GRanges(z)
+    z
+  })
+  
+  generateMatrix4heatmap <- function(class_pattern,data,dd,input.bw.path,sortBy) {
+    
+   # class_pattern <- "VeNR2F2repsFinal"
+  #  file_name <- "Art_3_reps"
+  #  data <- zz
+    
+    tss <- names(data)[grep(class_pattern,names(data),ignore.case = T)]
+    print(tss)
+    
+    tss.bed <- data[which(names(data) %in% tss)]
+    
+    feature.center <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
+      x <- tss.bed[[u]]
+      x
+    },tss.bed,dd)
+    
+    names(feature.center) <- names(tss.bed)
+    
+    # get the regions of around feature middle +/- dd 
+    feature.recentered.l <- lapply(1:length(tss.bed), function(u,tss.bed,dd){
+      
+      features <- tss.bed[[u]]
+      
+      wid <- width(features)
+      feature.recentered <- feature.center <- features
+      
+      start(feature.center) <- start(features) + floor(wid/2)
+      
+      width(feature.center) <- 1
+      
+      start(feature.recentered) <- start(feature.center) - dd
+      end(feature.recentered) <- end(feature.center) + dd
+      
+      feature.recentered
+      
+    },tss.bed,dd)
+    names(feature.recentered.l) <- names(tss.bed)
+    
+    cvglists.l <- lapply(1:length(feature.recentered.l), function(u,feature.recentered.l,input.bw.path){
+      
+      files <- dir(input.bw.path, "bw")
+      if(.Platform$OS.type != "windows"){
+        cvglists <- sapply(file.path(input.bw.path,files), import, 
+                           format="BigWig", 
+                           which=feature.recentered.l[[u]], 
+                           as="RleList")
+      }else{## rtracklayer can not import bigWig files on Windows
+        load(file.path(input.bw.path, "cvglist.rds"))
+      }
+      
+    },feature.recentered.l,input.bw.path)
+    
+    tfType <- "V42ERG_IN"
+    cvglists.ck <- lapply(1:length(cvglists.l), function(u,cvglists.l){
+      z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
+      z
+    },cvglists.l)
+    cvglists.ul.ck <- unlist(cvglists.ck)
+    
+    print(names(cvglists.ul.ck))
+    
+    n <- length(cvglists.ul.ck)
+    
+    sig1.4.heatmap.ck <- featureAlignedSignal2(cvglists.ck[[1]], feature.center[[1]], upstream=dd, downstream=dd)
+    sig1.4.heatmap.log2.ck <- lapply(sig1.4.heatmap.ck, function(.ele) log2(.ele+1))
+    names(sig1.4.heatmap.log2.ck) <- paste0(tfType,seq(1,n))
+    print(names(sig1.4.heatmap.log2.ck))
+    
+    tfType <- "V42ERG_IP"
+    cvglists.tr <- lapply(1:length(cvglists.l), function(u,cvglists.l){
+      z <- cvglists.l[[u]][grep(tfType,names(cvglists.l[[u]]))]
+      z
+    },cvglists.l)
+    cvglists.ul.tr <- unlist(cvglists.tr)
+    print(names(cvglists.ul.tr))
+    n <- length(cvglists.ul.tr)
+    
+    sig1.4.heatmap.tr <- featureAlignedSignal2(cvglists.tr[[1]], feature.center[[1]], upstream=dd, downstream=dd)
+    sig1.4.heatmap.log2.tr <- lapply(sig1.4.heatmap.tr, function(.ele) log2(.ele+1))
+    names(sig1.4.heatmap.log2.tr) <- paste0(tfType,seq(1,n))
+    print(names(sig1.4.heatmap.log2.tr))
+    
+    dim(sig1.4.heatmap.log2.tr[[1]])
+    
+    sortBy = "Trt"
+    sig1.4.heatmap.log2.ck.tr.l <- lapply(1:length(sig1.4.heatmap.log2.tr),function(u,sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy){
+      if(sortBy=="Trt"){
+        density.sum <- apply(sig1.4.heatmap.log2.tr[[u]],1,sum)
+        sig1.4.heatmap.log2.tr.sorted<- sig1.4.heatmap.log2.tr[[u]][order(density.sum,decreasing = T),]        
+        sig1.4.heatmap.log2.ck.sorted <- sig1.4.heatmap.log2.ck[[u]][match(rownames(sig1.4.heatmap.log2.tr.sorted),rownames(sig1.4.heatmap.log2.ck[[u]])),]
+        sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
+      }else{
+        density.sum <- apply(sig1.4.heatmap.log2.ck[[u]],1,sum)
+        sig1.4.heatmap.log2.ck.sorted<- sig1.4.heatmap.log2.ck[[u]][order(density.sum,decreasing = T),]        
+        sig1.4.heatmap.log2.tr.sorted <- sig1.4.heatmap.log2.tr[[u]][match(rownames(sig1.4.heatmap.log2.ck.sorted),rownames(sig1.4.heatmap.log2.tr[[u]])),]
+        sig1.4.heatmap.log2.ck.tr <- cbind(sig1.4.heatmap.log2.ck.sorted,sig1.4.heatmap.log2.tr.sorted)
+      }
+      sig1.4.heatmap.log2.ck.tr
+    },sig1.4.heatmap.log2.ck,sig1.4.heatmap.log2.tr,sortBy)
+    
+    sig1.4.heatmap.log2.ck.tr.l
+    
+  }
+  
+  heatmap4UpNoChangeDown <- function(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,selected.genes=NULL,cols=colorpanel(30,"white","white","red")) {
+    
+    class_patterns <- c("VeNR2F2repsFinal")
+    
+    class_pattern <- class_patterns[1]
+    sig1.4.heatmap.log2.ck.tr.Up <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="Trt")
+    
+    lbsUp <- as.character(mcols(data[[grep(class_pattern,names(data))]])$label)
+    
+    #print(names(sig1.4.heatmap.log2.ck.tr.Up))
+    
+    class_pattern <- class_patterns[2]
+    sig1.4.heatmap.log2.ck.tr.Down <- generateMatrix4heatmap(class_pattern,data,dd,input.bw.path,sortBy="CK")
+    
+    lbsDown <- as.character(mcols(data[[grep(class_pattern,names(data))]])$label)
+    #data[[grep(class_pattern,names(data))]]
+    
+    lbs <- c(lbsUp,lbsDown)
+    
+    if(is.null(selected.genes)) {selected.genes <- lbs[grep("yes",lbs)]}
+    
+    cols <- colorpanel(100,"white","lightblue","blue")
+    
+    ht_list <- lapply(1:length(sig1.4.heatmap.log2.ck.tr.Up), function(u,cols){
+      
+      #u <- 1
+      sig1.4.heatmap.log2.ck.tr.1 <- sig1.4.heatmap.log2.ck.tr.Up[[u]]
+      
+      
+      z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
+      
+      print(rownames(z.mat.0))
+      
+      ht <- Heatmap(z.mat.0, name = paste0("z-score","-rep",u),
+                    #col = rev(redblue(30))[-seq(35, 35)],  
+                    #col = rev(redblue(30)),
+                    # col = colorpanel(30,"white","white","red"),
+                    col = cols,
+                    show_row_name = FALSE,
+                    cluster_columns = F,
+                    cluster_rows = F,column_names_gp = gpar(fontsize = 6),column_split = rep(c(paste0("V42ERG_IN",u), paste0("V42ERG_IP",u)),c(100,100)))
+      
+      ht
+      
+    },cols)
+    
+    htList = ht_list[[1]] + ht_list[[2]]
+    
+    gb = grid.grabExpr(draw(htList))
+    g <- plot_grid(gb)
+    save_plot(file.path(output.file.dir,paste0(file_name,"_heatmap.png")),g,base_width = 25,base_height = 40)
+  }
+  
+  library(ComplexHeatmap)
+  library(gplots)
+  library(cowplot)
+  
+  class_patterns <- c("Art_K27acUp","Art_K27acDwn")
+  file_name <- "Art_3_reps"
+  data <- zz
+  
+  #[grep("Art",names(data))
+  selected.genes <- c("yes_chr4_77370192_77371689")
+  # for artery elements, let’s try red for the maximum density, ranging to white for the lowest;
+  cols= colorpanel(100,"white","pink","red")
+  
+  # cols= colorpanel(100,"white","orange","red")
+  
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,cols=cols)
+  
+  # for vein let’s go with blue for max, white for minimum.
+  
+  class_patterns <- c("Vein_K27acUp","Vein_K27acDwn")
+  file_name <- "Vein_3_reps"
+  cols= colorpanel(100,"white","lightblue","blue")
+  
+  heatmap4UpNoChangeDown(class_patterns,file_name,data, dd, input.bw.path, output.file.dir,cols=cols)
+  
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/Results_4_VeNR2F2repsFinal/VennByRegions"
+  
+   peak.index <- c(3,5)
+   name <- c("VeERGrepsFINAL","VeNR2F2repsFinal")
+   getCount4Venn(zz,peak.index,name,output.file.dir)
+   
+   grl <- zz[peak.index]
+   pdf(file.path(output.file.dir,paste0(paste(name,collapse ="_"),".pdf")))
+   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green"),cat.col = c("red", "red"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
+   dev.off()
+   
+   getCount4Venn2(zz,peak.index,name,output.file.dir)
+   
+   # VeERGrepsFINAL.bed
+   # VeNR2F2repsFinal.bed
+   # ArteryAll.bed
+   
+   peak.index <- c(3,5,1)
+   name <- c("VeERGrepsFINAL","VeNR2F2repsFinal","ArteryAll")
+   getCount4Venn(zz,peak.index,name,output.file.dir)
+   
+   grl <- zz[peak.index]
+   pdf(file.path(output.file.dir,paste0(paste(name,collapse ="_"),".pdf")))
+   makeVennDiagram(grl, NameOfPeaks=name,fill = c("blue", "green","red"),cat.col = c("blue", "green","red"),euler.d = TRUE,cex = 1,cat.dist=0.01,totalTest=56967)
+   dev.off() 
+   
+   # VeERGrepsFINAL.bed
+   # VeNR2F2repsFinal.bed
+   # CommonAll.bed				
+   peak.index <- c(3,5,2)
+   name <- c("VeERGrepsFINAL","VeNR2F2repsFinal","CommonAll")
+   getCount4Venn(zz,peak.index,name,output.file.dir)
+   
+   
+   # VeERGrepsFINAL.bed
+   # VeNR2F2repsFinal.bed
+   # VeinAll.bed
+   peak.index <- c(3,5,4)
+   name <- c("VeERGrepsFINAL","VeNR2F2repsFinal","VeinAll")
+   getCount4Venn(zz,peak.index,name,output.file.dir)
+   
+  
+  
+}
+
 
