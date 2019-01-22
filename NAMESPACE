@@ -42,6 +42,7 @@ importFrom(matrixStats, rowMins, rowMaxs)
 importMethodsFrom(AnnotationDbi, mget, get, mappedkeys, 
                   GOID, Term, Definition, Ontology)
 importFrom(Rsamtools, countBam, testPairedEndBam, ScanBamParam, scanBamFlag, scanBamWhat, scanBam, scanBamHeader)
+importFrom(rtracklayer, import)
 exportClass("bindist", "permPool", "annoGR")
 exportMethods("$", "$<-", "info", "annoGR")
 export( 

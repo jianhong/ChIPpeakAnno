@@ -179,13 +179,28 @@ setMethod("toGRanges", "RangedData",
               return(gr)
           })
 
+
+message4GTF <- function(con){
+  message("If you are importing files downloaded from ensembl, 
+          it will be better to import the files into a TxDb object,
+          and then convert to GRanges by toGRanges. Here is the sample code:
+          library(GenomicFeatures)
+          txdb <- makeTxDbFromGFF('", con ,"')
+          anno <- toGRanges(txdb, format='gene')")
+}
+
 setMethod("toGRanges", "connection", 
-          function(data, format=c("BED", "GFF",  
+          function(data, format=c("BED", "GFF", "GTF", 
                                   "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...){
               format <- match.arg(format)
+              if(format %in% c("GFF", "GTF")){
+                message4GTF("path/to/your/GFF")
+                gr <- import(data, format=format)
+                return(gr)
+              }
               colNames <- switchColNames(format, colNames)
               if(is.null(colNames)) 
                   stop("colNames is required for unkown format.")
@@ -238,12 +253,17 @@ setMethod("toGRanges", "EnsDb",
           })
 
 setMethod("toGRanges", "character", 
-          function(data, format=c("BED", "GFF",  
+          function(data, format=c("BED", "GFF", "GTF", 
                                   "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...){
               format <- match.arg(format)
+              if(format %in% c("GFF", "GTF")){
+                message4GTF(data)
+                gr <- import(data, format=format)
+                return(gr)
+              }
               if(format %in% c("narrowPeak", "broadPeak")){
                   data <- read.table(data, header=FALSE, 
                                      fill=TRUE, stringsAsFactors=FALSE)
@@ -271,6 +291,7 @@ setMethod("toGRanges", "character",
                                Column 2 and 3 must be integer. 
                                Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
                       if(!is.na(classes[5])) classes[5] <- "numeric"
+                      classes[1] <- "character"
                   }else{
                       if(format=="GFF"){##check class of column 4 and 5
                           if(classes[4]!="integer"||classes[5]!="integer")
@@ -280,6 +301,7 @@ setMethod("toGRanges", "character",
                                    seqname, source, feature, start, end, score, strand, frame and group.
                                    Column 4 and 5 must be integer.
                                    Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
+                        classes[1] <- "character"
                       }else{
                           if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                               ## do nothing

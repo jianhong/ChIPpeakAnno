@@ -15,12 +15,12 @@
   dataset such as RangedDate or MACS output file to GRanges
 }
 \usage{
-    \S4method{toGRanges}{character}(data, format=c("BED", "GFF",  
+    \S4method{toGRanges}{character}(data, format=c("BED", "GFF", "GTF", 
                                   "MACS", "MACS2", "MACS2.broad", 
                                   "narrowPeak", "broadPeak",
                                   "others"), 
                    header=FALSE, comment.char="#", colNames=NULL, ...)
-    \S4method{toGRanges}{connection}(data, format=c("BED", "GFF",  
+    \S4method{toGRanges}{connection}(data, format=c("BED", "GFF", "GTF",
                                   "MACS", "MACS2", "MACS2.broad",
                                   "narrowPeak", "broadPeak",
                                   "others"), 
