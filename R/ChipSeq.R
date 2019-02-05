@@ -11913,4 +11913,203 @@ overLapWithOtherFeatures3 <- function(input.bed.dir,input.bw.path,output.file.di
   
 }
 
+# MNaseSeq data analysis for Magnolia
+sampleInfoParser4Magnolia <- function(input.sample.information.file,output.sample.parser) {
+
+  MNase.seqOut.dir <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut"
+  
+  file.name.4 <- list.files(MNase.seqOut.dir,pattern="*xls$",all.files = TRUE,full.names = TRUE,recursive = FALSE,include.dirs = TRUE)
+  
+  file.name.5 <- file.name.4[-c(1,2)]
+  
+  mnase.data.L <- lapply(1:length(file.name.5), function(u,file.name.5){
+    mnase.data <- read.table(file.name.5[[u]],header = T)
+    mnase.data
+  },file.name.5)
+  
+  names(mnase.data.L) <- tools::file_path_sans_ext(basename(file.name.5))
+  mnase.data.L.1 <- mnase.data.L[c(3,6,9)]
+  mnase.data.L.2 <- do.call(cbind,mnase.data.L.1)
+  mnase.data.L.3 <- mnase.data.L.2[,c(1,2,4,6)]
+  
+  plot(mnase.data.L.3$Naked_TSS.Naked.hg38_2.txt.tss~mnase.data.L.3$Naked_TSS.pos,type = "l",col = "#CCFF00FF", xlab = "Relative distance", ylab = "Average signal value", ylim = c(1, 4.8),main = "TSS of hg38 genes")
+  lines(mnase.data.L.3$preEMT_TSS.preEMT.hg38_2.txt.tss~mnase.data.L.3$Naked_TSS.pos, type = "l", col = "blue")
+  lines(mnase.data.L.3$postEMT_TSS.postEMT.hg38_2.txt.tss~mnase.data.L.3$Naked_TSS.pos, type = "l", col = "green")
+  legend("topright", legend = c("naked","preEMT","postEMT"), col = c("#CCFF00FF","blue","green"), lwd = 1,cex = 0.5)
+  
+  
+  
+  
+  input.mnase.file <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2rmDu_sorted_m_brb_3_TSS.xls"
+  input.mnase.file <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/preEMT_TSS.xls"
+  mnase.data <- read.table(input.mnase.file,header = T)
+  
+  plot(mnase.data$naked.geneGroup1.xls.tss~mnase.data$pos,type = "l",col = "red", xlab = "Relative distance", ylab = "Average signal value", ylim = c(1, 4.8),main = "TSS for preEMT")
+  lines(mnase.data$preEMT.geneGroup1.xls.tss~mnase.data$pos, type = "l", col = "blue")
+  lines(mnase.data$preEMTSbNaked.geneGroup1.xls.tss~mnase.data$pos, type = "l", col = "green")
+  legend("topright", legend = c("naked","rawPreEMT","correctedPreEMT"), col = c("red","blue","green"), lwd = 1,cex = 0.5)
+ 
+  input.mnase.file.1 <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/RePrEMTpostEMT/pooled"
+  
+ 
+  
+  mnase.data.1 <- read.table(file.name.4[[2]],header = T)
+
+  mnase.data.post <- read.table(file.name.4[[4]],header = T)
+  
+  boundaries <- seq(min(mnase.data.1$fuzziness_score),max(mnase.data.1$fuzziness_score),by=0.2494)
+  
+  hist(mnase.data.1$fuzziness_score)
+  
+  d <- density(mnase.data.1$fuzziness_score)
+  plot(d, type="l")
+  
+  plot.multi.dens <- function(s)
+  {
+    junk.x = NULL
+    junk.y = NULL
+    for(i in 1:length(s)) {
+      junk.x = c(junk.x, density(s[[i]])$x)
+      junk.y = c(junk.y, density(s[[i]])$y)
+    }
+    xr <- range(junk.x)
+    yr <- range(junk.y)
+    plot(density(s[[1]]), xlim = xr, ylim = yr, main = "")
+    for(i in 1:length(s)) {
+      lines(density(s[[i]]), xlim = xr, ylim = yr, col = i)
+    }
+  }
+  
+  plot.multi.dens(list(mnase.data.1$fuzziness_score,mnase.data.post$fuzziness_score))
+  
+  library(sm)
+  sm.density.compare(data$rating, data$cond)
+  # Add a legend (the color numbers start from 2 and go up)
+  legend("topright", levels(data$cond), fill=2+(0:nlevels(data$cond)))
+  
+  plot(names(table(mnase.data.1$fuzziness_score)),as.numeric(table(mnase.data.1$fuzziness_score)), type="l", lwd=2, col="red",
+       main="The fuzziness score distribution",
+       xlab = "Fuzziness score",
+       ylab = "Frequency", yaxt="n",
+       xlim = c(30.63495, 74.14716), ylim = c(1, 1310422))
+  
+  ylab=c(seq(from=1, to=1310422, by=200000))
+  y=c(seq(from=1, to=1310422,by=200000))
+  axis(2,at=y,labels=ylab, las=1)
+  
+  lines(names(table(mnase.data.post$fuzziness_score)),as.numeric(table(mnase.data.post$fuzziness_score)),col="blue")
+  legend("topright", legend = c("preEMT","postEMT"), col = c("red","blue"), lwd = 1,cex = 0.5)
+  
+  data.hg38 <- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/hg38.txt",header = F, sep="\t")
+  
+  mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+  
+  G_list <- getBM(filters= "ensembl_transcript_id_version", attributes= c("ensembl_gene_id","ensembl_transcript_id_version","hgnc_symbol"),values=data.hg38$V1,mart= mart)
+  
+  colnames(data.hg38)[1] <- "ensembl_transcript_id_version"
+  
+  data.hg38.1 <- merge(data.hg38,G_list,by="ensembl_transcript_id_version",sort = FALSE)
+  
+  data.hg38.2 <- data.hg38.1[,c(13,2:11)]
+  
+  data.hg38.3 <- data.hg38.2[-which(data.hg38.2$hgnc_symbol==""),]
+  
+  write.table(data.hg38.3,file = "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/hg38_2.txt",append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
+  
+  
+  sc.file <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/Example/Sc.txt"
+  sc.data <- readLines(sc.file)
+  
+  sc.data.1 <- strsplit(sc.data, "\t")
+  
+  sc.data.2 <- lapply(1:length(sc.data.1),function(u,sc.data.1){
+    
+   x <- data.frame(
+       name=sc.data.1[[u]][2],       
+       chrom=sc.data.1[[u]][3],        
+       strand=sc.data.1[[u]][4],        
+       txStart=sc.data.1[[u]][5],      
+       txEnd=sc.data.1[[u]][6],
+       cdsStart=sc.data.1[[u]][7],
+       cdsEnd=sc.data.1[[u]][8],
+       exonCount=sc.data.1[[u]][9],
+       exonStarts=sc.data.1[[u]][10],
+       exonEnds=sc.data.1[[u]][11]
+     )
+    x
+  },sc.data.1)
+  
+  sc.data.3 <- do.call(rbind,sc.data.2)
+  
+  sc.data.4 <- sc.data.3[-1,]
+  sc.data.5 <- sc.data.4[-which(sc.data.4$name==""),]
+  
+  write.table(sc.data.4,file = "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/Example/ScGene.txt",append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = F)
+  
+  
+  s2.only <- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2rmDu_sorted_m/pooled/project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.smooth.peaks.xls",header=T)
+  
+  
+#  project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.smooth.regions.xls
+#  project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.smooth.positions.xls	
+  
+  
+  s2.sb.s1 <- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2_1221MS-1_S1/pooled/project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.bgsub.smooth.peaks.xls",header=T)
+  
+  
+ s2.sb.s1.r <- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2_1221MS-1_S1/pooled/project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.bgsub.smooth.regions.xls",header=T)
+  
+  
+ s2.sb.s1.po <- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2_1221MS-1_S1/pooled/project_umw_andreas_bergmann_Aimin_Magnolia_Out_Bed_1221MS-2_S2rmDu_m.bgsub.smooth.positions.xls",header = T)
+  
+
+  getFuzziness <- function(s2.sb.s1.po,trt){
+  S2Corr <- data.frame(trt= rep(trt,length(s2.sb.s1.po$fuzziness_score)),fuzziness_score=as.numeric(s2.sb.s1.po$fuzziness_score))
+  S2Corr 
+  }
+  
+  s1.only <- getFuzziness(s1.only,trt="s1only")
+  
+  s2.c <- getFuzziness(s2.sb.s1.po,trt="s2corrected")
+  s2.only <- getFuzziness(s2.only.po,trt="s2only")
+  
+  s3.c <- getFuzziness(s3.sb.s1.po,trt="s3corrected")
+  s3.only <- getFuzziness(s3.only.po,trt="s3only")
+  
+  Fuzziness.score <- rbind(s1.only,s2.c,s2.only,s3.c,s3.only)
+  
+  boxplot(Fuzziness.score$fuzziness_score~Fuzziness.score$trt,main="The distribution of the DANPOS fuzziness scores")
+  
+  
+}
+
+compareMacs2Rseg <- function(){
+
+input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
+file.name.4 <- list.files(input.file.dir,pattern="*.bed$",all.files = TRUE,full.names = TRUE,recursive = TRUE,include.dirs = TRUE)
+
+file.name.bedgraph <- file.name.4[c(1,7)]
+
+bed.in<-lapply(file.name.bedgraph,function(u){
+  
+  peaks=read.table(u)
+  colnames(peaks)[1:3]= c("chr","start","end")
+  peaks=toGRanges(peaks)
+  peaks
+})
+
+names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
+bed.in
+
+peak.index <- c(1,2)
+name <- c("macs2","rseg")
+
+output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3/CompareMACS2withRseg"
+
+getCount4Venn(bed.in,peak.index,name,output.file.dir)
+
+
+}
+
 
