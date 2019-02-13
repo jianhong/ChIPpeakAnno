@@ -7477,7 +7477,8 @@ orderPeakAndOutPutHuman <- function(peakAll,output.file.dir,output.file.name,out
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
-  chrOrder<-c(paste("chr",1:22,sep=""),"chrX","chrY","chrM")
+  chrOrder<-c(paste("chr",1:22,sep=""),"chrX","chrY","chrM","chr14_GL000009v2_random",
+              "chr4_GL000008v2_random","chrUn_KI270742v1")
   
   peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
   
@@ -7652,6 +7653,8 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
       }
       
       writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+      Draw4GO(over_bp,0.05,10,output.file.dir,"GO_BP_bar.png")
+      
       writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
       writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
     }
@@ -7659,6 +7662,12 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     getGoAndPath(overlaps.anno,output.file.dir,x_name)
     
   }else if(genome=="Hs"){
+    
+    #grl
+    u <- 1
+    x=grl[[u]]
+    x_name=names(grl)[u]
+    
     
     library(EnsDb.Hsapiens.v75)
     #annoData<-toGRanges(EnsDb.Hsapiens.v75, feature="gene")
@@ -7823,22 +7832,29 @@ writeGrlInUnique2Bed <- function(grl,output.file.dir) {
   
 }
 
-outGrl <- function(grl,output.file.dir) {
+outGrl <- function(grl,speci="Hs",output.file.dir) {
 
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
   #grl <- peaks.in.overlap.ciLAD.F121.9
   #u <- 3
   
-  null <- lapply(1:length(grl), function(u,grl,output.file.dir){
+  null <- lapply(1:length(grl), function(u,grl,speci,output.file.dir){
     x <- names(grl)[u]
     x <- gsub("///","_ol_",x)
     y <- as.data.frame(grl[[u]])[,1:3]
     output.file.name  <- x
    # output.file.dir <- "~/"
-    orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
     
-  },grl,output.file.dir)
+    if(speci=="Mm"){
+      orderPeakAndOutPut(y,output.file.dir,output.file.name,outHeader= FALSE)
+    }
+    
+    if(speci=="Hs"){
+      orderPeakAndOutPutHuman(y,output.file.dir,output.file.name,outHeader= FALSE)
+    }  
+      
+  },grl,speci,output.file.dir)
   
 }
 
@@ -9500,7 +9516,7 @@ getBedFiles2 <- function(input.file.dir) {
     peaks
   })
   
-  names(bed.in) <- gsub(" ","_",tools::file_path_sans_ext(basename(file.name.bedgraph)))
+  names(bed.in) <- gsub(" ","_",file.name.bedgraph)
   names(bed.in) <- gsub("_mm10_copy","",names(bed.in))
   bed.in
   
@@ -9835,6 +9851,7 @@ getNonoverLappingBed <- function(output.file.dir) {
 ## 11_16_2018
 # input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BedFiles_11_16_2018"
 # Aizhan.bed.in.1 <- getBedFiles(input.file.dir)
+
 # ol.4.Aizhan.bed.in.1 <- findOverlapsOfPeaks(Aizhan.bed.in.1[c(1,2)],connectedPeaks = "keepAll")
 # Aizhan.peaks.in.overlap.1 <- getPeaksInOverlap(ol.4.Aizhan.bed.in.1,1)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_3"
@@ -9856,7 +9873,9 @@ getNonoverLappingBed <- function(output.file.dir) {
 # F121.only <- GenomicRanges::setdiff(Aizhan.bed.in.1[[1]],Aizhan.bed.in.1[[2]])
 # F121.and.XL <- GenomicRanges::intersect(Aizhan.bed.in.1[[1]],Aizhan.bed.in.1[[2]])
 # XL.only <- GenomicRanges::setdiff(Aizhan.bed.in.1[[2]],Aizhan.bed.in.1[[1]])
-# cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL)
+
+# cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL,F121-9_NAD=Aizhan.bed.in.1[[1]],XL_NAD=Aizhan.bed.in.1[[2]])
+
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4"
 # outGrl(cm.unique.only.1,output.file.dir)
 
@@ -9870,7 +9889,6 @@ getNonoverLappingBed <- function(output.file.dir) {
 # gomat <- t(sapply(xx, foo, simplify=TRUE))
 # gomat <- as.data.frame(gomat)
 # colnames(gomat) <- c("ID","Term","Definition","Ontology")
-
 
 batchDraw4GO <- function(output.file.dir,gomat) {
   
@@ -9948,6 +9966,8 @@ getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
+  #YYY <- YYY1
+  
   YYY.set.name <- unique(as.character(YYY$SetName))
   
   index <- which(levels(YYY$SetName)==YYY.set.name[1])
@@ -9958,6 +9978,9 @@ getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
   
   index <- which(levels(YYY$SetName)==YYY.set.name[3])
   levels(YYY$SetName)[index] <- "F121.and.XL"
+  
+  index <- which(levels(YYY$SetName)==YYY.set.name[4])
+  levels(YYY$SetName)[index] <- "XL_NAD"
   
   fpkm.value.ref <- data.frame(SetName=rep("wholeGenome",dim(fpkm.value)[1]),GeneName=fpkm.value$gene.name,FPKM=fpkm.value$fpkm)
   
@@ -9977,9 +10000,41 @@ getBoxPlot4FPKMOfSubsetPeaks1 <- function(YYY,fpkm.value,output.file.dir){
 }
 
 getBoxplot4DiffRnaSeq <- function() {
+  
   YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.WT)
+  
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot"
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot_2_6_2019"
+  
+  YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,fpkm.value)
+  
+  gene.in.XL.only <- YYY1[which(YYY1$SetName=="XL.only"),]
+  
+  write.table(gene.in.XL.only,file = file.path(output.file.dir,"gene_in_XL_only.txt"),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY1,fpkm.value,output.file.dir)
+  
+  
   getBoxPlot4FPKMOfSubsetPeaks1(YYY1,rna.seq.data.WT,output.file.dir)
+  
+  GSE90894.rnaSeq.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/RedoBoxplot_2_11_2019/GSE90894_RPKM_mRNAseq_table.xlsx"
+  
+  GSE90894.rnaSeq.data <- as.data.frame(read_xlsx(GSE90894.rnaSeq.file))
+  
+  GSE90894.rnaSeq.data.1 <- GSE90894.rnaSeq.data[-c(1:4),]
+  
+  colnames(GSE90894.rnaSeq.data.1) <- as.character(GSE90894.rnaSeq.data[4,])
+  
+  GSE90894.rnaSeq.data.2 <- GSE90894.rnaSeq.data.1[,1:2]
+  
+  colnames(GSE90894.rnaSeq.data.2) <- colnames(rna.seq.data.WT)
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot_using_GSE90894_2_13_2019"
+  YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,GSE90894.rnaSeq.data.2)
+  getBoxPlot4FPKMOfSubsetPeaks1(YYY1,GSE90894.rnaSeq.data.2,output.file.dir)
+  
   
   tT.rna.seq.data <- read_xlsx(rna.seq.files[4])
   tT.fpkm <- exp(tT.rna.seq.data$logCPM)*(10^3/tT.rna.seq.data$Length)
@@ -10089,6 +10144,9 @@ getFPKM4F121 <- function() {
   YYY.Aizhan <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.from.Aizhan)
   
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot"
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot_2_5_2019"
+  
   getBoxPlot4FPKMOfSubsetPeaks1(YYY.Aizhan,rna.seq.data.from.Aizhan,output.file.dir)
   
   input.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
@@ -11191,52 +11249,89 @@ fromGr2Anno <- function() {
       
     }else if(genome=="Hs"){
       
-      #library(EnsDb.Hsapiens.v75)
+      # library(EnsDb.Hsapiens.v75)
+      
+      library(EnsDb.Hsapiens.v86)
+      
       #annoData<-toGRanges(EnsDb.Hsapiens.v75, feature="gene")
       
-      dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
+      #dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
       
-      #print(seqinfo(dd.hs))
-      #print(seqlevels(dd.hs))
-      
-      
-      #dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
+      dd.GRCm39.mm10<-toGRanges(EnsDb.Hsapiens.v86)
       overlaps.trimmed<-trim(x,use.names=TRUE)
-      overlaps.anno<-annoPeaks(overlaps.trimmed,dd.hs)
+      overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+      
+      output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38"
+      
       write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
       
+      getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+        over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Hs.eg.db",
+                              maxP=0.5, minGOterm=10,
+                              multiAdjMethod="BH", condense=TRUE)
+        path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Hs.eg.db", "reactome.db", maxP=.05)
+        write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+        
+        convert2geneSymbol <- function(over1) {
+          geneSymbol <- lapply(over1$EntrezID, function(u){
+            x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Hs.eg') 
+            x
+          })
+          
+          list_to_df <- function(list_for_df)
+          {
+            list_for_df <- as.list(list_for_df)
+            nm <- names(list_for_df)
+            if (is.null(nm)) 
+              nm <- seq_along(list_for_df)
+            df <- data.frame(name = nm, stringsAsFactors = FALSE)
+            df$value <- unname(list_for_df)
+            df
+          }
+          
+          geneSymbol3 <- list_to_df(geneSymbol)
+          over2 <- cbind(over1,geneSymbol3)
+          over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+          colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+          over3
+        }
+        
+        over$bp <- convert2geneSymbol(over$bp)
+        over$mf <- convert2geneSymbol(over$mf)
+        over$cc <- convert2geneSymbol(over$cc)
+        
+        over_bp <- as_tibble(over$bp)
+        over_mf <- as_tibble(over$mf)
+        over_cc <- as_tibble(over$cc)
+        
+        over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+        over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+        over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+        
+        writeTibble <- function(tibble.input, output.file.name = tempfile())
+        {
+          if (!dir.exists(dirname(output.file.name)))
+          {
+            dir.create(dirname(output.file.name), recursive = TRUE)
+          }
+          flatten_list = function(x)
+          {
+            if (typeof(x) != "list")
+            {
+              return(x)
+            }
+            sapply(x, function(y) paste(y, collapse = " ; "))
+          }
+          tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+        }
+        
+        writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+        writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+        writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+      }
       
-      #print(seqlevels(dd.hs)[,1])
-      
-      #print(seqlevels(re.out[[1]])[,1])
-      
-      # seqlevels(dd.hs,force=TRUE) <- c("chr1","chr10","chr11","chr12","chr13",
-      #                                           "chr14","chr15","chr16","chr17","chr18","chr19","chr2",
-      #                                           "chr3","chr4","chr5","chr6","chr7","chr8","chr9","chrX","chrY")
-      
-      #temp4=
-      
-      # re.out.L<-lapply(1:length(re.out),function(u,re.out,dd.hs){
-      #   
-      #   x=re.out[[u]]
-      #   x_name=names(re.out)[u]
-      #   
-      #   seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
-      #   #print(seqinfo(re.out.trimmed))
-      #   #print(seqlevels(re.out.trimmed))
-      #   seqinfo(x)<-seqinfo(dd.hs)
-      #   #GRCm38/mm10
-      #   #dd<-toGRanges(EnsDb.Mmusculus.v79)
-      #   #seqinfo(dd)
-      #   #library(ensembldb)
-      #   #library(GenomeInfoDb)
-      #   seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
-      #   re.out.trimmed<-trim(x, use.names=TRUE)
-      #   overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
-      #   
-      #   write.table(overlaps.anno,file=paste0(temp3,"/",x_name,"_annotation.txt"),row.names = FALSE,quote=FALSE,sep="\t")
-      # },re.out,dd.hs)
-      
+      getGoAndPath(overlaps.anno,output.file.dir,x_name)
+   
     }
     
   },re.out,output.file.dir,genome)
@@ -12109,7 +12204,381 @@ output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3/CompareMACS2wi
 
 getCount4Venn(bed.in,peak.index,name,output.file.dir)
 
-
 }
 
+compareMouseNadWithHuman <- function()
+{
+  input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman"
+    
+  lift.over.bed <- getBedFiles2(input.file.dir)
+  
+  peak.index <- c(1,5)
+  name <- c("DillingerHg38","XL_MEF_hg38")
 
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareWithDillingerHg38"
+  getCount4Venn(lift.over.bed,peak.index,name,output.file.dir)
+  
+  peaks1 <- lift.over.bed[[1]]
+  peaks2 <- lift.over.bed[[5]]
+  
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  grl <- list(DillingerHg38=peaks1.only,DillingerHg38AndXL_MEF_hg38=peaks1.and.peaks2,XL_MEF_hg38=peaks2.only)
+  
+  outGrl(grl,speci="Hs",output.file.dir)
+  
+  peak.index <- c(4,5)
+  name <- c("LMNB1_Hg38","XL_MEF_hg38")
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareWithLMNB1"
+  getCount4Venn(lift.over.bed,peak.index,name,output.file.dir)
+  
+  peaks1 <- lift.over.bed[[4]]
+  peaks2 <- lift.over.bed[[5]]
+  
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  grl <- list(LMNB1Hg38=peaks1.only,LMNB1Hg38AndXL_MEF_hg38=peaks1.and.peaks2,XL_MEF_hg38_part_with_LMNB1=peaks2.only)
+  
+  outGrl(grl,speci="Hs",output.file.dir)
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38"
+  
+  peak.index <- c(1,4)
+  name <- c("DillingerHg38","LMNB1_Hg38")
+  
+  getCount4Venn(lift.over.bed,peak.index,name,output.file.dir)
+  
+  peaks1 <- lift.over.bed[[1]]
+  peaks2 <- lift.over.bed[[4]]
+  
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  grl <- list(DillingerHg38=peaks1.only,DillingerHg38AndLMNB1_Hg38=peaks1.and.peaks2,LMNB1_Hg38=peaks2.only)
+  
+  outGrl(grl,speci="Hs",output.file.dir)
+  
+  lift.over.bed <- getBedFiles2(input.file.dir)
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38"
+  
+  peak.index <- c(2,4)
+  name <- c("DillingerHg38AndLMNB1_Hg38","MEF_TypeI_hg38")
+  getCount4Venn(lift.over.bed,peak.index,name,output.file.dir)
+
+  peak.index <- c(1,5)
+  name <- c("DillingerHg38","MEF_TypeII_hg38")
+  getCount4Venn(lift.over.bed,peak.index,name,output.file.dir)
+  
+}
+
+MNaseSeq <- function(){
+
+  s2.3.regions<- read.table("~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/1221MS-2_S2rmDu_sorted_filtered_tgfb1_20k_MNaseQC/summary/1221MS-2_S2rmDu_sorted_filtered_tgfb1_20k_MNaseQC_CustomRegion_profile.txt",header=F)
+  
+  custom_profile <- read.table(paste(NAME, '_CustomRegion_profile.txt', sep=""))
+  
+  CUSTOM <- custom_profile[ order( apply(custom_profile[,7:ncol(custom_profile)],1,mean) ) , 7:ncol(custom_profile)]
+  datarange <- floor((ncol(custom_profile) - 6)/2)
+  par(mar=c(4,4,4,2))
+  plot(apply(CUSTOM,2,mean),type="l",col="blue",axes=F, xlim=c(0, datarange*2),xlab="Relative distance to center(bp)",ylab="Average signal",main="Nucleosome profile on custom regions")
+  axis(side=1,at=c(0,datarange, datarange*2),labels=c(paste( "-",datarange*10,sep=""),"center", datarange*10 ))
+  axis(side=2)
+  box()
+  bi_siteheat(CUSTOM,c("white","blue"),0.99)
+  
+}
+
+gsa.read.gmt <- function(filename)
+{
+  a <- scan(filename, what = list("", ""), sep = "\t", quote = NULL, fill = TRUE, 
+            flush = TRUE, multi.line = FALSE)
+  geneset.names <- a[1][[1]]
+  geneset.descriptions <- a[2][[1]]
+  dd <- scan(filename, what = "", sep = "\t", quote = NULL)
+  nn <- length(geneset.names)
+  n <- length(dd)
+  ox <- rep(NA, nn)
+  ii <- 1
+  for (i in 1:nn)
+  {
+    while ((dd[ii] != geneset.names[i]) | (dd[ii + 1] != geneset.descriptions[i]))
+    {
+      ii <- ii + 1
+    }
+    ox[i] <- ii
+    ii <- ii + 1
+  }
+  genesets <- vector("list", nn)
+  for (i in 1:(nn - 1))
+  {
+    i1 <- ox[i] + 2
+    i2 <- ox[i + 1] - 1
+    geneset.descriptions[i] <- dd[ox[i] + 1]
+    genesets[[i]] <- dd[i1:i2]
+  }
+  geneset.descriptions[nn] <- dd[ox[nn] + 1]
+  genesets[[nn]] <- dd[(ox[nn] + 2):n]
+  out <- list(genesets = genesets, geneset.names = geneset.names, geneset.descriptions = geneset.descriptions)
+  class(out) <- "GSA.genesets"
+  return(out)
+}
+
+gene2cat2 <- function(gmt.input.file)
+{
+  
+  re <- gsa.read.gmt(gmt.input.file)
+  gene.name <- unique(do.call(c, re$genesets))
+  gene.2.cat <- sapply(gene.name, gene2cat, re)
+  names(gene.2.cat) <- gene.name
+  gene.2.cat
+  
+}
+
+gmtGene2Cat <- function(pathway.file, gene.anno.file = NULL, genomeID = c("mm10", 
+                                                                          "hg19", "hg38"))
+{
+  gmt_input_file <- pathway.file
+  gene.2.cat.gmt <- gene2cat2(gmt_input_file)
+  names.gene.gmt <- as.data.frame(names(gene.2.cat.gmt))
+  colnames(names.gene.gmt) <- "gene_id"
+  if (!is.null(gene.anno.file))
+  {
+    gene_anno_file <- gene.anno.file
+    gene.id.conversion <- read.csv(gene_anno_file)
+  } else
+  {
+    gene.id.conversion <- match.arg(genomeID)
+  }
+  xxx <- match2Genome(gene.id.conversion)
+  names.gene.gmt.2 <- match(names.gene.gmt$gene_id, xxx[, 1])
+  gene.id.conversion.2 <- xxx[names.gene.gmt.2, ]
+  gene.2.cat.gmt.2 <- gene.2.cat.gmt
+  names(gene.2.cat.gmt.2) <- gene.id.conversion.2[, 2]
+  gene.2.cat.gmt.2
+}
+
+overLapWithHg38Tss <- function(input.bw.path,output.file.dir,dd) {
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  data(TSS.human.GRCh38)
+  
+  FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd")
+  
+  FeatureLocForDistance = "TSS"
+  
+  TSS.ordered <- TSS.human.GRCh38
+  
+  featureGR <- TSS.ordered
+  end(featureGR) <- 
+    start(featureGR) <- 
+    switch(FeatureLocForDistance,
+           TSS=ifelse(strand(featureGR)=="-", 
+                      end(featureGR), 
+                      start(featureGR)), 
+           geneEnd=ifelse(strand(featureGR)=="-", 
+                          start(featureGR), 
+                          end(featureGR)),
+           middle=round(rowMeans(cbind(start(featureGR), 
+                                       end(featureGR)))),
+           start=start(featureGR),
+           end=end(featureGR) 
+    )
+  
+  dd = 5000
+  
+  r.start <- start(featureGR)-dd
+  r.end <-  start(featureGR)+dd
+  
+  featureGR.1 <- featureGR
+  
+  start(featureGR.1) <- r.start
+  end(featureGR.1) <- r.end
+  
+  zz.temp <- as.data.frame(featureGR.1)
+  
+ #zz.temp <- as.data.frame(TSS.human.GRCh38)
+  
+  chrOrder<-c(1:22,"X","Y")
+  
+  zz.temp$seqnames <- factor(zz.temp$seqnames, levels=chrOrder)
+  zz.temp.1 <- zz.temp[order(zz.temp$seqnames,zz.temp$start),]
+  zz.temp.2 <- zz.temp.1[-which(is.na(zz.temp.1$seqnames)),]
+  
+  z <- data.frame(paste("chr",zz.temp.2[,1],sep=""),zz.temp.2[,c(2:3,5)],row.names(zz.temp.2))
+  colnames(z)=c("seqnames","start","end","strand","label")
+  z <- GRanges(z)
+  
+  z.L <- list(Hg38Tss=z)
+  
+    class_pattern <- "Hg38Tss"
+    data <- z.L
+    
+    tss <- names(data)[grep(class_pattern,names(data),ignore.case = T)]
+    print(tss)
+    
+    tss.bed <- data[which(names(data) %in% tss)]
+  
+    # dd <- 5000
+    #   
+    #   u <- 1
+    #   features <- tss.bed[[u]]
+    #   
+    #   wid <- width(features)
+    #   
+    #   feature.center <- features
+    #   feature.recentered <- feature.center
+    #   
+    #   start(feature.center) <- start(features) + floor(wid/2)
+    #   
+    #   width(feature.center) <- 1
+    #   
+    #   start(feature.recentered) <- start(feature.center) - dd
+    #   end(feature.recentered) <- end(feature.center) + dd
+      
+      feature.recentered <- tss.bed[[1]] 
+      
+    input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Magnolia/HSePeaksBigWig"
+      
+      files <- dir(input.bw.path, "bw")
+      if(.Platform$OS.type != "windows"){
+        cvglists <- sapply(file.path(input.bw.path,files), import, 
+                           format="BigWig", 
+                           which=feature.recentered, 
+                           as="RleList")
+      }else{## rtracklayer can not import bigWig files on Windows
+        load(file.path(input.bw.path, "cvglist.rds"))
+      }
+      
+    names(cvglists) <- gsub(".bw", "", files)
+    
+    feature.center <- reCenterPeaks(tss.bed[[1]], width=1)
+    
+    sig <- featureAlignedSignal(cvglists, feature.center, 
+                                upstream=5000, downstream=5000)
+    names(sig) <- gsub("1218HS_","",names(sig))
+    
+    #keep <- rowSums(sig[[1]]) > 0
+    #sig <- sig[[1]][keep, ]
+    #feature.center <- feature.center[keep]
+    
+    heatmap <- ChIPpeakAnno::featureAlignedHeatmap(sig, feature.center, 
+                                      upstream=5000, downstream=5000)
+    
+    featureAlignedDistribution(sig, feature.center, 
+                               upstream=5000, downstream=5000,
+                               type="l")
+    
+    sig.normalized <- lapply(sig, function(u){
+      y <- t(scale(t(u), center=TRUE, scale=TRUE))
+      y
+    })
+  
+    heatmap <- ChIPpeakAnno::featureAlignedHeatmap(sig.normalized, feature.center, 
+                                                   upstream=5000, downstream=5000)
+    
+    
+    #keep <- rowSums(sig[[2]]) > 0
+    #sig <- sapply(sig, function(.ele) .ele[keep, ], simplify = FALSE)
+    #feature.center <- feature.center[keep]
+    
+    # heatmap <- featureAlignedHeatmap(sig, feature.center, 
+    #                                  upstream=5000, downstream=5000,
+    #                                  lower.extreme=c(-400.8430,-612.4750,-456.1310,-690.1795,
+    #                                                  -475.8967,-582.0910),
+    #                                  upper.extreme=c(860.7876,777.8088,596.1618,
+    #                                                  291.7805,253.2713,238.3586))
+    # 
+    library(gplots)
+    cols <- colorpanel(100,"white","lightblue","blue")
+    heatmap <- featureAlignedHeatmap(sig.normalized, feature.center, 
+                                     upstream=5000, color=cols,downstream=5000)
+
+    featureAlignedDistribution(sig.normalized, feature.center, 
+                               upstream=5000, downstream=5000,
+                               type="l")
+    
+    input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Magnolia/HSePeaks"
+    
+    files <- dir(input.bw.path, "bw")
+    
+    files.1 <- files[c(1,3,4,6,8,10,12,13,14,16)]
+    
+    files.2 <- files.1[c(1,3,8,9)]  
+
+    TssPlot <- function(.Platform, input.bw.path, files.2, feature.center, feature.recentered) {
+      if(.Platform$OS.type != "windows"){
+        cvglists <- sapply(file.path(input.bw.path,files.2), import, 
+                           format="BigWig", 
+                           which=feature.recentered, 
+                           as="RleList")
+      }else{## rtracklayer can not import bigWig files on Windows
+        load(file.path(input.bw.path, "cvglist.rds"))
+      }
+        
+      names(cvglists) <- gsub(".bw", "", files.2)
+      
+      sig <- featureAlignedSignal(cvglists, feature.center, 
+                                  upstream=5000, downstream=5000)
+      
+      names(sig) <- gsub("1218HS_","",names(sig))
+      
+      featureAlignedDistribution(sig, feature.center, 
+                                 upstream=5000, downstream=5000,
+                                 type="l")
+      
+      heatmap <- ChIPpeakAnno::featureAlignedHeatmap(sig, feature.center, 
+                                                     upstream=5000, downstream=5000)
+    }
+    
+    TssPlot(.Platform, input.bw.path, files.2, feature.center, feature.recentered)
+    
+    files.1 <- files[c(1,3,4,6,8,10,12,13,14,16)]
+    
+    files.3 <- files.1[c(2,4,5,6,7,10)]  
+    
+    TssPlot(.Platform, input.bw.path, files.3, feature.center, feature.recentered)
+    
+    files.4 <- files.1[c(6)]
+    TssPlot(.Platform, input.bw.path, files.4, feature.center, feature.recentered)
+    
+    files.4 <- files.1[c(6)]
+    TssPlot(.Platform, input.bw.path, files.4, feature.center, feature.recentered)
+    
+    files.4 <- files.1[c(1)]
+    TssPlot(.Platform, input.bw.path, files.4, feature.center, feature.recentered)
+    
+    
+    
+    sig.normalized <- lapply(sig, function(u){
+      y <- t(scale(t(u), center=TRUE, scale=TRUE))
+      y
+    })
+      
+    cols <- colorpanel(100,"white","lightblue","blue")
+    heatmap <- featureAlignedHeatmap(sig.normalized, feature.center, 
+                                     upstream=5000, color=cols,downstream=5000)
+ 
+    featureAlignedDistribution(sig.normalized, feature.center, 
+                               upstream=5000, downstream=5000,
+                               type="l")
+    
+    featureAlignedDistribution(sig, feature.center, 
+                               upstream=5000, downstream=5000,
+                               type="l")
+    
+    cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
+                                        sample.int(300, 100))), 
+                     B=RleList(chr1=Rle(sample.int(5000, 100), 
+                                        sample.int(300, 100))))
+    feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+    featureAlignedDistribution(cvglists, feature.gr, zeroAt=50, type="l")
+    
+}
