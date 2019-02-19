@@ -7562,7 +7562,6 @@ getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
 # 
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_17_2018/nonXL"
 # null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
- 
 
 # XL.3.subsets <- getUniquePeaks(ol.ciLAD.XL.MEF_LAD)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/XL"
@@ -7573,8 +7572,41 @@ getPeaksInUnique <- function(ol.ciLAD.XL.MEF_LAD) {
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_9_18_2018/nonXL"
 # null <- peaksToEnrichedGO(nonXL.3.subsets,output.file.dir,genome)
 
+# For peaks liftovered to hg38
+# re.out <- grl
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38/GO"
+# genome <- "Hs"
+# null <- peaksToEnrichedGO(re.out,output.file.dir,genome)
+# library(GO.db)
+# xx <- as.list(GOTERM)
+# foo <- function(x) c(GOID(x), Term(x),Definition(x), Ontology(x))
+# gomat <- t(sapply(xx, foo, simplify=TRUE))
+# gomat <- as.data.frame(gomat)
+# colnames(gomat) <- c("ID","Term","Definition","Ontology")
+# batchDraw4GO(output.file.dir,gomat)
+
+# get human hg38 replication timing data
+#
+# RT_HEFc6_hg38 <- getBedFiles2("~/Aimin/DropboxUmass/NADfinder/Aimin/RT_HEFc6_hg38")
+
+# RT_HEFc6_hg38.early <-  RT_HEFc6_hg38[[1]][which(RT_HEFc6_hg38[[1]]$V4 > 0),]
+# re.out.1 <- c(re.out,RT_HEFc6_hg38_early=RT_HEFc6_hg38.early) 
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38/GO2_early"
+
+# peak.index <- c(1,4) 
+# name <- c("DillingerHg38","RT_HEFc6_hg38_early")
+# getCount4Venn(re.out.1,peak.index,name,output.file.dir)
+
+# genome <- "Hs"
+# DillingerHg38.and.RT_HEFc6_hg38_early <- GenomicRanges::intersect(re.out.1[[1]],re.out.1[[4]])
+# re.out.2 <- list(DillingerHg38.and.RT_HEFc6_hg38_early=DillingerHg38.and.RT_HEFc6_hg38_early)
+# null <- peaksToEnrichedGO(re.out.2,output.file.dir,genome)
+# batchDraw4GO(output.file.dir,gomat)
+
 peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
-null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
+
+  null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
   
@@ -7663,55 +7695,81 @@ null <- lapply(1:length(re.out),function(u,re.out,output.file.dir,genome){
     
   }else if(genome=="Hs"){
     
-    #grl
-    u <- 1
-    x=grl[[u]]
-    x_name=names(grl)[u]
+    dd.GRCm39.mm10<-toGRanges(EnsDb.Hsapiens.v86)
+    overlaps.trimmed<-trim(x,use.names=TRUE)
+    overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
     
+    write.table(overlaps.anno,file=file.path(output.file.dir,paste0(x_name,"_annotation.txt")),row.names = FALSE,quote=FALSE,sep="\t")
     
-    library(EnsDb.Hsapiens.v75)
-    #annoData<-toGRanges(EnsDb.Hsapiens.v75, feature="gene")
-    
-    dd.hs<-toGRanges(EnsDb.Hsapiens.v75)
-    
-    print(seqinfo(dd.hs))
-    print(seqlevels(dd.hs))
-    
-    #print(seqlevels(dd.hs)[,1])
-    
-    #print(seqlevels(re.out[[1]])[,1])
-    
-    # seqlevels(dd.hs,force=TRUE) <- c("chr1","chr10","chr11","chr12","chr13",
-    #                                           "chr14","chr15","chr16","chr17","chr18","chr19","chr2",
-    #                                           "chr3","chr4","chr5","chr6","chr7","chr8","chr9","chrX","chrY")
-    
-    #temp4=
-    
-    re.out.L<-lapply(1:length(re.out),function(u,re.out,dd.hs){
+    getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
+      over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Hs.eg.db",
+                            maxP=0.5, minGOterm=10,
+                            multiAdjMethod="BH", condense=TRUE)
+      path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Hs.eg.db", "reactome.db", maxP=.05)
+      write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
       
-      x=re.out[[u]]
-      x_name=names(re.out)[u]
+      convert2geneSymbol <- function(over1) {
+        geneSymbol <- lapply(over1$EntrezID, function(u){
+          x <- annotate::getSYMBOL(unlist(strsplit(as.character(u),";")), data='org.Hs.eg') 
+          x
+        })
+        
+        list_to_df <- function(list_for_df)
+        {
+          list_for_df <- as.list(list_for_df)
+          nm <- names(list_for_df)
+          if (is.null(nm)) 
+            nm <- seq_along(list_for_df)
+          df <- data.frame(name = nm, stringsAsFactors = FALSE)
+          df$value <- unname(list_for_df)
+          df
+        }
+        
+        geneSymbol3 <- list_to_df(geneSymbol)
+        over2 <- cbind(over1,geneSymbol3)
+        over3 <- over2[,-which(colnames(over2) %in% c("name"))]
+        colnames(over3)[which(colnames(over3) %in% c("value"))] <- "geneSymbol"
+        over3
+      }
       
-      seqlevels(dd.hs,force=TRUE)<-seqinfo(x)@seqnames
-      #print(seqinfo(re.out.trimmed))
-      #print(seqlevels(re.out.trimmed))
-      seqinfo(x)<-seqinfo(dd.hs)
-      #GRCm38/mm10
-      #dd<-toGRanges(EnsDb.Mmusculus.v79)
-      #seqinfo(dd)
-      #library(ensembldb)
-      #library(GenomeInfoDb)
-      seqlevelsStyle(x) <- seqlevelsStyle(dd.hs)
-      re.out.trimmed<-trim(x, use.names=TRUE)
-      overlaps.anno<-annoPeaks(re.out.trimmed,dd.hs)
+      over$bp <- convert2geneSymbol(over$bp)
+      over$mf <- convert2geneSymbol(over$mf)
+      over$cc <- convert2geneSymbol(over$cc)
       
-      write.table(overlaps.anno,file=paste0(temp3,"/",x_name,"_annotation.txt"),row.names = FALSE,quote=FALSE,sep="\t")
-    },re.out,dd.hs)
+      over_bp <- as_tibble(over$bp)
+      over_mf <- as_tibble(over$mf)
+      over_cc <- as_tibble(over$cc)
+      
+      over_bp <- over_bp[order(over_bp$BH.adjusted.p.value),]
+      over_mf <- over_mf[order(over_mf$BH.adjusted.p.value),]
+      over_cc <- over_cc[order(over_cc$BH.adjusted.p.value),]
+      
+      writeTibble <- function(tibble.input, output.file.name = tempfile())
+      {
+        if (!dir.exists(dirname(output.file.name)))
+        {
+          dir.create(dirname(output.file.name), recursive = TRUE)
+        }
+        flatten_list = function(x)
+        {
+          if (typeof(x) != "list")
+          {
+            return(x)
+          }
+          sapply(x, function(y) paste(y, collapse = " ; "))
+        }
+        tibble.input %>% mutate_all(funs(flatten_list)) %>% write.csv(output.file.name)
+      }
+      
+      writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
+      writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
+      writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+    }
     
-  }
+    getGoAndPath(overlaps.anno,output.file.dir,x_name)
+    
+}},re.out,output.file.dir,genome)
   
-},re.out,output.file.dir,genome)
-
 }
 
 # This function uses the overlapping peaks from findOverlapsOfPeak, and gets the 
@@ -9673,15 +9731,20 @@ AnntationUsingChipSeeker <- function(dir.name,input.file.pattern,out.dir.name,tx
 
 Draw4GO <- function(tempDS3,threshold.p,topGo.n,output.dir,file.name) {
   x=tempDS3
-  y=x[order(x$BH.adjusted.p.value,decreasing = FALSE),]
-  threshold.p <- 0.05
+  y=x[order(x$BH.adjusted.p.value,decreasing = F),]
+  
+  write.table(y,file=file.path(output.dir,paste0(file.name,"_sorted_by_adjustedP.txt")),row.names = FALSE,quote=FALSE,sep="\t")
+  
+  #threshold.p <- 0.05
+  z = y[which(y$BH.adjusted.p.value < threshold.p),][1:topGo.n,]
   
   z$go.term <- factor(z$go.term, levels = z$go.term[order(z$BH.adjusted.p.value,decreasing = T)])
-  sp <- ggplot(z, aes(x=go.term,y=BH.adjusted.p.value)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=z$count.InDataset), hjust=0)+ coord_flip()+ggtitle("nonXL MEF ciLAD-overlapped NAD:GO Biol.Processes")+labs(x="GO term",y="BH adjusted p-value") + theme(plot.title=element_text(hjust=0.5))
   
-z$go.term <- factor(z$go.term, levels = z$go.term[order(z$count.InDataset,decreasing = T)])
-#file.name <- "x"
-sp <- ggplot(z, aes(x=go.term,y=count.InDataset)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=formatC(z$BH.adjusted.p.value, format = "e", digits = 1)), hjust=0) + coord_flip() + ggtitle(file.name)+labs(x="GO term",y="Gene couns in GO term") + theme(plot.title=element_text(hjust=0.5))
+  sp <- ggplot(z, aes(x=go.term,y=BH.adjusted.p.value)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=z$count.InDataset), hjust=0)+ coord_flip()+ggtitle(file.name)+labs(x="GO term",y="BH adjusted p-value") + theme(plot.title=element_text(hjust=0.5))
+  
+# z$go.term <- factor(z$go.term, levels = z$go.term[order(z$count.InDataset,decreasing = T)])
+# #file.name <- "x"
+# sp <- ggplot(z, aes(x=go.term,y=count.InDataset)) + geom_bar(stat="identity",position = "dodge")+geom_text(aes(label=formatC(z$BH.adjusted.p.value, format = "e", digits = 1)), hjust=0) + coord_flip() + ggtitle(file.name)+labs(x="GO term",y="Gene couns in GO term") + theme(plot.title=element_text(hjust=0.5))
   
   spp <- list(sp=sp)
   multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
@@ -9896,6 +9959,7 @@ batchDraw4GO <- function(output.file.dir,gomat) {
   
   null <- lapply(1:length(go.files), function(u,go.files,gomat,output.file.dir){
     
+     #u <- 1
      tempDS3 <- read.csv(go.files[u])
     
      tempDS3 <- tempDS3[,-1]
@@ -10008,6 +10072,10 @@ getBoxplot4DiffRnaSeq <- function() {
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot_2_6_2019"
   
   YYY1 <- getFPKM4DiffSet(cm.unique.only.1.anno,fpkm.value)
+  
+  boxplot(as.numeric(as.character(fpkm.value$fpkm)))
+  
+  boxplot(log10(as.numeric(as.character(fpkm.value$fpkm))+1))
   
   gene.in.XL.only <- YYY1[which(YYY1$SetName=="XL.only"),]
   
@@ -10142,6 +10210,15 @@ getFPKM4F121 <- function() {
   rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm=apply(fpkm,1,mean))
   
   YYY.Aizhan <- getFPKM4DiffSet(cm.unique.only.1.anno,rna.seq.data.from.Aizhan)
+  
+  boxplot(as.numeric(as.character(rna.seq.data.from.Aizhan$fpkm)))
+  
+  boxplot(log10(as.numeric(as.character(rna.seq.data.from.Aizhan$fpkm))+1))
+  
+  gene.in.XL.only.F121.9 <- YYY.Aizhan[which(YYY.Aizhan$SetName=="XL.only"),]
+  
+  write.table(gene.in.XL.only.F121.9,file = file.path(output.file.dir,"gene_in_XL_only_F121_9.txt"),
+              append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
   
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Aizhan_boxplot"
   
@@ -11337,7 +11414,6 @@ fromGr2Anno <- function() {
   },re.out,output.file.dir,genome)
 }
 
-
 # nathan_lawson new data 1(exclude no change ones)
 
 # input.bed.dir <- "~/Aimin/DropboxUmass/Aimin/Project/nathan_lawson/BedWithLabel"
@@ -12295,6 +12371,16 @@ MNaseSeq <- function(){
   
 }
 
+# gmt.file <- "~/Aimin/DropboxUmass/Aimin/Project/Pathway_Julie/c7.all.v6.2.symbols.gmt.txt"
+# gmt.data <- gsa.read.gmt(gmt.file)
+# output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/Pathway_Julie"
+
+XX <- tibble(genes=flatten_list(gmt.data$genesets),geneset=flatten_list(gmt.data$geneset.names),descriptions=flatten_list(gmt.data$geneset.descriptions))
+
+writeTibble(XX, output.file.name = file.path(output.file.dir,paste0(x_name,"pahtway.csv")))
+
+
+
 gsa.read.gmt <- function(filename)
 {
   a <- scan(filename, what = list("", ""), sep = "\t", quote = NULL, fill = TRUE, 
@@ -12484,7 +12570,6 @@ overLapWithHg38Tss <- function(input.bw.path,output.file.dir,dd) {
     heatmap <- ChIPpeakAnno::featureAlignedHeatmap(sig.normalized, feature.center, 
                                                    upstream=5000, downstream=5000)
     
-    
     #keep <- rowSums(sig[[2]]) > 0
     #sig <- sapply(sig, function(.ele) .ele[keep, ], simplify = FALSE)
     #feature.center <- feature.center[keep]
@@ -12554,8 +12639,6 @@ overLapWithHg38Tss <- function(input.bw.path,output.file.dir,dd) {
     
     files.4 <- files.1[c(1)]
     TssPlot(.Platform, input.bw.path, files.4, feature.center, feature.recentered)
-    
-    
     
     sig.normalized <- lapply(sig, function(u){
       y <- t(scale(t(u), center=TRUE, scale=TRUE))
