@@ -12108,9 +12108,6 @@ sampleInfoParser4Magnolia <- function(input.sample.information.file,output.sampl
   lines(mnase.data.L.3$postEMT_TSS.postEMT.hg38_2.txt.tss~mnase.data.L.3$Naked_TSS.pos, type = "l", col = "green")
   legend("topright", legend = c("naked","preEMT","postEMT"), col = c("#CCFF00FF","blue","green"), lwd = 1,cex = 0.5)
   
-  
-  
-  
   input.mnase.file <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/MNase_1221MS-2_S2rmDu_sorted_m_brb_3_TSS.xls"
   input.mnase.file <- "~/Aimin/DropboxUmass/Aimin/Project/Magnolia/MNase_seqOut/preEMT_TSS.xls"
   mnase.data <- read.table(input.mnase.file,header = T)
@@ -12375,11 +12372,9 @@ MNaseSeq <- function(){
 # gmt.data <- gsa.read.gmt(gmt.file)
 # output.file.dir <- "~/Aimin/DropboxUmass/Aimin/Project/Pathway_Julie"
 
-XX <- tibble(genes=flatten_list(gmt.data$genesets),geneset=flatten_list(gmt.data$geneset.names),descriptions=flatten_list(gmt.data$geneset.descriptions))
+# XX <- tibble(genes=flatten_list(gmt.data$genesets),geneset=flatten_list(gmt.data$geneset.names),descriptions=flatten_list(gmt.data$geneset.descriptions))
 
-writeTibble(XX, output.file.name = file.path(output.file.dir,paste0(x_name,"pahtway.csv")))
-
-
+# writeTibble(XX, output.file.name = file.path(output.file.dir,paste0(x_name,"pahtway.csv")))
 
 gsa.read.gmt <- function(filename)
 {
@@ -12738,3 +12733,421 @@ plotFPKM4AizhanNew <- function(){
  write.table(sum.5.sets.short,file = output.file.name,append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
  
 }
+
+enrichList.1 <- enrichList
+
+names(enrichList.1) <- c("EED−10","Input−1","Input−2","H3k4me3−3", "H3k4me3−4","H3k27me3−5","H3k27me3−6","Input−7","Input−8","EED−9", "Undetermined")
+
+# cols = colorpanel(256,"snow","red","red")
+# selected.genes="TGFB1:ENST00000598758"
+
+# makeHeatMap4Amatrix(enrichList.1[[4]], selected.genes, cols,title=names(enrichList.1)[4])
+# makeHeatMap4Amatrix(enrichList.1[[5]], selected.genes, cols,title=names(enrichList.1)[5])
+
+# makeHeatMap4Amatrix(enrichList.1[[6]], selected.genes, cols,title=names(enrichList.1)[6])
+# makeHeatMap4Amatrix(enrichList.1[[7]], selected.genes, cols,title=names(enrichList.1)[7])
+
+# makeHeatMap4Amatrix(enrichList.1[[10]], selected.genes, cols,title=names(enrichList.1)[10])
+# makeHeatMap4Amatrix(enrichList.1[[1]], selected.genes, cols,title=names(enrichList.1)[1])
+
+# makeHeatMap4Amatrix(enrichList.1[[2]], selected.genes, cols,title=names(enrichList.1)[2])
+# makeHeatMap4Amatrix(enrichList.1[[3]], selected.genes, cols,title=names(enrichList.1)[3])
+
+# makeHeatMap4Amatrix(enrichList.1[[8]], selected.genes, cols,title=names(enrichList.1)[8])
+# makeHeatMap4Amatrix(enrichList.1[[9]], selected.genes, cols,title=names(enrichList.1)[9])
+
+# makeHeatMap4Amatrix(enrichList.1[[11]], selected.genes, cols,title=names(enrichList.1)[11])
+
+makeHeatMap4Amatrix <- function(sig1.4.heatmap.log2.ck.tr.1, selected.genes, cols,title) {
+  
+ # z.mat.0 <- t(scale(t(sig1.4.heatmap.log2.ck.tr.1), center=TRUE, scale=TRUE))
+  
+  z.mat.0 <- sig1.4.heatmap.log2.ck.tr.1
+  
+  print(rownames(z.mat.0))
+  
+  labels <- as.character(rownames(z.mat.0))
+  selected.index <- match(selected.genes,labels)
+  markers <- labels[selected.index]
+  
+  marker_idx <- selected.index
+  
+  print(labels[marker_idx])
+  
+  ht <- Heatmap(z.mat.0, name = "Coverage",
+                #col = rev(redblue(30))[-seq(35, 35)],  
+                #col = rev(redblue(30)),
+                # col = colorpanel(30,"white","white","red"),
+                col = cols,
+                show_row_name = FALSE,
+                cluster_columns = F,
+                cluster_rows = F, column_title=title) + rowAnnotation(link = anno_mark(at = marker_idx, labels = markers),width = unit(5, "mm") +        max_text_width(markers))
+  
+  ht
+  
+}
+
+processPaulNewData <- function() {
+  
+file.name.bedgraph <- c("~/Aimin/DropboxUmass/pub_old_galaxy/Kaufman_Lab_shared_files/Peric-Hupkes 2010 MEF LADs mm10 igv.bed","~/Aimin/DropboxUmass/pub_old_galaxy/Kaufman_Lab_shared_files/RT_MEF female mm10.bedGraph.txt","~/Aimin/DropboxUmass/pub_old_galaxy/Paul_normr/Regimes.S26.binSize.50000.v1<0.01.q<0.05 igv.bed","~/Aimin/DropboxUmass/pub_old_galaxy/Julie/nonXL_MEF_1.5FC_minp_countF200_adjPval.bed","~/Aimin/DropboxUmass/pub_old_galaxy/Julie/XL_MEF_1.5FC_minp_countF200_adjPval.bed","~/Aimin/DropboxUmass/Vertii mouse NADs copy/MEF NAD paper IGV/hiddenDomains.bin.50k.S26_vis igv.bed","~/Aimin/DropboxUmass/Vertii mouse NADs copy/MEF NAD paper IGV/S26_broad_peaks macs igv.bed","~/Aimin/DropboxUmass/Vertii mouse NADs copy/MEF NAD paper IGV/S26_bin_50K_peaks igv.bed","~/Aimin/DropboxUmass/NADfinder/BedFiles/GSM1621023_WT_H3K9me3_peaks.bed")
+       
+length(file.name.bedgraph)
+
+bed.in<-lapply(1:length(file.name.bedgraph),function(u,file.name.bedgraph){
+  if(u %in% c(2,3,4,5)){peaks=read.table(file.name.bedgraph[u],skip=1)}else{peaks=read.table(file.name.bedgraph[u])}
+  
+  colnames(peaks)[1:3]= c("chr","start","end")
+  peaks=toGRanges(peaks)
+  peaks
+},file.name.bedgraph)
+
+bed.in[[2]] <- bed.in[[2]][which(bed.in[[2]]$V4<0),]
+
+names(bed.in) <- c("LADs","RT_late","Normr","NADfinder_nonXL","NADfinder_XL","Hidden_Domains","MACS","EDD","H3K9me3")
+
+output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ComparisionBetweenSoftwares"
+
+names(bed.in)
+
+peak.index <- c(1,3)
+name <- c("LADs","Normr")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+                             
+peak.index <- c(1,4)
+name <- c("LADs","NADfinder_nonXL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(1,5)
+name <- c("LADs","NADfinder_XL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(1,6)
+name <- c("LADs","Hidden_Domains")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+
+peak.index <- c(1,7)
+name <- c("LADs","MACS")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(1,8)
+name <- c("LADs","EDD")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(2,3)
+name <- c("RT_late","Normr")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+
+peak.index <- c(2,4)
+name <- c("RT_late","NADfinder_nonXL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(2,5)
+name <- c("RT_late","NADfinder_XL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(2,6)
+name <- c("RT_late","Hidden_Domains")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+
+peak.index <- c(2,7)
+name <- c("RT_late","MACS")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(2,8)
+name <- c("RT_late","EDD")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(9,3)
+name <- c("H3K9me3","Normr")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+
+peak.index <- c(9,4)
+name <- c("H3K9me3","NADfinder_nonXL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(9,5)
+name <- c("H3K9me3","NADfinder_XL")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(9,6)
+name <- c("H3K9me3","Hidden_Domains")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)                           
+
+peak.index <- c(9,7)
+name <- c("H3K9me3","MACS")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+peak.index <- c(9,8)
+name <- c("H3K9me3","EDD")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)   
+
+}
+
+goAnalysis4MEF_TypeIandTypII <- function() {
+  
+  input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman"
+  lift.over.bed <- getBedFiles2(input.file.dir)
+  re.out <- list(MEF_TypeI_hg38=lift.over.bed[[4]],MEF_TypeII_hg38=lift.over.bed[[5]])
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MouseLiftOverHuman/CompareDillingerHg38WithLMNB1hg38/GO_4_MEF_TypeI_and_TypeII_hg38"
+  
+  genome <- "Hs"
+  null <- peaksToEnrichedGO(re.out,output.file.dir,genome)
+  library(GO.db)
+  xx <- as.list(GOTERM)
+  foo <- function(x) c(GOID(x), Term(x),Definition(x), Ontology(x))
+  gomat <- t(sapply(xx, foo, simplify=TRUE))
+  gomat <- as.data.frame(gomat)
+  colnames(gomat) <- c("ID","Term","Definition","Ontology")
+  batchDraw4GO(output.file.dir,gomat)
+
+}
+
+redoEarlyLateRTciLAD <- function(input.file.dir) {
+
+  re.out <- getBedFiles(input.file.dir)
+  re.out.rt.mef <- getMoreBedFiles(input.file.dir,re.out)
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/ReCalculation4EarlyRTNaDciLAD"
+  
+  peak.index <- c(17,13,5)
+  name <- c("Late_RT","nonXL","ciLAD")
+  getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+  
+  peak.index <- c(16,13,5)
+  name <- c("Early_RT","nonXL","ciLAD")
+  getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+  
+  peak.index <- c(17,13,14)
+  name <- c("Late_RT","nonXL","LAD")
+  getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+  
+  peak.index <- c(16,13,14)
+  name <- c("Early_RT","nonXL","LAD")
+  getCount4Venn(re.out.rt.mef,peak.index,name,output.file.dir)
+  
+  re.out.rt.mef.5.sets <- re.out.rt.mef[c(17,16,13,5,14)]
+  
+  names(re.out.rt.mef.5.sets) <- c("lateRT","earlyRT","NAD","ciLAD","LAD")
+  
+  d <- sapply(names(re.out.rt.mef.5.sets), function(x) sapply(names(re.out.rt.mef.5.sets), function(y) calculateJaccardCoefficient42Peaks(peaks1=re.out.rt.mef.5.sets[[y]], peaks2=re.out.rt.mef.5.sets[[x]])))
+  
+  d <- d/100
+  write.table(d,file = file.path(output.file.dir,paste0("JC_similarity",".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = T,col.names=NA)
+  
+  dd <- d 
+  ddd <- unique(as.vector(dd))
+  d.sorted <- ddd[order(ddd)]
+  
+  install.packages("randomcoloR")
+  
+  library(randomcoloR)
+  n <- 11
+  palette <- distinctColorPalette(n)
+  
+  dd.s <- smoothplot(dd,0.5,method="mean")
+  
+  cols <- rainbow(length(dd))
+  library(RColorBrewer)
+  cols <- brewer.pal(length(dd),"Reds")
+  
+  rbPal <- colorRampPalette(c('red','blue'))
+  cols <- rbPal(10)[as.numeric(cut(d.sorted,breaks = 10))]
+  
+  xx <- ifelse(d.sorted>50,'red', ifelse(d.sorted<50&d.sorted>10,'green','grey'))
+  
+ xx <- lapply(d.sorted,function(u){
+    if(u>50){x="blue"}else if(u>10&&u<50){x="red"}
+    if(u>5&&u<10){x="green"}
+    if(u<1&&u>0.5){x="yellow"}
+    if(u>0&&u<0.5){x="black"}
+    if(u<=0){x="snow"}
+    x      
+  })
+  xx<- unlist(xx)
+
+  library(RColorBrewer)
+  cols <-colorRampPalette(colors=c("blue", "grey", "red"))(25)
+  
+  zScale <- seq(min(dd), max(dd), length.out = 25)
+  
+  # function that returns the nearest colour given a value of z
+  findNearestColour <- function(x) {
+    colorIndex <- which(abs(zScale - x) == min(abs(zScale - x)))
+    return(cols[colorIndex])
+  }
+  
+  # empty plot
+  plot(1, 1, type = "n", xlim = c(1, 5), ylim = c(1, 5), 
+       axes = F, xlab = "", ylab = "")
+  
+  xxx <- matrix(data = rep(0,25), nrow = 5, ncol = 5)
+  # populate it with the data
+  for(r in 1:5){
+    for(c in 1:5){
+      col = findNearestColour(dd[c,r])
+      xxx[r,c]=col
+    }
+  }
+  
+  hmcol<-rev(colorRampPalette(brewer.pal(25, "RdBu"))(256))
+ 
+   breaks <- seq(from=min(range(d)), to=max(range(d)), length.out=25)
+  midpoint <- which.min(abs(breaks - 0))
+  rampCol1 <- colorRampPalette(c("forestgreen", "darkgreen", "black"))(midpoint)
+  rampCol2 <- colorRampPalette(c("black", "darkred", "red"))(25-(midpoint+1))
+  rampCols <- c(rampCol1,rampCol2)
+  
+  colors = c(seq(0,0.001,length=8),seq(0.002,0.008,length=8),seq(0.009,0.2,length=2),seq(0.3,0.4,length=2),seq(0.5,1,length=5))
+  
+  my_palette <- redgreen(24)
+  
+  heatmap.3(d,col=my_palette, 
+  breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
+    breaks <- parent.frame()$breaks
+    return(list(
+      at=c(as.character(0),as.character(0.001),as.character(0.007),
+           as.character(1)),
+      labels=c(as.character(0),as.character(0.001),as.character(0.007),
+               as.character(1))
+    ))
+  })  
+  
+  heatmap.3(d,col=my_palette, 
+            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
+              breaks <- parent.frame()$breaks
+              return(list(
+                at=c(as.character(0),as.character(0.001),as.character(0.007),
+                     as.character(1)),
+                labels=c(as.character(0),as.character(0.001),as.character(0.007),
+                         as.character(1))
+              ))
+            })  
+  
+  heatmap.3(d,col=my_palette, 
+            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
+              breaks <- parent.frame()$breaks
+              return(list(
+                at=parent.frame()$scale01(c(breaks[1],breaks[length(breaks)])),
+                labels=c(as.character(breaks[1]),as.character(breaks[length(breaks)]))
+              ))
+            })
+  
+  tmpbreaks <- breaks
+  z <- seq(min.raw, max.raw, by=min(diff(breaks)/100))
+  image(z=matrix(z, ncol=1),
+        col=my_palette, breaks=tmpbreaks)
+  
+  max.raw <- max(abs(c(d,breaks)),na.rm=TRUE)
+  min.raw <- -max.raw
+  tmpbreaks[1] <- -max(abs(x), na.rm=TRUE)
+  tmpbreaks[length(tmpbreaks)] <- max(abs(x), na.rm=TRUE)
+    
+  d.s <- as.vector(d)[order(as.vector(d))]
+  image(z=matrix(d.s, ncol=1),col =my_palette , breaks = breaks)
+  
+  heatmap.2(d,trace="none",margin=c(8, 10),col=rampCols) 
+  plot(hclust(d, "average"))
+  
+  d <- d/100
+  
+  c <- as.dist(1-d)
+  hv <- hclust(c)
+  plot(as.dendrogram(hv), edgePar=list(col=3, lwd=4), horiz=F, main="Similarities between 5 peak sets") 
+  
+  jc.lateRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[17]],re.out.rt.mef[[5]])
+  jc.earlyRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[16]],re.out.rt.mef[[5]])
+  jc.earlyRT.LAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[16]],re.out.rt.mef[[14]])
+  
+  com.re <- data.frame(comparision=c("jc.lateRT.ciLAD","jc.earlyRT.ciLAD"),JC=c(jc.lateRT.ciLAD,jc.earlyRT.ciLAD))
+  p<-ggplot(data=com.re, aes(x=comparision, y=JC)) +
+    geom_bar(stat="identity", fill="steelblue")+
+    theme_minimal() + geom_text(aes(label=com.re$JC), hjust=0.5)
+  p
+  
+}
+
+calculateJaccardCoefficient42Peaks <- function(peaks1,peaks2){
+  
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  peaks1.union.peaks2 <-GenomicRanges::union(peaks1,peaks2)
+  
+  a <- sum(width(peaks1.and.peaks2))
+  b <- sum(width(peaks1.union.peaks2))
+  
+  c <- sum(width(peaks1))
+  d <- sum(width(peaks2))
+  
+  cat("Intersect: ",a,"Union: ",b,"peaks1: ",c,"peaks2: ",d)
+    
+  jc= (a/b)*100
+  jc  
+}
+
+smoothvec <- function(v, radius, method=c('mean', 'median')){
+  # Given a vector of coverage, return smoothed version of coverage.
+  # Args:
+  #   v: vector of coverage
+  #   radius: fraction of org. vector size.
+  #   method: smooth method
+  # Return: vector of smoothed coverage.
+  
+  stopifnot(is.vector(v))
+  stopifnot(length(v) > 0)
+  stopifnot(radius > 0 && radius < 1)
+  
+  halfwin <- ceiling(length(v) * radius)
+  s <- rep(NA, length(v))
+  
+  for(i in 1:length(v)){
+    winpos <- (i - halfwin) : (i + halfwin)
+    winpos <- winpos[winpos > 0 & winpos <= length(v)]
+    if(method == 'mean'){
+      s[i] <- mean(v[winpos])
+    }else if(method == 'median'){
+      s[i] <- median(v[winpos])
+    }
+  }
+  s
+}
+
+smoothplot <- function(m, radius, method=c('mean', 'median')){
+  # Smooth the entire avg. profile matrix using smoothvec.
+  # Args:
+  #   m: avg. profile matrix
+  #   radius: fraction of org. vector size.
+  #   method: smooth method.
+  # Return: smoothed matrix.
+  
+  stopifnot(is.matrix(m) || is.vector(m))
+  
+  if(is.matrix(m)) {
+    for(i in 1:ncol(m)) {
+      m[, i] <- smoothvec(m[, i], radius, method)
+    }
+  } else {
+    m <- smoothvec(m, radius, method)
+  }
+  m
+}
+
+d<-read.table(text="         lateRT      earlyRT         NAD
+ciLAD          LAD
+              1.000000000 0.0000000000 0.006224017 0.001260241 0.0069699285
+              0.000000000 1.0000000000 0.001425649 0.007418436 0.0007096344
+              0.006224017 0.0014256488 1.000000000 0.064653780 0.3935566356
+              0.001260241 0.0074184361 0.064653780 1.000000000 0.0024839407
+              0.006969928 0.0007096344 0.393556636 0.002483941 1.0000000000",
+header=TRUE)
+
+rownames(d)<-colnames(d)
+
+d<-as.matrix(d)
+diag(d)<-NA
+library(plotrix)
+color2D.matplot(-log(d+0.0001),extremes=c("red","blue"),
+ main="Correlation matrix of d",axes=FALSE)
+axis(1,at=seq(0.5,4.5),labels=colnames(d))
+axis(2,at=seq(0.5,4.5),labels=rownames(d))
+color.legend(0,-0.7,2,-0.5,legend=c(0,0.001,0.007,0.07,0.4),
+ rect.col=color.scale(log(c(0.00001,0.001,0.005,0.07,0.4)),
+ extremes=c("blue","red")),align="rb")
+
