@@ -9568,7 +9568,7 @@ getBedFiles2 <- function(input.file.dir) {
   
   bed.in<-lapply(file.name.bedgraph,function(u){
     
-    peaks=read.table(u)
+    peaks=read.table(u,header = F)
     colnames(peaks)[1:3]= c("chr","start","end")
     peaks=toGRanges(peaks)
     peaks
@@ -9789,7 +9789,7 @@ getBigWig <- function(rds.file,sample.name,output.dir) {
   
   range.rato.ss <- do.call(rbind,range.rato.s)
   range.rato.ss$names <- tools::file_path_sans_ext(range.rato.ss$names)
-  
+  sample.name <- "N18"
   s.index <- grep(sample.name,colnames(range.rato.ss))
   df.2.gr.temp <- range.rato.ss[,c(4,1,2,s.index)]
   colnames(df.2.gr.temp) <- c("seqnames","start","end","score")
@@ -9938,6 +9938,8 @@ getNonoverLappingBed <- function(output.file.dir) {
 # XL.only <- GenomicRanges::setdiff(Aizhan.bed.in.1[[2]],Aizhan.bed.in.1[[1]])
 
 # cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL,F121-9_NAD=Aizhan.bed.in.1[[1]],XL_NAD=Aizhan.bed.in.1[[2]])
+
+# cm.unique.only.1 <- list(F121.only=F121.only,XL.only=XL.only,F121.and.XL=F121.and.XL,XL_NAD=Aizhan.bed.in.1[[2]])
 
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4"
 # outGrl(cm.unique.only.1,output.file.dir)
@@ -10089,7 +10091,7 @@ getBoxplot4DiffRnaSeq <- function() {
   
   GSE90894.rnaSeq.file <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/RedoBoxplot_2_11_2019/GSE90894_RPKM_mRNAseq_table.xlsx"
   
-  GSE90894.rnaSeq.data <- as.data.frame(read_xlsx(GSE90894.rnaSeq.file))
+  GSE90894.rnaSeq.data <- as.data.frame(readxl::read_xlsx(GSE90894.rnaSeq.file))
   
   GSE90894.rnaSeq.data.1 <- GSE90894.rnaSeq.data[-c(1:4),]
   
@@ -10100,6 +10102,9 @@ getBoxplot4DiffRnaSeq <- function() {
   colnames(GSE90894.rnaSeq.data.2) <- colnames(rna.seq.data.WT)
   
   output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot_using_GSE90894_2_13_2019"
+  
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/MEF_boxplot_using_GSE90894_3_8_2019"
+  
   YYY1.GSE90894.mef <- getFPKM4DiffSet(cm.unique.only.1.anno,GSE90894.rnaSeq.data.2)
   getBoxPlot4FPKMOfSubsetPeaks1(YYY1.GSE90894.mef,GSE90894.rnaSeq.data.2,output.file.dir)
   
@@ -12928,99 +12933,11 @@ redoEarlyLateRTciLAD <- function(input.file.dir) {
   
   names(re.out.rt.mef.5.sets) <- c("lateRT","earlyRT","NAD","ciLAD","LAD")
   
-  d <- sapply(names(re.out.rt.mef.5.sets), function(x) sapply(names(re.out.rt.mef.5.sets), function(y) calculateJaccardCoefficient42Peaks(peaks1=re.out.rt.mef.5.sets[[y]], peaks2=re.out.rt.mef.5.sets[[x]])))
-  
-  d <- d/100
-  write.table(d,file = file.path(output.file.dir,paste0("JC_similarity",".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = T,col.names=NA)
-  
-  dd <- d 
-  ddd <- unique(as.vector(dd))
-  d.sorted <- ddd[order(ddd)]
-  
-  install.packages("randomcoloR")
-  
-  library(randomcoloR)
-  n <- 11
-  palette <- distinctColorPalette(n)
-  
-  dd.s <- smoothplot(dd,0.5,method="mean")
-  
-  cols <- rainbow(length(dd))
-  library(RColorBrewer)
-  cols <- brewer.pal(length(dd),"Reds")
-  
-  rbPal <- colorRampPalette(c('red','blue'))
-  cols <- rbPal(10)[as.numeric(cut(d.sorted,breaks = 10))]
-  
-  xx <- ifelse(d.sorted>50,'red', ifelse(d.sorted<50&d.sorted>10,'green','grey'))
-  
- xx <- lapply(d.sorted,function(u){
-    if(u>50){x="blue"}else if(u>10&&u<50){x="red"}
-    if(u>5&&u<10){x="green"}
-    if(u<1&&u>0.5){x="yellow"}
-    if(u>0&&u<0.5){x="black"}
-    if(u<=0){x="snow"}
-    x      
-  })
-  xx<- unlist(xx)
-
-  library(RColorBrewer)
-  cols <-colorRampPalette(colors=c("blue", "grey", "red"))(25)
-  
-  zScale <- seq(min(dd), max(dd), length.out = 25)
-  
-  # function that returns the nearest colour given a value of z
-  findNearestColour <- function(x) {
-    colorIndex <- which(abs(zScale - x) == min(abs(zScale - x)))
-    return(cols[colorIndex])
-  }
-  
-  # empty plot
-  plot(1, 1, type = "n", xlim = c(1, 5), ylim = c(1, 5), 
-       axes = F, xlab = "", ylab = "")
-  
-  xxx <- matrix(data = rep(0,25), nrow = 5, ncol = 5)
-  # populate it with the data
-  for(r in 1:5){
-    for(c in 1:5){
-      col = findNearestColour(dd[c,r])
-      xxx[r,c]=col
-    }
-  }
-  
-  hmcol<-rev(colorRampPalette(brewer.pal(25, "RdBu"))(256))
- 
-   breaks <- seq(from=min(range(d)), to=max(range(d)), length.out=25)
-  midpoint <- which.min(abs(breaks - 0))
-  rampCol1 <- colorRampPalette(c("forestgreen", "darkgreen", "black"))(midpoint)
-  rampCol2 <- colorRampPalette(c("black", "darkred", "red"))(25-(midpoint+1))
-  rampCols <- c(rampCol1,rampCol2)
+  d <- getJC4aSetOfPeaks(re.out.rt.mef.5.sets, output.file.dir)
   
   colors = c(seq(0,0.001,length=8),seq(0.002,0.008,length=8),seq(0.009,0.2,length=2),seq(0.3,0.4,length=2),seq(0.5,1,length=5))
   
   my_palette <- redgreen(24)
-  
-  heatmap.3(d,col=my_palette, 
-  breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
-    breaks <- parent.frame()$breaks
-    return(list(
-      at=c(as.character(0),as.character(0.001),as.character(0.007),
-           as.character(1)),
-      labels=c(as.character(0),as.character(0.001),as.character(0.007),
-               as.character(1))
-    ))
-  })  
-  
-  heatmap.3(d,col=my_palette, 
-            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
-              breaks <- parent.frame()$breaks
-              return(list(
-                at=c(as.character(0),as.character(0.001),as.character(0.007),
-                     as.character(1)),
-                labels=c(as.character(0),as.character(0.001),as.character(0.007),
-                         as.character(1))
-              ))
-            })  
   
   heatmap.3(d,col=my_palette, 
             breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
@@ -13030,28 +12947,6 @@ redoEarlyLateRTciLAD <- function(input.file.dir) {
                 labels=c(as.character(breaks[1]),as.character(breaks[length(breaks)]))
               ))
             })
-  
-  tmpbreaks <- breaks
-  z <- seq(min.raw, max.raw, by=min(diff(breaks)/100))
-  image(z=matrix(z, ncol=1),
-        col=my_palette, breaks=tmpbreaks)
-  
-  max.raw <- max(abs(c(d,breaks)),na.rm=TRUE)
-  min.raw <- -max.raw
-  tmpbreaks[1] <- -max(abs(x), na.rm=TRUE)
-  tmpbreaks[length(tmpbreaks)] <- max(abs(x), na.rm=TRUE)
-    
-  d.s <- as.vector(d)[order(as.vector(d))]
-  image(z=matrix(d.s, ncol=1),col =my_palette , breaks = breaks)
-  
-  heatmap.2(d,trace="none",margin=c(8, 10),col=rampCols) 
-  plot(hclust(d, "average"))
-  
-  d <- d/100
-  
-  c <- as.dist(1-d)
-  hv <- hclust(c)
-  plot(as.dendrogram(hv), edgePar=list(col=3, lwd=4), horiz=F, main="Similarities between 5 peak sets") 
   
   jc.lateRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[17]],re.out.rt.mef[[5]])
   jc.earlyRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[16]],re.out.rt.mef[[5]])
@@ -13067,8 +12962,13 @@ redoEarlyLateRTciLAD <- function(input.file.dir) {
 
 calculateJaccardCoefficient42Peaks <- function(peaks1,peaks2){
   
-  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
-  peaks1.union.peaks2 <-GenomicRanges::union(peaks1,peaks2)
+  if(length(peaks1)==length(peaks2)){
+  peaks1.and.peaks2 <- GenomicRanges::pintersect(peaks1,peaks2)
+  peaks1.union.peaks2 <-GenomicRanges::punion(peaks1,peaks2)
+  }else{
+    peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+    peaks1.union.peaks2 <-GenomicRanges::union(peaks1,peaks2)
+  }
   
   a <- sum(width(peaks1.and.peaks2))
   b <- sum(width(peaks1.union.peaks2))
@@ -13076,10 +12976,17 @@ calculateJaccardCoefficient42Peaks <- function(peaks1,peaks2){
   c <- sum(width(peaks1))
   d <- sum(width(peaks2))
   
-  cat("Intersect: ",a,"Union: ",b,"peaks1: ",c,"peaks2: ",d)
+  cat("Intersect:",a,"Union:",b,"peaks1:",c,"peaks2:",d,"\n")
     
-  jc= (a/b)*100
+  jc= a/b
   jc  
+}
+
+getJC4aSetOfPeaks <- function(re.out.rt.mef.5.sets, output.file.dir) {
+  d <- sapply(names(re.out.rt.mef.5.sets), function(x) sapply(names(re.out.rt.mef.5.sets), function(y) calculateJaccardCoefficient42Peaks(peaks1=re.out.rt.mef.5.sets[[y]], peaks2=re.out.rt.mef.5.sets[[x]])))
+  
+  write.table(d,file = file.path(output.file.dir,paste0("JC_similarity",".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = T,col.names=NA)
+  d
 }
 
 smoothvec <- function(v, radius, method=c('mean', 'median')){
@@ -13129,25 +13036,216 @@ smoothplot <- function(m, radius, method=c('mean', 'median')){
   m
 }
 
-d<-read.table(text="         lateRT      earlyRT         NAD
-ciLAD          LAD
-              1.000000000 0.0000000000 0.006224017 0.001260241 0.0069699285
-              0.000000000 1.0000000000 0.001425649 0.007418436 0.0007096344
-              0.006224017 0.0014256488 1.000000000 0.064653780 0.3935566356
-              0.001260241 0.0074184361 0.064653780 1.000000000 0.0024839407
-              0.006969928 0.0007096344 0.393556636 0.002483941 1.0000000000",
-header=TRUE)
+getJC4Others <- function(bed.in) {
+  output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/ComparisionBetweenSoftwares"
+    
+  d.9.sets <- getJC4aSetOfPeaks(bed.in, output.file.dir)
+  
+  d.9.sets.sorted <-as.vector(d.9.sets)[order(as.vector(d.9.sets))]
+  
+  #colors = c(seq(0,0.001,length=8),seq(0.002,0.008,length=8),seq(0.009,0.2,length=2),seq(0.3,0.4,length=2),seq(0.5,1,length=5))
+  
+  colors =seq(0,1,length=81)
+  
+  my_palette <- redgreen(80)
+  
+  heatmap.3(d.9.sets,col=my_palette, 
+            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(10, 10),key.xtickfun=function() {
+              breaks <- parent.frame()$breaks
+              return(list(
+                at=parent.frame()$scale01(c(breaks[1],breaks[length(breaks)])),
+                labels=c(as.character(breaks[1]),as.character(breaks[length(breaks)]))
+              ))
+            })
+}
 
-rownames(d)<-colnames(d)
+# getEpvalue4JC(bed.in,1,3,100)
 
-d<-as.matrix(d)
-diag(d)<-NA
-library(plotrix)
-color2D.matplot(-log(d+0.0001),extremes=c("red","blue"),
- main="Correlation matrix of d",axes=FALSE)
-axis(1,at=seq(0.5,4.5),labels=colnames(d))
-axis(2,at=seq(0.5,4.5),labels=rownames(d))
-color.legend(0,-0.7,2,-0.5,legend=c(0,0.001,0.007,0.07,0.4),
- rect.col=color.scale(log(c(0.00001,0.001,0.005,0.07,0.4)),
- extremes=c("blue","red")),align="rb")
+getEpvalue4JC <- function(bed.in,i,j,n) {
+  
+  #i <- 1
+  #j <- 2
+  #n = 10000
+  
+  JC.LADs.RT.late <- calculateJaccardCoefficient42Peaks(peaks1=bed.in[[i]], peaks2=bed.in[[j]])
+  i <- 2
+  w.d <- width(bed.in[[i]])
+  w.d.index <- seq(1,length(w.d))
+  temp <- bed.in[[i]]
+  j <- 1
+   n <- 100
+   
+  JC.permuted.l <- lapply(1:n, function(u,w.d.index,temp,bed.in){
+    set.seed(100)
+    w.d.index.permuted <- gtools::permute(w.d.index)
+    w.d[w.d.index.permuted]
+    end(temp) <- start(temp) + w.d[w.d.index.permuted]
+    JC.permuted <- calculateJaccardCoefficient42Peaks(peaks1=temp, peaks2=bed.in[[j]])
+    JC.permuted
+  },w.d.index,temp,bed.in)
+  
+  JC.permuted.l.1 <- unlist(JC.permuted.l)  
+  
+  JC.permuted.2 <- c(JC.LADs.RT.late,JC.permuted.l.1)
+  
+  e.p <- length(which(JC.permuted.l.1 > JC.LADs.RT.late))/n
+  
+  boxplot(JC.permuted.2)
+  e.p
+}
+
+# e.p <- sapply(names(bed.in), function(x) sapply(names(bed.in), function(y) getEpvalue4JC(bed.in=bed.in,i=y,j=x,n=100)))
+
+# pt <- overlapPermTest(A=bed.in[[1]],B=bed.in[[2]], ntimes=100)
+
+BoundaryAnalysis <- function() {
+    
+  input.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis/InputFiles"
+  NAD.peaks <- getBedFiles2(input.file.dir)
+  
+  gr.whole.genome <- GRanges(seqinfo(BSgenome.Mmusculus.UCSC.mm10))
+  
+  NAD.peaks.nonXL.rest <- GenomicRanges::setdiff(gr.whole.genome,NAD.peaks[[1]])
+  
+  NAD.peaks.XL.rest <- GenomicRanges::setdiff(gr.whole.genome,NAD.peaks[[2]])
+  
+}
+
+#range.rato.ss.half <- range.rato.ss
+
+#range.rato.ss.half.chr1 <-  range.rato.ss.half[which(range.rato.ss.half$names=="chr1"),]
+
+#x.chr1 <- dim(range.rato.ss.half.chr1)[1]
+#xx.chr1 <- seq(1,x.chr1)
+#xx.chr1.even <- xx.chr1[lapply(xx.chr1, "%%", 2) == 0]
+
+#range.rato.ss.half.chr1.odd <- range.rato.ss.half.chr1[-c(xx.chr1.even),]
+
+#range.rato.ss.half.chr1.odd$end <- range.rato.ss.half.chr1.odd$start+(range.rato.ss.half.chr1.odd$width)/2
+
+#range.rato.ss.half.chr1.even <- range.rato.ss.half.chr1[c(xx.chr1.even),]
+
+# sample.name <- "N18"
+# getBigWig2(sample.name,range.rato.ss,output.dir)
+
+# sample.name <- "N29"
+# getBigWig2(sample.name,range.rato.ss,output.dir)
+
+# sample.name <- "N33"
+# getBigWig2(sample.name,range.rato.ss,output.dir)  
+
+getBigWig2 <- function(sample.name,range.rato.ss,output.dir) {
+  
+  range.rato.ss$names <- tools::file_path_sans_ext(range.rato.ss$names)
+  
+  s.index <- grep(sample.name,colnames(range.rato.ss))
+  df.2.gr.temp <- range.rato.ss[,c(4,1,2,s.index)]
+  colnames(df.2.gr.temp) <- c("seqnames","start","end","score")
+  
+  df.2.gr <-  GRanges(df.2.gr.temp)
+  seqlengths(df.2.gr) <- seqlengths(BSgenome.Mmusculus.UCSC.mm10)[match(names(seqlengths(df.2.gr)),names(seqlengths(BSgenome.Mmusculus.UCSC.mm10)))] 
+  
+  len <- unlist(lapply(seList, length))
+  ZZ <- lapply(1:length(len), function(u,len,df.2.gr){
+    x <- names(len)[u]
+    y <- len[u]
+    z <- df.2.gr[which(seqnames(df.2.gr)==x)]
+    non.olp.index <- getNonOverLappingPeakIndex(z)
+    z <- z[non.olp.index]
+    z
+  },len,df.2.gr)
+  ZZZ <- do.call(base::c,ZZ)
+  
+  if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+  test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
+  export.bw(ZZZ,test_bw_out)
+}
+
+# df.2.gr.temp <- range.rato.ss[,c(4,1,2,5)]
+# colnames(df.2.gr.temp) <- c("seqnames","start","end","score")
+# 
+# df.2.gr <-  GRanges(df.2.gr.temp)
+# seqlengths(df.2.gr) <- seqlengths(BSgenome.Mmusculus.UCSC.mm10)[match(names(seqlengths(df.2.gr)),names(seqlengths(BSgenome.Mmusculus.UCSC.mm10)))] 
+# 
+# output.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
+# 
+# if(!dir.exists(output.dir)){dir.create(output.dir,recursive = TRUE)}
+# test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
+# export.bw(ZZZ,test_bw_out)
+
+par(mfrow=c(2,1))
+input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
+index <- c(rep(18,1),rep(29,1),rep(33,1))
+type <- rep(c("N"),1)
+title="nonXL"
+BoundaryAnalysis3(NAD.peaks[[1]],input.bw.path,type,index,title)
+
+BoundaryAnalysis3 <- function(NADpeaks,input.bw.path,type,index,title,y_title) {
+  
+  index.1 <- unique(index)
+  type.index <- paste(type,index,sep="")
+  
+  #NADpeaks <- NAD.peaks[[1]]
+  
+  NADpeaks <- NADpeaks
+  nonNAD.2.NAD <- NADpeaks
+  width(nonNAD.2.NAD) <- 1
+  nonNAD.2.NAD.region <- nonNAD.2.NAD 
+  dd <- 50000
+  start(nonNAD.2.NAD.region) <- start(nonNAD.2.NAD) - dd
+  end(nonNAD.2.NAD.region) <- end(nonNAD.2.NAD) + dd
+  
+  files <- dir(input.bw.path, "bw")
+  index.nonXL <- c(grep(index.1[1],files),grep(index.1[2],files),grep(index.1[3],files))
+  targets <- file.path(input.bw.path,files)[index.nonXL]
+  
+  sm = ScoreMatrixList(targets = targets, windows = nonNAD.2.NAD.region, bin.num = 200)
+  
+  #title <- "nonXL"
+  
+  plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title,"non-NAD to NAD"),ylab=y_title)
+  
+  NAD.2.nonNAD <- NADpeaks
+  
+  start(NAD.2.nonNAD) <- end(NAD.2.nonNAD)
+  
+  NAD.2.nonNAD.region <- NAD.2.nonNAD
+  
+  dd <- 50000
+  start(NAD.2.nonNAD.region) <- start(NAD.2.nonNAD) - dd
+  end(NAD.2.nonNAD.region) <- end(NAD.2.nonNAD) + dd
+  
+  #targets1 <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis/N18.sort.markDup.bw"
+  
+  sm = ScoreMatrixList(targets = targets, windows = NAD.2.nonNAD.region, bin.num = 200)
+  
+  plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title, "NAD to non-NAD",sep=" "),ylab=y_title)
+  
+}
+
+range.rato.s <- lapply(1:length(seList), function(u,seList){
+  range.ratio <- cbind(as.data.frame(ranges(seList[[u]])),assays(seList[[u]])$bcRatio)
+  range.ratio
+},seList)
+
+range.rato.ss <- do.call(rbind,range.rato.s)
+
+# sample.name <- "N24"
+# getBigWig2(sample.name,range.rato.ss,output.dir)
+
+# sample.name <- "N26"
+# getBigWig2(sample.name,range.rato.ss,output.dir)
+
+# sample.name <- "N28"
+# getBigWig2(sample.name,range.rato.ss,output.dir)  
+
+par(mfrow=c(2,1))
+input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
+index <- c(rep(24,1),rep(26,1),rep(28,1))
+type <- rep(c("N"),1)
+title="XL"
+BoundaryAnalysis3(NAD.peaks[[2]],input.bw.path,type,index,title)
+
+#/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4/XL.only.bed
+
 

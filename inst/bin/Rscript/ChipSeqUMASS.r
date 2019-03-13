@@ -10,6 +10,9 @@ packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI"
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
+BiocManager::install('genomationData')
+BiocManager::install('genomation')
+
 option_list = list(make_option(c("-i", "--input_file_dir"), type="character", default=NULL,
                                help="Input file dir", metavar="character"),
                    make_option(c("-p", "--input_file_pattern"), type="character", default=NULL,
