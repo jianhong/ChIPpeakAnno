@@ -142,8 +142,6 @@ overLapWithHg38Tss <- function(input.bw.path,output.file.dir,dd) {
   
   ht
   
-  
-  
   featureAlignedDistribution(sig, feature.center, 
                              upstream=5000, downstream=5000,
                              type="l")

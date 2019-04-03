@@ -3,10 +3,7 @@
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("BSgenome.Mmusculus.UCSC.mm10")
 
-packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI","tidyverse","annotate",
-              "reactome.db","dplyr","ggplot2","ggpubr","stringr","grid","Vennerable","devtools","reshape2",
-              "binaryLogic","org.Hs.eg.db","org.Mm.eg.db","eulerr","DiffBind","LOLA",
-              "TxDb.Hsapiens.UCSC.hg38.knownGene","EnsDb.Hsapiens.v75","EnsDb.Hsapiens.v86","BSgenome.Hsapiens.UCSC.hg19","BSgenome.Mmusculus.UCSC.mm10","rtracklayer","bedr","biomaRt")
+packages <- c("optparse","ChIPpeakAnno","ChIPseeker","EnsDb.Mmusculus.v75","DBI","tidyverse","annotate","reactome.db","dplyr","ggplot2","ggpubr","stringr","grid","Vennerable","devtools","reshape2","binaryLogic","org.Hs.eg.db","org.Mm.eg.db","eulerr","DiffBind","LOLA","TxDb.Hsapiens.UCSC.hg38.knownGene","EnsDb.Hsapiens.v75","EnsDb.Hsapiens.v86","BSgenome.Hsapiens.UCSC.hg19","BSgenome.Mmusculus.UCSC.mm10","rtracklayer","bedr","biomaRt","gplots","genomationData","genomation")
 
 null<-lapply(packages, function(xxx) suppressMessages(require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 

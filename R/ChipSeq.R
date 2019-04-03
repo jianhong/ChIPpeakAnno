@@ -12931,7 +12931,7 @@ redoEarlyLateRTciLAD <- function(input.file.dir) {
   
   re.out.rt.mef.5.sets <- re.out.rt.mef[c(17,16,13,5,14)]
   
-  names(re.out.rt.mef.5.sets) <- c("lateRT","earlyRT","NAD","ciLAD","LAD")
+  names(re.out.rt.mef.5.sets) <- c("lateRT","earlyRT","nonXL-NAD","ciLAD","LAD")
   
   d <- getJC4aSetOfPeaks(re.out.rt.mef.5.sets, output.file.dir)
   
@@ -12939,14 +12939,16 @@ redoEarlyLateRTciLAD <- function(input.file.dir) {
   
   my_palette <- redgreen(24)
   
+  tiff(file.path(output.file.dir,"heatmap4JC-nonXL-NAD.tiff"))
   heatmap.3(d,col=my_palette, 
-            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(8, 8),key.xtickfun=function() {
+            breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(9, 9),key.xtickfun=function() {
               breaks <- parent.frame()$breaks
               return(list(
                 at=parent.frame()$scale01(c(breaks[1],breaks[length(breaks)])),
                 labels=c(as.character(breaks[1]),as.character(breaks[length(breaks)]))
               ))
             })
+  dev.off()
   
   jc.lateRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[17]],re.out.rt.mef[[5]])
   jc.earlyRT.ciLAD <- calculateJaccardCoefficient42Peaks(re.out.rt.mef[[16]],re.out.rt.mef[[5]])
@@ -12984,8 +12986,11 @@ calculateJaccardCoefficient42Peaks <- function(peaks1,peaks2){
 
 getJC4aSetOfPeaks <- function(re.out.rt.mef.5.sets, output.file.dir) {
   d <- sapply(names(re.out.rt.mef.5.sets), function(x) sapply(names(re.out.rt.mef.5.sets), function(y) calculateJaccardCoefficient42Peaks(peaks1=re.out.rt.mef.5.sets[[y]], peaks2=re.out.rt.mef.5.sets[[x]])))
+  d <- d/100
   
-  write.table(d,file = file.path(output.file.dir,paste0("JC_similarity",".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = T,col.names=NA)
+  file.name <- paste(names(re.out.rt.mef.5.sets),collapse = "_")
+  
+  write.table(d,file = file.path(output.file.dir,paste0(file.name,"JC_similarity",".txt")),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = T,col.names=NA)
   d
 }
 
