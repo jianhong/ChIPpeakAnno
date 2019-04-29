@@ -230,6 +230,16 @@ makeSum <- function(re1,re2,output.file.dir) {
   hist(log10(re.11.22$len))
   dev.off()
   
+  pdf(file.path(output.file.dir,paste0("NSRs_length_distribution",".pdf")))
+  par(mar=c(14,5,4,2)) 
+  boxplot(log10(re.11.22$len)~re.11.22$name,las=2)
+  dev.off()
+  
+  pdf(file.path(output.file.dir,paste0("NSRs_length_histogram",".pdf")))
+  par(mar=c(14,5,4,2)) 
+  hist(log10(re.11.22$len))
+  dev.off()
+  
   print(summary(re.11.22$len))
   print(summary(log10(re.11.22$len)))
 }
@@ -574,6 +584,12 @@ png(file.path(output.file.dir,paste0("NSRs_FPKM_distribution",".png")))
 par(mar=c(18,5,4,2)) 
 boxplot(NSRs.fpkm$FPKM~NSRs.fpkm$SetName,las=2)
 dev.off()
+
+pdf(file.path(output.file.dir,paste0("NSRs_FPKM_distribution",".pdf")))
+par(mar=c(18,5,4,2)) 
+boxplot(NSRs.fpkm$FPKM~NSRs.fpkm$SetName,las=2)
+dev.off()
+
 
 getTtestP4FPKM <- function(fpkm1,fpkm2){
  x <-  t.test(fpkm1,fpkm2)$p.value
