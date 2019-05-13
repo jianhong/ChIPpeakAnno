@@ -36,7 +36,7 @@ colnames(rawdata.tli.after.filter.by.cpm) <- tli.new.col.name.2
 
 # Set DOE(Design Of Experiemnt)
 
-tli.colData <- data.frame(SampleName=colnames(rawdata.tli.after.filter.by.cpm),batach=rep(c("b1","b2","b3"),3),condition=c(rep("ref",3),rep("low",3),rep("high",3)))
+tli.colData <- data.frame(SampleName=colnames(rawdata.tli.after.filter.by.cpm),batach=rep(c("b1","b1","b1"),3),condition=c(rep("ref",3),rep("low",3),rep("high",3)))
 
 tli.colData$group <- factor(paste0(tli.colData$batach,"_",tli.colData$condition))
 
@@ -45,7 +45,7 @@ library(DESeq2)
 ddsFullCountTable<-DESeqDataSetFromMatrix(
     countData=rawdata.tli.after.filter.by.cpm,
     colData=tli.colData,
-    design= ~batach+condition)
+    design= ~condition)
 
 dds <-DESeq(ddsFullCountTable)
   
