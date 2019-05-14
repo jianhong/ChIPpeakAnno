@@ -9,7 +9,7 @@
 }
 \usage{data(Peaks.Ste12.Replicate1)}
 \format{
-  RangedData with slot rownames containing the ID of peak as character, slot 
+  GRanges with slot names containing the ID of peak as character, slot 
   start containing the start position of the peak, slot end containing the 
   end position of the peak and space containing the chromosome where the peak 
   is located.

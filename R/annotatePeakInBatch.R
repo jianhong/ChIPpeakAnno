@@ -19,6 +19,7 @@ annotatePeakInBatch <-
         FeatureLocForDistance = match.arg(FeatureLocForDistance)
         output = match.arg(output)
         select = match.arg(select)
+        multiple = multiple[1]
         
         if ((output == "overlapping" || output == "both")
             && select =="all" && multiple==FALSE) {
