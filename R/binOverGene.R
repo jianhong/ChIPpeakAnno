@@ -153,6 +153,7 @@ binOverGene <- function(cvglists, TxDb,
          "None of them in the seqlevels of TxDb.")
   }
   features <- features[seqnames(features) %in% seqn]
+  features <- features[!features$gene_id %in% features$gene_id[start(features)<1]] ## remove the start < 1
   len <- length(unique(features$gene_id))
   features.s <- split(features, seqnames(features))
   features.s <- features.s[seqn]
