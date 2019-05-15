@@ -100,5 +100,32 @@ intersectBED <- function(bed.in,index1,index2) {
   outGrl(re,speci="Mm",output.file.dir)
 }
 
-
+#' uniqueBED
+#'
+#' @param bed.in 
+#' @param index1
+#' @param index2 
+#' @param output.file.dir 
+#'
+#' @return a list including unique peaks
+#' 
+#' @export 
+#'
+#' @examples
+#' unique.bed <- uniqueBED(bed.in,1,4,output.file.dir)
+#' 
+uniqueBED <- function(bed.in,index1,index2,output.file.dir) {
+  
+  peaks1 <- bed.in[[index1]]
+  peaks2 <- bed.in[[index2]]
+  
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
+  
+  grl <- list(peaks1.only=peaks1.only,peaks2.only=peaks2.only)
+  names(grl) <- paste0("unique-",names(bed.in)[c(index1,index2)])
+  
+  outGrl(grl,speci="Mm",output.file.dir)
+  grl
+}
 
