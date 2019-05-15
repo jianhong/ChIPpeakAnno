@@ -1,12 +1,22 @@
 # function to get the overlapping region 
 intersectBED <- function(inputGRangeList, byBase = TRUE, output = c("BED", "WIG"), outputFileNamePrefix = "common"){
   
+  peaks1 <- inputGRangeList[[1]]
+  peaks2 <- inputGRangeList[[2]]
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
   
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
+  
+  outGrl(peaks1.and.peaks2,speci="Mm",output.file.dir)
   
 }
 
-uniqueBED <- function(inputGRangeList, byBase = TRUE, output  = c("BED", "WIG"), outputFileNamePrefix = c("file1Unique", "file2Unique"){
+uniqueBED <- function(inputGRangeList, byBase = TRUE, output  = c("BED", "WIG"), outputFileNamePrefix = c("file1Unique", "file2Unique")){
   
+  peaks1 <- inputGRangeList[[1]]
+  peaks2 <- inputGRangeList[[2]]
+  peaks1.only <- GenomicRanges::setdiff(peaks1,peaks2)
+  peaks2.only <- GenomicRanges::setdiff(peaks2,peaks1)
   
 }
 

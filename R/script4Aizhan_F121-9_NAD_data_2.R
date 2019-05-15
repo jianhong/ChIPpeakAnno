@@ -82,3 +82,23 @@ Aizhan.3.sets.of.peaks <- c(Aizhan.peaks.in.unique,Aizhan.peaks.in.overlap[[3]])
 names(Aizhan.3.sets.of.peaks)[3] <- names(Aizhan.peaks.in.overlap)[3]
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
 outGrl(Aizhan.3.sets.of.peaks,speci="Mm",output.file.dir)
+
+# intersectBED(bed.in,1,4)
+# intersectBED(bed.in,1,2)
+# intersectBED(bed.in,1,3)
+
+intersectBED <- function(bed.in,index1,index2) {
+  peaks1 <- bed.in[[index1]]
+  peaks2 <- bed.in[[index2]]
+  peaks1.and.peaks2 <- GenomicRanges::intersect(peaks1,peaks2)
+  outputFileNamePrefix = "common"
+  NameX <- paste(names(bed.in)[c(index1,index2)],collapse = "-and-")
+  NameY <- paste(c(outputFileNamePrefix,NameX),collapse = "-in-")
+  re <- list(peaks1.and.peaks2=peaks1.and.peaks2)
+  names(re) <- NameY
+  output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
+  outGrl(re,speci="Mm",output.file.dir)
+}
+
+
+

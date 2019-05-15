@@ -690,7 +690,6 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
   output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3"
   getCount4Venn(test.peaks,peak.index,name,output.file.dir)
   
-  
   #peaks1[!peaks1 %over% peaks2]
   
   #bedr.subtract.region(peaks1,peaks2)
