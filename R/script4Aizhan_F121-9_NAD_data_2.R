@@ -129,3 +129,57 @@ uniqueBED <- function(bed.in,index1,index2,output.file.dir) {
   grl
 }
 
+# # 1) F121-9 vs cLAD vs ciLAD analysis:
+#   
+# Dropbox (UMass Medical School)\pub_old_galaxy\F121-9\overlap analysis\F121-9 vs CLAD vs ciLAD\common-in-F121_9_and_ciLAD.bed
+
+input.file5 <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/overlap analysis/F121-9 vs CLAD vs ciLAD/common-in-F121_9_and_ciLAD.bed"
+
+# Dropbox (UMass Medical School)\pub_old_galaxy\F121-9\overlap analysis\F121-9 vs CLAD vs ciLAD\common-in-F121_9_and_cLAD.bed
+
+input.file6 <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/overlap analysis/F121-9 vs CLAD vs ciLAD/common-in-F121_9_and_cLAD.bed"
+
+# 2) F121-9 vs. MEF XL NADs analysis:
+#   
+# Dropbox (UMass Medical School)\pub_old_galaxy\F121-9\overlap analysis\F121-9 vs MEF XL NADs\common-in-F121_9_and-XL_MEF.bed
+ 
+input.file7 <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/overlap analysis/F121-9 vs MEF XL NADs/common-in-F121_9_and-XL_MEF.bed"
+
+# Dropbox (UMass Medical School)\pub_old_galaxy\F121-9\overlap analysis\F121-9 vs MEF XL NADs\unique-F121_9.bed
+
+input.file8 <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/overlap analysis/F121-9 vs MEF XL NADs/unique-F121_9.bed"
+
+# Dropbox (UMass Medical School)\pub_old_galaxy\F121-9\overlap analysis\F121-9 vs MEF XL NADs\unique-XL_MEF.bed
+
+input.file9 <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/overlap analysis/F121-9 vs MEF XL NADs/unique-XL_MEF.bed"
+
+input.files.greater.than.50kb <- c(input.file5,input.file6,input.file7,input.file8,input.file9)
+
+bed.in.50kb.above<-lapply(input.files.greater.than.50kb,function(u){
+  peaks=read.table(u,header=F,skip=1)
+  colnames(peaks)[1:3]= c("chr","start","end")
+  peaks=toGRanges(peaks)
+  peaks
+})
+
+basename(input.files.greater.than.50kb)
+
+names(bed.in.50kb.above) <- basename(input.files.greater.than.50kb)
+
+names(bed.in.50kb.above)
+
+peak.index <- c(1,2)
+name <- tools::file_path_sans_ext(names(bed.in.50kb.above)[c(1,2)])
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
+getCount4Venn(bed.in.50kb.above,peak.index,name,output.file.dir)
+
+
+peak.index <- c(3,4,5)
+name <- tools::file_path_sans_ext(names(bed.in.50kb.above)[c(3,4,5)])
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
+getCount4Venn(bed.in.50kb.above,peak.index,name,output.file.dir)
+
+
+
+
+
