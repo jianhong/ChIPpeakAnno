@@ -179,7 +179,22 @@ name <- tools::file_path_sans_ext(names(bed.in.50kb.above)[c(3,4,5)])
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn"
 getCount4Venn(bed.in.50kb.above,peak.index,name,output.file.dir)
 
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/filteredByG50KB"
 
+xx <- lapply(bed.in, function(u){
+  x <- u[which(width(u)>50000)]
+})
 
+peak.index <- c(1,2,3,4)
+name <- c("F121_9","cLAD","ciLAD","XL_MEF")
+getCount4Venn(xx,peak.index,name,output.file.dir)
 
+peak.index <- c(1,4)
+name <- c("F121_9","XL_MEF")
+getCount4Venn(xx,peak.index,name,output.file.dir)
 
+peak.index <- c(1,2,3)
+name <- c("F121_9","cLAD","ciLAD")
+getCount4Venn(xx,peak.index,name,output.file.dir)
+
+#nonXL.3.subsets <- getUniquePeaks(ol.ciLAD.non_XL.MEF_LAD)
