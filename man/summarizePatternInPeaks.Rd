@@ -45,9 +45,9 @@ TRUE or FALSE, default FALSE
 Lihua Julie Zhu
 }
 \examples{
-    peaks = RangedData(IRanges(start=c(100, 500), end=c(300, 600), 
-                               names=c("peak1", "peak2")), 
-                       space=c("NC_008253", "NC_010468"))
+    peaks = GRanges(seqnames=c("NC_008253", "NC_010468"), 
+                    IRanges(start=c(100, 500), end=c(300, 600), 
+                               names=c("peak1", "peak2")))
     filepath =system.file("extdata", "examplePattern.fa", 
                           package="ChIPpeakAnno")
     library(BSgenome.Ecoli.NCBI.20080805)
