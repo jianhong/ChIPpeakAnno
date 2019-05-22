@@ -21,7 +21,7 @@ annoPeaks <- function(peaks, annoData,
     }
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
-    stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(annoData))
+    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
     stopifnot(length(bindingRegion)==2)
     stopifnot(bindingRegion[1]<=0 && bindingRegion[2]>=1)
     if(ignore.peak.strand){

@@ -19,7 +19,7 @@ peaksNearBDP <- function(myPeakList, AnnotationData,
     }else{
         stop("Missing required argument AnnotationData!")
     }
-    stopifnot(seqlevelsStyle(myPeakList)==seqlevelsStyle(AnnotationData))
+    stopifnot(length(intersect(seqlevelsStyle(myPeakList),seqlevelsStyle(AnnotationData)))>0)
     stopifnot(is.numeric(MaxDistance))
     
     MaxDistance <- round(MaxDistance[1])
