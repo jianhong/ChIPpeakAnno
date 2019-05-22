@@ -1,7 +1,7 @@
 bdp <- function(peaks, annoData, maxgap=2000L, ...){
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
-    stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(annoData))
+    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
     stopifnot(is.numeric(maxgap))
     maxgap <- round(maxgap[1])
     peaks <- unique(peaks)

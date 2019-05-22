@@ -5,11 +5,11 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
                     ignore.peak.strand=TRUE, ...){
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
-    stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(annoData))
+    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
     stopifnot(inherits(DNAinteractiveData, "GRanges"))
     stopifnot(length(DNAinteractiveData$blocks)>0)
     stopifnot(all(elementNROWS(DNAinteractiveData$blocks)==2))
-    stopifnot(seqlevelsStyle(peaks)==seqlevelsStyle(DNAinteractiveData))
+    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(DNAinteractiveData)))>0)
     bindingType <- match.arg(bindingType)
     stopifnot(length(bindingRegion)==2)
     stopifnot(bindingRegion[1]<=0 && bindingRegion[2]>=1)
