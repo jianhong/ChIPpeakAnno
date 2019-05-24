@@ -50,18 +50,18 @@ Jianhong Ou
 }
 \examples{
 if(Sys.getenv("USER")=="jianhongou"){
-peaks1 = RangedData(IRanges(start = c(967654, 2010897, 2496704), 
+peaks1 = GRanges(seqnames=c("1", "2", "3"), 
+                 IRanges(start = c(967654, 2010897, 2496704), 
                             end = c(967754, 2010997, 2496804), 
-                            names = c("Site1", "Site2", "Site3")), 
-                   space = c("1", "2", "3"), 
+                            names = c("Site1", "Site2", "Site3")),  
                    strand=as.integer(1), 
                    feature=c("a","b", "c"))
   peaks2 = 
-      RangedData(IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260), 
+      GRanges(seqnames= c("1", "2", "3", "1", "2"), 
+                    IRanges(start=c(967659, 2010898, 2496700, 3075866, 3123260), 
                          end=c(967869, 2011108, 2496920, 3076166, 3123470), 
                          names = c("t1", "t2", "t3", "t4", "t5")), 
-                    space = c("1", "2", "3", "1", "2"), 
-                    strand = c(1, 1, -1,-1,1), 
+                    strand = c(1L, 1L, -1L,-1L,1L), 
                     feature=c("a","c","d","e", "a"))
     getVennCounts(peaks1,peaks2)
     getVennCounts(peaks1,peaks2, by="feature")
