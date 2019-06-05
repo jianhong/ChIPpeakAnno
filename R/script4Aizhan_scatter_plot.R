@@ -2,7 +2,7 @@
 
 #Here's a file with F121-9 NADs and AveSig values for each peak:
 #Dropbox (UMass Medical School)\NADfinder\tileCount-NADfinder1.5.2\backgroundCorrected\F121_9adjPlt0.05-1.5FC-countF200-minimump.xls
- 
+
 F121_9.NAD.AveSig <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/tileCount-NADfinder1.5.2/backgroundCorrected/F121_9adjPlt0.05-1.5FC-countF200-minimump-2.xls"
 
 #And here's the file with crosslinked MEF NADs and AveSig values for each peak:
@@ -44,9 +44,5 @@ plot(y[,1], x[,1], main="Comparing F121-9 NADs with MEF NADs",
      xlab="MEF_NAD_AveSig", ylab="F121-9_NAD_AveSig", pch=19)
 dev.off()
 
-
-
-
-
-save.image(file = file.path(output.file.dir,"Comparing_F121_9_NADs_with_MEF_NADs.RData"))
-savehistory(file = file.path(output.file.dir,"Comparing_F121_9_NADs_with_MEF_NADs.Rhistory"))
+save.image(file = file.path(output.dir,"Comparing_F121_9_NADs_with_MEF_NADs.RData"))
+savehistory(file = file.path(output.dir,"Comparing_F121_9_NADs_with_MEF_NADs.Rhistory"))

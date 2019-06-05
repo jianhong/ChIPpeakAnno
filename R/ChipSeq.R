@@ -524,6 +524,7 @@ AnnotatePeakUMASS <- function(input.file.dir,input.file.pattern,output.file.dir,
                             maxP=0.5, minGOterm=10,
                             multiAdjMethod="BH", condense=TRUE)
       
+      print(over)
       
       path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
       
@@ -7461,6 +7462,8 @@ orderPeakAndOutPut <- function(peakAll,output.file.dir,output.file.name,outHeade
   
   chrOrder<-c(paste("chr",1:19,sep=""),"chrX","chrY")
   
+  peakAll <- peakAll[which(peakAll$seqnames %in% chrOrder),]
+  
   peakAll$seqnames <- factor(peakAll$seqnames, levels=chrOrder)
   
   peakAll2 <- peakAll[order(peakAll$seqnames,peakAll$start),]
@@ -7623,10 +7626,11 @@ peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
     
     getGoAndPath <- function(overlaps.anno.with.entrez.id,output.file.dir,x_name) {
       
-      overlaps.anno.with.entrez.id <- overlaps.anno
+      #overlaps.anno.with.entrez.id <- overlaps.anno
       over <- getEnrichedGO(overlaps.anno.with.entrez.id, orgAnn="org.Mm.eg.db",
                             maxP=0.5, minGOterm=10,
                             multiAdjMethod="BH", condense=TRUE)
+      #print(over)
       path <- getEnrichedPATH(overlaps.anno.with.entrez.id, "org.Mm.eg.db", "reactome.db", maxP=.05)
       write.table(path,file=file.path(output.file.dir,paste0(x_name,"_path.txt")),row.names = FALSE,quote=FALSE,sep="\t")
       convert2geneSymbol <- function(over1) {
@@ -7684,10 +7688,12 @@ peaksToEnrichedGO <- function(re.out,output.file.dir,genome){
       }
       
       writeTibble(over_bp, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_BP.csv")))
-      Draw4GO(over_bp,0.05,10,output.file.dir,"GO_BP_bar.png")
+      #Draw4GO(over_bp,0.05,10,output.file.dir,"GO_BP_bar.png")
       
       writeTibble(over_mf, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_MF.csv")))
       writeTibble(over_cc, output.file.name = file.path(output.file.dir,paste0(x_name,"_GO_CC.csv")))
+      
+    #  over
     }
     
     getGoAndPath(overlaps.anno,output.file.dir,x_name)
@@ -9960,7 +9966,6 @@ batchDraw4GO <- function(output.file.dir,gomat) {
   
   null <- lapply(1:length(go.files), function(u,go.files,gomat,output.file.dir){
     
-     #u <- 1
      tempDS3 <- read.csv(go.files[u])
     
      tempDS3 <- tempDS3[,-1]
@@ -12738,9 +12743,9 @@ plotFPKM4AizhanNew <- function(){
  
 }
 
-enrichList.1 <- enrichList
+# enrichList.1 <- enrichList
 
-names(enrichList.1) <- c("EED−10","Input−1","Input−2","H3k4me3−3", "H3k4me3−4","H3k27me3−5","H3k27me3−6","Input−7","Input−8","EED−9", "Undetermined")
+# names(enrichList.1) <- c("EED−10","Input−1","Input−2","H3k4me3−3", "H3k4me3−4","H3k27me3−5","H3k27me3−6","Input−7","Input−8","EED−9", "Undetermined")
 
 # cols = colorpanel(256,"snow","red","red")
 # selected.genes="TGFB1:ENST00000598758"
@@ -13177,79 +13182,81 @@ getBigWig2 <- function(sample.name,range.rato.ss,output.dir) {
 # test_bw_out <- file.path(output.dir, paste0(tools::file_path_sans_ext(colnames(range.rato.ss)[s.index]),".bw"))
 # export.bw(ZZZ,test_bw_out)
 
-par(mfrow=c(2,1))
-input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
-index <- c(rep(18,1),rep(29,1),rep(33,1))
-type <- rep(c("N"),1)
-title="nonXL"
-BoundaryAnalysis3(NAD.peaks[[1]],input.bw.path,type,index,title)
-
-BoundaryAnalysis3 <- function(NADpeaks,input.bw.path,type,index,title,y_title) {
+boundaryAnalysisFunction <- function(NAD.peaks, seList, rbind) {
+  par(mfrow=c(2,1))
+  input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
+  index <- c(rep(18,1),rep(29,1),rep(33,1))
+  type <- rep(c("N"),1)
+  title="nonXL"
+  BoundaryAnalysis3(NAD.peaks[[1]],input.bw.path,type,index,title)
   
-  index.1 <- unique(index)
-  type.index <- paste(type,index,sep="")
+  BoundaryAnalysis3 <- function(NADpeaks,input.bw.path,type,index,title,y_title) {
+    
+    index.1 <- unique(index)
+    type.index <- paste(type,index,sep="")
+    
+    #NADpeaks <- NAD.peaks[[1]]
+    
+    NADpeaks <- NADpeaks
+    nonNAD.2.NAD <- NADpeaks
+    width(nonNAD.2.NAD) <- 1
+    nonNAD.2.NAD.region <- nonNAD.2.NAD 
+    dd <- 50000
+    start(nonNAD.2.NAD.region) <- start(nonNAD.2.NAD) - dd
+    end(nonNAD.2.NAD.region) <- end(nonNAD.2.NAD) + dd
+    
+    files <- dir(input.bw.path, "bw")
+    index.nonXL <- c(grep(index.1[1],files),grep(index.1[2],files),grep(index.1[3],files))
+    targets <- file.path(input.bw.path,files)[index.nonXL]
+    
+    sm = ScoreMatrixList(targets = targets, windows = nonNAD.2.NAD.region, bin.num = 200)
+    
+    #title <- "nonXL"
+    
+    plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title,"non-NAD to NAD"),ylab=y_title)
+    
+    NAD.2.nonNAD <- NADpeaks
+    
+    start(NAD.2.nonNAD) <- end(NAD.2.nonNAD)
+    
+    NAD.2.nonNAD.region <- NAD.2.nonNAD
+    
+    dd <- 50000
+    start(NAD.2.nonNAD.region) <- start(NAD.2.nonNAD) - dd
+    end(NAD.2.nonNAD.region) <- end(NAD.2.nonNAD) + dd
+    
+    #targets1 <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis/N18.sort.markDup.bw"
+    
+    sm = ScoreMatrixList(targets = targets, windows = NAD.2.nonNAD.region, bin.num = 200)
+    
+    plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title, "NAD to non-NAD",sep=" "),ylab=y_title)
+    
+  }
   
-  #NADpeaks <- NAD.peaks[[1]]
+  range.rato.s <- lapply(1:length(seList), function(u,seList){
+    range.ratio <- cbind(as.data.frame(ranges(seList[[u]])),assays(seList[[u]])$bcRatio)
+    range.ratio
+  },seList)
   
-  NADpeaks <- NADpeaks
-  nonNAD.2.NAD <- NADpeaks
-  width(nonNAD.2.NAD) <- 1
-  nonNAD.2.NAD.region <- nonNAD.2.NAD 
-  dd <- 50000
-  start(nonNAD.2.NAD.region) <- start(nonNAD.2.NAD) - dd
-  end(nonNAD.2.NAD.region) <- end(nonNAD.2.NAD) + dd
+  range.rato.ss <- do.call(rbind,range.rato.s)
   
-  files <- dir(input.bw.path, "bw")
-  index.nonXL <- c(grep(index.1[1],files),grep(index.1[2],files),grep(index.1[3],files))
-  targets <- file.path(input.bw.path,files)[index.nonXL]
+  # sample.name <- "N24"
+  # getBigWig2(sample.name,range.rato.ss,output.dir)
   
-  sm = ScoreMatrixList(targets = targets, windows = nonNAD.2.NAD.region, bin.num = 200)
+  # sample.name <- "N26"
+  # getBigWig2(sample.name,range.rato.ss,output.dir)
   
-  #title <- "nonXL"
+  # sample.name <- "N28"
+  # getBigWig2(sample.name,range.rato.ss,output.dir)  
   
-  plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title,"non-NAD to NAD"),ylab=y_title)
+  par(mfrow=c(2,1))
+  input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
+  index <- c(rep(24,1),rep(26,1),rep(28,1))
+  type <- rep(c("N"),1)
+  title="XL"
+  BoundaryAnalysis3(NAD.peaks[[2]],input.bw.path,type,index,title)
   
-  NAD.2.nonNAD <- NADpeaks
-  
-  start(NAD.2.nonNAD) <- end(NAD.2.nonNAD)
-  
-  NAD.2.nonNAD.region <- NAD.2.nonNAD
-  
-  dd <- 50000
-  start(NAD.2.nonNAD.region) <- start(NAD.2.nonNAD) - dd
-  end(NAD.2.nonNAD.region) <- end(NAD.2.nonNAD) + dd
-  
-  #targets1 <- "~/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis/N18.sort.markDup.bw"
-  
-  sm = ScoreMatrixList(targets = targets, windows = NAD.2.nonNAD.region, bin.num = 200)
-  
-  plotMeta(sm, xcoords = c(-50000, 50000),overlay=TRUE,profile.names=c(type.index),main=paste(title, "NAD to non-NAD",sep=" "),ylab=y_title)
-  
+  #/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4/XL.only.bed
 }
-
-range.rato.s <- lapply(1:length(seList), function(u,seList){
-  range.ratio <- cbind(as.data.frame(ranges(seList[[u]])),assays(seList[[u]])$bcRatio)
-  range.ratio
-},seList)
-
-range.rato.ss <- do.call(rbind,range.rato.s)
-
-# sample.name <- "N24"
-# getBigWig2(sample.name,range.rato.ss,output.dir)
-
-# sample.name <- "N26"
-# getBigWig2(sample.name,range.rato.ss,output.dir)
-
-# sample.name <- "N28"
-# getBigWig2(sample.name,range.rato.ss,output.dir)  
-
-par(mfrow=c(2,1))
-input.bw.path <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/BoundaryAnalysis"
-index <- c(rep(24,1),rep(26,1),rep(28,1))
-type <- rep(c("N"),1)
-title="XL"
-BoundaryAnalysis3(NAD.peaks[[2]],input.bw.path,type,index,title)
-
-#/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output/Aizhan_3_sets_bed_4/XL.only.bed
 
 
