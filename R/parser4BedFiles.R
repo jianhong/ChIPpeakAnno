@@ -50,22 +50,27 @@ Early.replication.timing <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F
 
 Late.replication.timing <- "/Users/aiminyan/Aimin/DropboxUmass/pub_old_galaxy/F121-9/published data/GSE95091_F121-9_nesc_r1_R_T_.bedGraph"
 
+H3K27me3 <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/H3K27me3/GSM2416833_WT_2i_ChIP_H3K27me3-domains-1.bed"
+
+F121_9_nonNADs <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4_F121_9_Type_I_NADs_F121_9_Type_II_NADs_F121_9_NADs_F121_9_nonNADs_box_plot/F121_9_nonNADs.bed"
+
+
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis"
 
-bed.files <- c(F121.9.NADs,F121.9.Type.I.NADs,F121.9.Type.II.NADs,shared.NADs,F121.9.specific.NADs,MEF.specific.NADs,cLAD,ciLAD,Early.replication.timing,Late.replication.timing)
+bed.files <- c(F121.9.NADs,F121.9.Type.I.NADs,F121.9.Type.II.NADs,shared.NADs,F121.9.specific.NADs,MEF.specific.NADs,cLAD,ciLAD,Early.replication.timing,Late.replication.timing,H3K27me3,F121_9_nonNADs)
 
 bed.in<-lapply(1:length(bed.files),function(u,bed.files){
   
   x <- bed.files[[u]]
   
-  if(u == 2|u==3|u==4|u==5|u==6|u==9|u==10){peaks=read.table(x,header=F)}else{peaks=read.table(x,header=F,skip=1)}
+  if(u == 2|u==3|u==4|u==5|u==6|u==9|u==10|u==11|u==12){peaks=read.table(x,header=F)}else{peaks=read.table(x,header=F,skip=1)}
   
   colnames(peaks)[1:3]= c("chr","start","end")
   peaks=toGRanges(peaks)
   peaks
 },bed.files)
 
-names(bed.in) <- c("F121.9.NADs","F121.9.Type.I.NADs","F121.9.Type.II.NADs","shared.NADs","F121.9.specific.NADs","MEF.specific.NADs","cLAD","ciLAD","Early.replication.timing","Late.replication.timing")
+names(bed.in) <- c("F121.9.NADs","F121.9.Type.I.NADs","F121.9.Type.II.NADs","shared.NADs","F121.9.specific.NADs","MEF.specific.NADs","cLAD","ciLAD","Early.replication.timing","Late.replication.timing","H3K27me3","F121_9_nonNADs")
 
 Ert <- bed.in[[9]][which(bed.in[[9]]$V4>0)]
 Lrt <- bed.in[[10]][which(bed.in[[10]]$V4<0)]
@@ -85,7 +90,7 @@ getJC4aSetOfPeaks1 <- function(re.out.rt.mef.5.sets, output.file.dir) {
   d
 }
 
-d <- getJC4aSetOfPeaks1(bed.in, output.file.dir)
+d <- getJC4aSetOfPeaks1(bed.in[1:10], output.file.dir)
 
 source("R/heatmap.3.R")
 
@@ -106,5 +111,20 @@ heatmap.3(d,col=my_palette,Rowv = T,Colv=T,dendrogram="both",
           })
 dev.off()
 
+peak.index <- c(1,7,11)
+name <- c("F121_9","cLAD","H3K27me3")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)
+
+peak.index <- c(1,8,11)
+name <- c("F121_9","ciLAD","H3K27me3")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)
+
+peak.index <- c(3,8,11)
+name <- c("F121_9_Type_II","ciLAD","H3K27me3")
+getCount4Venn(bed.in,peak.index,name,output.file.dir)
+
+F121.9.NADs.coverage <- getCoverage4GrOngenome(bed.in[[1]],"mm10")
+
+saveRDS(bed.in,file = file.path(output.file.dir,paste0(paste(names(bed.in),collapse = "-"),".rds")))
 save.image(file = file.path(output.file.dir,paste0(basename(output.file.dir),".RData")))
 savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".Rhistory")))
