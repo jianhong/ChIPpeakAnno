@@ -11,7 +11,7 @@ Find the overlapping peaks for two or more (less than five) set of peak ranges.
 }
 \usage{
 findOverlapsOfPeaks(\dots, maxgap=-1L, minoverlap=0L,
-                    ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll"))
+                    ignore.strand=TRUE, connectedPeaks=c("keepAll", "min", "merge"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,6 +28,8 @@ for a description of these arguments.
   }
 \item{connectedPeaks}{
   If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as 1, while set it to "min" will count it as the minimal involved peaks in any group of connected/overlapped peaks.
+  "keepAll" will keep all the orginal counts for each list while the final counts will be
+  same as "min".
 }
 }
 \details{

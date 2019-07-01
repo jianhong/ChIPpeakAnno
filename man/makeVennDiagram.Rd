@@ -10,9 +10,9 @@ determine whether those peaks overlap significantly.
 \usage{
 makeVennDiagram(Peaks, NameOfPeaks, maxgap = -1L, minoverlap = 0L,
                  totalTest, by = c("region", "feature", "base"),
-                 ignore.strand = TRUE, connectedPeaks = c("min",
-                 "merge", "keepAll"), method = c("hyperG",
-                 "permutation"), TxDb, ...)
+                 ignore.strand = TRUE, connectedPeaks = c("min", 
+                 "merge", "keepAll", "keepFirstListConsistent"), 
+                 method = c("hyperG", "permutation"), TxDb, ...)
 }
 \arguments{
   \item{Peaks}{
@@ -45,7 +45,10 @@ in nucleotide level.
 \item{connectedPeaks}{
   If multiple peaks involved in overlapping in several groups, set it to 
   "merge" will count it as only 1, while set it to "min" will count it as 
-  the minimal involved peaks in any connected peak group. 
+  the minimal involved peaks in any connected peak group. "keepAll" will
+  show all the orginal counts for each list while the final counts will be
+  same as "min". "keepFirstListConsistent" will keep the counts consistent
+  with first list.
 }
 \item{method}{method used for p value calculation. hyperG means 
 hypergeometric test and permutation means \link{peakPermTest}}
@@ -86,10 +89,16 @@ if (interactive()){
                         strand = c("+", "+", "-", "-", "+"), 
                         feature=c("a","b","c","d","a"))
     makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"),
-                    totalTest=100,scaled=FALSE, euler.d=FALSE)
+                    totalTest=100,scaled=FALSE, euler.d=FALSE, 
+                fill=c("#009E73", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2"), #circle border color
+                cat.col=c("#D55E00", "#0072B2"))
     
     makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"),
-                    totalTest=100)
+                    totalTest=100, 
+                fill=c("#009E73", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2"), #circle border color
+                cat.col=c("#D55E00", "#0072B2"))
     
     ###### 4-way diagram using annotated feature instead of chromosome ranges
     

@@ -1,6 +1,6 @@
 ##require library graph, RBGL
 findOverlapsOfPeaks <- function(..., maxgap=-1L, minoverlap=0L,
-                                ignore.strand=TRUE, connectedPeaks=c("min", "merge", "keepAll")){
+                                ignore.strand=TRUE, connectedPeaks=c("keepAll", "min", "merge")){
   ###check inputs
   NAME_conn_string <- "___conn___"
   NAME_short_string <- "__"

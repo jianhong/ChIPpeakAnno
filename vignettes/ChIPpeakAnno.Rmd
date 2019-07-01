@@ -127,7 +127,10 @@ gr1.import[1:2] #note the name slot is different from gr1
 gff <- system.file("extdata", "GFF_peaks.gff", package="ChIPpeakAnno")
 gr2 <- toGRanges(gff, format="GFF", header=FALSE, skip=3)
 ol <- findOverlapsOfPeaks(gr1, gr2)
-makeVennDiagram(ol)
+makeVennDiagram(ol,
+                fill=c("#009E73", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2"), #circle border color
+                cat.col=c("#D55E00", "#0072B2"))
 ```
 
 A pie chart is used to demonstrate the overlap features of the common peaks.
@@ -295,7 +298,10 @@ of `findOverlapsOfPeaks` as an input.
 The `makeVennDiagram` also outputs p-values indicating whether the overlapping is significant.
 
 ```{r findOverlapsOfPeaks8,fig.cap="venn diagram of overlaps",fig.width=6,fig.height=6}
-makeVennDiagram(ol, totalTest=1e+2)
+makeVennDiagram(ol, totalTest=1e+2,
+                fill=c("#009E73", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2"), #circle border color
+                cat.col=c("#D55E00", "#0072B2"))
 ```
 
 Alternatively,  users have the option to use other tools to plot Venn diagram. The following code demonstrates how to use a third party R package **Vernerable** with the output from the function `findOverlapsOfPeaks`. 
@@ -336,7 +342,10 @@ peaks3 <- GRanges(seqnames=c("1", "2", "3", "4", "5",
 
 ol <- findOverlapsOfPeaks(peaks1, peaks2, peaks3, maxgap=1000, 
                           connectedPeaks="min")
-makeVennDiagram(ol, totalTest=1e+2)
+makeVennDiagram(ol, totalTest=1e+2,
+                fill=c("#CC79A7", "#56B4E9", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2", "#E69F00"), #circle border color
+                cat.col=c("#D55E00", "#0072B2", "#E69F00"))
 ```
 
 The parameter _totalTest_ in the function `makeVennDiagram` indicates the total number of potential peaks used in the hypergeometric test. It should be 

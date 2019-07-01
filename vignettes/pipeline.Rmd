@@ -58,7 +58,9 @@ ol <- findOverlapsOfPeaks(gr1, gr2)
 ## add metadata (mean of score) to the overlapping peaks
 ol <- addMetadata(ol, colNames="score", FUN=mean) 
 ol$peaklist[["gr1///gr2"]][1:2]
-makeVennDiagram(ol)
+makeVennDiagram(ol, fill=c("#009E73", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2"), #circle border color
+                cat.col=c("#D55E00", "#0072B2")) # label color, keep same as circle border color
 ```
 
 ## Prepare annotation data
@@ -251,7 +253,18 @@ we estimate that the total binding sites is 1/24 of possible binding region in t
 ol <- findOverlapsOfPeaks(data, connectedPeaks="keepAll")
 averagePeakWidth <- mean(width(unlist(GRangesList(ol$peaklist))))
 tot <- ceiling(3.3e+9 * .03 / averagePeakWidth / 24)
-makeVennDiagram(ol, totalTest=tot, connectedPeaks="keepAll")
+makeVennDiagram(ol, totalTest=tot, connectedPeaks="keepAll", 
+                fill=c("#CC79A7", "#56B4E9", "#F0E442"), # circle fill color
+                col=c("#D55E00", "#0072B2", "#E69F00"), #circle border color
+                cat.col=c("#D55E00", "#0072B2", "#E69F00"))
+## see the difference if we set connectedPeaks to "keepFirstListConsistent"
+## set connectedPeaks to keepFirstListConsistent will show consistent total 
+## number of peaks for the first peak list.
+makeVennDiagram(ol, totalTest=tot, connectedPeaks="keepFirstListConsistent", 
+                fill=c("#CC79A7", "#56B4E9", "#F0E442"),
+                col=c("#D55E00", "#0072B2", "#E69F00"),
+                cat.col=c("#D55E00", "#0072B2", "#E69F00"))
+
 ```
 
 ### Permutation test

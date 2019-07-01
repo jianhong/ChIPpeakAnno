@@ -1,7 +1,7 @@
 makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
                             totalTest, by=c("region", "feature", "base"), 
                             ignore.strand=TRUE, 
-                            connectedPeaks=c("min", "merge", "keepAll"), 
+                            connectedPeaks=c("min", "merge", "keepAll", "keepFirstListConsistent"), 
                             method=c("hyperG", "permutation"), TxDb,
                             ...){
   ###Functions to be used
@@ -25,15 +25,19 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
     names(.x)<-NameOfPeaks
     .x
   }
-  plotVenn<-function(venn_cnt, vennx, otherCounts=NULL, 
-                     cat.cex = 1, cat.col = "black", 
-                     cat.fontface = "plain", cat.fontfamily = "serif", ...){
+  plotVenn<-function(venn_cnt, vennx, otherCounts=NULL, ...){
+    dots <- list(...)
+    if(is.null(dots$cat.cex)) dots$cat.cex = 1
+    if(is.null(dots$cat.col)) dots$cat.col = "black"
+    if(is.null(dots$cat.fontface)) dots$cat.fontface = "plain"
+    if(is.null(dots$cat.fontfamily)) dots$cat.fontfamily = "serif"
+    
     op=par(mar=c(0,0,0,0))
     on.exit(par(op))
     plot.new()
-    venngrid <- venn.diagram(x=vennx, filename=NULL, cat.cex = cat.cex,
-                             cat.col = cat.col, cat.fontface = cat.fontface, 
-                             cat.fontfamily = cat.fontfamily, ...)
+    dots$x <- vennx
+    dots <- c(dots, filename=list(NULL))
+    venngrid <- do.call(venn.diagram, dots)
     unlink(dir(pattern="^VennDiagram[0-9_\\-]+.log$")) ## delete the log file
     if(grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)]) && 
            connectedPeaks=="keepAll"){
@@ -99,9 +103,9 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
     }
     if(!is.null(otherCounts)){
       tmp <- textGrob(label=otherCounts, x=0.9, y=0.1, 
-                      gp=gpar(col = cat.col, cex = cat.cex, 
-                              fontface = cat.fontface, 
-                              fontfamily = cat.fontfamily))
+                      gp=gpar(col = "black", cex = dots$cat.cex, 
+                              fontface = dots$cat.fontface, 
+                              fontfamily = dots$cat.fontfamily))
       venngrid <- gList(venngrid, tmp)
     }
     grid.draw(venngrid)
@@ -217,11 +221,23 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
       venn_cnt <- getVennCounts(Peaks, maxgap=maxgap, 
                                 minoverlap=minoverlap, 
                                 by=by, ignore.strand=ignore.strand, 
-                                connectedPeaks=connectedPeaks)
+                                connectedPeaks=ifelse(connectedPeaks=="keepFirstListConsistent", 
+                                                      "keepAll", connectedPeaks))
   }
-  colnames(venn_cnt)[1:n1] <- NameOfPeaks 
-  Counts <- getCountsList(venn_cnt[,"Counts"])
-  vennx <- getVennList(venn_cnt, NameOfPeaks, Counts)
+  colnames(venn_cnt)[1:n1] <- NameOfPeaks
+  venn_cnt1 <- venn_cnt
+  if(connectedPeaks=="keepFirstListConsistent"){ ## keepAll to getVennCounts
+    if(!grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)])){
+      warning("If connectedPeaks set to keepFirstListConsistent,",
+              "connectedPeaks of findOverlapsOfPeaks must be keepAll.",
+              "Setting connectedPeaks to default.")
+    }else{
+      venn_cnt1[venn_cnt[, 1]==1, "Counts"] <- venn_cnt[venn_cnt[, 1]==1, n1+2]
+    }
+    connectedPeaks <- "min"
+  }
+  Counts <- getCountsList(venn_cnt1[,"Counts"])
+  vennx <- getVennList(venn_cnt1, NameOfPeaks, Counts)
   if(method=="hyperG"){
       if(!missing(totalTest)){
           otherCount <- totalTest - sum(venn_cnt[, "Counts"])
@@ -265,6 +281,6 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
           otherCount <- venn_cnt[1, "Counts"]
       }
   }
-  plotVenn(venn_cnt, vennx, otherCount=otherCount, ...)
+  plotVenn(venn_cnt1, vennx, otherCount=otherCount, ...)
   return(list(p.value=p.value, vennCounts=venn_cnt))
 }
