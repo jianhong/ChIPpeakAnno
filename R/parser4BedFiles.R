@@ -111,6 +111,11 @@ heatmap.3(d,col=my_palette,Rowv = T,Colv=T,dendrogram="both",
           })
 dev.off()
 
+
+/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/F121_9-cLAD-H3K27me3.pdf
+/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/F121_9-ciLAD-H3K27me3.pdf
+
+
 peak.index <- c(1,7,11)
 name <- c("F121_9","cLAD","H3K27me3")
 getCount4Venn(bed.in,peak.index,name,output.file.dir)
@@ -124,6 +129,41 @@ name <- c("F121_9_Type_II","ciLAD","H3K27me3")
 getCount4Venn(bed.in,peak.index,name,output.file.dir)
 
 F121.9.NADs.coverage <- getCoverage4GrOngenome(bed.in[[1]],"mm10")
+
+getPeaksGt50 <- function(bed.in,peak.index,name) {
+  
+  bed.in.to.be.selected <- bed.in[peak.index]
+  bed.in.to.be.selected.gt.50k <- lapply(bed.in.to.be.selected, function(u){
+      x.u <- u[which(width(u) > 50000)]
+      x.u
+  })
+  bed.in.to.be.selected.gt.50k
+  
+}
+
+peak.index <- c(1,7,11)
+name <- c("F121_9","cLAD","H3K27me3")
+bed.in.to.be.selected.gt.50k <- getPeaksGt50(bed.in,peak.index,name)
+print(names(bed.in.to.be.selected.gt.50k))
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/Gt50K"
+peak.index <- c(1,2,3)
+getCount4Venn(bed.in.to.be.selected.gt.50k,peak.index,name,output.file.dir)
+
+peak.index <- c(1,8,11)
+name <- c("F121_9","ciLAD","H3K27me3")
+bed.in.to.be.selected.gt.50k <- getPeaksGt50(bed.in,peak.index,name)
+print(names(bed.in.to.be.selected.gt.50k))
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/Gt50K"
+peak.index <- c(1,2,3)
+getCount4Venn(bed.in.to.be.selected.gt.50k,peak.index,name,output.file.dir)
+
+peak.index <- c(3,8,11)
+name <- c("F121_9_Type_II","ciLAD","H3K27me3")
+bed.in.to.be.selected.gt.50k <- getPeaksGt50(bed.in,peak.index,name)
+print(names(bed.in.to.be.selected.gt.50k))
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/Gt50K"
+peak.index <- c(1,2,3)
+getCount4Venn(bed.in.to.be.selected.gt.50k,peak.index,name,output.file.dir)
 
 saveRDS(bed.in,file = file.path(output.file.dir,paste0(paste(names(bed.in),collapse = "-"),".rds")))
 save.image(file = file.path(output.file.dir,paste0(basename(output.file.dir),".RData")))
