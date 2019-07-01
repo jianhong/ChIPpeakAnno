@@ -111,11 +111,6 @@ heatmap.3(d,col=my_palette,Rowv = T,Colv=T,dendrogram="both",
           })
 dev.off()
 
-
-/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/F121_9-cLAD-H3K27me3.pdf
-/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanJaccardAnalysis/F121_9-ciLAD-H3K27me3.pdf
-
-
 peak.index <- c(1,7,11)
 name <- c("F121_9","cLAD","H3K27me3")
 getCount4Venn(bed.in,peak.index,name,output.file.dir)
