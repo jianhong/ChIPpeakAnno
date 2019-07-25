@@ -8,7 +8,7 @@ Search by name for an Bimap object.
 }
 \usage{
 xget(x, envir, mode, ifnotfound=NA, inherits, 
-    output=c("all", "first"))
+    output=c("all", "first", "last"))
 }
 \arguments{
   \item{x, envir, mode, ifnotfound, inherits}{

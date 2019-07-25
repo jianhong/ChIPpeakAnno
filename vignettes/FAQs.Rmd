@@ -50,6 +50,10 @@ annotation data from bioMart. _AnnotationData_ could also be a user-defined
 list in `GenomicRanges::GRanges` format, e.g., another list of peaks.
 
 
+**Q**: If we use `annoPeaks` to annotate the start site of features, why the number of annotated peaks sometimes are smaller than we do `findOverlaps` for the peaks and features?
+
+**A**: `annoPeaks` will make sure the downstream annotation range for startSite and upstream annotation range for endSite are within the features. 
+
 ## Find Overlaps of Peaks
 **Q**: Why is the sum of peak numbers in the Venn-diagram not equal to the 
 sum of the numbers in the original peaks list?

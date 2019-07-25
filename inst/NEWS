@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.19.4
 -------------------------
 
+    o add last choice for xget.
+    
+CHANGES IN VERSION 3.19.3
+-------------------------
+
     o fix the colnames of addMetadata.
 
 CHANGES IN VERSION 3.19.2
