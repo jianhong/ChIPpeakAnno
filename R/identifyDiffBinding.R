@@ -34,7 +34,7 @@ index.genome2 <- grep("genome2",basename(file.1))
 bam.genome1 <- file.1[index.genome1][c(1,3,17,19)]
 bam.genome2 <- file.1[index.genome2][c(1,3,17,19)]
 
-tamoxifen <- dba(sampleSheet="tamoxifen.csv", dir=basedir,peakCaller="macs", peakFormat="raw", scoreCol=5 )
+#tamoxifen <- dba(sampleSheet="tamoxifen.csv", dir=basedir,peakCaller="macs", peakFormat="raw", scoreCol=5 )
 
 # prepare sample.csv for dba in DiffBind
 
