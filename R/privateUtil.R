@@ -227,6 +227,9 @@ vennCounts <- function(PeaksList, n, names,
                                              drop.redundant=TRUE))
             ##all connected peaks
             olm <- cbind(names(Peaks[ol[,1]]), names(Peaks[ol[,2]]))
+            ## remove the overlaps from same list
+            olm <- olm[sub(paste0(NAME_conn_string, ".*?$"), "", names(Peaks[ol[,1]]))!=
+                         sub(paste0(NAME_conn_string, ".*?$"), "", names(Peaks[ol[,2]])), , drop=FALSE]
             edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))
             nodes <- unique(as.character(olm))
             ##use graph to extract all the connected peaks
@@ -241,6 +244,9 @@ vennCounts <- function(PeaksList, n, names,
                                     drop.self=TRUE, drop.redundant=TRUE)
                 olm <- cbind(names(.peaks.list[queryHits(.ol)]), 
                              names(.peaks.list[subjectHits(.ol)]))
+                ## remove the overlaps from same list
+                olm <- olm[sub(paste0(NAME_conn_string, ".*?$"), "", names(.peaks.list[queryHits(.ol)]))!=
+                             sub(paste0(NAME_conn_string, ".*?$"), "", names(.peaks.list[subjectHits(.ol)])), , drop=FALSE]
                 edgeL <- c(split(olm[,2], olm[,1]), split(olm[,1], olm[,2]))
                 nodes <- unique(as.character(olm))
                 ##use graph to extract all the connected peaks

@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.18.2
+-------------------------
+
+    o fix the issue that findOverlapsOfPeaks will connect the peaks in same list.
+
 CHANGES IN VERSION 3.18.1
 -------------------------
 
