@@ -303,9 +303,14 @@ savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".
 
 
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/F121-9_box_plot"
+
 bed.in.new.anno <- getAnnotatedGene(bed.in.new[c(1:3,5)],"Mm")
 bed.in.new.anno.YYY <- getFPKM4DiffSet(bed.in.new.anno,rna.seq.data.from.Aizhan)
 getBoxPlot4FPKMOfSubsetPeaks7(bed.in.new.anno.YYY,rna.seq.data.from.Aizhan,"F121_9_NAD","rnaSeq_data_for_F121_9_FPKM.txt",output.file.dir)
+
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/F121-9_box_plot/scale_boxplot_0_2"
+getBoxPlot4FPKMOfSubsetPeaks8(bed.in.new.anno.YYY,rna.seq.data.from.Aizhan,"F121_9_NAD","rnaSeq_data_for_F121_9_FPKM.txt",output.file.dir)
+
 save.image(file = file.path(output.file.dir,paste0(basename(output.file.dir),".RData")))
 savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".Rhistory")))
 
@@ -497,9 +502,15 @@ savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".
 
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/mESC_Lowe_GSM1418813_box_plot"
 
+
+
 bed.in.new.anno <- getAnnotatedGene(bed.in.new[c(1:3,5)],"Mm")
 bed.in.new.anno.YYY <- getFPKM4DiffSet(bed.in.new.anno,GSM1418813.ES1.fpkm)
 getBoxPlot4FPKMOfSubsetPeaks7(bed.in.new.anno.YYY,GSM1418813.ES1.fpkm,"F121_9_NAD","GSM1418813.ES1.fpkm.txt",output.file.dir)
+
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/mESC_Lowe_GSM1418813_box_plot/scale_boxplot_0_2"
+getBoxPlot4FPKMOfSubsetPeaks8(bed.in.new.anno.YYY,GSM1418813.ES1.fpkm,"F121_9_NAD","GSM1418813.ES1.fpkm.txt",output.file.dir)
+
 save.image(file = file.path(output.file.dir,paste0(basename(output.file.dir),".RData")))
 savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".Rhistory")))
 
@@ -596,10 +607,44 @@ getBoxPlot4FPKMOfSubsetPeaks7 <- function(YYY,fpkm.value,setName,rnaSeqFPKMFileN
   
 }
 
+getBoxPlot4FPKMOfSubsetPeaks8 <- function(YYY,fpkm.value,setName,rnaSeqFPKMFileName,output.file.dir){
+  
+  if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
+  
+  write.table(fpkm.value,file=file.path(output.file.dir,rnaSeqFPKMFileName),sep="\t",quote = FALSE,row.names = FALSE,col.names = TRUE)
+  
+  fpkm.value.ref <- data.frame(SetName=rep("wholeGenome",dim(fpkm.value)[1]),GeneName=fpkm.value$gene.name,FPKM=fpkm.value$fpkm)
+  
+  #setName <- "F121_9_NADs"
+  NAD <- YYY[which(YYY$SetName==setName),]
+  
+  #NAD.fpkm.value <- fpkm.value.ref[which(fpkm.value.ref$GeneName %in% NAD$GeneName),]
+  #NAD.fpkm.value$SetName <- "NAD"
+  nonNAD.fpkm.value <- fpkm.value.ref[-which(fpkm.value.ref$GeneName %in% YYY$GeneName),]
+  nonNAD.fpkm.value$SetName <- "nonNAD"
+  
+  YYYY <- rbind(YYY,NAD,nonNAD.fpkm.value,fpkm.value.ref)
+  
+  png(file = file.path(output.file.dir,paste0(paste(levels(YYYY$SetName),collapse = "-"),".png")),width = 1500, height = 480)
+  
+  XX <- as.numeric(as.character(YYYY$FPKM))+1
+  XX.max <- max(XX)
+  XX.scaling <- (XX/XX.max)*2
+
+  
+  boxplot(XX.scaling~YYYY$SetName,ylab = "FPKM_0_2_scaling", ylim = c(0, 2))
+  
+  dev.off()
+  
+  write.table(YYYY,file=file.path(output.file.dir,"SetName_FPKM.txt"),sep="\t",quote = FALSE,row.names = FALSE,col.names = TRUE)
+  
+  YYYY
+  
+}
+
 gr.whole.genome <- GRanges(seqinfo(BSgenome.Mmusculus.UCSC.mm10))
 F121_9_nonNADs <- list(F121_9_nonNADs=GenomicRanges::setdiff(gr.whole.genome,gr.6.4.2019[[3]]))
 outGrl(F121_9_nonNADs,speci="Mm",output.file.dir)
 
 save.image(file = file.path(output.file.dir,"6_4_2019_FPKM.RData"))
 savehistory(file = file.path(output.file.dir,"6_4_2019_FPKM.Rhistory"))
-

@@ -159,6 +159,12 @@ plotMeta1 <- function (mat, centralTend = "mean", overlay = TRUE, winsorize = c(
         }
       }
     }
+    
+    metas.L <- lapply(metas, function(u){ x <- u })
+    col.L <- lapply(line.col, function(u){ x <- u })
+    
+    res <- list(xcoords = xcoords,metas = metas.L,col=col.L,ylim = myrange, ylab = ylab, xlab = xlab)
+    #res
   }
   marOrg = par()$mar
   marNew = marOrg
@@ -169,6 +175,9 @@ plotMeta1 <- function (mat, centralTend = "mean", overlay = TRUE, winsorize = c(
     
     
     if (!is.null(dispersion) && dispersion %in% disp.args) {
+      
+      # cat("check here\n")
+      
       plot(xcoords, metas[[1]], type = "l", col = dispersion.col[1], 
            ylim = myrange, ylab = ylab, xlab = xlab, ...)
       for (i in 1:length(metas)) {
@@ -200,6 +209,13 @@ plotMeta1 <- function (mat, centralTend = "mean", overlay = TRUE, winsorize = c(
         lines(xcoords, metas[[j]], col = line.col[j], 
               ...)
       }
+      
+      metas.L <- lapply(metas, function(u){ x <- u })
+      col.L <- lapply(line.col, function(u){ x <- u })
+      
+     # res <- list(xcoords = xcoords,metas = metas.L,col=col.L,ylim = myrange, ylab = ylab, xlab = xlab)
+     # res
+      
     }
     else {
       
@@ -215,10 +231,14 @@ plotMeta1 <- function (mat, centralTend = "mean", overlay = TRUE, winsorize = c(
       metas.L <- lapply(metas, function(u){ x <- u })
       col.L <- lapply(line.col, function(u){ x <- u })
       
-      res <- list(xcoords = xcoords,metas = metas.L,col=col.L,ylim = myrange, ylab = ylab, xlab = xlab)
-      res
+       res <- list(xcoords = xcoords,metas = metas.L,col=col.L,ylim = myrange, ylab = ylab, xlab = xlab)
+       res
       
     }
+    
+    #res <- list(xcoords = xcoords,metas = metas.L,col=col.L,ylim = myrange, ylab = ylab, xlab = xlab)
+    #res
+    
     if (!is.null(profile.names)) 
       if (!is.null(dispersion) && dispersion %in% disp.args) {
         legend(max(xcoords) + 0.05 * max(xcoords), myrange[2], 

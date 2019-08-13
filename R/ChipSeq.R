@@ -8300,8 +8300,10 @@ getFPKM4DiffSet <- function(XL.3.subsets.anno,fpkm.value) {
 
 # getBoxPlot4FPKMOfSubsetPeaks(YYY,output.file.dir)
 # output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_2_2018_boxplot_include_whole_genome"
+
+# output.file.dir <- "~/Aimin/DropboxUmass/NADfinder/Aimin/Output/Results_10_2_2018_boxplot_include_whole_genome/RegenerateTableAndFigAt_8_12_2019"
 # YYYY <- getBoxPlot4FPKMOfSubsetPeaks(YYY,fpkm.value,output.file.dir)
- 
+
 getBoxPlot4FPKMOfSubsetPeaks <- function(YYY,fpkm.value,output.file.dir){
   
   if(!dir.exists(output.file.dir)){dir.create(output.file.dir,recursive = TRUE)}
@@ -8340,6 +8342,10 @@ boxplot(log10(as.numeric(as.character(YYYY$FPKM))+1)~YYYY$SetName,ylab = "log10(
 dev.off()
 
 YYYY
+
+write.table(YYYY,file=file.path(output.file.dir,"SetName_FPKM.txt"),sep="\t",quote = FALSE,row.names = FALSE,col.names = TRUE)
+save.image(file = file.path(output.file.dir,paste0(basename(output.file.dir),".RData")))
+savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".Rhistory")))
 
 }
 

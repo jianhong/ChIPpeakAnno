@@ -93,6 +93,7 @@ getJC4aSetOfPeaks1 <- function(re.out.rt.mef.5.sets, output.file.dir) {
 d <- getJC4aSetOfPeaks1(bed.in[1:10], output.file.dir)
 
 source("R/heatmap.3.R")
+library(gplots)
 
 d.u <- unique(c(d))
 d.u.order <- d.u[order(d.u)]
@@ -101,6 +102,20 @@ my_palette <- redgreen(36)
 
 file.name <- paste(names(bed.in),collapse = "_")
 tiff(file.path(output.file.dir,paste0(file.name,"_heatmap4JC.tiff")))
+heatmap.3(d,col=my_palette,Rowv = T,Colv=T,dendrogram="both",
+          breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(12, 13),key.xtickfun=function() {
+            breaks <- parent.frame()$breaks
+            return(list(
+              at=parent.frame()$scale01(c(breaks[1],breaks[length(breaks)])),
+              labels=c(as.character(breaks[1]),as.character(breaks[length(breaks)]))
+            ))
+          })
+dev.off()
+
+# set res in 300 dpi
+file.name <- paste(names(bed.in),collapse = "_")
+tiff(file.path(output.file.dir,paste0(file.name,"_heatmap4JC_300dpi.tiff")),height = 20, width = 20, units = 'cm', 
+               compression = "lzw", res = 300)
 heatmap.3(d,col=my_palette,Rowv = T,Colv=T,dendrogram="both",
           breaks=colors, density.info="none", trace="none", key=T,symm=T,symkey=F,symbreaks=T,margin=c(12, 13),key.xtickfun=function() {
             breaks <- parent.frame()$breaks
