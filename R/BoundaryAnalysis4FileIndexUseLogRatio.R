@@ -83,7 +83,7 @@ g <- ggplot(df.nonXL, aes(x=bases, y=Coverage, group=Group)) +
     legend.justification = c("left", "top"),
     legend.box.just = "left",
     legend.margin = margin(6, 6, 6, 6)
-  )
+  ) + ylab("log2Ratio")
 
 g <- g + ggtitle(label) +theme(plot.title=element_text(hjust=0.5),legend.title = element_text(hjust = 0.5,face="bold",size=10))
 
