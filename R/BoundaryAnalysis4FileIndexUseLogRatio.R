@@ -79,7 +79,7 @@ label <- title
 
 g <- ggplot(df.nonXL, aes(x=bases, y=Coverage, group=Group)) +
   geom_line(aes(linetype=Group)) + theme(
-    legend.position = c(.45, .95),
+    legend.position = c(.45, .99),
     legend.justification = c("left", "top"),
     legend.box.just = "left",
     legend.margin = margin(6, 6, 6, 6)
@@ -89,7 +89,7 @@ g <- g + ggtitle(label) +theme(plot.title=element_text(hjust=0.5),legend.title =
 
 g <- g + grids(linetype = "dashed")
 
-g + geom_hline(yintercept=0, linetype="dashed", color = "red")
+g <- g + geom_hline(yintercept=0, linetype="dashed", color = "red")
 
 g
 
