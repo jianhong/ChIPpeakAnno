@@ -304,6 +304,8 @@ savehistory(file = file.path(output.file.dir,paste0(basename(output.file.dir),".
 
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/F121-9_box_plot"
 
+output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4Aizhan_F121_9_avesig_filtered_NADsVenn/F121-9_box_plot/test"
+
 bed.in.new.anno <- getAnnotatedGene(bed.in.new[c(1:3,5)],"Mm")
 bed.in.new.anno.YYY <- getFPKM4DiffSet(bed.in.new.anno,rna.seq.data.from.Aizhan)
 getBoxPlot4FPKMOfSubsetPeaks7(bed.in.new.anno.YYY,rna.seq.data.from.Aizhan,"F121_9_NAD","rnaSeq_data_for_F121_9_FPKM.txt",output.file.dir)

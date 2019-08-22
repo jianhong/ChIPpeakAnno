@@ -50,11 +50,14 @@ count2dataTable <- function(input.file) {
   
   fpkm <- data.frame(fpkm.8=countToFpkm(count.data.2[,8],count.data.2[,7]),fpkm.9=countToFpkm(count.data.2[,9],count.data.2[,7]))
   
-  rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm=apply(fpkm,1,mean))
+  #write.table(fpkm,file = file.path(output.file.dir,x_name),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
+  
+  rna.seq.data.from.Aizhan <- data.frame(gene.name=count.data.2$mgi_symbol,fpkm,fpkmAve=apply(fpkm,1,mean))
   rna.seq.data.from.Aizhan
 }
 
 rna.seq.data.from.Aizhan <- count2dataTable(input.file)
+write.table(rna.seq.data.from.Aizhan,file = file.path(output.file.dir,"F121_9_2_reps_and_ave_FPKM.txt"),append = FALSE, quote = F, sep = "\t",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = T)
 
 plotFPKM4AizhanNew <- function(cm.unique.only.1.anno,rna.seq.data.from.Aizhan){
 
