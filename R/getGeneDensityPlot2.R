@@ -60,6 +60,22 @@ bed.dir <- "/Users/aiminyan/Aimin/DropboxUmass/NADfinder/Aimin/Output4AizhanGene
 rna.seq.data.from.Aizhan <- readRDS(file=file.path(bed.dir,"rnaSeq_data_for_F121_9_FPKM.rds"))
 
 bed.4.gene.density.1.anno <- getAnnotatedGene(bed.4.gene.density.1,"Mm")
+
+fileName <- names(bed.4.gene.density.1.anno)
+  
+library(GenomicRanges)
+library(data.table)
+
+null <- lapply(1:length(bed.4.gene.density.1.anno),function(u,bed.4.gene.density.1.anno,bed.dir){
+  
+  x <- as.data.table(bed.4.gene.density.1.anno[[u]])
+  y <- names(bed.4.gene.density.1.anno)[u]
+  con <- as.character(file.path(bed.dir,paste0(y,".csv")))
+  print(con)
+  write.table(x,con,quote = F,sep=",",row.names = F)
+  
+},bed.4.gene.density.1.anno,bed.dir)
+
 bed.4.gene.density.1.anno.YYY <- getFPKM4DiffSet(bed.4.gene.density.1.anno,rna.seq.data.from.Aizhan)
 
 getFPKMboxplot <- function(bed.dir,YYYY) {
@@ -122,3 +138,6 @@ multi.page <- ggarrange(plotlist=spp,nrow = 1, ncol = 1)
 
 if(!dir.exists(bed.dir)){dir.create(bed.dir,recursive = TRUE)}
 ggexport(multi.page, width = 1000, height = 480,filename = file.path(bed.dir,"GeneDensity_8_20_2019.png"))
+
+save.image(file = file.path(bed.dir,"GeneListAnnotated2Bed.RData"))
+savehistory(file = file.path(bed.dir,"GeneListAnnotated2Bed.Rhistory"))

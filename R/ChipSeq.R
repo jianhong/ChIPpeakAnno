@@ -8265,11 +8265,19 @@ getAnnotatedGene <- function(re.out,genome){
     if(genome=="Mm"){
       
       dd.GRCm39.mm10<-toGRanges(EnsDb.Mmusculus.v75)
-      
       overlaps.trimmed<-trim(x,use.names=TRUE)
       overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
      
     }
+    
+    if(genome=="Hs"){
+    
+    dd.GRCm39.mm10<-toGRanges(EnsDb.Hsapiens.v86)
+    overlaps.trimmed<-trim(x,use.names=TRUE)
+    overlaps.anno<-annoPeaks(overlaps.trimmed,dd.GRCm39.mm10)
+    
+    }
+    
     overlaps.anno
   },re.out,genome)
 
