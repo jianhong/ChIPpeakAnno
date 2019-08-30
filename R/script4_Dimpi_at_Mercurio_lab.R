@@ -60,7 +60,16 @@ grep("ENSG00000137672",AnnotatePeak.nearestBiDirectionalPromoters$feature)
 
 output.file.dir <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Dimpi_Mercurio_lab"
 
+goodGR <- trim(AnnotatePeak.overlapping[c(4020,4021,4022),])
+overlaps.trimmed<-goodGR
+
+library(BSgenome.Hsapiens.UCSC.hg19)
+
+seq<-getAllPeakSequence(overlaps.trimmed,genome=Hsapiens,upstream=0, downstream=0)
+write2FASTA(seq, file.path(output.file.dir,"TRPC6.fa"))
+
 save.image(file = file.path(output.file.dir,"Dimpi_Mercurio_lab.RData"))
 savehistory(file = file.path(output.file.dir,"Dimpi_Mercurio_lab.Rhistory"))
+
 
 
