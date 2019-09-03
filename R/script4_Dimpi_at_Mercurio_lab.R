@@ -1,24 +1,47 @@
 TEAD.bed <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Dimpi_Mercurio_lab/ENCFF216XPT.bed"
 
-bed.files <- c(TEAD.bed)
+TEAD.bed <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Dimpi_Mercurio_lab/ENCFF000QRQ.bed"
 
-bed.in<-lapply(1:length(bed.files),function(u,bed.files){
+TEAD.bed <- "/Users/aiminyan/Aimin/DropboxUmass/Aimin/Project/Dimpi_Mercurio_lab/ENCFF000QRR.bed"
+
+
+bed2anno <- function(TEAD.bed) {
+  bed.files <- c(TEAD.bed)
   
-  x <- bed.files[[u]]
+  bed.in<-lapply(1:length(bed.files),function(u,bed.files){
+    
+    x <- bed.files[[u]]
+    
+    if(u == 1){peaks=read.table(x,header=F)}else{peaks=read.table(x,header=F,skip=1)}
+    
+    colnames(peaks)[1:3]= c("chr","start","end")
+    peaks=toGRanges(peaks)
+    peaks
+  },bed.files)
   
-  if(u == 1){peaks=read.table(x,header=F)}else{peaks=read.table(x,header=F,skip=1)}
+  bed.4.gene.density.1.anno <- getAnnotatedGene(bed.in,"Hs")
   
-  colnames(peaks)[1:3]= c("chr","start","end")
-  peaks=toGRanges(peaks)
-  peaks
-},bed.files)
+  grep("TRPC6",bed.4.gene.density.1.anno[[1]]$gene_name)
+  
+  index1 <- grep("ENSG00000137672",bed.4.gene.density.1.anno[[1]]$feature)
+  bed.4.gene.density.1.anno[[1]][index1,]
+  
+  annoData <- annoGR(EnsDb.Hsapiens.v75)
+  AnnotatePeak.overlapping = annotatePeakInBatch(bed.in[[1]], AnnotationData=annoData,output = c("both"))
+  index2 <- grep("ENSG00000137672",AnnotatePeak.overlapping$feature)
+  AnnotatePeak.overlapping[index2,]
+  
+  AnnotatePeak.overlapping = annotatePeakInBatch(bed.in[[1]], AnnotationData=annoData,output = c("downstream"),maxgap=9394)
+  index3 <- grep("ENSG00000137672",AnnotatePeak.overlapping$feature)
+  AnnotatePeak.overlapping[index3,]
+  
+}
 
-bed.4.gene.density.1.anno <- getAnnotatedGene(bed.in,"Hs")
+library(EnsDb.Hsapiens.v86)
+library(EnsDb.Hsapiens.v75)
+bed2anno(TEAD.bed)
 
-grep("TRPC6",bed.4.gene.density.1.anno[[1]]$gene_name)
 
-grep("ENSG00000137672",bed.4.gene.density.1.anno[[1]]$feature)
-     
 grep("SRD5A1P1",bed.4.gene.density.1.anno[[1]]$gene_name)
 
 bed.4.gene.density.1.anno[[1]][2586,]
