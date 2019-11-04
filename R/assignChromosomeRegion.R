@@ -12,7 +12,7 @@ assignChromosomeRegion <-
             if(!inherits(TxDb, "TxDb")) 
                 stop("TxDb must be an object of TxDb, 
                      try\n?TxDb\tto see more info.")
-            if(!inherits(peaks.RD, c("RangedData","GRanges"))) 
+            if(!inherits(peaks.RD, c("GRanges"))) 
                 stop("peaks.RD must be a GRanges object.")
             if(!is.null(precedence)) {
                 if(!all(precedence %in% c("Exons", "Introns", "fiveUTRs", 
@@ -22,8 +22,6 @@ assignChromosomeRegion <-
                          Exons, Introns, fiveUTRs, threeUTRs, 
                          Promoters, immediateDownstream")
             }
-            if(inherits(peaks.RD, "RangedData")) 
-                peaks.RD <- as(peaks.RD, "GRanges")
             ignore.strand <- all(as.character(strand(peaks.RD))=="*")
             exons <- exons(TxDb, columns=NULL)
             introns <- unique(unlist(intronsByTranscript(TxDb)))

@@ -11,7 +11,7 @@
 }
 \usage{data(ExonPlusUtr.human.GRCh37)}
 \format{
-    RangedData with slot start holding the start position of the exon, slot end 
+    GRanges with slot start holding the start position of the exon, slot end 
     holding the end position of the exon, slot rownames holding ensembl 
     transcript id and slot space holding the chromosome location where the gene 
     is located. In addition, the following variables are included.

@@ -12,8 +12,6 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         NAME_long_string <- "///"
         PeaksList <- list(...)
         PeaksList<-lapply(PeaksList, function(Peaks){
-            if (inherits(Peaks, "RangedData"))
-                Peaks <- toGRanges(Peaks, format="RangedData")
             if (!inherits(Peaks, "GRanges")) {
                 stop("No valid Peaks passed in. It needs to be GRanges object")
             }
@@ -41,13 +39,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         }else{
             names <- NULL
         }
-        flagRD <- FALSE
         if((!missing(Peaks1)) || (!missing(Peaks2))){
             if(!missing(Peaks2)){##
-                if(inherits(Peaks2, "RangedData")){
-                    Peaks2 <- toGRanges(Peaks2, format="RangedData")
-                    flagRD <- TRUE
-                }
                 if (!inherits(Peaks2, "GRanges")) {
                     stop("No valid Peaks passed in. 
                          It needs to be GRanges object")
@@ -59,10 +52,6 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                 names <- c(NameOfPeaks2, names)
             }
             if(!missing(Peaks1)){
-                if(inherits(Peaks1, "RangedData")){
-                    Peaks1 <- toGRanges(Peaks1, format="RangedData")
-                    flagRD <- TRUE
-                }
                 if (!inherits(Peaks1, "GRanges")) {
                     stop("No valid Peaks passed in. 
                          It needs to be GRanges object")
@@ -275,12 +264,6 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                 gsub(paste(NameOfPeaks2, NAME_short_string, sep=""), 
                      "", 
                      names(Peaks2withOverlaps))
-            if(flagRD){
-                peaklist <- lapply(peaklist, as, Class="RangedData")
-                correlation <- lapply(correlation, as, Class="RangedData")
-                Peaks1withOverlaps <- as(Peaks1withOverlaps, "RangedData")
-                Peaks2withOverlaps <- as(Peaks2withOverlaps, "RangedData")
-            }
             mergedPeaks <- peaklist[[sampleName]]##To fit old version
             mergedPeaks$peakNames <- NULL
             structure(list(venn_cnt=venn_cnt, 

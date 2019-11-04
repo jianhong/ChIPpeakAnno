@@ -29,7 +29,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
              http://www.bioconductor.org/packages/release/data/annotation/ 
              for available org.xx.eg.db packages")
     }
-    if (inherits(annotatedPeak, what=c("RangedData", "GRanges")))
+    if (inherits(annotatedPeak, what=c("GRanges")))
     {
         feature_ids = unique(as.character(annotatedPeak$feature))
     }

@@ -36,15 +36,13 @@ binOverFeature <- function(..., annotationData=GRanges(),
     if (missing(annotationData)) {
         stop("No AnnotationData as GRanges or annoGR is passed in.")
     }
-    if(!inherits(annotationData, c("GRanges","RangedData", "annoGR")) || 
+    if(!inherits(annotationData, c("GRanges", "annoGR")) || 
            length(annotationData)<1){
         stop("No AnnotationData as GRanges or annoGR is passed in.")
     }
     if(class(annotationData)=="annoGR")
         annotationData <- as(annotationData, "GRanges")
     annotationData <- unique(annotationData)
-    if(is(annotationData, "RangedData")) 
-        annotationData <- toGRanges(annotationData)
     if (!all(as.character(strand(annotationData)) %in% c("+", "-", "*")))
         stop("strands of annotationData must be +, - or *")
     select <- match.arg(select)

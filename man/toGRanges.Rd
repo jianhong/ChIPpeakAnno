@@ -3,7 +3,6 @@
 \alias{toGRanges,data.frame-method}
 \alias{toGRanges,TxDb-method}
 \alias{toGRanges,EnsDb-method}
-\alias{toGRanges,RangedData-method}
 \alias{toGRanges,connection-method}
 \alias{toGRanges,character-method}
 
@@ -12,7 +11,7 @@
 }
 \description{
   Convert UCSC BED format and its variants, such as GFF, or any user defined 
-  dataset such as RangedDate or MACS output file to GRanges
+  dataset such as MACS output file to GRanges
 }
 \usage{
     \S4method{toGRanges}{character}(data, format=c("BED", "GFF", "GTF", 

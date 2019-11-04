@@ -1,9 +1,6 @@
 write2FASTA <- function(mySeq, file="", width=80){
-    if(!inherits(mySeq, c("RangedData", "GRanges"))){
-        stop("mySeq must be an object of RangedData or GRanges")
-    }
-    if(is(mySeq, "RangedData")){
-        mySeq <- toGRanges(mySeq)
+    if(!inherits(mySeq, c("GRanges"))){
+        stop("mySeq must be an object of GRanges")
     }
     if(is.null(mySeq$sequence)){
         stop("metadata must contain sequence")

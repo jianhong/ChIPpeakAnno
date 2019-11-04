@@ -31,22 +31,7 @@ formatSeqnames <- function(gr) {
 #    if(seqlevelsStyle(gr)!="UCSC") seqlevelsStyle(gr) <- "UCSC"
     gr
 }
-RangedData2GRanges <- function(rd){
-  ss <- grep("^strand$", colnames(rd), ignore.case=TRUE)
-  if(length(ss)>1) 
-      stop("input RangedData has multiple columns for strand information")
-  if(length(ss)==1){
-    rd.strand <- formatStrand(rd[[ss]])
-  }else{
-    rd.strand <- "*"
-  }
-  for(coln in colnames(rd)){##because the bug of as(rd, "GRanges")
-    rd[[coln]] <- NULL
-  }
-  rd$strand <- rd.strand
-  gr <- as(rd, "GRanges")
-  gr
-}
+
 getRelationship <- function(queryHits, subjectHits){
     if(!inherits(queryHits, "GRanges")) 
         stop("queryHits must be an object of GRanges")
@@ -105,8 +90,6 @@ annoScore <- function(queryHits, subjectHits){
     JaccardIndex
 }
 trimPeakList <- function(Peaks, ignore.strand, by, keepMetadata=FALSE){
-    if (inherits(Peaks, "RangedData"))
-        Peaks <- toGRanges(Peaks, format="RangedData")
     if (!inherits(Peaks, "GRanges")) {
         stop("No valid Peaks passed in. It needs to be GRanges object")
     }

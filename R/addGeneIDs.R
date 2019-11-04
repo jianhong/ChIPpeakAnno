@@ -12,9 +12,6 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
              call.=FALSE)
     }
     
-    if(is(annotatedPeak, "RangedData")){
-        annotatedPeak <- RangedData2GRanges(annotatedPeak)
-    }
     feature_ids <- switch(class(annotatedPeak),
                           GRanges=unique(annotatedPeak$feature),
                           character=unique(annotatedPeak),

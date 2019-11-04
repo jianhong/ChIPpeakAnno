@@ -41,11 +41,8 @@ annotatePeakInBatch <-
             select <- "all"
         }
         if (missing(myPeakList)) stop("Missing required argument myPeakList!")
-        if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
+        if (!is(myPeakList, "GRanges")) {
             stop("No valid myPeakList passed in. It needs to be GRanges object")
-        }
-        if(inherits(myPeakList, "RangedData")){
-            myPeakList <- RangedData2GRanges(myPeakList)
         }
         if (missing(AnnotationData)) {
             message("No AnnotationData as GRanges is passed in, 
@@ -77,12 +74,10 @@ annotatePeakInBatch <-
             }
         }
         if (!inherits(AnnotationData, 
-                      c("RangedData", "GRanges", "annoGR"))) {
+                      c("GRanges", "annoGR"))) {
             stop("AnnotationData needs to be GRanges or annoGR object")
         }
-        if (inherits(AnnotationData, "RangedData")) {
-            TSS.ordered <- RangedData2GRanges(AnnotationData)
-        }else if(inherits(AnnotationData, "annoGR")){
+        if(inherits(AnnotationData, "annoGR")){
             TSS.ordered <- as(AnnotationData, "GRanges")
         }else{
             TSS.ordered <- AnnotationData

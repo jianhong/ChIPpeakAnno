@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.21.1
+-------------------------
+
+    o remove RangedData from ChIPpeakAnno.
+
 CHANGES IN VERSION 3.19.5
 -------------------------
 

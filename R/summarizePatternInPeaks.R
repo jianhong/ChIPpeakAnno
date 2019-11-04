@@ -19,13 +19,10 @@ summarizePatternInPeaks <-
         {
             stop("BSgenomeName is required as BSgenome object!")
         }
-        if (missing(peaks) || (!is(peaks, "RangedData") && 
-                                   !is(peaks, "GRanges"))) {
+        if (missing(peaks) || (!is(peaks, "GRanges"))) {
             stop("No valid peaks passed in. It needs to 
-                 be RangedData or GRanges object.")
+                 be GRanges object.")
         }
-        if(is(peaks, "RangedData")) 
-            peaks <- toGRanges(peaks, format="RangedData")
         if (!missing(outfile) && file.exists(outfile) && !append)
         {
             stop("outfile specified as ", outfile, 

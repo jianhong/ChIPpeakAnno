@@ -2,7 +2,7 @@ getAllPeakSequence <- function(myPeakList,
                                upstream=200L, downstream=upstream, 
                                genome, AnnotationData)
 {
-    if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
+    if (!inherits(myPeakList, c("GRanges"))) {
         stop("No valid myPeakList passed in. It needs to be GRanges object")
     }
     if (missing(genome))
@@ -11,9 +11,6 @@ getAllPeakSequence <- function(myPeakList,
              please pass in either a BSgenome object or a Mart object!")
     }
     myPeakList.bk <- myPeakList
-    if(inherits(myPeakList, "RangedData")){
-        myPeakList <- RangedData2GRanges(myPeakList)
-    }
     if (is(genome, "BSgenome"))
     {
         strand <- strand(myPeakList)
@@ -65,12 +62,9 @@ getAllPeakSequence <- function(myPeakList,
                     Better way would be calling getAnnotation before 
                     querying for sequence")
         }
-        if (!inherits(AnnotationData, c("RangedData", "GRanges"))) {
+        if (!inherits(AnnotationData, c("GRanges"))) {
             stop("AnnotationData needs to be GRanges object. 
                  Better way would be calling getAnnotation.")
-        }
-        if (inherits(AnnotationData, "RangedData")) {
-            AnnotationData <- RangedData2GRanges(AnnotationData)
         }
         
         downstream.bk = downstream

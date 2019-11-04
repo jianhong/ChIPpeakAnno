@@ -25,7 +25,7 @@ Either "fasta" (the default) or "fastq"
 BSgenome package for details
 }
   \item{peaks}{
-\link[GenomicRanges:GRanges-class]{GRanges} or \link[IRanges:RangedData-class]{RangedData} 
+\link[GenomicRanges:GRanges-class]{GRanges} 
 containing the peaks
 }
   \item{outfile}{

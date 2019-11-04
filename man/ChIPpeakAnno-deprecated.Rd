@@ -14,12 +14,10 @@ and may be defunct as soon as the next release.
                     select=c("all", "first","last","arbitrary"), 
                     annotate = 0, ignore.strand=TRUE, 
                     connectedPeaks=c("min", "merge"), \dots)
-  BED2RangedData(data.BED,header=FALSE, \dots)
-  GFF2RangedData(data.GFF,header=FALSE, \dots)
 }
 \arguments{
-  \item{Peaks1}{RangedData: See example below.}
-  \item{Peaks2}{RangedData: See example below.}
+  \item{Peaks1}{GRanges: See example below.}
+  \item{Peaks2}{GRanges: See example below.}
   \item{maxgap,minoverlap}{
 Used in the internal call to \code{findOverlaps()} to detect overlaps.
 See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the \pkg{IRanges} package
@@ -48,18 +46,9 @@ Include overlapFeature and shortestDistance in the OverlappingPeaks or not.
   the minimal involved peaks in any concered groups 
 }
 \item{\dots}{
-    Objects of \link[GenomicRanges:GRanges-class]{GRanges} or 
-    \link[IRanges:RangedData-class]{RangedData}: See also 
-    \code{\link{findOverlapsOfPeaks}}. 
-    Or any parameter need to be passed into read.delim function for 
-    2RangedData function.
+    Objects of \link[GenomicRanges:GRanges-class]{GRanges}: See also 
+    \code{\link{findOverlapsOfPeaks}}.
 }
-\item{header}{TRUE or FALSE, default to FALSE, 
-indicates whether data file has header}
-\item{data.BED}{ BED format data frame or BED filename, 
-please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details }
-\item{data.GFF}{ GFF format data frame or GFF file name, 
-please refer to http://genome.ucsc.edu/FAQ/FAQformat#format3 for details }
 }
 \details{
   findOverlappingPeaks is now deprecated wrappers for 

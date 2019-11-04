@@ -41,12 +41,12 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         stop("argument pathAnn is not the annotation data with objects named 
              as xxxxxEXTID2PATHID and/or xxxxxPATHID2NAME")
     }
-    if (inherits(annotatedPeak, what=c("RangedData", "GRanges"))){
+    if (inherits(annotatedPeak, what=c("GRanges"))){
         feature_ids = unique(as.character(annotatedPeak$feature))
     }else if (is.character(annotatedPeak)){
         feature_ids = unique(annotatedPeak)
     }else{
-        stop("annotatedPeak needs to be RangedData type with feature variable 
+        stop("annotatedPeak needs to be GRanges with feature variable 
              holding the feature id or a character vector holding the IDs of 
              the features used to annotate the peaks!")
     }

@@ -16,8 +16,7 @@ getAnnotation(mart,
   UTR. The default is TSS. }
 }
 \value{
-  \link[GenomicRanges:GRanges-class]{GRanges} or 
-  \link[IRanges:RangedData-class]{RangedData} with slot start holding the start 
+  \link[GenomicRanges:GRanges-class]{GRanges} with slot start holding the start 
   position of the feature, slot end holding the end position of the feature,
   slot names holding the id of the feature, slot space holding the chromosome 
   location where the feature is located. In addition, the following variables 

@@ -147,7 +147,7 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
   }
   if (missing(Peaks))
   {
-    stop("Missing Peaks which is a list of peaks in RangedData or GRanges!")
+    stop("Missing Peaks which is a list of peaks in GRanges!")
   }
   connectedPeaks <- match.arg(connectedPeaks)
   by <- match.arg(by)
@@ -196,14 +196,12 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
   NameOfPeaks <- make.names(NameOfPeaks, unique=TRUE, allow_=TRUE)
   if(!olout_flag){
       for(i in seq_len(n1)){
-        if (!inherits(Peaks[[i]], c("RangedData", "GRanges")))
+        if (!inherits(Peaks[[i]], c("GRanges")))
         {
           err.msg = paste("Element", i, 
                           "in Peaks is not a valid GRanges object", sep=" ")
           stop(err.msg)
         }
-        if (inherits(Peaks[[i]], "RangedData")) Peaks[[i]] <- 
-            toGRanges(Peaks[[i]], format="RangedData")
         if (is.null(names(Peaks[[i]]))) names(Peaks[[i]]) <-  
             formatC(1:length(Peaks[[i]]), 
                     width=nchar(length(Peaks[[i]])), 

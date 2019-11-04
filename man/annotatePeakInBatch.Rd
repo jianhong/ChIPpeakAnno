@@ -154,7 +154,7 @@ Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8
     ## example 3: you have a list of transcription factor biding sites from 
     ## literature and are interested in determining the extent of the overlap 
     ## to the list of peaks from your experiment. Prior calling the function 
-    ## annotatePeakInBatch, need to represent both dataset as RangedData 
+    ## annotatePeakInBatch, need to represent both dataset as GRanges 
     ## where start is the start of the binding site, end is the end of the 
     ## binding site, names is the name of the binding site, space and strand 
     ## are the chromosome name and strand where the binding site is located.

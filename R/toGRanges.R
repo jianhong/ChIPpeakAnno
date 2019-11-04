@@ -166,19 +166,6 @@ setMethod("toGRanges", "data.frame",
               return(gr)
 })
 
-setMethod("toGRanges", "RangedData", 
-          function(data, ...){
-              ## RangedData to data.frame
-              data <- as.data.frame(data)
-              ## data colNames should be
-              ## space, start, end, width, names, ...
-              data$width <- NULL
-              colNames <- colnames(data)
-              format <- "RangedData"
-              gr <- df2GRanges(data, colNames, format, ...)
-              return(gr)
-          })
-
 
 message4GTF <- function(con){
   message("If you are importing files downloaded from ensembl, 
