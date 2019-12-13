@@ -73,6 +73,7 @@ export(
        getAnnotation, 
        getEnrichedGO,
        getEnrichedPATH, 
+       getGO,
        getUniqueGOidCount, 
        getVennCounts,
        hyperGtest,
