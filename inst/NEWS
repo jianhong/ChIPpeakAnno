@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.21.2
 -------------------------
 
+    o Update function summarizePatternInPeaks.
+    
+CHANGES IN VERSION 3.21.2
+-------------------------
+
     o Add function getGO.
     
 
