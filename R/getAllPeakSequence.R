@@ -10,6 +10,10 @@ getAllPeakSequence <- function(myPeakList,
         stop("genome is required parameter, 
              please pass in either a BSgenome object or a Mart object!")
     }
+  old_name <- names(myPeakList)
+    if(length(old_name)!=length(myPeakList)){
+      names(myPeakList) <- paste0("peak_", seq_along(myPeakList))
+    }
     myPeakList.bk <- myPeakList
     if (is(genome, "BSgenome"))
     {
@@ -47,11 +51,15 @@ getAllPeakSequence <- function(myPeakList,
         myPeakList <- myPeakList.bk
         myPeakList$upstream <- rep(upstream,length(myPeakList.bk))
         myPeakList$downstream <- rep(downstream,length(myPeakList.bk))
-        myPeakList$sequence <- seq
+        myPeakList$sequence <- NA
+        if(!all(names(myPeakList) %in% names(seq))){
+          warning("The genome assembly are not identical to your peaks!")
+        }
+        myPeakList[names(seq)]$sequence <- seq
         if(all(seqlevels(myPeakList) %in% seqlevels(genome))){
             seqlengths(myPeakList) <- seqlengths(genome)[seqlevels(myPeakList)]
         }   
-
+        names(myPeakList) <- old_name
         myPeakList
     }else if (is(genome, "Mart")){
         if (missing(AnnotationData)) {

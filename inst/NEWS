@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.21.2
+CHANGES IN VERSION 3.21.4
+-------------------------
+
+    o Fix a bug in getAllPeakSequence when there is peak out side of genome.
+    
+CHANGES IN VERSION 3.21.3
 -------------------------
 
     o Update function summarizePatternInPeaks.
