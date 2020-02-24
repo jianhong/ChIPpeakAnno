@@ -2,7 +2,7 @@ getAllPeakSequence <- function(myPeakList,
                                upstream=200L, downstream=upstream, 
                                genome, AnnotationData)
 {
-    if (!inherits(myPeakList, c("RangedData", "GRanges"))) {
+    if (!inherits(myPeakList, c("GRanges"))) {
         stop("No valid myPeakList passed in. It needs to be GRanges object")
     }
     if (missing(genome))
@@ -10,10 +10,11 @@ getAllPeakSequence <- function(myPeakList,
         stop("genome is required parameter, 
              please pass in either a BSgenome object or a Mart object!")
     }
-    myPeakList.bk <- myPeakList
-    if(inherits(myPeakList, "RangedData")){
-        myPeakList <- RangedData2GRanges(myPeakList)
+  old_name <- names(myPeakList)
+    if(length(old_name)!=length(myPeakList)){
+      names(myPeakList) <- paste0("peak_", seq_along(myPeakList))
     }
+    myPeakList.bk <- myPeakList
     if (is(genome, "BSgenome"))
     {
         strand <- strand(myPeakList)
@@ -50,11 +51,15 @@ getAllPeakSequence <- function(myPeakList,
         myPeakList <- myPeakList.bk
         myPeakList$upstream <- rep(upstream,length(myPeakList.bk))
         myPeakList$downstream <- rep(downstream,length(myPeakList.bk))
-        myPeakList$sequence <- seq
+        myPeakList$sequence <- NA
+        if(!all(names(myPeakList) %in% names(seq))){
+          warning("The genome assembly are not identical to your peaks!")
+        }
+        myPeakList[names(seq)]$sequence <- seq
         if(all(seqlevels(myPeakList) %in% seqlevels(genome))){
             seqlengths(myPeakList) <- seqlengths(genome)[seqlevels(myPeakList)]
         }   
-
+        names(myPeakList) <- old_name
         myPeakList
     }else if (is(genome, "Mart")){
         if (missing(AnnotationData)) {
@@ -65,12 +70,9 @@ getAllPeakSequence <- function(myPeakList,
                     Better way would be calling getAnnotation before 
                     querying for sequence")
         }
-        if (!inherits(AnnotationData, c("RangedData", "GRanges"))) {
+        if (!inherits(AnnotationData, c("GRanges"))) {
             stop("AnnotationData needs to be GRanges object. 
                  Better way would be calling getAnnotation.")
-        }
-        if (inherits(AnnotationData, "RangedData")) {
-            AnnotationData <- RangedData2GRanges(AnnotationData)
         }
         
         downstream.bk = downstream

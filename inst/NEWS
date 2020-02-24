@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.20.1
+-------------------------
+
+    o fix the issue in getAllPeakSequence when peak is not in the out side of genome.
+    
 CHANGES IN VERSION 3.19.5
 -------------------------
 
