@@ -12,14 +12,19 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
              call.=FALSE)
     }
     
-    feature_ids <- switch(class(annotatedPeak),
-                          GRanges=unique(annotatedPeak$feature),
-                          character=unique(annotatedPeak),
-                          stop("annotatedPeak needs to be GRanges type with 
-                               feature variable holding the feature id or a 
-                               character vector holding the IDs of the features 
-                               used to annotate the peaks!",call.=FALSE))
-    
+    if(is(annotatedPeak, "GRanges")){
+      feature_ids <- unique(annotatedPeak$feature)
+    }else{
+      if(is.character(annotatedPeak)){
+        feature_ids <- unique(annotatedPeak)
+      }else{
+        stop("annotatedPeak needs to be GRanges type with 
+                                 feature variable holding the feature id or a 
+             character vector holding the IDs of the features 
+             used to annotate the peaks!",call.=FALSE)
+      }
+    }
+  
     feature_ids <- feature_ids[!is.na(feature_ids)]
     feature_ids <- feature_ids[feature_ids!=""]
     if (length(feature_ids) == 0)

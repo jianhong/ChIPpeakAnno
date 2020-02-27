@@ -153,8 +153,8 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
   by <- match.arg(by)
   n1 = length(Peaks)
   olout_flag <- FALSE
-  if(class(Peaks)=="overlappingPeaks"){
-    if(!is.null(Peaks$venn_cnt) && class(Peaks$venn_cnt)=="VennCounts"){
+  if(is(Peaks, "overlappingPeaks")){
+    if(!is.null(Peaks$venn_cnt) && is(Peaks$venn_cnt, "VennCounts")){
         venn_cnt <- Peaks$venn_cnt
         n1 <- which(colnames(venn_cnt)=="Counts") - 1 ##ncol(venn_cnt)-1
         if(missing(NameOfPeaks)){
@@ -243,7 +243,7 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
           p.value <- getPval(venn_cnt, totalTest)
       }else{
           otherCount <- venn_cnt[1, "Counts"]
-          if(class(Peaks)=="overlappingPeaks"){
+          if(is(Peaks, "overlappingPeaks")){
               averagePeakWidth = median(unlist(lapply(Peaks$peaklist, width)))
           }else{
               averagePeakWidth = median(unlist(lapply(Peaks, width))) 

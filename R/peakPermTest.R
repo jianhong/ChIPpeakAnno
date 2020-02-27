@@ -7,10 +7,10 @@ peakPermTest <- function(peaks1, peaks2, ntimes=100,
                          featureType=c("transcript", "exon"),
                          seqn=NA, ...){
     if(!is(peaks1, "GRanges") || !is(peaks2, "GRanges")){
-        stop("class of peaks1 and peaks2 must be GRanges.")
+        stop("peaks1 and peaks2 must be GRanges objects.")
     }
     if(!missing(bindingDistribution)){
-        if(class(bindingDistribution)!="bindist"){
+        if(!is(bindingDistribution, "bindist")){
             stop("bindingDistribution must be an object of bindist")
         }
     }
@@ -22,8 +22,8 @@ peakPermTest <- function(peaks1, peaks2, ntimes=100,
                             bindingType=bindingType, 
                             featureType=featureType, seqn=seqn)
     }else{
-        if(class(pool)!="permPool"){
-            stop("class of pool must be permPool")
+        if(!is(pool, "permPool")){
+            stop("pool must be a permPool object")
         }
     }
     set.seed(seed)

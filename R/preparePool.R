@@ -8,7 +8,7 @@ preparePool <- function(TxDb, template, bindingDistribution,
         stop("TxDb must be an object of TxDb")
     }
     if(!missing(bindingDistribution)){
-        if(class(bindingDistribution)!="bindist"){
+        if(!is(bindingDistribution, "bindist")){
             stop("bindingDistribution must be an object of bindist")
         }
     }

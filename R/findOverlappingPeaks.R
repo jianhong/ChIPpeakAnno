@@ -77,7 +77,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
             colnames(mcols(Peaks)))
         metacolnames <- Reduce(intersect, metacolnames)
         metacolclass <- do.call(rbind, lapply(PeaksList, function(Peaks)
-            sapply(mcols(Peaks)[, metacolnames, drop=FALSE], class)))
+            sapply(mcols(Peaks)[, metacolnames, drop=FALSE], function(.ele) class(.ele)[1])))
         metacolclass <- apply(metacolclass, 2, 
                               function(.ele) length(unique(.ele))==1)
         metacolnames <- metacolnames[metacolclass]
@@ -164,7 +164,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         mcols$peakNames <- gsub(NAME_conn_string, 
                                 NAME_short_string, 
                                 names(all.peaks[mLists]))
-        mcolsn <- sapply(mcols[1, ], class)
+        mcolsn <- sapply(mcols[1, ], function(.ele) class(.ele)[1])
         mapping <- DataFrame(HHH_row___H=1:length(all.peaks.rd))
         for(.name in names(mcolsn)){
             .dat <- split(mcols[, .name], mIndex)

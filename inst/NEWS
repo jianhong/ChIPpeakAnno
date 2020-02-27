@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.21.5
+-------------------------
+
+    o replace all `class` by `is`.
+    
 CHANGES IN VERSION 3.21.4
 -------------------------
 

@@ -40,7 +40,7 @@ binOverFeature <- function(..., annotationData=GRanges(),
            length(annotationData)<1){
         stop("No AnnotationData as GRanges or annoGR is passed in.")
     }
-    if(class(annotationData)=="annoGR")
+    if(is(annotationData, "annoGR"))
         annotationData <- as(annotationData, "GRanges")
     annotationData <- unique(annotationData)
     if (!all(as.character(strand(annotationData)) %in% c("+", "-", "*")))

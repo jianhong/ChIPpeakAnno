@@ -55,17 +55,21 @@ featureAlignedDistribution <- function(cvglists, feature.gr,
         stop("cvglists must be output of featureAlignedSignal or 
              a list of SimpleRleList or RleList")
     }
-    cls <- sapply(cvglists, class)
-    if(all(cls=="matrix")){
-        cov <- cvglists
-        if(ncol(cov[[1]])!=n.tile){
-            stop("n.tile must keep same as featureAligendSignal.")
-        }
+    
+    cls <- sapply(cvglists, is, class2="matrix")
+    if(all(cls)){
+      cov <- cvglists
+      if(ncol(cov[[1]])!=n.tile){
+        stop("n.tile must keep same as featureAligendSignal.")
+      }
     }else{
-        if(any(!cls %in% c("SimpleRleList", "RleList", "CompressedRleList")))
-            stop("cvglists must be a list of SimpleRleList or RleList")
-        cov <- featureAlignedSignal(cvglists, feature.gr, n.tile=n.tile)
+      cls <- sapply(cvglists, inherits, 
+                    what = c("SimpleRleList", "RleList", "CompressedRleList"))
+      if(any(!cls))
+        stop("cvglists must be a list of SimpleRleList or RleList")
+      cov <- featureAlignedSignal(cvglists, feature.gr, n.tile=n.tile)
     }
+    
     ## normalized read density
     if(any(sapply(cov, function(.ele) any(is.na(.ele))))){
         warning("cvglists contain NA values. ", 

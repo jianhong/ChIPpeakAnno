@@ -42,8 +42,9 @@ featureAlignedSignal <- function(cvglists, feature.gr,
   if(!is(cvglists, "list")){
     stop("cvglists must be a list of SimpleRleList or RleList")
   }
-  cls <- sapply(cvglists, class)
-  if(any(!cls %in% c("SimpleRleList", "RleList", "CompressedRleList")))
+  cls <- sapply(cvglists, inherits, 
+                what = c("SimpleRleList", "RleList", "CompressedRleList"))
+  if(any(!cls))
     stop("cvglists must be a list of SimpleRleList or RleList")
   seqLen <-  lapply(cvglists, function(.ele) 
     sapply(.ele, function(.e) sum(runLength(.e))))

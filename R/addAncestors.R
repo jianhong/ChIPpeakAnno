@@ -5,7 +5,7 @@ addAncestors <- function(go.ids, ontology=c("bp","cc", "mf"))
     {
         stop("missing required parameter go.ids!")
     }
-    if (class(go.ids) != "matrix" | dim(go.ids)[2] <4)
+    if (!is(go.ids, "matrix") | dim(go.ids)[2] <4)
     {
         stop("go.ids need to be a matrix with at least 4 columns, 
             the first column is go id and the second column is the entrez ID!")

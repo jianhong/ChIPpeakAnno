@@ -34,7 +34,7 @@ newAnnoGR <- function (seqnames = Rle(),
     if (!is.factor(runValue(seqnames))) 
         runValue(seqnames) <- factor(runValue(seqnames), 
                                      levels = unique(runValue(seqnames)))
-    if (class(ranges) != "IRanges") 
+    if (!is(ranges, "IRanges")) 
         ranges <- as(ranges, "IRanges")
     if (!is(strand, "Rle")) 
         strand <- Rle(strand)

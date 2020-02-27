@@ -48,8 +48,9 @@ binOverGene <- function(cvglists, TxDb,
   if(!is(cvglists, "list")){
     stop("cvglists must be a list of SimpleRleList or RleList")
   }
-  cls <- sapply(cvglists, class)
-  if(any(!cls %in% c("SimpleRleList", "RleList", "CompressedRleList")))
+  cls <- sapply(cvglists, inherits, 
+                what = c("SimpleRleList", "RleList", "CompressedRleList"))
+  if(any(!cls))
     stop("cvglists must be a list of SimpleRleList or RleList")
   stopifnot(is(TxDb, "TxDb"))
   stopifnot(maxGeneLen>minGeneLen)

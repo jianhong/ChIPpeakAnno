@@ -10,7 +10,7 @@ peaksNearBDP <- function(myPeakList, AnnotationData,
         if (!inherits(AnnotationData, c("GRanges", "annoGR"))) {
             stop("AnnotationData needs to be GRanges or annoGR object")
         }
-        if(class(AnnotationData)=="annoGR")
+        if(is(AnnotationData, "annoGR"))
             AnnotationData <- AnnotationData@gr
     }else{
         stop("Missing required argument AnnotationData!")
