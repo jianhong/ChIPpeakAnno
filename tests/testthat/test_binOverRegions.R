@@ -1,8 +1,7 @@
 test_that("binOverRegions or binOverGene works not correct", {
     ##algorithm
     library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-    debug <- FALSE
-    if(debug){
+    if(Sys.getenv("USER")[1]=="jianhongou"){
         TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
         x <- isActiveSeq(TxDb)
         x[seq_along(x)] <- FALSE

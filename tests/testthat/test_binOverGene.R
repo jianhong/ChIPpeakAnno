@@ -1,6 +1,6 @@
 test_that("binOverGene works not correct", {
   ## by simulation data
-  if(Sys.getenv("USER")=="jianhongou"){
+  if(Sys.getenv("USER")[1]=="jianhongou"){
   peaks <- toGRanges(TxDb.Hsapiens.UCSC.hg38.knownGene)
   peaks1 <- peaks <- peaks[seqnames(peaks)=="chr1"]
   st <- as.character(strand(peaks))=="+"
