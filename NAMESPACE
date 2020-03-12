@@ -7,6 +7,7 @@ importFrom("stats", "as.dendrogram", "cor.test", "hclust", "kmeans",
              "loess.smooth", "nobs", "rexp", "setNames", "ts", "fisher.test")
 importFrom("utils", "adist", "combn", "data", "installed.packages",
              "read.delim", "read.table", "write.table")
+importFrom("Rfast", "rowMinsMaxs")
 import(BiocGenerics)
 import(Biobase)
 import(methods)
@@ -67,6 +68,7 @@ export(
        featureAlignedHeatmap,
        featureAlignedSignal,
        findEnhancers,
+       findMotifsInPromoterSeqs,
        findOverlappingPeaks,
        findOverlapsOfPeaks,
        getAllPeakSequence, 

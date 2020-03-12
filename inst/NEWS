@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.21.5
+CHANGES IN VERSION 3.21.6
+-------------------------
+
+    o add new function findMotifsInPromoterSeqs.
+    
+HANGES IN VERSION 3.21.5
 -------------------------
 
     o replace all `class` by `is`.
