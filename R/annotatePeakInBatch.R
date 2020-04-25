@@ -371,13 +371,16 @@ annotatePeakInBatch <-
         ##                             TSS.ordered[dist$subjectHits],
         ##                             ignore.strand=ignore.strand)
         ##        dist <- dist[abs(distance) <= maxgap, ]
+        if(output=="nearestBiDirectionalPromoters" && length(bindingRegion)<=1){
+          stop("If output is nearestBiDirectionalPromoters, please set bindingRegion. See ?annoPeaks for details.")
+        }
         myPeakList.Hit <- 
             myPeakList[dist$queryHits[!is.na(dist$subjectHits)]]
         myPeakList.NA <- 
             myPeakList[!names(myPeakList) %in% names(myPeakList.Hit)]
         subjectHits <- 
             TSS.ordered[dist$subjectHits[!is.na(dist$subjectHits)]]
-        subjectHits$output <- 
+        mcols(subjectHits)$output <- 
             dist[!is.na(dist$subjectHits),"output"]
         #    myPeakList.Hit$distanceToNearest <- 
         #    dist$distance[!is.na(dist$subjectHits)]

@@ -16,6 +16,28 @@ test_that("annotatePeakInBatch works not correct", {
             }
         }
     }
+    ## check 0 row
+    myPeak = GRanges("chr1", 
+                     IRanges(start = c(17208381), 
+                             end = c(17208381), 
+                             names=c("Site1")), 
+                     strand = c('+'))
+    feature = GRanges("chr1", 
+                      IRanges(start = c(17066767, 17180899), 
+                              end = c(17267729, 17180971), 
+                              names =c("Site1", "Site2")),
+                      strand = c('-'))
+    for(output in c("nearestLocation", "overlapping", "both", 
+                    "shortestDistance", "inside",
+                    "upstream&inside", "inside&downstream",
+                    "upstream", "downstream", 
+                    "upstreamORdownstream")){
+      suppressWarnings(annotation.step1 <- 
+                         annotatePeakInBatch(myPeak, AnnotationData=feature, 
+                                             output=output,
+                                             ignore.strand = FALSE))
+    }
+    
     ##check one row
     myPeak = GRanges("chr1", 
                      IRanges(start = c(17208381), 
