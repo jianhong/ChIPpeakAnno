@@ -65,7 +65,6 @@
 #' @return A vector of numeric.
 #' It is the background corrected log2-transformed ratios, CPMRatios or OddRatios.
 #'
-#' @importFrom Rfast rowMinsMaxs
 #' @export
 #'
 #' @examples
@@ -199,7 +198,7 @@ findMotifsInPromoterSeqs <-
       
       
       tem <- cbind(as.numeric(res[,5]), as.numeric(res[,6]), as.numeric(res[,20]), as.numeric(res[,21]))
-      res2 <- cbind(seqnames = res[,1], compositMotifStart= rowMinsMaxs(tem)[1,], compositMotifEnd = rowMinsMaxs(tem)[2,], res[, -1])
+      res2 <- cbind(seqnames = res[,1], compositMotifStart= rowMins(tem), compositMotifEnd = rowMaxs(tem), res[, -1])
       
       res2 <- res2[, -grep("Offset", colnames(res2))]
       
