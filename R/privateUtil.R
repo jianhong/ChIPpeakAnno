@@ -15,19 +15,22 @@ formatStrand <- function(strand){
 }
 ###clear seqnames, the format should be chr+NUM
 formatSeqnames <- function(gr) {
+  if(length(seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
+                                seqlevels(gr))])>0){
     if(is(gr, "GRanges")){
-        seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqlevels(gr))] <-
-            paste("chr", 
-                  seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
-                                      seqlevels(gr))], sep="")
-        seqlevels(gr)[seqlevels(gr)=="chrMT"] <- "chrM" 
+      seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqlevels(gr))] <-
+        paste("chr", 
+              seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
+                                  seqlevels(gr))], sep="")
+      seqlevels(gr)[seqlevels(gr)=="chrMT"] <- "chrM" 
     }else{
-        seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqnames(gr))] <-
-            paste("chr", 
-                  seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
-                                     seqnames(gr))], sep="")
-        seqnames(gr)[seqnames(gr)=="chrMT"] <- "chrM" 
+      seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqnames(gr))] <-
+        paste("chr", 
+              seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
+                                 seqnames(gr))], sep="")
+      seqnames(gr)[seqnames(gr)=="chrMT"] <- "chrM" 
     }
+  }
 #    if(seqlevelsStyle(gr)!="UCSC") seqlevelsStyle(gr) <- "UCSC"
     gr
 }
