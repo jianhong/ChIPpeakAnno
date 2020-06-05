@@ -1,3 +1,52 @@
+#' Get gene sequence using the biomaRt package
+#' 
+#' Get gene sequence using the biomaRt package
+#' 
+#' 
+#' @param LocationParameters c(ensembl_gene_id, distance from the peak to the
+#' transcription start site of the gene with the above ensemblID, upstream
+#' offset from the peak, downstream offset from the peak, Gene Start, Gene End)
+#' @param mart see useMart of bioMaRt package for details
+#' @return a list with the following items \item{feature_id}{ensemble gene ID}
+#' \item{distancetoFeature}{distance from the peak to the transcriptionstart
+#' site of the gene with the above ensembl gene ID} \item{upstream}{upstream
+#' offset from the peakStart} \item{downstream}{downstream offset from the
+#' peakEnd} \item{seq}{sequence obtained around the peak with above upstream
+#' and downstream offset}
+#' @note internal function not intended to be called directly by users
+#' @author Lihua Julie Zhu
+#' @keywords internal misc
+#' @importFrom biomaRt getSequence
+#' @examples
+#' 
+#' 
+#' 
+#' if (interactive())
+#' {
+#' mart <- useMart(biomart="ensembl", dataset="drerio_gene_ensembl")
+#' LocationParameters =c("ENSDARG00000054562",400, 750, 750,40454140,40454935)
+#' getGeneSeq(LocationParameters, mart)
+#' 
+#' LocationParameters =c("ENSDARG00000054562",752, 750, 750,40454140,40454935)
+#' getGeneSeq(LocationParameters, mart)
+#'  
+#' LocationParameters =c("ENSDARG00000054562",750, 750, 750,40454140,40454935)
+#' getGeneSeq(LocationParameters, mart)
+#'  
+#'  LocationParameters =c("ENSDARG00000054562",-2, 750, 750,40454140,40454935)
+#'  getGeneSeq(LocationParameters, mart)
+#' 
+#'  LocationParameters =c("ENSDARG00000054562",0, 750, 750,40454140,40454935)
+#'  getGeneSeq(LocationParameters, mart)
+#'  
+#'  LocationParameters =c("ENSDARG00000054562",2, 750, 750,40454140,40454935)
+#'  getGeneSeq(LocationParameters, mart) 
+#'  
+#'  LocationParameters =c("ENSDARG00000054562",1000, 750, 750,40454140,40454935)
+#'  getGeneSeq(LocationParameters, mart)
+#' }
+#' 
+#' 
 getGeneSeq <- function(LocationParameters, mart){
     ### ensembl_gene_id, distanceToNearestTSS, upstream, downstream, 
     ### TSSStart, TSSEnd, mart

@@ -1,3 +1,6 @@
+#' @importFrom graphics hist
+#' @import methods
+#' @importFrom grDevices boxplot.stats
 buildBindingDistribution <- function(x, AnnotationData,
                                      bindingType=c("TSS", "geneEnd"), 
                                      featureType=c("transcript", "exon")){

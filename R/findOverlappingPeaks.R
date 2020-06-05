@@ -1,4 +1,93 @@
 ##require library graph, RBGL
+
+
+#' Find the overlapping peaks for two peak ranges.
+#' 
+#' Find the overlapping peaks for two input peak ranges.
+#' 
+#' The new function findOverlapsOfPeaks is recommended.
+#' 
+#' Efficiently perform overlap queries with an interval tree implemented in
+#' IRanges.
+#' 
+#' @aliases findOverlappingPeaks findOverlappingPeaks-deprecated
+#' @param Peaks1 GRanges: See example below.
+#' @param Peaks2 GRanges: See example below.
+#' @param maxgap,minoverlap Used in the internal call to \code{findOverlaps()}
+#' to detect overlaps. See
+#' \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the
+#' \pkg{IRanges} package for a description of these arguments.
+#' @param multiple TRUE or FALSE: TRUE may return multiple overlapping peaks in
+#' Peaks2 for one peak in Peaks1; FALSE will return at most one overlapping
+#' peaks in Peaks2 for one peak in Peaks1. This parameter is kept for backward
+#' compatibility, please use select.
+#' @param NameOfPeaks1 Name of the Peaks1, used for generating column name.
+#' @param NameOfPeaks2 Name of the Peaks2, used for generating column name.
+#' @param select all may return multiple overlapping peaks, first will return
+#' the first overlapping peak, last will return the last overlapping peak and
+#' arbitrary will return one of the overlapping peaks.
+#' @param annotate Include overlapFeature and shortestDistance in the
+#' OverlappingPeaks or not.  1 means yes and 0 means no. Default to 0.
+#' @param ignore.strand When set to TRUE, the strand information is ignored in
+#' the overlap calculations.
+#' @param connectedPeaks If multiple peaks involved in overlapping in several
+#' groups, set it to "merge" will count it as only 1, while set it to "min"
+#' will count it as the minimal involved peaks in any concered groups
+#' @param \dots Objects of \link[GenomicRanges:GRanges-class]{GRanges}: See
+#' also \code{\link{findOverlapsOfPeaks}}.
+#' @return \item{OverlappingPeaks}{a data frame consists of input peaks
+#' information with added information: overlapFeature (upstream: peak1 resides
+#' upstream of the peak2; downstream: peak1 resides downstream of the peak2;
+#' inside: peak1 resides inside the peak2 entirely; overlapStart: peak1
+#' overlaps with the start of the peak2; overlapEnd: peak1 overlaps with the
+#' end of the peak2; includeFeature: peak1 include the peak2 entirely) and
+#' shortestDistance (shortest distance between the overlapping peaks)}
+#' \item{MergedPeaks}{GRanges contains merged overlapping peaks}
+#' @author Lihua Julie Zhu
+#' @seealso findOverlapsOfPeaks, annotatePeakInBatch, makeVennDiagram
+#' @references 1.Interval tree algorithm from: Cormen, Thomas H.; Leiserson,
+#' Charles E.; Rivest, Ronald L.; Stein, Clifford. Introduction to Algorithms,
+#' second edition, MIT Press and McGraw-Hill. ISBN 0-262-53196-8
+#' 
+#' 2.Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to annotate
+#' ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010, 11:237
+#' doi:10.1186/1471-2105-11-237
+#' 
+#' 3. Zhu L (2013). Integrative analysis of ChIP-chip and ChIP-seq dataset.  In
+#' Lee T and Luk ACS (eds.), Tilling Arrays, volume 1067, chapter 4, pp. -19.
+#' Humana Press. http://dx.doi.org/10.1007/978-1-62703-607-8_8
+#' @keywords misc
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom S4Vectors mcols DataFrame
+#' @importClassesFrom graph graphNEL
+#' @importFrom graph ugraph
+#' @importFrom RBGL connectedComp
+#' @importFrom utils data
+#' @examples
+#' 
+#'     if (interactive())
+#'     {    
+#'     peaks1 = 
+#'         GRanges(seqnames=c(6,6,6,6,5), 
+#'                 IRanges(start=c(1543200,1557200,1563000,1569800,167889600),
+#'                         end=c(1555199,1560599,1565199,1573799,167893599),
+#'                         names=c("p1","p2","p3","p4","p5")),
+#'                 strand=as.integer(1))
+#'     peaks2 = 
+#'         GRanges(seqnames=c(6,6,6,6,5), 
+#'                 IRanges(start=c(1549800,1554400,1565000,1569400,167888600),
+#'                         end=c(1550599,1560799,1565399,1571199,167888999),
+#'                         names=c("f1","f2","f3","f4","f5")),
+#'                 strand=as.integer(1))
+#'     t1 =findOverlappingPeaks(peaks1, peaks2, maxgap=1000, 
+#'           NameOfPeaks1="TF1", NameOfPeaks2="TF2", select="all", annotate=1) 
+#'     r = t1$OverlappingPeaks
+#'     pie(table(r$overlapFeature))
+#'     as.data.frame(t1$MergedPeaks)
+#'     }
+#' 
 findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                                  multiple = c(TRUE, FALSE),
                                  NameOfPeaks1 = "TF1", NameOfPeaks2 = "TF2", 
@@ -30,7 +119,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                 PeaksList <- PeaksList[[1]]
                 n <- length(PeaksList)
                 names <- names(PeaksList)
-                if(is.null(names)) names <- paste("peaks", 1:n, sep="")
+                if(is.null(names)) names <- paste("peaks", seq.int(n), sep="")
             }else{
                 ##save dots arguments names
                 dots <- substitute(list(...))[-1]
@@ -77,7 +166,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
             colnames(mcols(Peaks)))
         metacolnames <- Reduce(intersect, metacolnames)
         metacolclass <- do.call(rbind, lapply(PeaksList, function(Peaks)
-            sapply(mcols(Peaks)[, metacolnames, drop=FALSE], function(.ele) class(.ele)[1])))
+            sapply(mcols(Peaks)[, metacolnames, drop=FALSE], 
+                   function(.ele) class(.ele)[1])))
         metacolclass <- apply(metacolclass, 2, 
                               function(.ele) length(unique(.ele))==1)
         metacolnames <- metacolnames[metacolclass]
@@ -114,7 +204,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         outcomes <- matrix(0,noutcomes,ncontrasts)
         colnames(outcomes) <- names
         for (j in 1:ncontrasts)
-            outcomes[,j] <- rep(0:1,times=2^(j-1),each=2^(ncontrasts-j))
+            outcomes[,j] <- rep(0:1,times=2^(j-1), 
+                                each=2^(ncontrasts-j))
         xlist <- list()
         xlist1 <- list()
         for (i in 1:ncontrasts){
@@ -155,7 +246,8 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
                                      all, 1:length(all), SIMPLIFY=FALSE))
         all.peaks <- Peaks[all[,2]]
         all.peaks$gpForFindOverlapsOfPeaks <- all[, 1]
-        all.peaks.rd <- reduce(all.peaks, min.gapwidth=maxgap+1L, with.revmap=TRUE)
+        all.peaks.rd <- reduce(all.peaks, min.gapwidth=maxgap+1L,
+                               with.revmap=TRUE)
         mapping <- all.peaks.rd$revmap
         m <- sapply(mapping, length)
         mIndex <- rep(1:length(mapping), m)
@@ -204,7 +296,7 @@ findOverlappingPeaks <- function(Peaks1, Peaks2, maxgap = -1L,minoverlap=0L,
         correlation <- list()
         names(Peaks) <- gsub(NAME_conn_string, NAME_short_string, names(Peaks))
         npl <- names(peaklist)
-        for(i in 1:length(npl))
+        for(i in seq_along(npl))
         {
             npln <- unlist(strsplit(npl[i], NAME_long_string))
             if(length(npln)==2){

@@ -1,3 +1,37 @@
+#' Obtain the TSS, exon or miRNA annotation for the specified species
+#' 
+#' Obtain the TSS, exon or miRNA annotation for the specified species using the
+#' biomaRt package
+#' 
+#' 
+#' @param mart A mart object, see useMart of biomaRt package for details.
+#' @param featureType TSS, miRNA, Exon, 5'UTR, 3'UTR, transcript or Exon plus
+#' UTR. The default is TSS.
+#' @return \link[GenomicRanges:GRanges-class]{GRanges} with slot start holding
+#' the start position of the feature, slot end holding the end position of the
+#' feature, slot names holding the id of the feature, slot space holding the
+#' chromosome location where the feature is located. In addition, the following
+#' variables are included.  \item{list("strand")}{1 for positive strand and -1
+#' for negative strand where the feature is located}
+#' \item{list("description")}{description of the feeature such as gene}
+#' @note For featureType of TSS, start is the transcription start site if
+#' strand is 1 (plus strand), otherwise, end is the transcription start site
+#' @author Lihua Julie Zhu, Jianhong Ou
+#' @references Durinck S. et al. (2005) BioMart and Bioconductor: a powerful
+#' link between biological biomarts and microarray data analysis.
+#' Bioinformatics, 21, 3439-3440.
+#' @keywords misc
+#' @export
+#' @import GenomicRanges
+#' @importFrom biomaRt getBM
+#' @examples
+#' 
+#' if (interactive())
+#' {
+#'   mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+#'   Annotation <- getAnnotation(mart, featureType="TSS")
+#' }
+#' 
 getAnnotation <- function(mart, 
                           featureType=c("TSS","miRNA", "Exon", 
                                         "5utr", "3utr", 

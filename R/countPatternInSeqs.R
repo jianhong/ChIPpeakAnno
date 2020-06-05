@@ -1,3 +1,30 @@
+#' Output total number of patterns found in the input sequences
+#' 
+#' Output total number of patterns found in the input sequences
+#' 
+#' 
+#' @param pattern DNAstringSet object
+#' @param sequences a vector of sequences
+#' @return Total number of occurrence of the pattern in the sequences
+#' @author Lihua Julie Zhu
+#' @seealso summarizePatternInPeaks, translatePattern
+#' @keywords misc
+#' @export
+#' @importFrom Biostrings reverseComplement
+#' @examples
+#'   library(Biostrings)
+#'   filepath = 
+#'     system.file("extdata", "examplePattern.fa", package="ChIPpeakAnno")
+#'   dict = readDNAStringSet(filepath = filepath, format="fasta", 
+#'                           use.names=TRUE)
+#'   sequences = c("ACTGGGGGGGGCCTGGGCCCCCAAAT", 
+#'                 "AAAAAACCCCTTTTGGCCATCCCGGGACGGGCCCAT", 
+#'                 "ATCGAAAATTTCC")
+#'   countPatternInSeqs(pattern=dict[1], sequences=sequences)
+#'   countPatternInSeqs(pattern=dict[2], sequences=sequences)
+#'   pattern = DNAStringSet("ATNGMAA")
+#'   countPatternInSeqs(pattern=pattern, sequences=sequences)
+#' 
 countPatternInSeqs <- function(pattern, sequences){     
     if(missing(pattern) || !is(pattern, "DNAStringSet" ))
     {

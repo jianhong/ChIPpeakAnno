@@ -1,4 +1,35 @@
-getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_symbol"){
+#' Obtain gene ontology (GO) terms for given genes
+#' 
+#' Obtain gene ontology (GO) terms useing GO gene mapping package such as
+#' org.Hs.db.eg to obtain the GO annotation.
+#' 
+#' 
+#' @param all.genes A character vector of feature IDs
+#' @param orgAnn Organism annotation package such as org.Hs.eg.db for human and
+#' org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
+#' org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish
+#' @param ID_type The feature type in annotatedPeak such as ensembl_gene_id,
+#' refseq_id, gene_symbol
+#' @param writeTo File path for output table
+#' @return An invisible table with genes and GO terms.
+#' @author Lihua Julie Zhu
+#' @seealso getEnrichedGO
+#' @keywords misc
+#' @export
+#' @importFrom AnnotationDbi mappedkeys Definition Ontology Term
+#' @importFrom utils write.table
+#' @examples
+#' 
+#'   if (interactive()) {
+#'      data(annotatedPeak)
+#'      library(org.Hs.eg.db)
+#'      getGO(annotatedPeak[1:6]$feature, 
+#'           orgAnn="org.Hs.eg.db", 
+#'           ID_type="ensembl_gene_id")
+#' }
+#' 
+getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", 
+                  writeTo, ID_type="gene_symbol"){
 
   GOgenome = sub(".db", "", orgAnn)
   
@@ -14,13 +45,16 @@ getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_sym
     
     if (orgAnn == "BAD_NAME") 
       
-      stop("Currently only the following type of IDs are supported:\n ensembl_gene_id, refseq_id  and gene_symbol!")
+      stop("Currently only the following type of IDs are supported:\n 
+           ensembl_gene_id, refseq_id  and gene_symbol!")
     
     orgAnn <- get(paste(GOgenome, orgAnn, sep = ""))
     
     if (!is(orgAnn, "AnnDbBimap")) {
       
-      stop("orgAnn is not a valid annotation dataset! \n For example, orgs.Hs.eg.db package for human and \n the org.Mm.eg.db package for mouse.")
+      stop("orgAnn is not a valid annotation dataset! \n 
+           For example, orgs.Hs.eg.db package for human and \n 
+           the org.Mm.eg.db package for mouse.")
       
     }
     
@@ -48,7 +82,8 @@ getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_sym
   
   if (length(entrezIDs) < 2) {
     
-    stop("The number of gene is less than 2. Please double check your feature_id_type.")
+    stop("The number of gene is less than 2. 
+         Please double check your feature_id_type.")
     
   }
   
@@ -128,13 +163,16 @@ getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_sym
   
   if (orgAnn2 == "BAD_NAME") 
     
-    stop("Currently only the following type of IDs are supported:\n ensembl_gene_id, refseq_id and gene_symbol!")
+    stop("Currently only the following type of IDs are supported:\n 
+         ensembl_gene_id, refseq_id and gene_symbol!")
   
   orgAnn2 <- get(paste(GOgenome, orgAnn2, sep = ""))
   
   if (!is(orgAnn2, "AnnDbBimap")) {
     
-    stop("orgAnn is not a valid annotation dataset! \n For example, orgs.Hs.eg.db package for human and \n                     the org.Mm.eg.db package for mouse.")
+    stop("orgAnn is not a valid annotation dataset! \n 
+         For example, orgs.Hs.eg.db package for human and \n 
+         the org.Mm.eg.db package for mouse.")
     
   }
   
@@ -154,7 +192,10 @@ getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_sym
   
   
   
-  this.GO.withTermsEntrezIDs <- cbind(ids.withInputIDs[match(this.GO.withTermsEntrezIDs[, 4], ids.withInputIDs[,2]), 1], this.GO.withTermsEntrezIDs)
+  this.GO.withTermsEntrezIDs <- 
+    cbind(ids.withInputIDs[match(this.GO.withTermsEntrezIDs[, 4], 
+                                 ids.withInputIDs[,2]), 1],
+          this.GO.withTermsEntrezIDs)
   
   colnames(this.GO.withTermsEntrezIDs)[1] = "Alternate.ID"
   
@@ -162,7 +203,9 @@ getGO <- function(all.genes, orgAnn = "org.Hs.eg.db", writeTo, ID_type="gene_sym
   
   
   
-  if(!missing(writeTo)) write.table(this.GO.withTermsEntrezIDs, file =writeTo, sep="\t", row.names = FALSE)
+  if(!missing(writeTo)) write.table(this.GO.withTermsEntrezIDs,
+                                    file =writeTo, sep="\t",
+                                    row.names = FALSE)
   
   return(invisible(this.GO.withTermsEntrezIDs))
 }

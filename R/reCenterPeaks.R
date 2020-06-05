@@ -1,3 +1,20 @@
+#' re-center the peaks
+#' 
+#' Create a new list of peaks based on the peak centers of given list.
+#' 
+#' 
+#' @param peaks An object of \link[GenomicRanges:GRanges-class]{GRanges} or
+#' \link{annoGR}.
+#' @param width The width of new peaks
+#' @param ... Not used.
+#' @return An object of GRanges.
+#' @author Jianhong Ou
+#' @keywords misc
+#' @export
+#' @examples
+#' 
+#'     reCenterPeaks(GRanges("chr1", IRanges(1, 10)), width=2)
+#' 
 reCenterPeaks <- function(peaks, width=2000L, ...){
     stopifnot(inherits(peaks, c("annoGR", "GRanges")))
     peaks.center <- start(peaks) + floor(width(peaks)/2)

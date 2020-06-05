@@ -1,3 +1,43 @@
+#' Obtain genomic sequences around the peaks
+#' 
+#' Obtain genomic sequences around the peaks leveraging the BSgenome and
+#' biomaRt package
+#' 
+#' 
+#' @param myPeakList An object of \link[GenomicRanges:GRanges-class]{GRanges}:
+#' See example below
+#' @param upstream upstream offset from the peak start, e.g., 200
+#' @param downstream downstream offset from the peak end, e.g., 200
+#' @param genome BSgenome object or mart object. Please refer to
+#' available.genomes in BSgenome package and useMart in bioMaRt package for
+#' details
+#' @param AnnotationData GRanges object with annotation information.
+#' @return \link[GenomicRanges:GRanges-class]{GRanges} with slot start holding
+#' the start position of the peak, slot end holding the end position of the
+#' peak, slot rownames holding the id of the peak and slot seqnames holding the
+#' chromosome where the peak is located. In addition, the following variables
+#' are included: \item{upstream}{upstream offset from the peak start}
+#' \item{downstream}{downstream offset from the peak end} \item{sequence}{the
+#' sequence obtained}
+#' @author Lihua Julie Zhu, Jianhong Ou
+#' @references Durinck S. et al. (2005) BioMart and Bioconductor: a powerful
+#' link between biological biomarts and microarray data analysis.
+#' Bioinformatics, 21, 3439-3440.
+#' @keywords misc
+#' @export
+#' @importFrom BiocGenerics start end width strand
+#' @importFrom GenomeInfoDb seqlengths seqlevels seqnames `seqlengths<-`
+#' @importFrom Biostrings getSeq
+#' @examples
+#' 
+#' #### use Annotation data from BSgenome
+#' peaks <- GRanges(seqnames=c("NC_008253", "NC_010468"),
+#'                  IRanges(start=c(100, 500), end=c(300, 600), 
+#'                          names=c("peak1", "peak2")))
+#' library(BSgenome.Ecoli.NCBI.20080805)
+#' seq <- getAllPeakSequence(peaks, upstream=20, downstream=20, genome=Ecoli)
+#' write2FASTA(seq, file="test.fa")
+#' 
 getAllPeakSequence <- function(myPeakList, 
                                upstream=200L, downstream=upstream, 
                                genome, AnnotationData)

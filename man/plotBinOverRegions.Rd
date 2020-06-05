@@ -15,6 +15,7 @@ plotBinOverRegions(dat, ...)
 plot the output of \link{binOverRegions} or \link{binOverGene}
 }
 \examples{
+
 if(interactive()){
 path <- system.file("extdata", package="ChIPpeakAnno")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -28,6 +29,7 @@ d <- binOverGene(cvglists, TxDb.Hsapiens.UCSC.hg19.knownGene)
 plotBinOverRegions(d)
 }
 }
+
 }
 \seealso{
 \link{binOverRegions}, \link{binOverGene}

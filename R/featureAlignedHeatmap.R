@@ -1,3 +1,56 @@
+#' Heatmap representing signals in given ranges
+#' 
+#' plot heatmap in the given feature ranges
+#' 
+#' 
+#' @param cvglists Output of \link{featureAlignedSignal} or a list of
+#' \link[IRanges:AtomicList-class]{SimpleRleList} or
+#' \link[IRanges:AtomicList-class]{RleList}
+#' @param feature.gr An object of \link[GenomicRanges:GRanges-class]{GRanges}
+#' with identical width.  If the width equal to 1, you can use upstream and
+#' downstream to set the range for plot.  If the width not equal to 1, you can
+#' use zeroAt to set the zero point of the heatmap.
+#' @param upstream,downstream upstream or dwonstream from the feature.gr.  It
+#' must keep same as \link{featureAlignedSignal}. It is used for x-axis label.
+#' @param zeroAt zero point position of feature.gr
+#' @param n.tile The number of tiles to generate for each element of
+#' feature.gr, default is 100
+#' @param annoMcols The columns of metadata of feature.gr that specifies the
+#' annotations shown of the right side of the heatmap.
+#' @param sortBy Sort the feature.gr by columns by annoMcols and then the
+#' signals of the given samples. Default is the first sample. Set to NULL to
+#' disable sort.
+#' @param color vector of colors used in heatmap
+#' @param lower.extreme,upper.extreme The lower and upper boundary value of
+#' each samples
+#' @param margin Margin for of the plot region.
+#' @param gap Gap between each heatmap columns.
+#' @param newpage Call grid.newpage or not. Default, TRUE
+#' @param gp A gpar object can be used for text.
+#' @param ... Not used.
+#' @return invisible gList object.
+#' @author Jianhong Ou
+#' @seealso See Also as \link{featureAlignedSignal},
+#' \link{featureAlignedDistribution}
+#' @keywords misc
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom BiocGenerics start end width strand
+#' @importFrom S4Vectors mcols
+#' @importFrom grid grid.newpage viewport legendGrob gpar gList gEdit rasterGrob
+#' gTree rasterGrob grid.pretty yaxisGrob grid.draw xaxisGrob
+#' @importFrom grDevices colorRampPalette col2rgb rgb
+#' @examples
+#' 
+#'   cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
+#'                                       sample.int(300, 100))), 
+#'                    B=RleList(chr1=Rle(sample.int(5000, 100), 
+#'                                       sample.int(300, 100))))
+#'   feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+#'   feature.gr$anno <- rep(c("type1", "type2"), c(25, 24))
+#'   featureAlignedHeatmap(cvglists, feature.gr, zeroAt=50, annoMcols="anno")
+#' 
 featureAlignedHeatmap <- 
     function(cvglists, feature.gr, upstream, downstream, 
              zeroAt, n.tile=100,
@@ -92,18 +145,21 @@ featureAlignedHeatmap <-
                 if(!is.numeric(sortMatrix[,i])){
                     sortMatrix[,i] <- 
                         factor(as.character(sortMatrix[,i]), 
-                               levels=rev(unique(as.character(sortMatrix[, i]))))
+                               levels=
+                                 rev(unique(as.character(sortMatrix[, i]))))
                 }
             }
             if(all(sortBy %in% colnames(mcols(feature.gr)))){
                 sortMatrix <- 
                     cbind(sortMatrix, 
-                          as.data.frame(mcols(feature.gr)[, sortBy, drop=FALSE]))
+                          as.data.frame(mcols(feature.gr)[, sortBy, 
+                                                          drop=FALSE]))
             }else{
                 if(all(sortBy %in% colnames(covTotalCoverage))){
                     sortMatrix <- 
                         cbind(sortMatrix,
-                              data.frame(covTotalCoverage[, sortBy, drop=FALSE]))
+                              data.frame(covTotalCoverage[, sortBy,
+                                                          drop=FALSE]))
                 }else{
                     stop("sortBy is incorrect.")
                 }
@@ -114,7 +170,8 @@ featureAlignedHeatmap <-
                     as.data.frame(mcols(feature.gr)[, sortBy, drop=FALSE])
             }else{
                 if(all(sortBy %in% colnames(covTotalCoverage))){
-                    sortMatrix <- data.frame(covTotalCoverage[, sortBy, drop=FALSE])
+                    sortMatrix <- data.frame(covTotalCoverage[, sortBy,
+                                                              drop=FALSE])
                 }else{
                     stop("sortBy is incorrect.")
                 }

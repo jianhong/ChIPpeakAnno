@@ -1,3 +1,57 @@
+#' Annotate peaks
+#' 
+#' Annotate peaks by annoGR object in the given range.
+#' 
+#' 
+#' @param peaks peak list, \link[GenomicRanges:GRanges-class]{GRanges} object
+#' @param annoData annotation data, \link[GenomicRanges:GRanges-class]{GRanges}
+#' object
+#' @param bindingType Specifying the criteria to associate peaks with
+#' annotation. Here is how to use it together with the parameter bindingRegion
+#' \itemize{ \item To obtain peaks within 5kb upstream and up to 3kb downstream
+#' of TSS within the gene body, set bindingType = "startSite" and bindingRegion
+#' = c(-5000, 3000) \item To obtain peaks up to 5kb upstream within the gene
+#' body and 3kb downstream of gene/Exon End, set bindingType = "endSite" and
+#' bindingRegion = c(-5000, 3000) \item To obtain peaks from 5kb upstream to
+#' 3kb downstream of genes/Exons , set bindingType = "fullRange" and
+#' bindingRegion = c(-5000, 3000) \item To obtain peaks with nearest
+#' bi-directional promoters within 5kb upstream and 3kb downstream of TSS, set
+#' bindingType = "nearestBiDirectionalPromoters" and bindingRegion = c(-5000,
+#' 3000) } \describe{ \item{startSite}{start position of the feature (strand is
+#' considered)} \item{endSite}{end position of the feature (strand is
+#' considered)} \item{fullRange}{whole range of the feature}
+#' \item{nearestBiDirectionalPromoters}{nearest promoters from both direction
+#' of the peaks (strand is considered). It will report bidirectional promoters
+#' if there are promoters in both directions in the given region (defined by
+#' bindingRegion). Otherwise, it will report the closest promoter in one
+#' direction.} }
+#' @param bindingRegion Annotation range used together with bindingType, which
+#' is a vector with two integer values, default to c (-5000, 5000). The first
+#' one must be no bigger than 0, which means upstream. And the sec ond one must
+#' be no less than 1, which means downstream (1 is the site position, 2 is the
+#' next base of the site position). For details, see bindingType.
+#' @param ignore.peak.strand ignore the peaks strand or not.
+#' @param select "all" or "bestOne". Return the annotation containing all or
+#' the best one.  The "bestOne" is selected by the shortest distance to the
+#' sites and then similarity between peak and annotations.  Ignored if
+#' bindingType is nearestBiDirectionalPromoters.
+#' @param ...  Not used.
+#' @return Output is a GRanges object of the annotated peaks.
+#' @export
+#' @importFrom GenomeInfoDb seqlevelsStyle seqlengths
+#' @importFrom BiocGenerics strand start end width pos
+#' @importFrom S4Vectors queryHits subjectHits
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{annotatePeakInBatch}}
+#' @keywords misc
+#' @examples
+#'     library(ensembldb)
+#'     library(EnsDb.Hsapiens.v75)
+#'     data("myPeakList")
+#'     annoGR <- toGRanges(EnsDb.Hsapiens.v75)
+#'     seqlevelsStyle(myPeakList) <- seqlevelsStyle(annoGR)
+#'     annoPeaks(myPeakList, annoGR)
+#' 
 annoPeaks <- function(peaks, annoData, 
                       bindingType=c("nearestBiDirectionalPromoters",
                                     "startSite", "endSite", "fullRange"), 

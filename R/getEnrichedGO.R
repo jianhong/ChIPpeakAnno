@@ -1,16 +1,140 @@
+#' Obtain enriched gene ontology (GO) terms that near the peaks
+#' 
+#' Obtain enriched gene ontology (GO) terms based on the features near the
+#' enriched peaks using GO.db package and GO gene mapping package such as
+#' org.Hs.db.eg to obtain the GO annotation and using hypergeometric test
+#' (phyper) and multtest package for adjusting p-values
+#' 
+#' 
+#' @param annotatedPeak A GRanges object or a vector of feature IDs
+#' @param orgAnn Organism annotation package such as org.Hs.eg.db for human and
+#' org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
+#' org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish
+#' @param feature_id_type The feature type in annotatedPeak such as
+#' ensembl_gene_id, refseq_id, gene_symbol or entrez_id
+#' @param maxP The maximum p-value to be considered to be significant
+#' @param minGOterm The minimum count in a genome for a GO term to be included
+#' @param multiAdjMethod The multiple testing procedures, for details, see
+#' mt.rawp2adjp in multtest package
+#' @param condense Condense the results or not.
+#' @param removeAncestorByPval Remove ancestor by p-value. P-value is
+#' calculated by fisher exact test. If gene number in all of the children is
+#' significant greater than it in parent term, the parent term will be removed
+#' from the list.
+#' @param keepByLevel If the shortest path from the go term to 'all' is greater
+#' than the given level, the term will be removed.
+#' @return A list with 3 elements \item{list("bp")}{ enriched biological
+#' process with the following 9 variables
+#' 
+#' go.id:GO biological process id
+#' 
+#' go.term:GO biological process term
+#' 
+#' go.Definition:GO biological process description
+#' 
+#' Ontology: Ontology branch, i.e. BP for biological process
+#' 
+#' count.InDataset: count of this GO term in this dataset
+#' 
+#' count.InGenome: count of this GO term in the genome
+#' 
+#' pvalue: pvalue from the hypergeometric test
+#' 
+#' totaltermInDataset: count of all GO terms in this dataset
+#' 
+#' totaltermInGenome: count of all GO terms in the genome
+#' 
+#' } \item{list("mf")}{enriched molecular function with the following 9
+#' variables
+#' 
+#' go.id:GO molecular function id
+#' 
+#' go.term:GO molecular function term
+#' 
+#' go.Definition:GO molecular function description
+#' 
+#' Ontology: Ontology branch, i.e. MF for molecular function
+#' 
+#' count.InDataset: count of this GO term in this dataset
+#' 
+#' count.InGenome: count of this GO term in the genome
+#' 
+#' pvalue: pvalue from the hypergeometric test
+#' 
+#' totaltermInDataset: count of all GO terms in this dataset
+#' 
+#' totaltermInGenome: count of all GO terms in the genome
+#' 
+#' } \item{list("cc")}{enriched cellular component the following 9 variables
+#' 
+#' go.id:GO cellular component id
+#' 
+#' go.term:GO cellular component term
+#' 
+#' go.Definition:GO cellular component description
+#' 
+#' Ontology: Ontology type, i.e. CC for cellular component
+#' 
+#' count.InDataset: count of this GO term in this dataset
+#' 
+#' count.InGenome: count of this GO term in the genome
+#' 
+#' pvalue: pvalue from the hypergeometric test
+#' 
+#' totaltermInDataset: count of all GO terms in this dataset
+#' 
+#' totaltermInGenome: count of all GO terms in the genome
+#' 
+#' }
+#' @author Lihua Julie Zhu
+#' @seealso phyper, hyperGtest
+#' @references Johnson, N. L., Kotz, S., and Kemp, A. W. (1992) Univariate
+#' Discrete Distributions, Second Edition. New York: Wiley
+#' @keywords misc
+#' @export
+#' @importFrom AnnotationDbi mappedkeys
+#' @importFrom multtest mt.rawp2adjp
+#' @importFrom AnnotationDbi Definition Ontology Term
+#' @importFrom stats phyper
+#' @examples
+#' 
+#'   data(enrichedGO)
+#'   enrichedGO$mf[1:10,]
+#'   enrichedGO$bp[1:10,]
+#'   enrichedGO$cc
+#'   if (interactive()) {
+#'      data(annotatedPeak)
+#'      library(org.Hs.eg.db)
+#'      library(GO.db)
+#'      enriched.GO = getEnrichedGO(annotatedPeak[1:6,], 
+#'                                  orgAnn="org.Hs.eg.db", 
+#'                                  maxP=0.01,
+#'                                  minGOterm=10,
+#'                                  multiAdjMethod= NULL)
+#'      dim(enriched.GO$mf)
+#'      colnames(enriched.GO$mf)
+#'      dim(enriched.GO$bp)
+#'      enriched.GO$cc
+#' }
+#' 
 getEnrichedGO <- function(annotatedPeak, orgAnn, 
                           feature_id_type="ensembl_gene_id", 
                           maxP=0.01,
                           minGOterm=10, multiAdjMethod=NULL,
                           condense=FALSE,
                           removeAncestorByPval=NULL,
-                          keepByLevel=NULL){    
+                          keepByLevel=NULL){
+  stopifnot("The 'GO.db' package is required"=
+              requireNamespace("GO.db", quietly = TRUE)) 
     if (missing(annotatedPeak))
     {
         stop("Missing required argument annotatedPeak!")    
     }
     if(length(multiAdjMethod)>0){
-        multiAdjMethod <- match.arg(multiAdjMethod, c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", "BY","ABH","TSBH"))
+        multiAdjMethod <- match.arg(multiAdjMethod, 
+                                    c("Bonferroni", "Holm", "Hochberg", 
+                                      "SidakSS", "SidakSD", "BH", "BY",
+                                      "ABH","TSBH"))
     }
     if (missing(orgAnn))
     {
@@ -75,7 +199,8 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         entrezIDs <- cov2EntrezID(feature_ids, orgAnn, feature_id_type)
     }
     if(length(entrezIDs)<2){
-        stop("The number of gene is less than 2. Please double check your feature_id_type.")
+        stop("The number of gene is less than 2. 
+             Please double check your feature_id_type.")
     }
     
     goAnn <- get(paste(GOgenome,"GO", sep=""))
@@ -101,9 +226,9 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         }
         onto <- match.arg(onto)
         Ancestors <- switch(onto, 
-                            bp=mget(GOIDs, GOBPANCESTOR, ifnotfound = NA),
-                            cc=mget(GOIDs, GOCCANCESTOR, ifnotfound = NA),
-                            mf=mget(GOIDs, GOMFANCESTOR, ifnotfound = NA))
+                            bp=mget(GOIDs, GO.db::GOBPANCESTOR, ifnotfound = NA),
+                            cc=mget(GOIDs, GO.db::GOCCANCESTOR, ifnotfound = NA),
+                            mf=mget(GOIDs, GO.db::GOMFANCESTOR, ifnotfound = NA))
         Ancestors <- unique(unlist(Ancestors))
         Ancestors <- Ancestors[Ancestors!="all" & !is.na(Ancestors)]
         if(length(Ancestors)>0){
@@ -112,13 +237,13 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             children.s <- split(children[, 2], children[, 1])
             Ancestors <- switch(onto,
                                bp=mget(Ancestors, 
-                                       GOBPOFFSPRING, 
+                                       GO.db::GOBPOFFSPRING, 
                                        ifnotfound = NA),
                                cc=mget(Ancestors, 
-                                       GOCCOFFSPRING, 
+                                       GO.db::GOCCOFFSPRING, 
                                        ifnotfound = NA),
                                mf=mget(Ancestors, 
-                                       GOMFOFFSPRING, 
+                                       GO.db::GOMFOFFSPRING, 
                                        ifnotfound = NA))
             Ancestors <- cbind(Ancestor=rep(names(Ancestors),
                                            elementNROWS(Ancestors)),

@@ -1,6 +1,27 @@
+#' get the oligonucleotide frequency
+#' 
+#' Prepare the oligonucleotide frequency for given Markov order.
+#' 
+#' 
+#' @param sequence The sequences packaged in DNAStringSet, DNAString object or
+#' output of function \link{getAllPeakSequence}.
+#' @param MarkovOrder Markov order.
+#' @param last The sequence size to be analyzed.
+#' @return A numeric vector.
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{oligoSummary}}
+#' @keywords misc
+#' @export
+#' @examples
+#'     library(seqinr)
+#'     library(Biostrings)
+#'     oligoFrequency(DNAString("AATTCGACGTACAGATGACTAGACT"))
+#' 
 oligoFrequency <- function(sequence, MarkovOrder=3L, last=1e6){
     stopifnot(is.numeric(MarkovOrder))
     stopifnot(MarkovOrder>0)
+    stopifnot("The seqinr package is required." = 
+                  requireNamespace("seqinr", quietly = TRUE))
     if(is(sequence, "GRanges")){
         sequence <- sequence$sequence
     }else{
@@ -25,14 +46,60 @@ oligoFrequency <- function(sequence, MarkovOrder=3L, last=1e6){
         seqInOne <- substring(seqInOne, 1, last)
     }
     freqs <- lapply(unique(c(1, MarkovOrder, MarkovOrder+1)), function(m){
-        count(s2c(seqInOne), 
-              wordsize=m, freq = TRUE,
-              alphabet=c("a", "c", "g", "t"))
+        seqinr::count(seqinr::s2c(seqInOne), 
+                      wordsize=m, freq = TRUE,
+                      alphabet=c("a", "c", "g", "t"))
     })
     unlist(freqs, recursive = FALSE)
 }
 
 
+
+
+#' Output a summary of consensus in the peaks
+#' 
+#' Calculate the z-scores of all combinations of oligonucleotide in a given
+#' length by Markove chain.
+#' 
+#' 
+#' @param sequence The sequences packaged in DNAStringSet, DNAString object or
+#' output of function \link{getAllPeakSequence}.
+#' @param oligoLength The length of oligonucleotide.
+#' @param freqs Output of function \link{frequency}.
+#' @param MarkovOrder The order of Markov chain.
+#' @param quickMotif Generate the motif by z-score of not.
+#' @param revcomp Consider both the given strand and the reverse complement
+#' strand when searching for motifs in a complementable alphabet (ie DNA).
+#' Default, FALSE.
+#' @param maxsize Maximum allowed dataset size (in length of sequences).
+#' @return A list is returned. \item{zscore}{A numeric vector. The z-scores of
+#' each oligonucleotide.} \item{counts}{A numeric vector. The counts number of
+#' each oligonucleotide.} \item{motifs}{a list of motif matrix.}
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{frequency}}
+#' @references van Helden, Jacques, Marcel li del Olmo, and Jose E.
+#' Perez-Ortin. "Statistical analysis of yeast genomic downstream sequences
+#' reveals putative polyadenylation signals." Nucleic Acids Research 28.4
+#' (2000): 1000-1010.
+#' @keywords misc
+#' @export
+#' @importFrom Biostrings DNAStringSet PDict vcountPDict DNAString 
+#' pairwiseAlignment aligned
+#' @importFrom utils adist combn
+#' @importFrom stats hclust kmeans as.dendrogram nobs
+#' @examples
+#' 
+#'     if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'         data(annotatedPeak)
+#'         library(BSgenome.Hsapiens.UCSC.hg19)
+#'         library(seqinr)
+#'         seq <- getAllPeakSequence(annotatedPeak[1:100], 
+#'                      upstream=20, 
+#'                      downstream=20, 
+#'                      genome=Hsapiens)
+#'         oligoSummary(seq)
+#'     }
+#' 
 oligoSummary <- function(sequence, oligoLength=6L, 
                          freqs=NULL, MarkovOrder=3L, 
                          quickMotif=FALSE, revcomp=FALSE,
@@ -42,6 +109,8 @@ oligoSummary <- function(sequence, oligoLength=6L,
     MarkovOrder <- as.integer(MarkovOrder)
     stopifnot(MarkovOrder>0&MarkovOrder<6)
     stopifnot(MarkovOrder < oligoLength-2)
+    stopifnot("The seqinr package is required." = 
+                  requireNamespace("seqinr", quietly = TRUE))
     if(is(sequence, "GRanges")){
         sequence <- sequence$sequence
     }else{
@@ -56,7 +125,7 @@ oligoSummary <- function(sequence, oligoLength=6L,
     }
     
     sequence <- tolower(sequence)
-    oligoWords <- words(oligoLength)
+    oligoWords <- seqinr::words(oligoLength)
     dict <- PDict(DNAStringSet(oligoWords))
     len <- length(sequence)
     sequence.tbl <- 1
@@ -79,7 +148,7 @@ oligoSummary <- function(sequence, oligoLength=6L,
         coln <- colnames(mat)
         map <- c(a="t", c="g", g="c", t="a")
         revComp <- function(.ele){
-            paste(map[rev(s2c(.ele))], collapse="")
+            paste(map[rev(seqinr::s2c(.ele))], collapse="")
         }
         coln.rev <- sapply(coln, revComp)
         coln.id <- 1:length(coln)
@@ -108,8 +177,8 @@ oligoSummary <- function(sequence, oligoLength=6L,
                                 MarkovOrder=MarkovOrder)
     }
     namesFreqs <- unique(c("a", "c", "g", "t", 
-                           words(MarkovOrder),
-                           words(MarkovOrder+1)))
+                           seqinr::words(MarkovOrder),
+                           seqinr::words(MarkovOrder+1)))
     names(freqs) <- tolower(names(freqs))
     stopifnot(all(namesFreqs %in% names(freqs)))
     f <- sapply(names(cntSum), function(.ele) {
@@ -120,7 +189,8 @@ oligoSummary <- function(sequence, oligoLength=6L,
         prod(freqs[m1])/prod(freqs[m0])
     })
     if(len > maxsize){
-        seqLen <- sapply(names(sequence.tbl), nchar, USE.NAMES=FALSE) - oligoLength + 1
+        seqLen <- sapply(names(sequence.tbl), nchar, USE.NAMES=FALSE) - 
+            oligoLength + 1
     }else{
         seqLen <- sapply(sequence, nchar, USE.NAMES=FALSE) - oligoLength + 1
     }
@@ -133,7 +203,7 @@ oligoSummary <- function(sequence, oligoLength=6L,
     mu <- colSums(f.m)
     names(mu) <- names(cntSum)
     #     Kov <- sapply(names(cntSum), function(.ele){
-    #         arr <- s2c(.ele)
+    #         arr <- seqinr::s2c(.ele)
     #         k <- lapply(seq_len(length(arr)), function(.e){
     #             if(.e==1) return(TRUE)
     #             if(.e %% 2) 
@@ -147,7 +217,8 @@ oligoSummary <- function(sequence, oligoLength=6L,
     #         sum(k*j)
     #     })
     #std <- sqrt(mu * (2*Kov - 1 - (2*oligoLength - 1) * mu/length(sequence)))
-    #std <- sqrt(length(sequence) * (Kov/2-1+(2*oligoLength-1)/4^oligoLength) / 4^oligoLength)
+    #std <- sqrt(length(sequence) * 
+    #            (Kov/2-1+(2*oligoLength-1)/4^oligoLength) / 4^oligoLength)
     N <- len #length(sequence)
     std <- sqrt(mu/N * (1-mu/N) / N)
     zscore <- (cntSum - mu)/N/std
@@ -175,14 +246,14 @@ oligoSummary <- function(sequence, oligoLength=6L,
                       dimnames=list(c("A", "C", "G", "T"), 
                                     c("a", "c", "g", "t")))
         if(length(s)==1){
-            return(tmp[, s2c(s)])
+            return(tmp[, seqinr::s2c(s)])
         }
         ss <- table(s)
         if(length(ss)==1){
-            return(tmp[, s2c(names(ss))])
+            return(tmp[, seqinr::s2c(names(ss))])
         }
         sss <- lapply(names(ss), function(.ele) 
-            as.numeric(tmp[, s2c(.ele)]))
+            as.numeric(tmp[, seqinr::s2c(.ele)]))
         sss <- mapply(function(mat, times, coln) mat*times, 
                       sss, ss, SIMPLIFY = FALSE)
         consensusStr <- DNAString(names(ss)[1])
@@ -226,7 +297,9 @@ oligoSummary <- function(sequence, oligoLength=6L,
         if(length(.ele)==2){
             .ele <- colnames(.cnt)
             .ele <- c(rep(.ele[1], sum(.cnt[, 1])), 
-                      rep(.ele[2], sum(.cnt[.cnt[, 2]>0 & (!(.cnt[, 1]>0 & .cnt[, 2]>0)), 2])))
+                      rep(.ele[2], sum(.cnt[.cnt[, 2]>0 &
+                                                (!(.cnt[, 1]>0 & 
+                                                       .cnt[, 2]>0)), 2])))
             return(str2motif(.ele))
         }
         ## get max hits of any combinations
@@ -276,8 +349,10 @@ oligoSummary <- function(sequence, oligoLength=6L,
         if(ncol(.cnt)>1){
             for(i in 2:ncol(.cnt)){
                 .cnt.gt0[, i] <- .cnt.gt0[, i] & 
-                    !(apply(.cnt.gt0[, 1:(i-1), drop=FALSE], 1, any) & .cnt.gt0[, i])
-                .ele <- c(.ele, rep(colnames(.cnt)[i], sum(.cnt[.cnt.gt0[, i] , i])))
+                    !(apply(.cnt.gt0[, 1:(i-1), drop=FALSE], 1, any) &
+                          .cnt.gt0[, i])
+                .ele <- c(.ele, rep(colnames(.cnt)[i], 
+                                    sum(.cnt[.cnt.gt0[, i] , i])))
             }
         }
         str2motif(.ele)

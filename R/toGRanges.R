@@ -1,3 +1,4 @@
+## help function df2GRanges
 df2GRanges <- function(data, colNames=NULL, format="", ...){
     if (missing(data)){
         stop("data is required!")
@@ -156,6 +157,80 @@ switchColNames <- function(format=c("BED", "GFF",
            colNames)
 }
 
+#' Convert dataset to GRanges
+#' 
+#' Convert UCSC BED format and its variants, such as GFF, or any user defined
+#' dataset such as MACS output file to GRanges
+#' 
+#' @rdname toGRanges
+#' @aliases toGRanges toGRanges,data.frame-method 
+#' @param data an object of data.frame, \link[GenomicFeatures:TxDb-class]{TxDb}
+#' or \link[ensembldb]{EnsDb}, or the file name of data to be imported.
+#' Alternatively, data can be a readable txt-mode connection (See ?read.table).
+#' @param format data format.  If the data format is set to BED, GFF,
+#' narrowPeak or broadPeak, please refer to
+#' http://genome.ucsc.edu/FAQ/FAQformat#format1 for column order. "MACS" is for
+#' converting the excel output file from MACS1. "MACS2" is for converting the
+#' output file from MACS2.
+#' @param feature annotation type
+#' @param header A logical value indicating whether the file contains the names
+#' of the variables as its first line. If missing, the value is determined from
+#' the file format: header is set to TRUE if and only if the first row contains
+#' one fewer field than the number of columns.
+#' @param comment.char character: a character vector of length one containing a
+#' single character or an empty string. Use "" to turn off the interpretation
+#' of comments altogether.
+#' @param colNames If the data format is set to "others", colname must be
+#' defined. And the colname must contain space, start and end. The column name
+#' for the chromosome # should be named as space.
+#' @param \dots parameters passed to \link{read.table}
+#' @param OrganismDb an object of \link[OrganismDbi]{OrganismDb}. It is used
+#' for extracting gene symbol for geneModel group for
+#' \link[GenomicFeatures:TxDb-class]{TxDb}
+#' @return An object of \link[GenomicRanges:GRanges-class]{GRanges}
+#' @author Jianhong Ou
+#' @keywords misc
+#' @exportMethod toGRanges
+#' @export toGRanges
+#' @examples
+#' 
+#'   macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
+#'   macsOutput <- toGRanges(macs, format="MACS")
+#'   if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     ## MACS connection
+#'     macs <- readLines(macs)
+#'     macs <- textConnection(macs)
+#'     macsOutput <- toGRanges(macs, format="MACS")
+#'     close(macs)
+#'     ## bed
+#'     toGRanges(system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno"),
+#'                 format="BED")
+#'     ## narrowPeak
+#'     toGRanges(system.file("extdata", "peaks.narrowPeak", package="ChIPpeakAnno"),
+#'                 format="narrowPeak")
+#'     ## broadPeak
+#'     toGRanges(system.file("extdata", "TAF.broadPeak", package="ChIPpeakAnno"),
+#'                 format="broadPeak")
+#'     ## MACS2
+#'     toGRanges(system.file("extdata", "MACS2_peaks.xls", package="ChIPpeakAnno"),
+#'                 format="MACS2")
+#'     ## GFF
+#'     toGRanges(system.file("extdata", "GFF_peaks.gff", package="ChIPpeakAnno"),
+#'                 format="GFF")
+#'     ## EnsDb
+#'     library(EnsDb.Hsapiens.v75)
+#'     toGRanges(EnsDb.Hsapiens.v75, feature="gene")
+#'     ## TxDb
+#'     library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+#'     toGRanges(TxDb.Hsapiens.UCSC.hg19.knownGene, feature="gene")
+#'     ## data.frame
+#'     macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
+#'     macs <- read.delim(macs, comment.char="#")
+#'     toGRanges(macs)
+#'   }
+#' 
+#' @importFrom grDevices rgb
+#' 
 setGeneric("toGRanges", function(data, ...) standardGeneric("toGRanges"))
 setMethod("toGRanges", "data.frame", 
           function(data, colNames=NULL, ...){
@@ -176,6 +251,10 @@ message4GTF <- function(con){
           anno <- toGRanges(txdb, format='gene')")
 }
 
+#' @importFrom rtracklayer import
+#' @importFrom utils read.table
+#' @rdname toGRanges
+#' @aliases toGRanges,connection-method
 setMethod("toGRanges", "connection", 
           function(data, format=c("BED", "GFF", "GTF", 
                                   "MACS", "MACS2", "MACS2.broad", 
@@ -218,6 +297,8 @@ setMethod("toGRanges", "connection",
               return(gr)
           })
 
+#' @rdname toGRanges
+#' @aliases toGRanges,TxDb-method
 setMethod("toGRanges", "TxDb", 
           function(data, feature=c("gene", "transcript", "exon",
                                    "CDS", "fiveUTR", "threeUTR",
@@ -231,6 +312,8 @@ setMethod("toGRanges", "TxDb",
               }
           })
 
+#' @rdname toGRanges
+#' @aliases toGRanges,EnsDb-method 
 setMethod("toGRanges", "EnsDb", 
           function(data, 
                    feature=c("gene", "transcript", "exon", "disjointExons"),
@@ -239,6 +322,8 @@ setMethod("toGRanges", "EnsDb",
               return(EnsDb2GR(data, feature))
           })
 
+#' @rdname toGRanges
+#' @aliases toGRanges,character-method
 setMethod("toGRanges", "character", 
           function(data, format=c("BED", "GFF", "GTF", 
                                   "MACS", "MACS2", "MACS2.broad", 

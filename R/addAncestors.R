@@ -1,5 +1,28 @@
+#' Add GO IDs of the ancestors for a given vector of GO ids
+#' @description Add GO IDs of the ancestors for a given vector of GO IDs 
+#' leveraging GO.db 
+#' @param go.ids A matrix with 4 columns: first column is GO IDs and 4th 
+#' column is entrez IDs.
+#' @param ontology bp for biological process, cc for cellular component and 
+#' mf for molecular function.
+#' @return A vector of GO IDs containing the input GO IDs with the GO IDs of 
+#' their ancestors added.
+#' @export
+#' @author Lihua Julie Zhu
+#' @examples 
+#' go.ids = cbind(c("GO:0008150", "GO:0005576", "GO:0003674"),
+#'                c("ND", "IDA", "ND"), 
+#'                c("BP", "BP", "BP"), 
+#'                c("1", "1", "1"))
+#' library(GO.db)
+#' addAncestors(go.ids, ontology="bp")
+#' @keywords misc
+#' 
+
 addAncestors <- function(go.ids, ontology=c("bp","cc", "mf"))
 {
+    stopifnot("The 'GO.db' package is required"=
+                  requireNamespace("GO.db", quietly = TRUE))
     ontology = match.arg(ontology)
     if (missing(go.ids))
     {
@@ -12,15 +35,15 @@ addAncestors <- function(go.ids, ontology=c("bp","cc", "mf"))
     }
     if (ontology =="bp")
     {
-        xx <- as.list(GOBPANCESTOR)
+        xx <- as.list(GO.db::GOBPANCESTOR)
     }
     else if (ontology =="cc")
     {
-        xx <- as.list(GOCCANCESTOR)
+        xx <- as.list(GO.db::GOCCANCESTOR)
     }
     else if (ontology =="mf")
     {
-        xx <- as.list(GOMFANCESTOR)
+        xx <- as.list(GO.db::GOMFANCESTOR)
     }
     xx <- xx[!is.na(xx)]
     

@@ -1,3 +1,64 @@
+#' extract signals in given ranges from bam files
+#' 
+#' extract signals in the given feature ranges from bam files (DNAseq only).
+#' The reads will be extended to estimated fragement length.
+#' 
+#' 
+#' @param bamfiles The file names of the 'BAM' ('SAM' for asBam) files to be
+#' processed.
+#' @param index The names of the index file of the 'BAM' file being processed;
+#' this is given without the '.bai' extension.
+#' @param feature.gr An object of \link[GenomicRanges:GRanges-class]{GRanges}
+#' with identical width.
+#' @param upstream,downstream upstream or dwonstream from the feature.gr.
+#' @param n.tile The number of tiles to generate for each element of
+#' feature.gr, default is 100
+#' @param fragmentLength Estimated fragment length.
+#' @param librarySize Estimated library size.
+#' @param pe Pair-end or not. Default auto.
+#' @param adjustFragmentLength A numberic vector with length 1. Adjust the
+#' fragments/reads length to.
+#' @param gal A GAlignmentsList object or a list of GAlignmentPairs. If
+#' bamfiles is missing, gal is required.
+#' @param \dots Not used.
+#' @return A list of matrix. In each matrix, each row record the signals for
+#' corresponding feature.
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{featureAlignedSignal}},
+#' \code{\link{estLibSize}}, \code{\link{estFragmentLength}}
+#' @keywords misc
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom S4Vectors elementNROWS mcols
+#' @importFrom GenomicAlignments readGAlignments readGAlignmentPairs
+#' @importFrom Rsamtools testPairedEndBam ScanBamParam scanBamWhat scanBamFlag
+#' @examples
+#' 
+#'  if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     path <- system.file("extdata", package="MMDiffBamSubset")
+#'     if(file.exists(path)){
+#'         WT.AB2 <- file.path(path, "reads", "WT_2.bam")
+#'         Null.AB2 <- file.path(path, "reads", "Null_2.bam")
+#'         Resc.AB2 <- file.path(path, "reads", "Resc_2.bam")
+#'         peaks <- file.path(path, "peaks", "WT_2_Macs_peaks.xls")
+#'         estLibSize(c(WT.AB2, Null.AB2, Resc.AB2))
+#'         feature.gr <- toGRanges(peaks, format="MACS")
+#'         feature.gr <- feature.gr[seqnames(feature.gr)=="chr1" & 
+#'                              start(feature.gr)>3000000 & 
+#'                              end(feature.gr)<75000000]
+#'         sig <- featureAlignedExtendSignal(c(WT.AB2, Null.AB2, Resc.AB2), 
+#'                                feature.gr=reCenterPeaks(feature.gr, width=1), 
+#'                                upstream = 505,
+#'                                downstream = 505,
+#'                                n.tile=101, 
+#'                                fragmentLength=250,
+#'                                librarySize=1e9)
+#'         featureAlignedHeatmap(sig, reCenterPeaks(feature.gr, width=1010), 
+#'                           zeroAt=.5, n.tile=101)
+#'     }
+#'  }
+#' 
 featureAlignedExtendSignal <- function(bamfiles, index=bamfiles, 
                                        feature.gr, 
                                        upstream, downstream, 
@@ -28,7 +89,8 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
             inherits(.ele, c("GAlignments", "GAlignmentPairs"))
           })
           if(any(!galInput)){
-            stop("gal must be a GAlignmentsList object or a list of GAlignmentPairs.")
+            stop("gal must be a GAlignmentsList object or ", 
+                 "a list of GAlignmentPairs.")
           }
         }
       }
@@ -133,9 +195,10 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
                                              isNotPassingQualityControls=FALSE),
                             what=scanBamWhat())
       paramp <- ScanBamParam(which=reduce(feature.gr.expand), 
-                             flag=scanBamFlag(isProperPair=TRUE,
-                                              isSecondaryAlignment=FALSE,
-                                              isNotPassingQualityControls=FALSE),
+                             flag=scanBamFlag(
+                               isProperPair=TRUE,
+                               isSecondaryAlignment=FALSE,
+                               isNotPassingQualityControls=FALSE),
                              what=scanBamWhat())
       bams.gr <- mapply(function(f, i, p, .fLen) {
         if(!p){
@@ -153,7 +216,8 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     }
     
     if(!missing(adjustFragmentLength)){
-      bams.gr <- lapply(bams.gr, reCenterPeaks, width=adjustFragmentLength)
+      bams.gr <- lapply(bams.gr, reCenterPeaks, 
+                        width=adjustFragmentLength)
       fragmentLength <- adjustFragmentLength
     }
     ## count overlaps

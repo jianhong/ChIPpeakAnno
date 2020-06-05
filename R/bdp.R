@@ -1,3 +1,31 @@
+#' obtain the peaks near bi-directional promoters
+#' 
+#' Obtain the peaks near bi-directional promoters. Also output percent of peaks
+#' near bi-directional promoters.
+#' 
+#' 
+#' @param peaks peak list, \link[GenomicRanges:GRanges-class]{GRanges} object
+#' @param annoData annotation data, \link{annoGR} object
+#' @param maxgap maxgap between peak and TSS
+#' @param ...  Not used.
+#' @return Output is a list of GRanges object of the peaks near bi-directional
+#' promoters.
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{annoPeaks}}, \code{\link{annoGR}}
+#' @keywords misc
+#' @importFrom GenomeInfoDb seqlevelsStyle
+#' @importFrom S4Vectors elementNROWS
+#' @examples
+#' 
+#'   if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     library(ensembldb)
+#'     library(EnsDb.Hsapiens.v75)
+#'     data("myPeakList")
+#'     annoGR <- annoGR(EnsDb.Hsapiens.v75)
+#'     seqlevelsStyle(myPeakList) <- seqlevelsStyle(annoGR)
+#'     ChIPpeakAnno:::bdp(myPeakList, annoGR)
+#'   }
+#' 
 bdp <- function(peaks, annoData, maxgap=2000L, ...){
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))

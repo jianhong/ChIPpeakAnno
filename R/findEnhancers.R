@@ -1,3 +1,60 @@
+#' Find possible enhancers depend on DNA interaction data
+#' 
+#' Find possible enhancers by data from chromosome conformation capture
+#' techniques such as 3C, 5C or HiC.
+#' 
+#' 
+#' @param peaks peak list, \link[GenomicRanges:GRanges-class]{GRanges} object
+#' @param annoData annotation data, \link[GenomicRanges:GRanges-class]{GRanges}
+#' object
+#' @param DNAinteractiveData DNA interaction data,
+#' \link[GenomicRanges:GRanges-class]{GRanges} object with interaction blocks
+#' informations.
+#' @param bindingType Specifying the criteria to associate peaks with
+#' annotation. Here is how to use it together with the parameter bindingRegion.
+#' The annotation will be shift to a new position depend on the DNA interaction
+#' region.  \itemize{ \item To obtain peaks within 5kb upstream and up to 3kb
+#' downstream of shift TSS within the gene body, set bindingType = "startSite"
+#' and bindingRegion = c(-5000, 3000) \item To obtain peaks up to 5kb upstream
+#' within the gene body and 3kb downstream of shift gene/Exon End, set
+#' bindingType = "endSite" and bindingRegion = c(-5000, 3000) \item To obtain
+#' peaks with nearest bi-directional enhancer regions within 5kb upstream and
+#' 3kb downstream of shift TSS, set bindingType =
+#' "nearestBiDirectionalPromoters" and bindingRegion = c(-5000, 3000) }
+#' \describe{ \item{startSite}{start position of the feature (strand is
+#' considered)} \item{endSite}{end position of the feature (strand is
+#' considered)} \item{nearestBiDirectionalPromoters}{nearest enhancer regions
+#' from both direction of the peaks (strand is considered). It will report
+#' bidirectional enhancer regions if there are enhancer regions in both
+#' directions in the given region (defined by bindingRegion). Otherwise, it
+#' will report the closest enhancer regions in one direction.} }
+#' @param bindingRegion Annotation range used together with bindingType, which
+#' is a vector with two integer values, default to c (-5000, 5000). The first
+#' one must be no bigger than 0. And the sec ond one must be no less than 1.
+#' For details, see bindingType.
+#' @param ignore.peak.strand ignore the peaks strand or not.
+#' @param ...  Not used.
+#' @return Output is a GRanges object of the annotated peaks.
+#' @author Jianhong Ou
+#' @seealso See Also as \code{\link{annotatePeakInBatch}}
+#' @keywords misc
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom GenomeInfoDb seqlevelsStyle
+#' @importFrom BiocGenerics start end width strand
+#' @importFrom S4Vectors elementNROWS mcols queryHits subjectHits
+#' @examples
+#' 
+#'   bed <- system.file("extdata", 
+#'                      "wgEncodeUmassDekker5CGm12878PkV2.bed.gz",
+#'                      package="ChIPpeakAnno")
+#'   DNAinteractiveData <- toGRanges(gzfile(bed))
+#'   library(EnsDb.Hsapiens.v75)
+#'   annoData <- toGRanges(EnsDb.Hsapiens.v75, feature="gene")
+#'   data("myPeakList")
+#'   findEnhancers(myPeakList[500:1000], annoData, DNAinteractiveData)
+#' 
 findEnhancers <- function(peaks, annoData, DNAinteractiveData, 
                     bindingType=c("nearestBiDirectionalPromoters",
                                   "startSite", "endSite"), 
@@ -5,11 +62,13 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
                     ignore.peak.strand=TRUE, ...){
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
-    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
+    stopifnot(length(intersect(seqlevelsStyle(peaks),
+                               seqlevelsStyle(annoData)))>0)
     stopifnot(inherits(DNAinteractiveData, "GRanges"))
     stopifnot(length(DNAinteractiveData$blocks)>0)
     stopifnot(all(elementNROWS(DNAinteractiveData$blocks)==2))
-    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(DNAinteractiveData)))>0)
+    stopifnot(length(intersect(seqlevelsStyle(peaks),
+                               seqlevelsStyle(DNAinteractiveData)))>0)
     bindingType <- match.arg(bindingType)
     stopifnot(length(bindingRegion)==2)
     stopifnot(bindingRegion[1]<=0 && bindingRegion[2]>=1)
@@ -302,7 +361,7 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
     colnames(mcols(enhancer)) <- 
         gsub("HiC", "DNAinteractive", colnames(mcols(enhancer)))
     peak.gpid <- rle(enhancer$peak.oid.to.be.deleted)
-    peak.gpid$values <- 1:length(peak.gpid$values)
+    peak.gpid$values <- seq_along(peak.gpid$values)
     peak.gpid <- inverse.rle(peak.gpid)
     enhancer <- enhancer[order(peak.gpid, enhancer$distance)]
     enhancer <- enhancer[!duplicated(paste(enhancer$feature, enhancer$peak))]

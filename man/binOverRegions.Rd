@@ -4,36 +4,48 @@
 \alias{binOverRegions}
 \title{coverage of chromosome regions}
 \usage{
-binOverRegions(cvglists, TxDb, upstream.cutoff = 1000L,
-  downstream.cutoff = upstream.cutoff, nbinsCDS = 100L, nbinsUTR = 20L,
-  nbinsUpstream = 20L, nbinsDownstream = nbinsUpstream,
-  includeIntron = FALSE, minCDSLen = nbinsCDS, minUTRLen = nbinsUTR,
-  maxCDSLen = Inf, maxUTRLen = Inf)
+binOverRegions(
+  cvglists,
+  TxDb,
+  upstream.cutoff = 1000L,
+  downstream.cutoff = upstream.cutoff,
+  nbinsCDS = 100L,
+  nbinsUTR = 20L,
+  nbinsUpstream = 20L,
+  nbinsDownstream = nbinsUpstream,
+  includeIntron = FALSE,
+  minCDSLen = nbinsCDS,
+  minUTRLen = nbinsUTR,
+  maxCDSLen = Inf,
+  maxUTRLen = Inf
+)
 }
 \arguments{
-\item{cvglists}{A list of \link[IRanges:AtomicList-class]{SimpleRleList} or 
-\link[IRanges:AtomicList-class]{RleList}. It represents the coverage for samples.}
+\item{cvglists}{A list of \link[IRanges:AtomicList-class]{SimpleRleList} or
+\link[IRanges:AtomicList-class]{RleList}. It represents the coverage for
+samples.}
 
-\item{TxDb}{An object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}. 
-It is used for extracting the annotations.}
+\item{TxDb}{An object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}.  It
+is used for extracting the annotations.}
 
-\item{upstream.cutoff, downstream.cutoff}{cutoff length for upstream 
-or downstream of transcript.}
+\item{upstream.cutoff, downstream.cutoff}{cutoff length for upstream or
+downstream of transcript.}
 
 \item{nbinsCDS, nbinsUTR, nbinsUpstream, nbinsDownstream}{The number of bins
 for CDS, UTR, upstream and downstream.}
 
-\item{includeIntron}{A logical value which indicates including intron or not.}
+\item{includeIntron}{A logical value which indicates including intron or
+not.}
 
 \item{minCDSLen, minUTRLen}{minimal length of CDS or UTR of transcript.}
 
 \item{maxCDSLen, maxUTRLen}{maximal length of CDS or UTR of transctipt.}
 }
 \description{
-calculate the coverage of 5'UTR, CDS and 3'UTR per transcript 
-per bin.
+calculate the coverage of 5'UTR, CDS and 3'UTR per transcript per bin.
 }
 \examples{
+
 if(Sys.getenv("USER")=="jianhongou"){
 path <- system.file("extdata", package="ChIPpeakAnno")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -47,6 +59,7 @@ d <- binOverRegions(cvglists, TxDb.Hsapiens.UCSC.hg19.knownGene)
 plotBinOverRegions(d)
 }
 }
+
 }
 \seealso{
 \link{binOverGene}, \link{plotBinOverRegions}

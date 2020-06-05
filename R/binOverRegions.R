@@ -1,26 +1,33 @@
 #' coverage of chromosome regions
 #' 
-#' @description calculate the coverage of 5'UTR, CDS and 3'UTR per transcript 
-#' per bin.
-#' @param cvglists A list of \link[IRanges]{SimpleRleList} or 
-#' \link[IRanges]{RleList}. It represents the coverage for samples.
-#' @param TxDb An object of \code{\link[GenomicFeatures]{TxDb}}. 
-#' It is used for extracting the annotations.
-#' @param upstream.cutoff,downstream.cutoff cutoff length for upstream 
-#' or downstream of transcript.
+#' calculate the coverage of 5'UTR, CDS and 3'UTR per transcript per bin.
+#' 
+#' 
+#' @param cvglists A list of \link[IRanges:AtomicList-class]{SimpleRleList} or
+#' \link[IRanges:AtomicList-class]{RleList}. It represents the coverage for
+#' samples.
+#' @param TxDb An object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}.  It
+#' is used for extracting the annotations.
+#' @param upstream.cutoff,downstream.cutoff cutoff length for upstream or
+#' downstream of transcript.
 #' @param nbinsCDS,nbinsUTR,nbinsUpstream,nbinsDownstream The number of bins
 #' for CDS, UTR, upstream and downstream.
-#' @param includeIntron A logical value which indicates including intron or not.
+#' @param includeIntron A logical value which indicates including intron or
+#' not.
 #' @param minCDSLen,minUTRLen minimal length of CDS or UTR of transcript.
 #' @param maxCDSLen,maxUTRLen maximal length of CDS or UTR of transctipt.
-#' @import IRanges
-#' @import GenomicRanges
-#' @import GenomicFeatures
-#' @import GenomeInfoDb
-#' @export 
 #' @author Jianhong Ou
 #' @seealso \link{binOverGene}, \link{plotBinOverRegions}
-#' @examples 
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom GenomicFeatures transcripts
+#' @importFrom S4Vectors mcols elementMetadata
+#' @importFrom BiocGenerics strand start
+#' @importFrom GenomeInfoDb seqinfo seqlevels seqnames
+#' @examples
+#' 
+#' if(Sys.getenv("USER")=="jianhongou"){
 #' path <- system.file("extdata", package="ChIPpeakAnno")
 #' library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' library(rtracklayer)
@@ -32,6 +39,8 @@
 #' d <- binOverRegions(cvglists, TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' plotBinOverRegions(d)
 #' }
+#' }
+#' 
 binOverRegions <- function(cvglists, TxDb, 
                            upstream.cutoff=1000L, 
                            downstream.cutoff=upstream.cutoff, 
@@ -72,23 +81,33 @@ binOverRegions <- function(cvglists, TxDb,
     features$gene_id <- NULL
     
     features.disjoin <- disjoin(features, with.revmap=TRUE)
-    features.disjoin.1 <- features.disjoin[rep(seq_along(features.disjoin), lengths(features.disjoin$revmap))]
+    features.disjoin.1 <- 
+      features.disjoin[rep(seq_along(features.disjoin),
+                           lengths(features.disjoin$revmap))]
     features.disjoin.1$revmap <- unlist(features.disjoin$revmap)
-    features.disjoin.1$feature_type <- features$feature_type[features.disjoin.1$revmap]
+    features.disjoin.1$feature_type <- 
+      features$feature_type[features.disjoin.1$revmap]
     features.disjoin.1$tx_name <- features$tx_name[features.disjoin.1$revmap]
-    features.disjoin.1$revmap2 <- rep(seq_along(features.disjoin), lengths(features.disjoin$revmap))
-    feature_type2 <- split(features.disjoin.1$feature_type, features.disjoin.1$revmap2)
+    features.disjoin.1$revmap2 <- 
+      rep(seq_along(features.disjoin), lengths(features.disjoin$revmap))
+    feature_type2 <- 
+      split(features.disjoin.1$feature_type, features.disjoin.1$revmap2)
     feature_type2 <- lapply(feature_type2, unique)
     feature_type2 <- feature_type2[lengths(feature_type2)==1]
-    features.disjoin.1 <- features.disjoin.1[match(as.numeric(names(feature_type2)), features.disjoin.1$revmap2)]
+    features.disjoin.1 <- 
+      features.disjoin.1[match(as.numeric(names(feature_type2)),
+                               features.disjoin.1$revmap2)]
     features.disjoin.1$seqn <- paste(features.disjoin.1$tx_name, 
                                      features.disjoin.1$feature_type, 
                                      as.character(seqnames(features.disjoin.1)))
-    features1 <- GRanges(seqnames = features.disjoin.1$seqn, ranges = ranges(features.disjoin.1),
+    features1 <- GRanges(seqnames = features.disjoin.1$seqn, 
+                         ranges = ranges(features.disjoin.1),
                          strand = strand(features.disjoin.1))
     features1 <- reduce(features1)
-    mcols(features1) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(features1)), " ")), 
-                                   stringsAsFactors=FALSE)
+    mcols(features1) <- 
+      data.frame(do.call(rbind, 
+                         strsplit(as.character(seqnames(features1)), " ")), 
+                 stringsAsFactors=FALSE)
     colnames(mcols(features1)) <- c("tx_name", "feature_type", "seqn")
     features1 <- GRanges(seqnames = features1$seqn, 
                          ranges = ranges(features1),
@@ -97,19 +116,24 @@ binOverRegions <- function(cvglists, TxDb,
                          feature_type = features1$feature_type)
     seqinfo(features1) <- seqinfo(features)[seqlevels(features1)]
     features <- features1
-    rm(list=c("features.disjoin", "features.disjoin.1", "feature_type2", "features1"))
+    rm(list=c("features.disjoin", "features.disjoin.1", 
+              "feature_type2", "features1"))
     
     txs <- unique(features$tx_name)
     txs <- txs[!is.na(txs)]
     if(includeIntron){
         cds <- features[features$feature_type=="CDS"]
-        cds <- GRanges(seqnames = paste(as.character(seqnames(cds)), cds$tx_name),
+        cds <- GRanges(seqnames = paste(as.character(seqnames(cds)), 
+                                        cds$tx_name),
                        ranges = ranges(cds), strand = strand(cds))
         cds <- reduce(cds, min.gapwidth=1e9)
-        mcols(cds) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(cds)), " ")), 
-                                 stringsAsFactors = FALSE)
+        mcols(cds) <- 
+          data.frame(do.call(rbind, 
+                             strsplit(as.character(seqnames(cds)), " ")), 
+                     stringsAsFactors = FALSE)
         colnames(mcols(cds)) <- c("seqn", "tx_name")
-        cds <- GRanges(seqnames = cds$seqn, ranges = ranges(cds), strand = strand(cds),
+        cds <- GRanges(seqnames = cds$seqn, 
+                       ranges = ranges(cds), strand = strand(cds),
                        tx_name = cds$tx_name, feature_type = "CDS")
         seqinfo(cds) <- seqinfo(features)[seqlevels(cds)]
         features <- features[features$feature_type %in% c("5UTR", "3UTR")]
@@ -125,14 +149,19 @@ binOverRegions <- function(cvglists, TxDb,
     features <- features[features$tx_name %in% txs]
     ## add upstream and downstream
     if(upstream.cutoff>0 && downstream.cutoff>0){
-        genes <- GRanges(seqnames = paste(as.character(seqnames(features)), features$tx_name),
+        genes <- GRanges(seqnames = paste(as.character(seqnames(features)), 
+                                          features$tx_name),
                          ranges = ranges(features), strand = strand(features))
         genes <- reduce(genes, min.gapwidth=1e9)
-        mcols(genes) <- data.frame(do.call(rbind, strsplit(as.character(seqnames(genes)), " ")),
-                                   stringsAsFactors = FALSE)
+        mcols(genes) <- 
+          data.frame(do.call(rbind, 
+                             strsplit(as.character(seqnames(genes)), " ")),
+                     stringsAsFactors = FALSE)
         colnames(mcols(genes)) <- c("seqn", "tx_name")
-        genes <- GRanges(seqnames = genes$seqn, ranges = ranges(genes), strand = strand(genes),
-                       tx_name = genes$tx_name)
+        genes <- 
+          GRanges(seqnames = genes$seqn, 
+                  ranges = ranges(genes), strand = strand(genes),
+                  tx_name = genes$tx_name)
         seqinfo(genes) <- seqinfo(features)[seqlevels(genes)]
         suppressWarnings({
             upstream <- promoters(genes,
@@ -169,7 +198,7 @@ binOverRegions <- function(cvglists, TxDb,
           gr.intersect$tx_name <- NA
           gr.intersect$feature_type <- NA
           gr.disjoin <- disjoin(c(gr, gr.intersect), 
-                                      with.revmap=TRUE, ignore.strand=TRUE)
+                                with.revmap=TRUE, ignore.strand=TRUE)
           gr.disjoin <- gr.disjoin[lengths(gr.disjoin$revmap)==1]
           gr.disjoin$revmap <- unlist(gr.disjoin$revmap)
           strand(gr.disjoin) <- strand(gr[gr.disjoin$revmap])
@@ -193,10 +222,12 @@ binOverRegions <- function(cvglists, TxDb,
     features.disjoin <- disjoin(features, with.revmap=TRUE)
     features.disjoin <- features.disjoin[lengths(features.disjoin$revmap)==1]
     features.disjoin$revmap <- unlist(features.disjoin$revmap)
-    features.disjoin$feature_type <- features$feature_type[features.disjoin$revmap]
+    features.disjoin$feature_type <- 
+      features$feature_type[features.disjoin$revmap]
     features.disjoin$tx_name <- features$tx_name[features.disjoin$revmap]
     features.disjoin$revmap <- NULL
-    features.disjoin.tx_name <- split(features.disjoin$feature_type, features.disjoin$tx_name)
+    features.disjoin.tx_name <- 
+      split(features.disjoin$feature_type, features.disjoin$tx_name)
     features.disjoin.tx_name <- lapply(features.disjoin.tx_name, unique)
     features.disjoin.tx_name <- 
       names(features.disjoin.tx_name)[lengths(features.disjoin.tx_name) ==
@@ -208,10 +239,14 @@ binOverRegions <- function(cvglists, TxDb,
     rm(features.disjoin)
     ## make sure features are sorted by pos
     features <- 
-      features[order(as.numeric(factor(features$tx_name, 
-                                       levels = txs)),
-                     as.numeric(factor(features$feature_type,
-                                       levels = feature_type[feature_type %in% unique(features$feature_type)])),
+      features[order(
+        as.numeric(factor(features$tx_name, 
+                          levels = txs)),
+        as.numeric(factor(features$feature_type,
+                          levels = 
+                            feature_type[feature_type %in% 
+                                           unique(
+                                             features$feature_type)])),
                      start(features))]
     
     ## filter by minCDSLen, min5UTR, min3UTR
@@ -268,14 +303,17 @@ binOverRegions <- function(cvglists, TxDb,
         .cvg.sub <- .cvgs[.gr.l]
         ### split the RleList into bins
         .ir <- IRanges(rep(1, length(.cvg.sub)), lengths(.cvg.sub))
-        .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
+        .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", 
+                                             names(.cvg.sub))])
         names(.ir) <- names(.cvg.sub)
         .cnt <- viewMeans(Views(.cvg.sub, .ir))
         .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
         ## make sure 5'->3'
         .cnt <- lapply(.cnt, function(x){
-          strd <- as.character(strand(features))[match(sub("^(.*?) (.*$)", "\\2", names(x)), 
-                                                       features$tx_name)]
+          strd <- 
+            as.character(strand(features))[match(sub("^(.*?) (.*$)", "\\2", 
+                                                     names(x)), 
+                                                 features$tx_name)]
           x <- split(x, strd)
           x <- lapply(x, do.call, what=rbind)
           if("-" %in% names(x)){
@@ -297,15 +335,23 @@ binOverRegions <- function(cvglists, TxDb,
 }
 
 
+
+
 #' plot the coverage of regions
 #' 
-#' @description plot the output of \link{binOverRegiions} or \link{binOverGene}
+#' plot the output of \link{binOverRegions} or \link{binOverGene}
+#' 
+#' 
 #' @param dat A list of matrix which indicate the coverage of regions per bin
 #' @param ... Parameters could be used by \link[graphics]{matplot}
-#' @export
 #' @author Jianhong Ou
 #' @seealso \link{binOverRegions}, \link{binOverGene}
-#' @examples 
+#' @export
+#' @importFrom S4Vectors elementNROWS
+#' @importFrom graphics abline axis legend matplot
+#' @examples
+#' 
+#' if(interactive()){
 #' path <- system.file("extdata", package="ChIPpeakAnno")
 #' library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' library(rtracklayer)
@@ -317,6 +363,8 @@ binOverRegions <- function(cvglists, TxDb,
 #' d <- binOverGene(cvglists, TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' plotBinOverRegions(d)
 #' }
+#' }
+#' 
 plotBinOverRegions <- function(dat, ...){
     feature_type <- c("upstream", "5UTR", "CDS", "gene", "3UTR", "downstream")
     if(!all(names(dat) %in% feature_type)){

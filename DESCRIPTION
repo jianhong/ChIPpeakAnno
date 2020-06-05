@@ -3,7 +3,7 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.23.2
+Version: 3.23.3
 Encoding: UTF-8
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Hervé Pagès, Claude Gazin,
     Nathan Lawson, Ryan Thompson, Simon Lin, David Lapointe and
@@ -14,39 +14,38 @@ Depends:
     R (>= 3.5),
     methods,
     IRanges (>= 2.13.12),
-    Biostrings (>= 2.47.6),
     GenomicRanges (>= 1.31.8),
     S4Vectors (>= 0.17.25)
 Imports:
-    BiocGenerics (>= 0.1.0),
-    GO.db,
-    biomaRt,
-    BSgenome,
-    GenomicFeatures,
-    GenomeInfoDb,
-    grid,
-    matrixStats,
     AnnotationDbi,
-    limma,
-    multtest,
-    RBGL,
-    graph,
-    BiocManager,
-    stats,
-    regioneR,
+    BiocGenerics (>= 0.1.0),
+    Biostrings (>= 2.47.6),
     DBI,
     ensembldb,
-    Biobase,
-    seqinr,
-    idr,
+    GenomeInfoDb,
     GenomicAlignments,
-    DelayedArray,
-    SummarizedExperiment,
-    rtracklayer,
+    GenomicFeatures,
+    RBGL,
     Rsamtools,
-    VennDiagram
+    SummarizedExperiment,
+    VennDiagram,
+    biomaRt,
+    grDevices,
+    graph,
+    graphics,
+    grid,
+    matrixStats,
+    multtest,
+    regioneR,
+    rtracklayer,
+    stats,
+    utils
 Suggests:
+    BSgenome,
+    limma,
     reactome.db,
+    BiocManager,
+    BiocStyle,
     BSgenome.Ecoli.NCBI.20080805,
     BSgenome.Hsapiens.UCSC.hg19,
     org.Ce.eg.db,
@@ -54,12 +53,15 @@ Suggests:
     BSgenome.Celegans.UCSC.ce10,
     BSgenome.Drerio.UCSC.danRer7,
     BSgenome.Hsapiens.UCSC.hg38,
+    DelayedArray,
+    idr,
+    seqinr,
     EnsDb.Hsapiens.v75,
     EnsDb.Hsapiens.v79,
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     TxDb.Hsapiens.UCSC.hg38.knownGene,
+    GO.db,
     gplots,
-    BiocStyle,
     knitr,
     rmarkdown,
     testthat,
@@ -79,6 +81,7 @@ Description: The package includes functions to retrieve the sequences
     BSgenome, GO.db, multtest and stat packages.
 License: GPL (>= 2)
 LazyLoad: yes
+LazyData: true
 biocViews: Annotation, ChIPSeq, ChIPchip
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 7.1.0

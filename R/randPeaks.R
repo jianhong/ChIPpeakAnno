@@ -1,3 +1,4 @@
+#' @importFrom stats rexp
 randPeaks <- function(A, grs, N, ...){
     len <- sapply(grs, length)
     if(any(len<1)){
@@ -11,7 +12,7 @@ randPeaks <- function(A, grs, N, ...){
     s <- unlist(GRangesList(s))
     
     wid <- width(A)
-    ## how to abvoid warning?
+    ## how to avoid warning?
     wid <- rexp(length(s),1/(mean(wid)-min(wid))) + min(wid)
     halfwid <- floor(wid/2)
     suppressWarnings(start(s) <- start(s)-halfwid)

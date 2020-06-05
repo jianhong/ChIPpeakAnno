@@ -1,16 +1,23 @@
-##condense matrix by colnames
-# parameters
-# @mx    	a matrix to be condensed
-# @iname	index colname
-# @sep		separator
-# @cnt		add count columns?
-# output	index colname, condensed colnames with count columns.
-# Usage:
-#	a<-matrix(c(rep(rep(1:5,2),2),rep(1:10,2)),ncol=4)
-#	colnames(a)<-c("con.1","con.2","index.1","index.2")
-#	condenseMatrixByColnames(a,"con.1")
-#	condenseMatrixByColnames(a,2)
-
+#' Condense matrix by colnames
+#' 
+#' Condense matrix by colnames
+#' 
+#' 
+#' @param mx a matrix to be condensed
+#' @param iname the name of the column to be condensed
+#' @param sep separator for condensed values,default ;
+#' @param cnt TRUE/FALSE specifying whether adding count column or not?
+#' @return dataframe of condensed matrix
+#' @author Jianhong Ou, Lihua Julie Zhu
+#' @keywords misc
+#' @export
+#' @examples
+#' 
+#' a<-matrix(c(rep(rep(1:5,2),2),rep(1:10,2)),ncol=4)
+#' colnames(a)<-c("con.1","con.2","index.1","index.2")
+#' condenseMatrixByColnames(a,"con.1")
+#' condenseMatrixByColnames(a,2)
+#' 
 condenseMatrixByColnames <- function(mx,iname,sep=";",cnt=FALSE){
     if(!is(mx, "matrix")) stop("mx must be matrix\n")
     if(length(iname)!=1) stop("iname must be single colname\n")

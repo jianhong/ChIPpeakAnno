@@ -1,3 +1,38 @@
+#' extract signals in given ranges
+#' 
+#' extract signals in the given feature ranges
+#' 
+#' 
+#' @param cvglists List of \link[IRanges:AtomicList-class]{SimpleRleList} or
+#' \link[IRanges:AtomicList-class]{RleList}
+#' @param feature.gr An object of \link[GenomicRanges:GRanges-class]{GRanges}
+#' with identical width.
+#' @param upstream,downstream Set the feature.gr to upstream and dwonstream
+#' from the center of the feature.gr if they are set.
+#' @param n.tile The number of tiles to generate for each element of
+#' feature.gr, default is 100
+#' @param ... Not used.
+#' @return A list of matrix. In each matrix, each row record the signals for
+#' corresponding feature. rownames of the matrix show the seqnames and
+#' coordinates.
+#' @author Jianhong Ou
+#' @seealso See Also as \link{featureAlignedHeatmap},
+#' \link{featureAlignedDistribution}
+#' @keywords misc
+#' @export
+#' @import GenomicRanges
+#' @importFrom BiocGenerics width start end strand `%in%`
+#' @importFrom S4Vectors runLength runValue Rle
+#' @importFrom GenomeInfoDb seqnames seqlengths 
+#' @examples
+#' 
+#'   cvglists <- list(A=RleList(chr1=Rle(sample.int(5000, 100), 
+#'                                       sample.int(300, 100))), 
+#'                    B=RleList(chr1=Rle(sample.int(5000, 100), 
+#'                                       sample.int(300, 100))))
+#'   feature.gr <- GRanges("chr1", IRanges(seq(1, 4900, 100), width=100))
+#'   featureAlignedSignal(cvglists, feature.gr)
+#' 
 featureAlignedSignal <- function(cvglists, feature.gr, 
                                  upstream, downstream, 
                                  n.tile=100, ...){
@@ -54,7 +89,8 @@ featureAlignedSignal <- function(cvglists, feature.gr,
   if(length(seqLen)>0){
     feature.gr.subset <- 
       feature.gr[seqnames(feature.gr) %in% names(seqLen)]
-    if(any(end(feature.gr.subset)>seqLen[as.character(seqnames(feature.gr.subset))])){
+    if(any(end(feature.gr.subset)>
+           seqLen[as.character(seqnames(feature.gr.subset))])){
       warning("Some end position of the peaks are out of bound!",
               "They will be filtered.")
       feature.gr <- 

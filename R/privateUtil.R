@@ -14,6 +14,7 @@ formatStrand <- function(strand){
   strand
 }
 ###clear seqnames, the format should be chr+NUM
+#' @importFrom GenomeInfoDb `seqlevels<-`
 formatSeqnames <- function(gr) {
   if(length(seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
                                 seqlevels(gr))])>0){
@@ -124,6 +125,7 @@ trimPeakList <- function(Peaks, ignore.strand, by, keepMetadata=FALSE){
     Peaks
 }
 
+#' @importFrom S4Vectors queryHits subjectHits
 vennCounts <- function(PeaksList, n, names,
                        maxgap=-1L, minoverlap=0L,
                        by=c("region", "feature", "base"), 
@@ -330,7 +332,16 @@ vennCounts <- function(PeaksList, n, names,
 }
 
 
-
+#' TxDb object to GRanges
+#' 
+#' convert TxDb object to GRanges
+#' @param ranges an Txdb object
+#' @param feature feature type, could be geneModel, gene, exon, 
+#' transcript, CDS, fiveUTR, threeUTR, microRNA, and tRNA
+#' @param OrganismDb org db object
+#' @importFrom GenomicFeatures exonsBy cdsBy fiveUTRsByTranscript 
+#' threeUTRsByTranscript genes exons transcripts cds microRNAs tRNAs
+#' @importFrom AnnotationDbi select
 TxDb2GR <- function(ranges, feature, OrganismDb){
     switch(feature,
            geneModel={
@@ -497,7 +508,14 @@ TxDb2GR <- function(ranges, feature, OrganismDb){
     )
 }
 
-
+#' EnsDb object to GRanges
+#' 
+#' convert EnsDb object to GRanges
+#' @param ranges an EnsDb object
+#' @param feature feature type, could be disjointExons, gene, exon and 
+#' transcript
+#' @importFrom ensembldb disjointExons
+#' @importFrom GenomeInfoDb `seqlevelsStyle<-`
 EnsDb2GR <- function(ranges, feature){
     gr <- 
         switch(feature,
@@ -549,6 +567,8 @@ EnsDb2GR <- function(ranges, feature){
     return(gr)
 }
 
+
+#' @importFrom stats fisher.test
 removeAncestor <- function(goenrichments, onto, cutoffPvalue){
   stopifnot(colnames(goenrichments)[1] %in% c("go.id")) ## confirm the result is from getEnrichedGO
   stopifnot(onto %in% c("BP", "MF", "CC"))

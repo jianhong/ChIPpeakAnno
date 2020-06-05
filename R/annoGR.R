@@ -1,5 +1,46 @@
-## Annotation class
-## need DBI
+#' Class \code{annoGR}
+#' 
+#' An object of class \code{annoGR} represents the annotation data could be
+#' used by annotationPeakInBatch.
+#' 
+#' 
+#' @name annoGR-class
+#' @rdname annoGR
+#' @aliases annoGR-class annoGR
+#' @docType class
+#' @param ranges an object of \link[GenomicRanges:GRanges-class]{GRanges},
+#' \link[GenomicFeatures:TxDb-class]{TxDb} or \link[ensembldb]{EnsDb}
+#' @param feature annotation type
+#' @param date a \link{Date} object
+#' @param ... could be following parameters
+#' @param source character, where the annotation comes from
+#' @param mdata data frame, metadata from annotation
+#' @param OrganismDb an object of OrganismDb. It is used for extracting gene
+#' symbol for geneModel group for \link[GenomicFeatures:TxDb-class]{TxDb}
+#' @section Objects from the Class: Objects can be created by calls of the form
+#' \code{new("annoGR", date, elementMetadata, feature, mdata, ranges, seqinfo,
+#' seqnames, source, strand)}
+#' @slot seqnames,ranges,strand,elementMetadata,seqinfo slots inherit from 
+#' \link[GenomicRanges:GRanges-class]{GRanges}. 
+#' The ranges must have unique names.
+#' @slot source character, where the annotation comes from
+#' @slot date a \link{Date} object
+#' @slot feature annotation type, could be "gene", "exon", "transcript", "CDS",
+#' "fiveUTR", "threeUTR", "microRNA", "tRNAs", "geneModel" for 
+#' \link[GenomicFeatures:TxDb-class]{TxDb} object, or "gene", "exon",
+#' "transcript" for \link[ensembldb]{EnsDb} object
+#' @slot mdata data frame, metadata from annotation
+#' @author Jianhong Ou
+#' @keywords classes
+#' @exportClass annoGR
+#' @import methods
+#' @examples
+#' 
+#'     if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'         library(EnsDb.Hsapiens.v79)
+#'         anno <- annoGR(EnsDb.Hsapiens.v79)
+#'     }
+#' 
 setClass("annoGR", 
          representation(source="character",
                         date="Date",
@@ -21,6 +62,9 @@ setClass("annoGR",
              re
          })
 
+#' @importFrom S4Vectors Rle DataFrame 
+#' @importFrom stats setNames
+#' @importFrom GenomeInfoDb Seqinfo
 newAnnoGR <- function (seqnames = Rle(), 
                        ranges = IRanges(), 
                        strand = Rle("*", length(seqnames)), 
@@ -41,7 +85,7 @@ newAnnoGR <- function (seqnames = Rle(),
     if (!is.factor(runValue(strand)) || !identical(levels(runValue(strand)), 
                                                    levels(strand()))) 
         runValue(strand) <- strand(runValue(strand))
-    if (anyMissing(runValue(strand))) {
+    if (any(is.na(runValue(strand)))) {
         warning("missing values in strand converted to \"*\"")
         runValue(strand)[is.na(runValue(strand))] <- "*"
     }
@@ -96,6 +140,12 @@ if(!isGeneric("info")){
     setGeneric("info", function(object) standardGeneric("info"))
 }
 
+#' @name coerce
+#' @import GenomicRanges
+#' @rdname annoGR
+#' @aliases coerce,GRanges,annoGR-method
+#' coerce,annoGR,GRanges-method
+#' @exportMethod coerce
 setAs(from="annoGR", to="GRanges", function(from){
     do.call(GRanges, args=append(list(seqnames=seqnames(from), 
                                       ranges=ranges(from),
@@ -104,10 +154,15 @@ setAs(from="annoGR", to="GRanges", function(from){
                                       seqinfo=seqinfo(from)),
                                  as.list(mcols(from))))
 })
+
 setAs(from="GRanges", to="annoGR", function(from){
     annoGR(from)
 })
 
+#' @rdname annoGR
+#' @exportMethod info
+#' @param object annoGR object.
+#' @aliases info info,annoGR-method
 setMethod("info", "annoGR", function(object){
     cat(class(object), "object;\n")
     cat("# source: ", object@source, "\n")
@@ -120,6 +175,9 @@ setMethod("info", "annoGR", function(object){
     }
 })
 
+#' @rdname annoGR
+#' @exportMethod annoGR
+#' @aliases annoGR,GRanges-method
 setMethod("annoGR", "GRanges", 
           function(ranges, feature="group", date, ...){
               if(missing("date")) date <- Sys.Date()
@@ -134,6 +192,11 @@ setMethod("annoGR", "GRanges",
                      ...)
           })
 
+#' @importFrom DBI dbGetQuery 
+#' @importFrom BiocGenerics dbconn
+#' @rdname annoGR
+#' @exportMethod annoGR
+#' @aliases annoGR,TxDb-method
 setMethod("annoGR", "TxDb", 
           function(ranges, feature=c("gene", "transcript", "exon",
                                      "CDS", "fiveUTR", "threeUTR",
@@ -153,6 +216,11 @@ setMethod("annoGR", "TxDb",
                      mdata=mdata)
           })
 
+#' @importFrom DBI dbGetQuery 
+#' @importFrom BiocGenerics dbconn
+#' @rdname annoGR
+#' @exportMethod annoGR
+#' @aliases annoGR,EnsDb-method
 setMethod("annoGR", "EnsDb",
           function(ranges, 
                    feature=c("gene", "transcript", "exon", "disjointExons"),

@@ -1,3 +1,44 @@
+#' Aggregate peaks over bins from the TSS
+#' 
+#' Aggregate peaks over bins from the feature sites.
+#' 
+#' 
+#' @param \dots Objects of GRanges to be analyzed
+#' @param annotationData An object of
+#' \link[GenomicRanges:GRanges-class]{GRanges} or \link{annoGR} for annotation
+#' @param select Logical: annotate the peaks to all features or the nearest one
+#' @param radius The radius of the longest distance to feature site
+#' @param nbins The number of bins
+#' @param minGeneLen The minimal gene length
+#' @param aroundGene Logical: count peaks around features or a given site of
+#' the features.  Default = FALSE
+#' @param mbins if aroundGene set as TRUE, the number of bins intra-feature.
+#' The value will be normalized by value * (radius/genelen) * (mbins/nbins)
+#' @param featureSite which site of features should be used for distance
+#' calculation
+#' @param PeakLocForDistance which site of peaks should be used for distance
+#' calculation
+#' @param FUN the function to be used for score calculation
+#' @param errFun the function to be used for errorbar calculation or values for
+#' the errorbar.
+#' @param xlab titles for each x axis
+#' @param ylab titles for each y axis
+#' @param main overall titles for each plot
+#' @return A data.frame with bin values.
+#' @author Jianhong Ou
+#' @keywords misc
+#' @export
+#' @import GenomicRanges
+#' @importFrom BiocGenerics strand start end width score
+#' @importFrom graphics segments axis abline
+#' @examples
+#' 
+#' bed <- system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno")
+#' gr1 <- toGRanges(bed, format="BED", header=FALSE)
+#' data(TSS.human.GRCh37)
+#' binOverFeature(gr1, annotationData=TSS.human.GRCh37,
+#'                radius=5000, nbins=10, FUN=length, errFun=0)
+#' 
 binOverFeature <- function(..., annotationData=GRanges(),
                            select=c("all", "nearest"),
                            radius=5000L, nbins=50L,
@@ -380,7 +421,8 @@ binOverFeature <- function(..., annotationData=GRanges(),
                 }
             })
         value <- unlist(lapply(gps, fun))
-        std <- if(mode(errfun)=="function") unlist(lapply(gps, errfun)) else rep(errfun, length(gps))
+        std <- if(mode(errfun)=="function") unlist(lapply(gps, errfun)) else 
+            rep(errfun, length(gps))
         std[is.na(std)] <- 0
         ##plot the figure
         ylim.min <- min(value[!is.na(value)] - std[!is.na(value)])

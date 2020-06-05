@@ -1,3 +1,50 @@
+#' Merge peaks from plus strand and minus strand
+#' 
+#' Merge peaks from plus strand and minus strand within certain distance apart,
+#' and output merged peaks as bed format.
+#' 
+#' 
+#' @param peaks.file Specify the peak file. The peak file should contain peaks
+#' from both plus and minus strand
+#' @param columns Specify the column names in the peak file
+#' @param sep Specify column delimiter, default tab-delimited
+#' @param header Specify whether the file has a header row, default TRUE
+#' @param distance.threshold Specify the maximum gap allowed between the plus
+#' stranded and the nagative stranded peak
+#' @param plus.strand.start.gt.minus.strand.end Specify whether plus strand
+#' peak start greater than the paired negative strand peak end. Default to TRUE
+#' @param output.bedfile Specify the bed output file name
+#' @return output the merged peaks in bed file and a data frame of the bed
+#' format
+#' @author Lihua Julie Zhu
+#' @seealso annotatePeakInBatch, findOverlappingPeaks, makeVennDiagram
+#' @references Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package to
+#' annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
+#' 11:237doi:10.1186/1471-2105-11-237
+#' @keywords misc
+#' @export
+#' @importFrom matrixStats rowMins rowMaxs
+#' @importFrom utils read.table write.table
+#' @examples
+#' 
+#' 
+#' if (interactive())
+#' {
+#'     data(myPeakList)
+#'     data(TSS.human.NCBI36)
+#'     library(matrixStats)
+#'         peaks <- system.file("extdata", "guide-seq-peaks.txt", 
+#'                               package = "ChIPpeakAnno")
+#'         merged.bed <- mergePlusMinusPeaks(peaks.file = peaks, 
+#'                                           columns=c("name", "chromosome", 
+#'                                                     "start", "end", "strand", 
+#'                                                     "count", "count"), 
+#'                                           sep = "\t", header = TRUE,  
+#'                                           distance.threshold = 100,  
+#'                                 plus.strand.start.gt.minus.strand.end = TRUE, 
+#'                                           output.bedfile = "T2test100bp.bed")
+#' }
+#' 
 mergePlusMinusPeaks <- function(peaks.file, 
                                 columns=c("name", "chromosome", "start", 
                                           "end", "strand", "count", 

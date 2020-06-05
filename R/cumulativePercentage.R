@@ -1,30 +1,30 @@
 #' Plot the cumulative percentage tag allocation in sample
 #' 
-#' Plot the difference between the cumulative percentage tag allocation in 
+#' Plot the difference between the cumulative percentage tag allocation in
 #' paired samples.
+#' 
 #' 
 #' @param bamfiles Bam file names.
 #' @param gr An object of \link[GenomicRanges:GRanges-class]{GRanges}
 #' @param input Which file name is input. default 1.
 #' @param binWidth The width of each bin.
-#' @param ... parameter for \link[GenomicAlignments]{summarizeOverlaps}.
-#' @import SummarizedExperiment
-#' @import GenomicAlignments
-#' @import GenomicRanges
-#' @import S4Vectors
-#' @importFrom BiocGenerics which.min, which.max
+#' @param ... parameter for
+#' \link[GenomicAlignments:summarizeOverlaps-methods]{summarizeOverlaps}.
+#' @return A list of data.frame with the cumulative percentages.
+#' @author Jianhong Ou
+#' @references Normalization, bias correction, and peak calling for ChIP-seq
+#' Aaron Diaz, Kiyoub Park, Daniel A. Lim, Jun S. Song Stat Appl Genet Mol
+#' Biol. Author manuscript; available in PMC 2012 May 3.Published in final
+#' edited form as: Stat Appl Genet Mol Biol. 2012 Mar 31; 11(3):
+#' 10.1515/1544-6115.1750
+#' /j/sagmb.2012.11.issue-3/1544-6115.1750/1544-6115.1750.xml.  Published
+#' online 2012 Mar 31.  doi: 10.1515/1544-6115.1750 PMCID: PMC3342857
+#' @importFrom SummarizedExperiment assays
+#' @importFrom GenomicAlignments summarizeOverlaps
 #' @importFrom graphics abline axis legend matlines par plot
 #' @export
-#' @return A list of data.frame with the cumulative percentages.
-#' @references Normalization, bias correction, and peak calling for ChIP-seq
-#' Aaron Diaz, Kiyoub Park, Daniel A. Lim, Jun S. Song
-#' Stat Appl Genet Mol Biol. Author manuscript; 
-#' available in PMC 2012 May 3.Published in final edited form as: 
-#' Stat Appl Genet Mol Biol. 2012 Mar 31; 11(3): 10.1515/1544-6115.1750
-#'  /j/sagmb.2012.11.issue-3/1544-6115.1750/1544-6115.1750.xml. 
-#'  Published online 2012 Mar 31.  doi: 10.1515/1544-6115.1750
-#'  PMCID: PMC3342857
 #' @examples
+#' 
 #' \dontrun{
 #' path <- system.file("extdata", "reads", package="MMDiffBamSubset")
 #' files <- dir(path, "bam$", full.names = TRUE)
@@ -33,7 +33,7 @@
 #' cumulativePercentage(files, gr)
 #' } 
 #'  
-
+#' 
 cumulativePercentage <- function(bamfiles, gr, input=1, binWidth=1e3,
                                  ...){
   stopifnot(is(gr, "GRanges"))

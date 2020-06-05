@@ -1,7 +1,90 @@
+#' Make Venn Diagram from a list of peaks
+#' @description Make Venn Diagram from two or more peak ranges, 
+#' Also calculate p-value to  determine whether those peaks 
+#' overlap significantly.
+#' @param Peaks A list of peaks in \link[GenomicRanges:GRanges-class]{GRanges}
+#'  format: See example below.
+#' @param NameOfPeaks Character vector to specify the name of Peaks, 
+#' e.g., c("TF1", "TF2"). This will be used as label in the Venn Diagram.
+#' @param maxgap,minoverlap Used in the internal call to 
+#' \code{findOverlaps()} to detect overlaps.
+#' See \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} 
+#' in the \pkg{IRanges} package for a description of these arguments.
+#' @param totalTest Numeric value to specify the total number of tests 
+#' performed to obtain the list of peaks. It should be much larger than 
+#' the number of peaks in the largest peak set.
+#' @param by "region", "feature" or "base", default = "region". 
+#' "feature" means using feature field in the GRanges for calculating overlap, 
+#' "region" means using chromosome range for calculating overlap, 
+#' and "base" means calculating overlap in nucleotide level.
+#' @param ignore.strand Logical: when set to TRUE, the strand information is
+#' ignored in the overlap calculations.
+#' @param connectedPeaks If multiple peaks involved in overlapping in 
+#' several groups, set it to "merge" will count it as only 1, 
+#' while set it to "min" will count it as the minimal involved peaks in 
+#' any connected peak group. "keepAll" will show all the orginal counts 
+#' for each list while the final counts will be same as "min". 
+#' "keepFirstListConsistent" will keep the counts consistent with first list.
+#' @param method method to be used for p value calculation. 
+#' hyperG means hypergeometric test and permutation means \link{peakPermTest}.
+#' @param TxDb An object of \link[GenomicFeatures:TxDb-class]{TxDb}.
+#' @param \dots Additional arguments to be passed to 
+#' \link[VennDiagram:venn.diagram]{venn.diagram}.
+#' @details For customized graph options, 
+#' please see venn.diagram in VennDiagram package.
+#' @return In addition to a Venn Diagram produced, a p.value is calculated by
+#' hypergeometric test to determine whether the overlaps of 
+#' peaks or features are significant.
+#' @importFrom VennDiagram venn.diagram
+#' @importFrom grid textGrob gList grid.newpage
+#' @export
+#' @author Lihua Julie Zhu, Jianhong Ou
+#' @seealso \link{findOverlapsOfPeaks}, 
+#' \link[VennDiagram:venn.diagram]{venn.diagram}, \link{peakPermTest}
+#' @examples 
+#' if (interactive()){
+#' peaks1 <- GRanges(seqnames=c("1", "2", "3"),
+#'                   IRanges(start=c(967654, 2010897, 2496704),
+#'                           end=c(967754, 2010997, 2496804), 
+#'                           names=c("Site1", "Site2", "Site3")),
+#'                   strand="+",
+#'                   feature=c("a","b","f"))
+#' peaks2 = GRanges(seqnames=c("1", "2", "3", "1", "2"), 
+#'                  IRanges(start = c(967659, 2010898,2496700,
+#'                                    3075866,3123260),
+#'                          end = c(967869, 2011108, 2496920, 
+#'                                  3076166, 3123470),
+#'                          names = c("t1", "t2", "t3", "t4", "t5")), 
+#'                  strand = c("+", "+", "-", "-", "+"), 
+#'                  feature=c("a","b","c","d","a"))
+#' makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"),
+#'                 totalTest=100,scaled=FALSE, euler.d=FALSE, 
+#'                 fill=c("#009E73", "#F0E442"), # circle fill color
+#'                 col=c("#D55E00", "#0072B2"), #circle border color
+#'                 cat.col=c("#D55E00", "#0072B2"))
+#' 
+#' makeVennDiagram(list(peaks1, peaks2), NameOfPeaks=c("TF1", "TF2"),
+#'                 totalTest=100, 
+#'                 fill=c("#009E73", "#F0E442"), # circle fill color
+#'                 col=c("#D55E00", "#0072B2"), #circle border color
+#'                 cat.col=c("#D55E00", "#0072B2"))
+#' 
+#' ###### 4-way diagram using annotated feature instead of chromosome ranges
+#' 
+#' makeVennDiagram(list(peaks1, peaks2, peaks1, peaks2), 
+#'                 NameOfPeaks=c("TF1", "TF2","TF3", "TF4"), 
+#'                 totalTest=100, by="feature",
+#'                 main = "Venn Diagram for 4 peak lists",
+#'                 fill=c(1,2,3,4))
+#' }
+#' @keywords graph
+#' 
+
 makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
                             totalTest, by=c("region", "feature", "base"), 
                             ignore.strand=TRUE, 
-                            connectedPeaks=c("min", "merge", "keepAll", "keepFirstListConsistent"), 
+                            connectedPeaks=c("min", "merge", "keepAll", 
+                                             "keepFirstListConsistent"), 
                             method=c("hyperG", "permutation"), TxDb,
                             ...){
   ###Functions to be used
@@ -34,7 +117,7 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
     
     op=par(mar=c(0,0,0,0))
     on.exit(par(op))
-    plot.new()
+    grid.newpage()
     dots$x <- vennx
     dots <- c(dots, filename=list(NULL))
     venngrid <- do.call(venn.diagram, dots)
@@ -102,7 +185,7 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
         }
     }
     if(!is.null(otherCounts)){
-      tmp <- textGrob(label=otherCounts, x=0.9, y=0.1, 
+      tmp <- textGrob(label=paste("others:", otherCounts), x=0.9, y=0.1, 
                       gp=gpar(col = "black", cex = dots$cat.cex, 
                               fontface = dots$cat.fontface, 
                               fontfamily = dots$cat.fontfamily))
@@ -190,7 +273,8 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
   if (n1 < n2)
   {
     warning("The number of element in NameOfPeaks is larger than 
-            the number of elements in Peaks! NameOfPeaks will be cut by the length of Peaks")
+            the number of elements in Peaks! 
+            NameOfPeaks will be cut by the length of Peaks")
     NameOfPeaks <- NameOfPeaks[1:n1]
   }
   NameOfPeaks <- make.names(NameOfPeaks, unique=TRUE, allow_=TRUE)
@@ -216,11 +300,13 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
           }
       }
       names(Peaks) <- NameOfPeaks
-      venn_cnt <- getVennCounts(Peaks, maxgap=maxgap, 
-                                minoverlap=minoverlap, 
-                                by=by, ignore.strand=ignore.strand, 
-                                connectedPeaks=ifelse(connectedPeaks=="keepFirstListConsistent", 
-                                                      "keepAll", connectedPeaks))
+      venn_cnt <- 
+        getVennCounts(Peaks, maxgap=maxgap, 
+                      minoverlap=minoverlap, 
+                      by=by, ignore.strand=ignore.strand, 
+                      connectedPeaks=
+                        ifelse(connectedPeaks=="keepFirstListConsistent", 
+                               "keepAll", connectedPeaks))
   }
   colnames(venn_cnt)[1:n1] <- NameOfPeaks
   venn_cnt1 <- venn_cnt
@@ -279,6 +365,7 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
           otherCount <- venn_cnt[1, "Counts"]
       }
   }
+  if(otherCount==0) otherCount <- NULL
   plotVenn(venn_cnt1, vennx, otherCount=otherCount, ...)
   return(list(p.value=p.value, vennCounts=venn_cnt))
 }

@@ -6,5 +6,5 @@ test_that("write2FASTA works not correct", {
                                          names=c("id1", "id2")), 
                                  sequence= c("CCCCCCCCGGGGG", 
                                              "TTTTTTTAAAAAA"))
-    write2FASTA(peaksWithSequences, "testWrite2FASTA.fa")
+    write2FASTA(peaksWithSequences, tempfile(fileext = "testWrite2FASTA.fa"))
 })

@@ -1,5 +1,119 @@
 #import GenomicFeatures
 ## Jianhong Ou @ Mar.20, 2013
+
+
+#' Summarize peak distribution over exon, intron, enhancer, proximal promoter,
+#' 5 prime UTR and 3 prime UTR
+#' 
+#' Summarize peak distribution over exon, intron, enhancer, proximal promoter,
+#' 5 prime UTR and 3 prime UTR
+#' 
+#' 
+#' @param peaks.RD peaks in GRanges: See example below
+#' @param exon exon data obtained from getAnnotation or customized annotation
+#' of class GRanges containing additional variable: strand (1 or + for plus
+#' strand and -1 or - for minus strand). This parameter is for backward
+#' compatibility only.  \code{\link[GenomicFeatures:TxDb-class]{TxDb}} should
+#' be used instead.
+#' @param TSS TSS data obtained from getAnnotation or customized annotation of
+#' class GRanges containing additional variable: strand (1 or + for plus strand
+#' and -1 or - for minus strand). For example,
+#' data(TSS.human.NCBI36),data(TSS.mouse.NCBIM37), data(TSS.rat.RGSC3.4) and
+#' data(TSS.zebrafish.Zv8). This parameter is for backward compatibility only.
+#' \code{\link[GenomicFeatures:TxDb-class]{TxDb}} should be used instead.
+#' @param utr5 5 prime UTR data obtained from getAnnotation or customized
+#' annotation of class GRanges containing additional variable: strand (1 or +
+#' for plus strand and -1 or - for minus strand). This parameter is for
+#' backward compatibility only.  \code{\link[GenomicFeatures:TxDb-class]{TxDb}}
+#' should be used instead.
+#' @param utr3 3 prime UTR data obtained from getAnnotation or customized
+#' annotation of class GRanges containing additional variable: strand (1 or +
+#' for plus strand and -1 or - for minus strand). This parameter is for
+#' backward compatibility only.  \code{\link[GenomicFeatures:TxDb-class]{TxDb}}
+#' should be used instead.
+#' @param proximal.promoter.cutoff Specify the cutoff in bases to classify
+#' proximal promoter or enhencer. Peaks that reside within
+#' proximal.promoter.cutoff upstream from or overlap with transcription start
+#' site are classified as proximal promoters. Peaks that reside upstream of the
+#' proximal.promoter.cutoff from gene start are classified as enhancers. The
+#' default is 1000 bases.
+#' @param immediate.downstream.cutoff Specify the cutoff in bases to classify
+#' immediate downstream region or enhancer region. Peaks that reside within
+#' immediate.downstream.cutoff downstream of gene end but not overlap 3 prime
+#' UTR are classified as immediate downstream.  Peaks that reside downstream
+#' over immediate.downstreatm.cutoff from gene end are classified as enhancers.
+#' The default is 1000 bases.
+#' @param nucleotideLevel Logical. Choose between peak centric and nucleotide
+#' centric view. Default=FALSE
+#' @param precedence If no precedence specified, double count will be enabled,
+#' which means that if a peak overlap with both promoter and 5'UTR, both
+#' promoter and 5'UTR will be incremented. If a precedence order is specified,
+#' for example, if promoter is specified before 5'UTR, then only promoter will
+#' be incremented for the same example.  The values could be any conbinations
+#' of "Promoters", "immediateDownstream", "fiveUTRs", "threeUTRs", "Exons" and
+#' "Introns", Default=NULL
+#' @param TxDb an object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}
+#' @return A list of two named vectors: percentage and jaccard (Jaccard Index).
+#' The information in the vectors: \item{list("Exons")}{Percent or the picard
+#' index of the peaks resided in exon regions.} \item{list("Introns")}{Percent
+#' or the picard index of the peaks resided in intron regions.}
+#' \item{list("fiveUTRs")}{Percent or the picard index of the peaks resided in
+#' 5 prime UTR regions.} \item{list("threeUTRs")}{Percent or the picard index
+#' of the peaks resided in 3 prime UTR regions.}
+#' \item{list("Promoter")}{Percent or the picard index of the peaks resided in
+#' proximal promoter regions.} \item{list("ImmediateDownstream")}{Percent or
+#' the picard index of the peaks resided in immediate downstream regions.}
+#' \item{list("Intergenic.Region")}{Percent or the picard index of the peaks
+#' resided in intergenic regions.}
+#' 
+#' The Jaccard index, also known as Intersection over Union.  The Jaccard index
+#' is between 0 and 1. The higher the index, the more significant the overlap
+#' between the peak region and the genomic features in consideration.
+#' @author Jianhong Ou, Lihua Julie Zhu
+#' @seealso annotatePeakInBatch, findOverlapsOfPeaks,getEnriched,
+#' makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks
+#' @references 1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package
+#' to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
+#' 11:237doi:10.1186/1471-2105-11-237
+#' 
+#' 2. Zhu L.J. (2013) Integrative analysis of ChIP-chip and ChIP-seq dataset.
+#' Methods Mol Biol. 2013;1067:105-24. doi: 10.1007/978-1-62703-607-8\_8.
+#' @keywords misc
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom GenomeInfoDb keepSeqlevels seqlevels
+#' @importFrom BiocGenerics start end width strand
+#' @importFrom GenomicFeatures exons intronsByTranscript fiveUTRsByTranscript 
+#' threeUTRsByTranscript transcripts microRNAs tRNAs
+#' @examples
+#' 
+#' if (interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     ##Display the list of genomes available at UCSC:
+#'     #library(rtracklayer)
+#'     #ucscGenomes()[, "db"]
+#'     ## Display the list of Tracks supported by makeTxDbFromUCSC()
+#'     #supportedUCSCtables()
+#'     ##Retrieving a full transcript dataset for Human from UCSC
+#'     ##TranscriptDb <- 
+#'     ##     makeTxDbFromUCSC(genome="hg19", tablename="ensGene")
+#'     if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
+#'       TxDb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+#'       exons <- exons(TxDb, columns=NULL)
+#'       fiveUTRs <- unique(unlist(fiveUTRsByTranscript(TxDb)))
+#'       Feature.distribution <- 
+#'           assignChromosomeRegion(exons, nucleotideLevel=TRUE, TxDb=TxDb)
+#'       barplot(Feature.distribution$percentage)
+#'       assignChromosomeRegion(fiveUTRs, nucleotideLevel=FALSE, TxDb=TxDb)
+#'       data(myPeakList)
+#'       assignChromosomeRegion(myPeakList, nucleotideLevel=TRUE, 
+#'                              precedence=c("Promoters", "immediateDownstream", 
+#'                                           "fiveUTRs", "threeUTRs", 
+#'                                           "Exons", "Introns"), 
+#'                              TxDb=TxDb)
+#'     }
+#' }
+#' 
 assignChromosomeRegion <-
     function(peaks.RD, exon, TSS, utr5, utr3, 
              proximal.promoter.cutoff=1000L, 
@@ -76,7 +190,8 @@ assignChromosomeRegion <-
                 warning("peaks.RD has sequence levels not in TxDb.")
                 sharedlevels <- 
                     intersect(seqlevels(newAnno), seqlevels(peaks.RD))
-                peaks.RD <- keepSeqlevels(peaks.RD, sharedlevels, pruning.mode="coarse")
+                peaks.RD <- keepSeqlevels(peaks.RD, sharedlevels, 
+                                          pruning.mode="coarse")
             }
             mcols(peaks.RD) <- NULL
             if(!is.null(precedence)){
@@ -87,13 +202,16 @@ assignChromosomeRegion <-
             names(Intergenic.Region) <- NULL
             annotation$Intergenic.Region <- Intergenic.Region
             anno.names <- names(annotation)
-            ol.anno <- findOverlaps(peaks.RD, annotation, ignore.strand=ignore.strand)
+            ol.anno <- findOverlaps(peaks.RD, annotation,
+                                    ignore.strand=ignore.strand)
             if(nucleotideLevel){
               ## calculate Jaccard index
               jaccardIndex <- unlist(lapply(annotation, function(.ele){
-                intersection <- intersect(.ele, peaks.RD, ignore.strand=ignore.strand)
+                intersection <- intersect(.ele, peaks.RD, 
+                                          ignore.strand=ignore.strand)
                 union <- union(.ele, peaks.RD, ignore.strand=ignore.strand)
-                sum(as.numeric(width(intersection)))/sum(as.numeric(width(union)))
+                sum(as.numeric(width(intersection)))/
+                    sum(as.numeric(width(union)))
               }))
               jaccardIndex <- jaccardIndex[anno.names]
               names(jaccardIndex) <- anno.names
@@ -102,10 +220,12 @@ assignChromosomeRegion <-
               ## create a new annotations
               newAnno <- unlist(annotation)
               newAnno$source <- rep(names(annotation), lengths(annotation))
-              newAnno.disjoin <- disjoin(newAnno, with.revmap=TRUE, ignore.strand=ignore.strand)
+              newAnno.disjoin <- disjoin(newAnno, with.revmap=TRUE, 
+                                         ignore.strand=ignore.strand)
               if(!is.null(precedence)){
                 revmap <- cbind(from=unlist(newAnno.disjoin$revmap), 
-                                to=rep(seq_along(newAnno.disjoin), lengths(newAnno.disjoin$revmap)))
+                                to=rep(seq_along(newAnno.disjoin), 
+                                       lengths(newAnno.disjoin$revmap)))
                 revmap <- revmap[order(revmap[, "to"], revmap[, "from"]), , drop=FALSE]
                 revmap <- revmap[!duplicated(revmap[, "to"]), , drop=FALSE]
                 newAnno.disjoin$source <- newAnno[revmap[, "from"]]$source

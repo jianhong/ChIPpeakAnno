@@ -1,25 +1,31 @@
 #' coverage of gene body
 #' 
-#' @description calculate the coverage of gene body per gene 
-#' per bin.
-#' @param cvglists A list of \link[IRanges]{SimpleRleList} or 
-#' \link[IRanges]{RleList}. It represents the coverage for samples.
-#' @param TxDb An object of \code{\link[GenomicFeatures]{TxDb}}. 
-#' It is used for extracting the annotations.
-#' @param upstream.cutoff,downstream.cutoff cutoff length for upstream 
-#' or downstream of transcript.
-#' @param nbinsGene,nbinsUpstream,nbinsDownstream The number of bins
-#' for gene, upstream and downstream.
-#' @param includeIntron A logical value which indicates including intron or not.
+#' calculate the coverage of gene body per gene per bin.
+#' 
+#' 
+#' @param cvglists A list of \link[IRanges:AtomicList-class]{SimpleRleList} or
+#' \link[IRanges:AtomicList-class]{RleList}. It represents the coverage for
+#' samples.
+#' @param TxDb An object of \code{\link[GenomicFeatures:TxDb-class]{TxDb}}.  It
+#' is used for extracting the annotations.
+#' @param upstream.cutoff,downstream.cutoff cutoff length for upstream or
+#' downstream of transcript.
+#' @param nbinsGene,nbinsUpstream,nbinsDownstream The number of bins for gene,
+#' upstream and downstream.
+#' @param includeIntron A logical value which indicates including intron or
+#' not.
 #' @param minGeneLen,maxGeneLen minimal or maximal length of gene.
-#' @import IRanges
-#' @import GenomicRanges
-#' @import GenomicFeatures
-#' @import GenomeInfoDb
-#' @export 
 #' @author Jianhong Ou
 #' @seealso \link{binOverRegions}, \link{plotBinOverRegions}
-#' @examples 
+#' @export
+#' @import IRanges
+#' @import GenomicRanges
+#' @importFrom S4Vectors mcols
+#' @importFrom BiocGenerics start end width strand do.call
+#' @importFrom GenomeInfoDb seqinfo seqnames
+#' @examples
+#' 
+#' if(Sys.getenv("USER")=="jianhongou"){
 #' path <- system.file("extdata", package="ChIPpeakAnno")
 #' library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' library(rtracklayer)
@@ -31,6 +37,8 @@
 #' d <- binOverGene(cvglists, TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' plotBinOverRegions(d)
 #' }
+#' }
+#' 
 binOverGene <- function(cvglists, TxDb, 
                         upstream.cutoff=0L, 
                         downstream.cutoff=upstream.cutoff, 
@@ -154,7 +162,9 @@ binOverGene <- function(cvglists, TxDb,
          "None of them in the seqlevels of TxDb.")
   }
   features <- features[seqnames(features) %in% seqn]
-  features <- features[!features$gene_id %in% features$gene_id[start(features)<1]] ## remove the start < 1
+  features <- 
+    features[!features$gene_id %in% 
+               features$gene_id[start(features)<1]] ## remove the start < 1
   len <- length(unique(features$gene_id))
   features.s <- split(features, seqnames(features))
   features.s <- features.s[seqn]
@@ -181,16 +191,19 @@ binOverGene <- function(cvglists, TxDb,
       .cvg.sub <- .cvgs[.gr.l]
       ### split the RleList into bins
       .ir <- IRanges(1, lengths(.cvg.sub))
-      .ir <- IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
+      .ir <- 
+        IRanges::tile(.ir, n=bins[sub("^(.*?) .*$", "\\1", names(.cvg.sub))])
       names(.ir) <- names(.cvg.sub)
       .cnt <- viewMeans(Views(.cvg.sub, .ir))
       .cnt <- split(.cnt, sub("^(.*?) .*$", "\\1", names(.cnt)))
       ## make sure 5'->3'
       .cnt <- lapply(.cnt, function(x){
-        strd <- as.character(strand(features))[match(sub("^(.*?) (.*$)", "\\2", names(x)), 
-                                                    features$gene_id)]
+        strd <- 
+          as.character(strand(features))[match(sub("^(.*?) (.*$)", 
+                                                   "\\2", names(x)), 
+                                               features$gene_id)]
         x <- split(x, strd)
-        x <- lapply(x, do.call, what=rbind)
+        x <- lapply(x, BiocGenerics::do.call, what=rbind)
         if("-" %in% names(x)){
           x[["-"]] <- x[["-"]][, ncol(x[["-"]]):1, drop=FALSE]
         }
