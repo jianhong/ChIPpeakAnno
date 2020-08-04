@@ -3,7 +3,7 @@
 [![platforms](http://bioconductor.org/shields/availability/devel/ChIPpeakAnno.svg)](http://bioconductor.org/packages/devel/bioc/html/ChIPpeakAnno.html)
 [![build](http://bioconductor.org/shields/build/devel/bioc/ChIPpeakAnno.svg)](http://bioconductor.org/packages/devel/bioc/html/ChIPpeakAnno.html)
 
-Visualize significant conserved amino acid sequence pattern in groups based on probability theory.
+Batch annotation and visualization of peaks from ChIP-seq, ATAC-seq, and NAD-seq experiments or any experiments resulted in large number of chromosome ranges
 
 ## Installation
 
