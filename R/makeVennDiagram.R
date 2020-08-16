@@ -28,12 +28,13 @@
 #' @param method method to be used for p value calculation. 
 #' hyperG means hypergeometric test and permutation means \link{peakPermTest}.
 #' @param TxDb An object of \link[GenomicFeatures:TxDb-class]{TxDb}.
+#' @param plot logical. If TRUE (default), a venn diagram is plotted. 
 #' @param \dots Additional arguments to be passed to 
 #' \link[VennDiagram:venn.diagram]{venn.diagram}.
 #' @details For customized graph options, 
 #' please see venn.diagram in VennDiagram package.
-#' @return In addition to a Venn Diagram produced, a p.value is calculated by
-#' hypergeometric test to determine whether the overlaps of 
+#' @return A p.value is calculated by
+#' hypergeometric test or permutation test to determine whether the overlaps of 
 #' peaks or features are significant.
 #' @importFrom VennDiagram venn.diagram
 #' @importFrom grid textGrob gList grid.newpage
@@ -85,7 +86,8 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
                             ignore.strand=TRUE, 
                             connectedPeaks=c("min", "merge", "keepAll", 
                                              "keepFirstListConsistent"), 
-                            method=c("hyperG", "permutation"), TxDb,
+                            method=c("hyperG", "permutation"), 
+                            TxDb, plot=TRUE,
                             ...){
   ###Functions to be used
   getCountsList<-function(counts){
@@ -233,6 +235,7 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
     stop("Missing Peaks which is a list of peaks in GRanges!")
   }
   connectedPeaks <- match.arg(connectedPeaks)
+  stopifnot(is.logical(plot))
   by <- match.arg(by)
   n1 = length(Peaks)
   olout_flag <- FALSE
@@ -366,6 +369,8 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
       }
   }
   if(otherCount==0) otherCount <- NULL
-  plotVenn(venn_cnt1, vennx, otherCount=otherCount, ...)
+  if(plot) {
+    plotVenn(venn_cnt1, vennx, otherCount=otherCount, ...)
+  }
   return(list(p.value=p.value, vennCounts=venn_cnt))
 }

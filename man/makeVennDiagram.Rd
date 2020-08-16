@@ -15,6 +15,7 @@ makeVennDiagram(
   connectedPeaks = c("min", "merge", "keepAll", "keepFirstListConsistent"),
   method = c("hyperG", "permutation"),
   TxDb,
+  plot = TRUE,
   ...
 )
 }
@@ -54,12 +55,14 @@ hyperG means hypergeometric test and permutation means \link{peakPermTest}.}
 
 \item{TxDb}{An object of \link[GenomicFeatures:TxDb-class]{TxDb}.}
 
+\item{plot}{logical. If TRUE (default), a venn diagram is plotted.}
+
 \item{\dots}{Additional arguments to be passed to 
 \link[VennDiagram:venn.diagram]{venn.diagram}.}
 }
 \value{
-In addition to a Venn Diagram produced, a p.value is calculated by
-hypergeometric test to determine whether the overlaps of 
+A p.value is calculated by
+hypergeometric test or permutation test to determine whether the overlaps of 
 peaks or features are significant.
 }
 \description{
