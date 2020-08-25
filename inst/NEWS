@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.23.6
+-------------------------
+
+    o change parameter from otherCount to otherCounts to makeVennDiagram function.
+    
 CHANGES IN VERSION 3.23.5
 -------------------------
 

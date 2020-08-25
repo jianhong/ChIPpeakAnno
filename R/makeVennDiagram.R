@@ -370,7 +370,7 @@ totalTest = humanGenomeSize * (2%(codingDNA) +
   }
   if(otherCount==0) otherCount <- NULL
   if(plot) {
-    plotVenn(venn_cnt1, vennx, otherCount=otherCount, ...)
+    plotVenn(venn_cnt1, vennx, otherCounts=otherCount, ...)
   }
   return(list(p.value=p.value, vennCounts=venn_cnt))
 }
