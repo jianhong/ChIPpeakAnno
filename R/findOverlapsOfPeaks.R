@@ -15,11 +15,13 @@
 #' \pkg{IRanges} package for a description of these arguments.
 #' @param ignore.strand When set to TRUE, the strand information is ignored in
 #' the overlap calculations.
-#' @param connectedPeaks If multiple peaks involved in overlapping in several
-#' groups, set it to "merge" will count it as 1, while set it to "min" will
-#' count it as the minimal involved peaks in any group of connected/overlapped
-#' peaks.  "keepAll" will keep all the orginal counts for each list while the
-#' final counts will be same as "min".
+#' @param connectedPeaks If multiple peaks are involved in any group of 
+#' connected/overlapping peaks in any input peak list, set it to "merge" will
+#' add 1 to the overlapping counts, while set it to "min" will add the minimal 
+#' involved peaks in each group of connected/overlapped peaks to the 
+#' overlapping counts. Set it to "keepAll" will add the number of involved 
+#' peaks for each peak list to the corresponding overlapping counts. 
+#' In addition, it will output counts as if connectedPeaks were set to "min".
 #' @return return value is An object of overlappingPeaks.  \item{venn_cnt}{an
 #' object of VennCounts} \item{peaklist}{a list consists of all overlapping
 #' peaks or unique peaks} \item{uniquePeaks}{an object of
