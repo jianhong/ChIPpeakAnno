@@ -27,9 +27,13 @@ for a description of these arguments.
     When set to TRUE, the strand information is ignored in the overlap calculations.
   }
 \item{connectedPeaks}{
-  If multiple peaks involved in overlapping in several groups, set it to "merge" will count it as 1, while set it to "min" will count it as the minimal involved peaks in any group of connected/overlapped peaks.
-  "keepAll" will keep all the orginal counts for each list while the final counts will be
-  same as "min".
+  If multiple peaks are involved in any group of 
+  connected/overlapping peaks in any input peak list, set it to "merge" will
+  add 1 to the overlapping counts, while set it to "min" will add the minimal 
+  involved peaks in each group of connected/overlapped peaks to the 
+  overlapping counts. Set it to "keepAll" will add the number of involved 
+  peaks for each peak list to the corresponding overlapping counts. 
+  In addition, it will output counts as if connectedPeaks were set to "min".
 }
 }
 \details{
