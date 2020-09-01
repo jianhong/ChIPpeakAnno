@@ -32,7 +32,12 @@ add 1 to the overlapping counts, while set it to "min" will add the minimal
 involved peaks in each group of connected/overlapped peaks to the 
 overlapping counts. Set it to "keepAll" will add the number of involved 
 peaks for each peak list to the corresponding overlapping counts. 
-In addition, it will output counts as if connectedPeaks were set to "min".}
+In addition, it will output counts as if connectedPeaks were set to "min".
+For examples (https://support.bioconductor.org/p/133486/#133603), 
+if 5 peaks in group1 overlap with 2 peaks in group 2, setting connectedPeaks
+ to "merge" will add 1 to the overlapping counts; setting it to "keepAll" 
+ will add 5 peaks to count.group1, 2 to count.group2, and 2 to counts; 
+ setting it to “min” will add 2 to the overlapping counts.}
 }
 \value{
 return value is An object of overlappingPeaks.  \item{venn_cnt}{an
