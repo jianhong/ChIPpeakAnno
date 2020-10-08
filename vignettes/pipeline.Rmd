@@ -81,7 +81,7 @@ The sample code here plots the distribution of peaks around the TSS.
 overlaps <- ol$peaklist[["gr1///gr2"]]
 binOverFeature(overlaps, annotationData=annoData,
                radius=5000, nbins=20, FUN=length, errFun=0,
-               ylab="count", 
+               xlab="distance from TSS (bp)", ylab="count", 
                main="Distribution of aggregated peak numbers around TSS")
 ```
 
@@ -104,6 +104,8 @@ genomicElementDistribution(peaks,
 ## check the genomic element distribution for the overlaps
 ## the genomic element distribution will indicates the 
 ## the best methods for annotation.
+## The percentages in the legend show the percentage of peaks in 
+## each category.
 out <- genomicElementDistribution(overlaps, 
                            TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene,
                            promoterRegion=c(upstream=2000, downstream=500),
@@ -123,7 +125,7 @@ x <- genomicElementUpSetR(overlaps,
 upset(x$plotData, nsets=13, nintersects=NA)
 ```
 
-You can also overview your data by ideo plot.
+You can also overview your data by ideogram.
 
 ```{r}
 library(trackViewer)

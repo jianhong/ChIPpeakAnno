@@ -33,7 +33,7 @@
 #' @export
 #' @importFrom ggplot2 ggplot geom_rect xlim coord_polar aes_string geom_bar
 #' coord_flip scale_fill_manual theme_void theme_bw facet_wrap geom_col 
-#' geom_text
+#' geom_text guide_legend
 #' @importFrom GenomicFeatures intronsByTranscript exons fiveUTRsByTranscript 
 #' threeUTRsByTranscript genes
 #' @importFrom stats as.formula
@@ -76,7 +76,11 @@ genomicElementDistribution <-
                        Exons=c(utr5="5' UTR",
                                utr3="3' UTR",
                                CDS="CDS",
-                               otherExon="Other exon")),
+                               otherExon="Other exon"),
+                       group=c(geneLevel="Gene Level",
+                               promoterLevel="Promoter Level",
+                               Exons="Exon level",
+                               ExonIntron="Exon/Intron/Intergenic")),
            labelColors = c(promoter="#D55E00",
                            geneDownstream="#E69F00",
                            geneBody="#51C6E6",
@@ -121,6 +125,10 @@ genomicElementDistribution <-
                          utr3="3' UTR",
                          CDS="CDS",
                          otherExon="Other exon"))
+    groupLabels <- c(geneLevel="Gene Level",
+                     promoterLevel="Promoter Level",
+                     Exons="Exon level",
+                     ExonIntron="Exon/Intron/Intergenic")
     labelCols = c(promoter="#D55E00",
                   geneDownstream="#E69F00",
                   geneBody="#51C6E6",
@@ -142,6 +150,11 @@ genomicElementDistribution <-
       }
     }
     
+    for(i in names(groupLabels)){
+      if("group" %in% names(labels)){
+        groupLabels[names(labels[["group"]])] <- labels[["group"]]
+      }
+    }
     if(!missing(promoterLevel)){
       # stopifnot("promoterLevel must be within promoterRegion"=
       #             all(abs(promoterLevel$breaks[promoterLevel$breaks<0])<=
@@ -281,6 +294,8 @@ genomicElementDistribution <-
         }
       )
     }
+    groupLabels <- groupLabels[names(anno)]
+    groupLabels[is.na(groupLabels)] <- names(anno)[is.na(groupLabels)]
     
     ## filter peaks by seqlev
     if(!missing(seqlev)){
@@ -322,8 +337,9 @@ genomicElementDistribution <-
       m <- mcols(m)[, names(anno)]
       p <- lapply(names(anno), function(.ele){
         tt <- table(m[, .ele])
-        data.frame(category=factor(rep(.ele, length(tt)), 
-                                   levels = names(anno)),
+        data.frame(category=factor(rep(groupLabels[.ele],
+                                       length(tt)), 
+                                   levels = groupLabels),
                    type=factor(names(tt), levels = rev(names(labelCols))), 
                    percentage=as.numeric(tt)/sum(tt))
       })
@@ -361,7 +377,8 @@ genomicElementDistribution <-
         theme_bw()
     }
     p <- p + 
-      scale_fill_manual(values = labelCols, labels=l1, name=NULL)
+      scale_fill_manual(values = labelCols, labels=l1, name=NULL,
+                        guide = guide_legend(reverse=TRUE))
     
     if(plot){
       print(p)
