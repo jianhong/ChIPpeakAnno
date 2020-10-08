@@ -133,8 +133,8 @@ to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
 Methods Mol Biol. 2013;1067:105-24. doi: 10.1007/978-1-62703-607-8\_8.
 }
 \seealso{
-annotatePeakInBatch, findOverlapsOfPeaks,getEnriched,
-makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks
+\link{genomicElementDistribution}, \link{genomicElementUpSetR},
+\link{binOverFeature}, \link{binOverGene}, \link{binOverRegions}
 }
 \author{
 Jianhong Ou, Lihua Julie Zhu

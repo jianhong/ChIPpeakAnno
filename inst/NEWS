@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.23.9
+-------------------------
+
+    o add new function enrichmentPlot, genomicElementDistribution, genomicElementUpSetR, and methagenePlot to improve visualization.
+    
 CHANGES IN VERSION 3.23.8
 -------------------------
 

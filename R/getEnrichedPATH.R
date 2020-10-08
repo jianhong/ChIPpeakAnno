@@ -35,7 +35,7 @@
 #' @importFrom multtest mt.rawp2adjp
 #' @examples
 #' 
-#' if (interactive()) {
+#' if (interactive()||Sys.getenv("USER")=="jianhongou") {
 #' data(annotatedPeak)
 #' library(org.Hs.eg.db)
 #' library(reactome.db)
@@ -139,7 +139,7 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         }
     }))
     
-    all.PATH <- unique(all.PATH)## incalse the database is not unique
+    all.PATH <- unique(all.PATH)## incase the database is not unique
     this.PATH <- unique(this.PATH)
     
     colnames(all.PATH)<-c("path.id","EntrezID")
@@ -161,24 +161,37 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     colnames(selected) = c("path.id", "count.InDataset", "count.InGenome", 
                            "pvalue", "totaltermInDataset", "totaltermInGenome")
     
-    if (is.null(multiAdjMethod))
-    {
-        s = selected[as.numeric(as.character(selected[,4]))<maxP & 
-                         as.numeric(as.character(selected[,3]))>=minPATHterm,]
+    annoTerms <- function(termids){
+        if(length(termids)<1){
+            goterm <- matrix(ncol=2)
+        }else{
+            termids <- as.character(termids)
+            terms <- xget(termids, get(sub(".db", "PATHID2NAME", pathAnn)))
+            goterm <- cbind(termids, 
+                            terms[match(termids, names(terms))])
+        }
+        colnames(goterm) <- c("path.id", "path.term")
+        rownames(goterm) <- NULL
+        goterm
     }
-    else
-    {
+    annoterm <- annoTerms(selected$path.id)
+    selected <- merge(annoterm, selected, by="path.id")
+    
+    if (is.null(multiAdjMethod)){
+        s = selected[as.numeric(as.character(selected[,"pvalue"]))<maxP & 
+                         as.numeric(as.character(selected[, "count.InGenome"]))>=minPATHterm,]
+    }else{
         procs = c(multiAdjMethod)
-        res <- mt.rawp2adjp(as.numeric(as.character(selected[,4])), procs)
+        res <- mt.rawp2adjp(as.numeric(as.character(selected[,"pvalue"])), procs)
         adjp = unique(res$adjp)
-        colnames(adjp)[1] = colnames(selected)[4]
+        colnames(adjp)[1] = "pvalue"
         colnames(adjp)[2] = paste(multiAdjMethod, "adjusted.p.value", sep=".")
-        selected[,4] = as.numeric(as.character(selected[,4]))
+        selected[,"pvalue"] = as.numeric(as.character(selected[,"pvalue"]))
         bp1 = merge(selected, adjp, all.x=TRUE)
         
         s = bp1[as.numeric(as.character(bp1[,dim(bp1)[2]]))<maxP &  
                     !is.na(bp1[,dim(bp1)[2]]) & 
-                    as.numeric(as.character(bp1[,4]))>=minPATHterm,]
+                    as.numeric(as.character(bp1[,"count.InGenome"]))>=minPATHterm,]
     }
     
     path.id <- gsub("[^0-9]","",as.character(s$path.id))

@@ -23,13 +23,10 @@ suppressPackageStartupMessages({
   library(reactome.db)
   library(BSgenome.Hsapiens.UCSC.hg19)
   library(seqinr)
+  library(UpSetR)
+library(trackViewer)
 })
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
-i <- 0
-generateFigureCaption <- function(cap){
-    i <<- i+1
-    return(paste0("Figure ", i, ". ", cap))
-}
 ```
 
 In this guide, we illustrate here two common downstream analysis workflows for ChIP-seq experiments, one is for comparing and combining peaks for single transcription factor (TF) with replicates, and the other is for comparing binding profiles from ChIP-seq experiments with multiple TFs.
@@ -46,7 +43,7 @@ in **ChIPpeakAnno**, other common peak formats such as BED, GFF and MACS can be 
 
 The following examples illustrate the usage of this method to convert BED and GFF file to GRanges, add metadata from orignal peaks to the overlap GRanges using function `addMetadata`, and visualize the overlapping using function `makeVennDiagram`.
 
-```{r workflow1, fig.cap=generateFigureCaption("Venn diagram of overlaps for replicated experiments"), fig.width=6, fig.height=6}
+```{r workflow1, fig.cap="Venn diagram of overlaps for replicated experiments", fig.width=6, fig.height=6}
 library(ChIPpeakAnno)
 bed <- system.file("extdata", "MACS_output.bed", package="ChIPpeakAnno")
 gr1 <- toGRanges(bed, format="BED", header=FALSE) 
@@ -80,7 +77,7 @@ annoData[1:2]
 After finding the overlapping peaks, the distribution of the distance of overlapped peaks to the nearest feature such as the transcription start sites (TSS) can be plotted by `binOverFeature` function. 
 The sample code here plots the distribution of peaks around the TSS.
 
-```{r workflow2,fig.cap=generateFigureCaption("Distribution of peaks around transcript start sites."),fig.width=8,fig.height=6}
+```{r workflow2,fig.cap="Distribution of peaks around transcript start sites.",fig.width=8,fig.height=6}
 overlaps <- ol$peaklist[["gr1///gr2"]]
 binOverFeature(overlaps, annotationData=annoData,
                radius=5000, nbins=20, FUN=length, errFun=0,
@@ -88,20 +85,59 @@ binOverFeature(overlaps, annotationData=annoData,
                main="Distribution of aggregated peak numbers around TSS")
 ```
 
-In addition, `assignChromosomeRegion` can be used to summarize the distribution of  peaks over different type of features such as exon, intron, enhancer, proximal promoter, 5' UTR and 3' UTR. 
+In addition, `genomicElementDistribution` can be used to summarize the distribution of  peaks over different type of features such as exon, intron, enhancer, proximal promoter, 5' UTR and 3' UTR. 
 This distribution can be summarized in peak centric or nucleotide centric view using 
-the function `assignChromosomeRegion`. 
+the function `genomicElementDistribution`. 
 Please note that one peak might span multiple type of features, leading to the number of annotated features greater than the total number of input peaks. At the peak centric view, precedence will dictate the annotation order when peaks span multiple type of features.
 
-```{r workflow4,fig.cap=generateFigureCaption("Peak distribution over different genomic features."),fig.width=10,fig.height=4}
+```{r workflow4,fig.cap="Peak distribution over different genomic features.",fig.width=10,fig.height=4}
+## check the genomic element distribution of the duplicates
+## the genomic element distribution will indicates the 
+## the correlation between duplicates.
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-aCR<-assignChromosomeRegion(overlaps, nucleotideLevel=FALSE, 
-                           precedence=c("Promoters", "immediateDownstream", 
-                                         "fiveUTRs", "threeUTRs", 
-                                         "Exons", "Introns"), 
-                           TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene)
-barplot(aCR$percentage, las=3)
+peaks <- GRangesList(rep1=gr1,
+                     rep2=gr2)
+genomicElementDistribution(peaks, 
+                           TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene,
+                           promoterRegion=c(upstream=2000, downstream=500),
+                           geneDownstream=c(upstream=0, downstream=2000))
+## check the genomic element distribution for the overlaps
+## the genomic element distribution will indicates the 
+## the best methods for annotation.
+out <- genomicElementDistribution(overlaps, 
+                           TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene,
+                           promoterRegion=c(upstream=2000, downstream=500),
+                           geneDownstream=c(upstream=0, downstream=2000),
+                           promoterLevel=list(
+                         # from 5' -> 3', fixed precedence 3' -> 5'
+                             breaks = c(-2000, -1000, -500, 0, 500),
+                             labels = c("upstream 1-2Kb", "upstream 0.5-1Kb", 
+                                        "upstream <500b", "TSS - 500b"),
+                             colors = c("#FFE5CC", "#FFCA99", 
+                                        "#FFAD65", "#FF8E32")))
+## check the genomic element distribution by upset plot.
+## by function genomicElementUpSetR, no precedence will be considered.
+library(UpSetR)
+x <- genomicElementUpSetR(overlaps, 
+                          TxDb.Hsapiens.UCSC.hg19.knownGene)
+upset(x$plotData, nsets=13, nintersects=NA)
 ```
+
+You can also overview your data by ideo plot.
+
+```{r}
+library(trackViewer)
+ideo <- loadIdeogram(genome = "hg19")
+dataList <- GRangesList(gr1)
+ideogramPlot(ideo, dataList, layout = list("chr1", c("chr3", "chr22")), 
+             parameterList = list(ideoHeight=unit(.25, "npc")))
+```
+Metagene plot may also provide information for annotation.
+
+```{r}
+metagenePlot(peaks, TxDb.Hsapiens.UCSC.hg19.knownGene)
+```
+
 
 ## Annotate peaks
 As shown from the distribution of aggregated peak numbers around TSS and 
@@ -125,7 +161,7 @@ write.csv(as.data.frame(unname(overlaps.anno)), "anno.csv")
 
 The distribution of the common peaks around features can be visualized using a pie chart.
 
-```{r workflow20,fig.cap=generateFigureCaption("Pie chart of the distribution of common peaks around features.")}
+```{r workflow20,fig.cap="Pie chart of the distribution of common peaks around features."}
 pie1(table(overlaps.anno$insideFeature))
 ```
 
@@ -133,13 +169,11 @@ pie1(table(overlaps.anno$insideFeature))
 ## Obtain enriched GO terms and Pathways
 The following example shows how to use `getEnrichedGO` to obtain a list of enriched GO terms with annotated peaks. For pathway analysis, please use function `getEnrichedPATH` with reactome or KEGG database. Please note that by default  _feature\_id\_type_ is set as “ensembl\_gene\_id”. If you are using **TxDb** as annotation data, please set it to “entrez\_id”.
 ```{r enrichment}
-over <- getEnrichedGO(overlaps.anno, orgAnn="org.Hs.eg.db", 
-                     maxP=.05, minGOterm=10, 
-                     multiAdjMethod="BH", condense=TRUE)
-head(over[["bp"]][, -c(3, 10)])
+over <- getEnrichedGO(overlaps.anno, orgAnn="org.Hs.eg.db", condense=TRUE)
+enrichmentPlot(over)
 library(reactome.db)
 path <- getEnrichedPATH(overlaps.anno, "org.Hs.eg.db", "reactome.db", maxP=.05)
-head(path)
+enrichmentPlot(path)
 ```
 
 ## Obtain the sequences surrounding the peaks
@@ -153,7 +187,7 @@ write2FASTA(seq, "test.fa")
 
 ## Output a summary of consensus in the peaks
 Here is an example to get the Z-scores for short oligos[@leung1996over,@van2000statistical].
-```{r consensus,fig.cap=generateFigureCaption("Histogram of Z-score of 6-mer"),fig.height=6,fig.width=6}
+```{r consensus,fig.cap="Histogram of Z-score of 6-mer",fig.height=6,fig.width=6}
 ## summary of the short oligos
 library(seqinr)
 freqs <- oligoFrequency(Hsapiens$chr1, MarkovOrder=3)
@@ -165,7 +199,7 @@ h <- hist(zscore, breaks=100, xlim=c(-50, 50), main="Histogram of Z-score")
 text(zscore[length(zscore)], max(h$counts)/10, 
      labels=names(zscore[length(zscore)]), adj=1)
 ```
-```{r simulation, fig.cap=generateFigureCaption("Histogram of Z-score of simulation data"), fig.width=6, fig.height=6}
+```{r simulation, fig.cap="Histogram of Z-score of simulation data", fig.width=6, fig.height=6}
 ## We can also try simulation data
 seq.sim.motif <- list(c("t", "g", "c", "a", "t", "g"), 
                       c("g", "c", "a", "t", "g", "c"))
@@ -188,7 +222,7 @@ h <- hist(zscore, breaks=100, main="Histogram of Z-score")
 text(zscore[1:2], rep(5, 2), 
      labels=names(zscore[1:2]), adj=0, srt=90)
 ```
-```{r simulation.motif, fig.cap=generateFigureCaption("Motif of simulation data"), fig.width=6, fig.height=6}
+```{r simulation.motif, fig.cap="Motif of simulation data", fig.width=6, fig.height=6}
 ## generate the motifs
 library(motifStack)
 pfms <- mapply(function(.ele, id)
@@ -251,7 +285,7 @@ please refer to the [post](https://stat.ethz.ch/pipermail/bioconductor/2010-Nove
 The following example makes an assumption that there are 3% of coding region plus promoter region. Because the sample data is only a subset of chromosome 2, 
 we estimate that the total binding sites is 1/24 of possible binding region in the genome.
 
-```{r vennDiagram, fig.cap=generateFigureCaption("Venn diagram of overlaps."), fig.width=6, fig.height=6}
+```{r vennDiagram, fig.cap="Venn diagram of overlaps.", fig.width=6, fig.height=6}
 ol <- findOverlapsOfPeaks(data, connectedPeaks="keepAll")
 averagePeakWidth <- mean(width(unlist(GRangesList(ol$peaklist))))
 tot <- ceiling(3.3e+9 * .03 / averagePeakWidth / 24)
@@ -285,7 +319,7 @@ Please note that some of the blacklists may need to be converted to the correct 
 
 Following are the sample codes to do the permutation test using `permTest`:
 
-```{r peakPermTest1, fig.cap=generateFigureCaption("permutation test for YY1 and TEAD4")}
+```{r peakPermTest1, fig.cap="permutation test for YY1 and TEAD4"}
     data(HOT.spots)
     data(wgEncodeTfbsV3)
     hotGR <- reduce(unlist(HOT.spots))
@@ -305,7 +339,7 @@ Following are the sample codes to do the permutation test using `permTest`:
     pt1 <- peakPermTest(YY1, TEAD4, pool=pool, seed=1, force.parallel=FALSE)
     plot(pt1)
 ```
-```{r peakPermTest2, fig.cap=generateFigureCaption("permutation test for YY1 and TAF")}
+```{r peakPermTest2, fig.cap="permutation test for YY1 and TAF"}
     pt2 <- peakPermTest(YY1, TAF, pool=pool, seed=1, force.parallel=FALSE)
     plot(pt2)
 ```
@@ -313,7 +347,7 @@ Following are the sample codes to do the permutation test using `permTest`:
 
 ## Visualize and compare the binding pattern
 The binding pattern around a genome feature could be visualized and compared using a side-by-side heatmap and density plot using the binding ranges of overlapping peaks.
-```{r heatmap,fig.cap=generateFigureCaption("Heatmap of aligned features sorted by signal of TAF"),fig.width=4,fig.height=6}
+```{r heatmap,fig.cap="Heatmap of aligned features sorted by signal of TAF",fig.width=4,fig.height=6}
 features <- ol$peaklist[[length(ol$peaklist)]]
 feature.recentered <- reCenterPeaks(features, width=4000)
 ## here we also suggest importData function in bioconductor trackViewer package 
@@ -342,7 +376,7 @@ heatmap <- featureAlignedHeatmap(sig, feature.center,
                                  upstream=2000, downstream=2000,
                                  upper.extreme=c(3,.5,4))
 ```
-```{r sortHeatmapByHcluster,fig.cap=generateFigureCaption("Heatmap of aligned features sorted by hclut"),fig.width=4,fig.height=6}
+```{r sortHeatmapByHcluster,fig.cap="Heatmap of aligned features sorted by hclut",fig.width=4,fig.height=6}
 sig.rowsums <- sapply(sig, rowSums, na.rm=TRUE)
 d <- dist(sig.rowsums)
 hc <- hclust(d)
@@ -352,7 +386,7 @@ heatmap <- featureAlignedHeatmap(sig, feature.center,
                                  upper.extreme=c(3,.5,4),
                                  sortBy="order")
 ```
-```{r distribution,fig.cap=generateFigureCaption("Distribution of aligned features"),fig.width=6,fig.height=6}
+```{r distribution,fig.cap="Distribution of aligned features",fig.width=6,fig.height=6}
 featureAlignedDistribution(sig, feature.center, 
                            upstream=2000, downstream=2000,
                            type="l")

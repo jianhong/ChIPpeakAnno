@@ -70,8 +70,8 @@
 #' is between 0 and 1. The higher the index, the more significant the overlap
 #' between the peak region and the genomic features in consideration.
 #' @author Jianhong Ou, Lihua Julie Zhu
-#' @seealso annotatePeakInBatch, findOverlapsOfPeaks,getEnriched,
-#' makeVennDiagram,addGeneIDs, peaksNearBDP,summarizePatternInPeaks
+#' @seealso \link{genomicElementDistribution}, \link{genomicElementUpSetR},
+#' \link{binOverFeature}, \link{binOverGene}, \link{binOverRegions}
 #' @references 1. Zhu L.J. et al. (2010) ChIPpeakAnno: a Bioconductor package
 #' to annotate ChIP-seq and ChIP-chip data. BMC Bioinformatics 2010,
 #' 11:237doi:10.1186/1471-2105-11-237

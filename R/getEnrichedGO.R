@@ -124,6 +124,13 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                           condense=FALSE,
                           removeAncestorByPval=NULL,
                           keepByLevel=NULL){
+  if(is(annotatedPeak, "GRangesList")){
+    args <- as.list(match.call())
+    res <- lapply(annotatedPeak, function(.ele){
+      args$annotatedPeak <- .ele
+      do.call(getEnrichedGO, args = args)
+    })
+  }
   stopifnot("The 'GO.db' package is required"=
               requireNamespace("GO.db", quietly = TRUE)) 
     if (missing(annotatedPeak))

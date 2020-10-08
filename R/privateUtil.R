@@ -641,3 +641,15 @@ swapList <- function(x){
   }
   y
 }
+
+
+filterByOverlaps <- function(x, ranges, ignore.strand=FALSE, 
+                             minoverlap=1L, ...){
+  y <- disjoin(c(x, ranges), ignore.strand=ignore.strand)
+  ranges <- subsetByOverlaps(y, ranges, ignore.strand=ignore.strand)
+  x <- subsetByOverlaps(y, x, ignore.strand=ignore.strand)
+  subsetByOverlaps(x, ranges = ranges, invert = TRUE, 
+                   ignore.strand=ignore.strand,
+                   minoverlap = minoverlap,
+                   ...)
+}

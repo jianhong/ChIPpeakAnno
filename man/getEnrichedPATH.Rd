@@ -51,7 +51,7 @@ adjusting p-values
 }
 \examples{
 
-if (interactive()) {
+if (interactive()||Sys.getenv("USER")=="jianhongou") {
 data(annotatedPeak)
 library(org.Hs.eg.db)
 library(reactome.db)
