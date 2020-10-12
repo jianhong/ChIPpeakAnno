@@ -1,11 +1,16 @@
 ---
 title: "Common Downstream ChIP-seq Analysis Workflows using ChIPpeakAnno"
 author: "Jianhong Ou, Jun Yu, Lihua Julie Zhu"
-output: 
-    BiocStyle::html_document:
-        css: custom.css
-date: "`r doc_date()`"
-package: "`r pkg_ver('ChIPpeakAnno')`"
+output:
+html_document:
+    theme: simplex
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    fig_caption: true
+    css: custom.css
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('ChIPpeakAnno')`"
 bibliography: bibliography.bib
 csl: nature.csl
 vignette: >

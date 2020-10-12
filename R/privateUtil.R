@@ -14,26 +14,63 @@ formatStrand <- function(strand){
   strand
 }
 ###clear seqnames, the format should be chr+NUM
-#' @importFrom GenomeInfoDb `seqlevels<-`
-formatSeqnames <- function(gr) {
-  if(length(seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
-                                seqlevels(gr))])>0){
-    if(is(gr, "GRanges")){
-      seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqlevels(gr))] <-
-        paste("chr", 
-              seqlevels(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
-                                  seqlevels(gr))], sep="")
-      seqlevels(gr)[seqlevels(gr)=="chrMT"] <- "chrM" 
-    }else{
-      seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqnames(gr))] <-
-        paste("chr", 
-              seqnames(gr)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", 
-                                 seqnames(gr))], sep="")
-      seqnames(gr)[seqnames(gr)=="chrMT"] <- "chrM" 
+#' @importFrom GenomeInfoDb `seqlevels<-` `seqlevelsStyle` `seqlevelsStyle<-`
+formatSeqnames <- function(from, to) {
+  tryCatch({
+    seql <- seqlevelsStyle(to)
+    seqf <- seqlevelsStyle(from)
+    if(!seql[1] %in% seqf){
+      seqlevelsStyle(from) <- seql[1]
     }
-  }
-#    if(seqlevelsStyle(gr)!="UCSC") seqlevelsStyle(gr) <- "UCSC"
-    gr
+    from
+  }, error = function(e){
+    message(e)
+    message("\n Try to keep the seqname style consistent.")
+    seql <- seqlevels(to)
+    getPrefix <- function(x, seql){
+      seql <- table(c(grepl(x, seql), "TRUE", "FALSE"))
+      if(seql['TRUE'] > seql['FALSE']){
+        prefix <- x
+      }else{
+        prefix <- ""
+      }
+      prefix
+    }
+    
+    prefix <- ""
+    for(i in c("chr", "Chr")){
+      if(prefix==""){
+        prefix <- getPrefix(i, seql)
+      }
+    }
+    if(prefix!=""){
+      if(length(seqlevels(from)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$",
+                                      seqlevels(from))])>0){
+        if(is(from, "GRanges")){
+          seqlevels(from)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqlevels(from))] <-
+            paste(prefix,
+                  seqlevels(from)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$",
+                                        seqlevels(from))], sep="")
+          #seqlevels(from)[seqlevels(from)=="chrMT"] <- "chrM"
+        }else{
+          seqnames(from)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$", seqnames(from))] <-
+            paste(prefix,
+                  seqnames(from)[grepl("^(\\d+|V?I{0,3}|IV|MT|M|X|Y)$",
+                                       seqnames(from))], sep="")
+          #seqnames(from)[seqnames(from)=="chrMT"] <- "chrM"
+        }
+      }
+      #if(seqlevelsStyle(from)!="UCSC") seqlevelsStyle(from) <- "UCSC"
+      seqlevels(from) <- sub("^chr", prefix, seqlevels(from), 
+                             ignore.case = TRUE)
+    }else{
+      ## remove chr
+      seqlevels(from) <- sub("^chr", prefix, seqlevels(from), 
+                             ignore.case = TRUE)
+    }
+    
+     from
+  })
 }
 
 getRelationship <- function(queryHits, subjectHits){

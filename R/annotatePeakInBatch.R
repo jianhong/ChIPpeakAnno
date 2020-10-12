@@ -322,8 +322,9 @@ annotatePeakInBatch <-
         
         ##clear seqnames, the format should be chr+NUM
         ##TODO, how about the seqname not start with chr?
-        TSS.ordered <- formatSeqnames(TSS.ordered)
-        myPeakList <- formatSeqnames(myPeakList)
+        ## fix by seqlevelsStyle
+        TSS.ordered <- formatSeqnames(TSS.ordered, myPeakList)
+        #myPeakList <- formatSeqnames(myPeakList)
         if(!all(seqlevels(myPeakList) %in% seqlevels(TSS.ordered))){
             warning("not all the seqnames of myPeakList is 
                     in the AnnotationData.")

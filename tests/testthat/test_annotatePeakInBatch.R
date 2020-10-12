@@ -330,13 +330,13 @@ test_that("annotatePeakInBatch works not correct", {
 #     11_13_43336708 ENSG00000210484             5265          NearestLocation
 #     11_11_71974217 ENSG00000210995            15216          NearestLocation
     
-    peak <- GRanges(c("Chr01","Chr01","Chr01"),
+    peak <- GRanges(c("chr1","chr1","chr1"),
                     IRanges(start=c(1650,2806,8361), 
                             end=c(1860,3006,8591),
                             names=c("peak1","peak2","peak3")),
                     strand=as.integer(1))
 
-    GENOME <- GRanges("Chr01", 
+    GENOME <- GRanges("chr1", 
                       IRanges(start=c(1660, 2906, 8391),
                               end=c(2502, 6646, 8860),
                               names=c("Potri.001G000100",

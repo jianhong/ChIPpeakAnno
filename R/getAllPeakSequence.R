@@ -73,8 +73,8 @@ getAllPeakSequence <- function(myPeakList,
         strand(myPeakList) <- strand
         ##how to make the seqname be same is a question.
         if(!all(seqlevels(myPeakList) %in% seqnames(genome))){
-            myPeakList <- formatSeqnames(myPeakList)
-            genome <- formatSeqnames(genome)
+            #myPeakList <- formatSeqnames(myPeakList)
+            genome <- formatSeqnames(genome, myPeakList)
         }
         ends <- unlist(
             apply(

@@ -168,9 +168,8 @@ assignChromosomeRegion <-
                 c("Exons", "Introns", "fiveUTRs", "threeUTRs", 
                   "Promoters", "immediateDownstream")
             ###clear seqnames, the format should be chr+NUM
-            peaks.RD <- formatSeqnames(peaks.RD)
+            peaks.RD <- formatSeqnames(peaks.RD, exons)
             peaks.RD <- unique(peaks.RD)
-            annotation <- lapply(annotation, formatSeqnames)
             annotation <- GRangesList(annotation)
             newAnno <- c(unlist(annotation))
             if(ignore.strand){

@@ -15,7 +15,7 @@ findMotifsInPromoterSeqs(
   upstream = 5000L,
   downstream = 5000L,
   name.motif1 = "motif1",
-  name.motif2 = "motf2",
+  name.motif2 = "motif2",
   max.distance = 100L,
   min.distance = 1L,
   motif.orientation = c("both", "motif1UpstreamOfMotif2", "motif2UpstreamOfMoif1"),

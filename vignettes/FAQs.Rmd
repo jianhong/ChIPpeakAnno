@@ -1,7 +1,13 @@
 ---
 title: "ChIPpeakAnno FAQs"
 author: "Jianhong Ou, Jun Yu, Lihua Julie Zhu"
-output: BiocStyle::html_document
+output:
+  html_document:
+    theme: simplex
+    toc: true
+    toc_float: true
+    toc_depth: 4
+    fig_caption: true
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('ChIPpeakAnno')`"
 vignette: >

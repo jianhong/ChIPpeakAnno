@@ -110,7 +110,7 @@ findMotifsInPromoterSeqs <-
            upstream = 5000L,
            downstream = 5000L,
            name.motif1 = "motif1",
-           name.motif2 = "motf2",
+           name.motif2 = "motif2",
            max.distance = 100L, min.distance = 1L,
            motif.orientation = c("both", "motif1UpstreamOfMotif2", 
                                  "motif2UpstreamOfMoif1"),
@@ -133,7 +133,7 @@ findMotifsInPromoterSeqs <-
     
     peaks <- promoters(tx, upstream = upstream, downstream = downstream)
     
-    x1 <- do.call(rbind, lapply(1:length(peaks),function(i) {
+    x1 <- do.call(rbind, lapply(seq_along(peaks),function(i) {
       thisPeak <- peaks[[i]]
       mcols(thisPeak)$gene_id = names(peaks)[i]
       summarizePatternInPeaks(patternFilePath = patternFilePath1, 
@@ -161,7 +161,7 @@ findMotifsInPromoterSeqs <-
       stop("missing required parameter patternFilePath2!")
     }
     else {
-      x2 <- do.call(rbind, lapply(1:length(peaks),function(i) {
+      x2 <- do.call(rbind, lapply(seq_along(peaks),function(i) {
         thisPeak <- peaks[[i]]
         mcols(thisPeak)$gene_id = names(peaks)[i]
         summarizePatternInPeaks(patternFilePath = patternFilePath2,
@@ -201,7 +201,7 @@ findMotifsInPromoterSeqs <-
       m2 <- m2[, c(1:2, 7:8, 11)]
       colnames(m2)[3:5] <- paste(name.motif2, colnames(m2)[3:5])
       
-      m2$seqnames <- paste("chr", m2$seqnames, sep = "" )
+      #m2$seqnames <- paste("chr", m2$seqnames, sep = "" )
       
       res <- merge(m2, temp, by = c("feature", "seqnames"))
       colnames(res)[6:14] <- paste(name.motif1, colnames(res)[6:14])
