@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.23.12
+-------------------------
+
+    o fix the bug for genomicElementDistribution when the order of SortedByQueryHits is incorrect.
+    
 CHANGES IN VERSION 3.23.11
 -------------------------
 

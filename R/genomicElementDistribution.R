@@ -316,9 +316,11 @@ genomicElementDistribution <-
       pct <- lapply(anno, FUN = function(.ele){
         y <- .peaks
         ol <- findOverlaps(y, .ele, ignore.strand=ignore.strand)
-        ol <- ol[!duplicated(queryHits(ol))]
+        ol <- as.data.frame(ol)
+        ol <- ol[order(ol$queryHits, ol$subjectHits), ]
+        ol <- ol[!duplicated((ol$queryHits)), ]
         y$anno <- "undefined"
-        y$anno[queryHits(ol)] <- .ele$type[subjectHits(ol)]
+        y$anno[ol$queryHits] <- .ele$type[ol$subjectHits]
         y$anno
       })
       
