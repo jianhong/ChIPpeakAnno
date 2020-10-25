@@ -11,7 +11,7 @@
 #' @param orgAnn organism annotation package such as org.Hs.eg.db for human and
 #' org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
 #' org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish
-#' @param pathAnn pathway annotation package such as KEGG.db, reactome.db
+#' @param pathAnn pathway annotation package such as KEGG.db, reactome.db, KEGGREST
 #' @param feature_id_type the feature type in annotatedPeakRanges such as
 #' ensembl_gene_id, refseq_id, gene_symbol or entrez_id
 #' @param maxP maximum p-value to be considered to be significant
@@ -25,7 +25,7 @@
 #' from the hypergeometric test} \item{totaltermInDataset}{count of all PATH in
 #' this dataset} \item{totaltermInGenome}{count of all PATH in the genome}
 #' \item{PATH}{PATH name}
-#' @author Jianhong Ou
+#' @author Jianhong Ou, Kai Hu
 #' @seealso phyper, hyperGtest
 #' @references Johnson, N. L., Kotz, S., and Kemp, A. W. (1992) Univariate
 #' Discrete Distributions, Second Edition. New York: Wiley
@@ -33,6 +33,7 @@
 #' @export
 #' @importFrom AnnotationDbi mappedkeys
 #' @importFrom multtest mt.rawp2adjp
+#' @importFrom KEGGREST keggGet keggLink
 #' @examples
 #' 
 #' if (interactive()||Sys.getenv("USER")=="jianhongou") {
@@ -40,18 +41,27 @@
 #' library(org.Hs.eg.db)
 #' library(reactome.db)
 #' enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+#'                  feature_id_type="ensembl_gene_id",
 #'                  pathAnn="reactome.db", maxP=0.01,
 #'                  minPATHterm=10, multiAdjMethod=NULL)
 #'  head(enriched.PATH)
+#'  enrichedKEGG = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+#'                  feature_id_type="ensembl_gene_id",
+#'                  pathAnn="KEGGREST", maxP=0.01,
+#'                  minPATHterm=10, multiAdjMethod=NULL)
+#'  enrichmentPlot(enrichedKEGG)
 #' }
 #' 
 getEnrichedPATH <- function(annotatedPeak, orgAnn, pathAnn, 
                             feature_id_type="ensembl_gene_id", 
                             maxP=0.01, minPATHterm=10, multiAdjMethod=NULL)
-{    
+{
     if (missing(annotatedPeak)){
         stop("Missing required argument annotatedPeak!")	
     }
+    # if (missing(feature_id_type)) {
+    #     stop("Missing required argument feature_id_type!")	
+    # }
     if(length(multiAdjMethod)>0){
         multiAdjMethod <- match.arg(multiAdjMethod, 
                                     c("Bonferroni", "Holm", "Hochberg", 
@@ -65,7 +75,7 @@ getEnrichedPATH <- function(annotatedPeak, orgAnn, pathAnn,
              http://www.bioconductor.org/packages/release/data/annotation/ 
              for available org.xx.eg.db packages")
     }
-    if(!.checkLoadedPackage(orgAnn,TRUE)){
+    if(!isNamespaceLoaded(orgAnn)){
         stop(paste("Need to load", orgAnn,
                    "before using getEnrichedPATH. Try \n\"library(",
                    orgAnn,")\""))
@@ -77,20 +87,12 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
              and pathway identifies to pathway names named as 
              xxxxxPATHID2NAME.")
     }
-    if(!.checkLoadedPackage(pathAnn,TRUE)){
+    if(!isNamespaceLoaded(pathAnn)){
         stop(paste("Need to load",pathAnn,
                    "before using getEnrichedPATH. Try \n\"library(",
                    pathAnn,")\""))
     }
-    extid2path<- paste(gsub(".db$","",pathAnn),"EXTID2PATHID", sep="")
-    path2name<- paste(gsub(".db$","",pathAnn),"PATHID2NAME", sep="")
-    if(length(objects(paste("package",pathAnn,sep=":"),
-                      pattern=extid2path))!=1 & 
-           length(objects(paste("package",pathAnn,sep=":"),
-                          pattern=path2name))!=1 ){
-        stop("argument pathAnn is not the annotation data with objects named 
-             as xxxxxEXTID2PATHID and/or xxxxxPATHID2NAME")
-    }
+
     if (inherits(annotatedPeak, what=c("GRanges"))){
         feature_ids = unique(as.character(annotatedPeak$feature))
     }else if (is.character(annotatedPeak)){
@@ -110,16 +112,46 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
              Please double check your feature_id_type.")
     }
     
-    extid2path <- get(extid2path)
-    mapped_genes <- mappedkeys(extid2path)
-    #get all the entrez_ids in the species
-    mapped_genes <- 
-        mapped_genes[mapped_genes %in% 
-                         mappedkeys(get(paste(gsub(".db","",orgAnn),
-                                              "SYMBOL",sep="")))]
-    totalN.genes=length(unique(mapped_genes))
-    thisN.genes = length(unique(entrezIDs))
-    xx <- as.list(extid2path[mapped_genes])
+    if (pathAnn %in% c("reactome.db", "KEGG.db")) {
+        extid2path<- paste(gsub(".db$","",pathAnn),"EXTID2PATHID", sep="")
+        path2name<- paste(gsub(".db$","",pathAnn),"PATHID2NAME", sep="")
+        if(length(objects(paste("package",pathAnn,sep=":"),
+                          pattern=extid2path))!=1 & 
+           length(objects(paste("package",pathAnn,sep=":"),
+                          pattern=path2name))!=1 ){
+            stop("argument pathAnn is not the annotation data with objects named 
+             as xxxxxEXTID2PATHID and/or xxxxxPATHID2NAME")
+        }
+        extid2path <- get(extid2path)
+        mapped_genes <- mappedkeys(extid2path)
+        #get all the entrez_ids in the species
+        mapped_genes <- 
+            mapped_genes[mapped_genes %in% 
+                             mappedkeys(get(paste(gsub(".db","",orgAnn),
+                                                  "SYMBOL",sep="")))]
+        totalN.genes=length(unique(mapped_genes))
+        thisN.genes = length(unique(entrezIDs))
+        xx <- as.list(extid2path[mapped_genes])
+    } else if (pathAnn == "KEGGREST") {
+    # for KEGGREST db
+        organismKEGGREST <- .findKEGGRESTOrganismName(orgAnn)
+        EGID2PATHID <- keggLink("pathway", organismKEGGREST)
+        # get rid of the leading organismKEGGREST in front of the EntrezID and the "path" in front of the PATHID
+        names(EGID2PATHID) <- unlist(lapply(strsplit(names(EGID2PATHID), ":"), "[", 2)) 
+        EGID2PATHID <- unlist(lapply(strsplit(EGID2PATHID, ":"), "[", 2)) 
+        
+        mapped_genes2 <- names(keggLink("pathway", organismKEGGREST))
+        mapped_genes2 <- unique(unlist(lapply(strsplit(mapped_genes2, ":"), "[", 2)))
+        
+        mapped_genes <- mapped_genes2[mapped_genes2 %in% 
+                            mappedkeys(get(paste(gsub(".db","",orgAnn), "SYMBOL", sep="")))]
+        
+        totalN.genes=length(unique(mapped_genes))
+        thisN.genes = length(unique(entrezIDs))
+        
+        xx <- with(stack(as.list(EGID2PATHID)), split(values, ind))
+    }
+    
     all.PATH <- do.call(rbind, lapply(mapped_genes,function(x1)
     {
         temp = unlist(xx[names(xx) ==x1])
@@ -165,10 +197,35 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         if(length(termids)<1){
             goterm <- matrix(ncol=2)
         }else{
-            termids <- as.character(termids)
-            terms <- xget(termids, get(sub(".db", "PATHID2NAME", pathAnn)))
-            goterm <- cbind(termids, 
-                            terms[match(termids, names(terms))])
+            if (pathAnn %in% c("reactome.db")) {
+                termids <- as.character(termids)
+                terms <- xget(termids, get(sub(".db", "PATHID2NAME", pathAnn)))
+                goterm <- cbind(termids, 
+                                terms[match(termids, names(terms))])
+            } else if (pathAnn %in% c("KEGG.db", "KEGGREST")) {
+                # Must get rid of the leading organismKEGGREST of path.id 
+                # if using KEGG.db or KEGGREST
+                organismKEGGREST <- .findKEGGRESTOrganismName(orgAnn)
+                termidsPreRemoved <- sub(organismKEGGREST, "", termids)
+                
+                if (pathAnn == "KEGG.db") {
+                    terms <- xget(termidsPreRemoved, get(sub(".db", "PATHID2NAME", pathAnn)))
+                    goterm <- cbind(termids, 
+                                    terms[match(termidsPreRemoved, names(terms))])
+                } else if (pathAnn  == "KEGGREST") {
+                    getPathName <- function(pathid) {
+                        namePath <- tryCatch(
+                            res <- keggGet(pathid)[[1]]$NAME,
+                            error = function(c) res <- "NA"
+                        )
+                        names(namePath) <- pathid
+                        namePath
+                    }
+                    terms <- unlist(lapply(termids, getPathName))
+                    goterm <- cbind(termids, 
+                                    terms[match(termids, names(terms))])
+                }
+            }
         }
         colnames(goterm) <- c("path.id", "path.term")
         rownames(goterm) <- NULL
@@ -194,28 +251,51 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
                     as.numeric(as.character(bp1[,"count.InGenome"]))>=minPATHterm,]
     }
     
-    path.id <- gsub("[^0-9]","",as.character(s$path.id))
-    species <- gsub("[0-9]","",as.character(s$path.id)[1])
-    path2name <- get(path2name)
-    pathterm <- mget(unique(path.id),path2name,ifnotfound=NA)
-    pathterm <- do.call(rbind, lapply(pathterm,function(.ele){
-        paste(.ele,collapse=";")}))
-    if(is.null(dim(pathterm))){
-        stop("No enriched pathway can be found.")
-    }
-    colnames(pathterm) = "PATH"
-    rownames(pathterm) = paste(species,rownames(pathterm),sep="")
-    
-    selected1 = merge(s, pathterm, by.x="path.id", by.y="row.names")
-    
-    selected = merge(this.PATH, selected1)
+    selected = merge(this.PATH, s)
     
     selected
     }
 
-.checkLoadedPackage<-function(package, character.only = FALSE){
-    if(!character.only)
-        package <- as.character(substitute(package))
-    loaded <- paste("package", package, sep=":") %in% search()
-    return(loaded)
+
+.findKEGGRESTOrganismName <- function(name) {
+    # Find the organism names used in the KEGGREST db, tested for Hs, Mm, Dm, Rn, Sc, and Dr 
+    #acroName <- egOrgMap(orgName)
+    #KEGGOrganismList <- keggList("organism")
+    #ad <- adist(acroName, KEGGOrganismList[, "species"])[1, ]
+    #KEGGOrganism <- KEGGOrganismList[which.min(ad), "organism"][[1]]
+    if(!is(name, "character"))
+        stop("class of input organism should be character")
+    organism <- c(
+        "org.Ag.eg.db"="aga",
+        "org.At.eg.db"="ath",
+        "org.Bt.eg.db"="bta",
+        "org.Ce.eg.db"="cel",
+        "org.Cf.eg.db"="cfa",
+        "org.Dm.eg.db"="dme",
+        "org.Dr.eg.db"="dre",
+        "org.EcK12.eg.db"="eco",
+        "org.EcSakai.eg.db"="ecs",
+        "org.Gg.eg.db"="gga",
+        "org.Hs.eg.db"="hsa",
+        "org.Mm.eg.db"="mmu",
+        "org.Mmu.eg.db"="mcc",
+        "org.Pf.plasmo.db"="pfa",
+        "org.Pt.eg.db"="ptr",
+        "org.Rn.eg.db"="rno",
+        "org.Sc.sgd.db"="sce",
+        "org.Sco.eg.db"="sco",
+        "org.Ss.eg.db"="ssc",
+        "org.Tgondii.eg.db"="tgo",
+        "org.Xl.eg.db"="xla")
+    if(name %in% names(organism)){
+        return(organism[name])
+    }else{
+        if(name %in% organism)
+            return(names(organism)[organism==name])
+    }
+    ##claculate the string distance, need utils package
+    org <- as.character(c(names(organism), organism))
+    dis <- adist(name, org)
+    org <- org[dis==min(dis)]
+    stop(paste("You input \"", name, "\". Do you mean \"", org, "\"?", sep=""))
 }

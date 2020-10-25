@@ -22,7 +22,7 @@ feature IDs}
 org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
 org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish}
 
-\item{pathAnn}{pathway annotation package such as KEGG.db, reactome.db}
+\item{pathAnn}{pathway annotation package such as KEGG.db, reactome.db, KEGGREST}
 
 \item{feature_id_type}{the feature type in annotatedPeakRanges such as
 ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
@@ -56,9 +56,15 @@ data(annotatedPeak)
 library(org.Hs.eg.db)
 library(reactome.db)
 enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+                 feature_id_type="ensembl_gene_id",
                  pathAnn="reactome.db", maxP=0.01,
                  minPATHterm=10, multiAdjMethod=NULL)
  head(enriched.PATH)
+ enrichedKEGG = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+                 feature_id_type="ensembl_gene_id",
+                 pathAnn="KEGGREST", maxP=0.01,
+                 minPATHterm=10, multiAdjMethod=NULL)
+ enrichmentPlot(enrichedKEGG)
 }
 
 }
@@ -70,6 +76,6 @@ Discrete Distributions, Second Edition. New York: Wiley
 phyper, hyperGtest
 }
 \author{
-Jianhong Ou
+Jianhong Ou, Kai Hu
 }
 \keyword{misc}
