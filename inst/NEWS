@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.24.1
+-------------------------
+
+    o fix the bug for genomicElementDistribution when the peak length is zero.
+    
 CHANGES IN VERSION 3.23.12
 -------------------------
 
