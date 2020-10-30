@@ -319,7 +319,7 @@ genomicElementDistribution <-
         ol <- as.data.frame(ol)
         ol <- ol[order(ol$queryHits, ol$subjectHits), ]
         ol <- ol[!duplicated((ol$queryHits)), ]
-        y$anno <- "undefined"
+        y$anno <- rep("undefined", length(y))
         y$anno[ol$queryHits] <- .ele$type[ol$subjectHits]
         y$anno
       })
