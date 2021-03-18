@@ -30,7 +30,8 @@ biomaRt package
 }
 \note{
 For featureType of TSS, start is the transcription start site if
-strand is 1 (plus strand), otherwise, end is the transcription start site
+strand is 1 (plus strand), otherwise, end is the transcription start site.\cr\cr
+Note that the version of the annotation db must match with the genome used for mapping because the coordinates may differ for different genome releases. For example, if you are using Mus_musculus.v103 for mapping, you'd best also use EnsDb.Mmusculus.v103 for annotation. See Examples for more info.
 }
 \examples{
 
@@ -40,6 +41,25 @@ if (interactive())
   Annotation <- getAnnotation(mart, featureType="TSS")
 }
 
+Below are 3 options to fetch the annotation file.
+Option1: with the AnnotationHub package
+library(AnnotationHub)
+ah <- AnnotationHub()
+EnsDb.Mmusculus <- query(ah, pattern = c("Mus musculus", "EnsDb"))
+EnsDb.Mmusculus
+EnsDb.Mmusculus.v101 <- EnsDb.Mmusculus[[length(EnsDb.Mmusculus)]]
+class(EnsDb.Mmusculus.v101)
+
+Option2: with the getAnnotation() function
+library(ChIPpeakAnno)
+library(biomaRt)
+listMarts()
+mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
+Annotation <- getAnnotation(mart)
+Note that getAnnotation() queries biomart, which is always up-to-date.
+
+Option3: build your own EnsDb package
+This may need extra effort, and the makeEnsembldbPackage is a good starting point.
 }
 \references{
 Durinck S. et al. (2005) BioMart and Bioconductor: a powerful
