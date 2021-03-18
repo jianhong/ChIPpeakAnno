@@ -22,7 +22,11 @@ object}
 
 \item{DNAinteractiveData}{DNA interaction data,
 \link[GenomicRanges:GRanges-class]{GRanges} object with interaction blocks
-informations.}
+informations, \link[InteractionSet:InteractionSet]{GInteractions} object, 
+or BEDPE file which could be imported by 
+\link[trackViewer:importGInteractions]{importGInteractions} or 
+rtracklayer::\link[rtracklayer]{import} or assembly in following list:
+hg38, hg19, mm10, danRer10, danRer11.}
 
 \item{bindingType}{Specifying the criteria to associate peaks with
 annotation. Here is how to use it together with the parameter bindingRegion.
@@ -69,7 +73,7 @@ techniques such as 3C, 5C or HiC.
   annoData <- toGRanges(EnsDb.Hsapiens.v75, feature="gene")
   data("myPeakList")
   findEnhancers(myPeakList[500:1000], annoData, DNAinteractiveData)
-
+  
 }
 \seealso{
 See Also as \code{\link{annotatePeakInBatch}}

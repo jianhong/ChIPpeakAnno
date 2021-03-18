@@ -9,7 +9,11 @@
 #' object
 #' @param DNAinteractiveData DNA interaction data,
 #' \link[GenomicRanges:GRanges-class]{GRanges} object with interaction blocks
-#' informations.
+#' informations, \link[InteractionSet:InteractionSet]{GInteractions} object, 
+#' or BEDPE file which could be imported by 
+#' \link[trackViewer:importGInteractions]{importGInteractions} or 
+#' rtracklayer::\link[rtracklayer]{import} or assembly in following list:
+#' hg38, hg19, mm10, danRer10, danRer11.
 #' @param bindingType Specifying the criteria to associate peaks with
 #' annotation. Here is how to use it together with the parameter bindingRegion.
 #' The annotation will be shift to a new position depend on the DNA interaction
@@ -41,6 +45,8 @@
 #' @export
 #' @import IRanges
 #' @import GenomicRanges
+#' @importFrom InteractionSet GInteractions
+#' @importMethodsFrom S4Vectors first second
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom BiocGenerics start end width strand
 #' @importFrom S4Vectors elementNROWS mcols queryHits subjectHits
@@ -54,7 +60,7 @@
 #'   annoData <- toGRanges(EnsDb.Hsapiens.v75, feature="gene")
 #'   data("myPeakList")
 #'   findEnhancers(myPeakList[500:1000], annoData, DNAinteractiveData)
-#' 
+#'   
 findEnhancers <- function(peaks, annoData, DNAinteractiveData, 
                     bindingType=c("nearestBiDirectionalPromoters",
                                   "startSite", "endSite"), 
@@ -64,11 +70,6 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
     stopifnot(length(intersect(seqlevelsStyle(peaks),
                                seqlevelsStyle(annoData)))>0)
-    stopifnot(inherits(DNAinteractiveData, "GRanges"))
-    stopifnot(length(DNAinteractiveData$blocks)>0)
-    stopifnot(all(elementNROWS(DNAinteractiveData$blocks)==2))
-    stopifnot(length(intersect(seqlevelsStyle(peaks),
-                               seqlevelsStyle(DNAinteractiveData)))>0)
     bindingType <- match.arg(bindingType)
     stopifnot(length(bindingRegion)==2)
     stopifnot(bindingRegion[1]<=0 && bindingRegion[2]>=1)
@@ -79,28 +80,59 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
     
     peaks$peak.oid.to.be.deleted <- 1:length(peaks)
     
-    HiC_FOR <- lapply(DNAinteractiveData$blocks, `[`, 1)
-    HiC_REV <- lapply(DNAinteractiveData$blocks, `[`, 2)
-    HiC_FOR <- unlist(IRangesList(HiC_FOR))
-    HiC_REV <- unlist(IRangesList(HiC_REV))
-    ## BED file blocks are half open half close.
-    HiC_FOR <- shift(HiC_FOR, start(DNAinteractiveData)-1)
-    HiC_REV <- shift(HiC_REV, start(DNAinteractiveData)-1)
-    HiC_FOR_GR <- HiC_REV_GR <- DNAinteractiveData
-    ranges(HiC_FOR_GR) <- HiC_FOR
-    ranges(HiC_REV_GR) <- HiC_REV
-    
-    HiC.A.ups <- shift(HiC_FOR_GR, -max(abs(bindingRegion)))
+    if(inherits(DNAinteractiveData, "GRanges")){
+        stopifnot(length(DNAinteractiveData$blocks)>0)
+        stopifnot(all(elementNROWS(DNAinteractiveData$blocks)==2))
+        stopifnot(length(intersect(seqlevelsStyle(peaks),
+                                   seqlevelsStyle(DNAinteractiveData)))>0)
+        HiC_FIRST <- lapply(DNAinteractiveData$blocks, `[`, 1)
+        HiC_SECOND <- lapply(DNAinteractiveData$blocks, `[`, 2)
+        HiC_FIRST <- unlist(IRangesList(HiC_FIRST))
+        HiC_SECOND <- unlist(IRangesList(HiC_SECOND))
+        ## BED file blocks are half open half close.
+        HiC_FIRST <- shift(HiC_FIRST, start(DNAinteractiveData)-1)
+        HiC_SECOND <- shift(HiC_SECOND, start(DNAinteractiveData)-1)
+        HiC_FIRST_GR <- HiC_SECOND_GR <- DNAinteractiveData
+        ranges(HiC_FIRST_GR) <- HiC_FIRST
+        ranges(HiC_SECOND_GR) <- HiC_SECOND
+    }
+    ## TODO
+    # if(is.character(DNAinteractiveData)){ 
+    #     if(DNAinteractiveData %in% c("hg38", "hg19", "mm10", 
+    #                                  "danRer10", "danRer11")){
+    #         DNAinteractiveData <- 
+    #             readRDS(system.file("extdata", 
+    #                                 paste0(DNAinteractiveData, 
+    #                                        "interactions.rds"),
+    #                                 package = "ChIPpeakAnno",
+    #                                 mustWork = TRUE))
+    #     }else{
+    #         DNAinteractiveData <- toGInteractions(DNAinteractiveData)
+    #     }
+    # }
+    if(inherits(DNAinteractiveData, c("GInteractions", "Pairs"))){
+        HiC_FIRST_GR <- first(DNAinteractiveData)
+        HiC_SECOND_GR <- second(DNAinteractiveData)
+        stopifnot("seqlevels style of peaks and interaction data are different"=
+                      length(intersect(seqlevelsStyle(peaks),
+                                   seqlevelsStyle(HiC_FIRST_GR)))>0)
+        stopifnot("seqlevels style of peaks and interaction data are different"=
+                      length(intersect(seqlevelsStyle(peaks),
+                                       seqlevelsStyle(HiC_SECOND_GR)))>0)
+    }
+    # peaks overlap with interaction region A_B, C_D
+    # in upstream A, A_B, B_C, C_D, downstream D.
+    HiC.A.ups <- shift(HiC_FIRST_GR, -max(abs(bindingRegion)))
     width(HiC.A.ups) <- max(abs(bindingRegion))
-    HiC.D.dws <- shift(HiC_REV_GR, max(abs(bindingRegion)))
-    start(HiC.D.dws) <- end(HiC_REV_GR) + 1
-    HiC.BC <- HiC_REV_GR
-    start(HiC.BC) <- end(HiC_FOR_GR) + 1
-    end(HiC.BC) <- start(HiC_REV_GR) - 1
+    HiC.D.dws <- shift(HiC_SECOND_GR, max(abs(bindingRegion)))
+    start(HiC.D.dws) <- end(HiC_SECOND_GR) + 1
+    HiC.BC <- HiC_SECOND_GR
+    start(HiC.BC) <- end(HiC_FIRST_GR) + 1
+    end(HiC.BC) <- start(HiC_SECOND_GR) - 1
     HiC.groups <- list(A.ups=HiC.A.ups,
-                       AB=HiC_FOR_GR,
+                       AB=HiC_FIRST_GR,
                        BC=HiC.BC,
-                       CD=HiC_REV_GR,
+                       CD=HiC_SECOND_GR,
                        D.dws=HiC.D.dws)
     peaks.ol.HiCdata <- lapply(HiC.groups, function(hic){
         ol <- findOverlaps(peaks, hic)
@@ -108,7 +140,7 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
         this.peaks$HiC.idx <- subjectHits(ol)
         this.peaks
     })
-    if(all(elementNROWS(peaks.ol.HiCdata)==0)){
+    if(all(elementNROWS(peaks.ol.HiCdata)==0)){## not in interaction region
         return(GRanges())
     }
     ## refine annoData by HiCdata
@@ -129,12 +161,12 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
                        promoters(tmp, upstream=0, downstream=1)
                    },
                    stop("Not supported binding type", bindingType))
-        HiC_FOR_GR.anno <- HiC_FOR_GR[subjectHits(ol)]
-        HiC_REV_GR.anno <- HiC_REV_GR[subjectHits(ol)]
-        annoData.ol.HiC$point_A <- start(HiC_FOR_GR.anno)
-        annoData.ol.HiC$point_B <- end(HiC_FOR_GR.anno)
-        annoData.ol.HiC$point_C <- start(HiC_REV_GR.anno)
-        annoData.ol.HiC$point_D <- end(HiC_REV_GR.anno)
+        HiC_FIRST_GR.anno <- HiC_FIRST_GR[subjectHits(ol)]
+        HiC_SECOND_GR.anno <- HiC_SECOND_GR[subjectHits(ol)]
+        annoData.ol.HiC$point_A <- start(HiC_FIRST_GR.anno)
+        annoData.ol.HiC$point_B <- end(HiC_FIRST_GR.anno)
+        annoData.ol.HiC$point_C <- start(HiC_SECOND_GR.anno)
+        annoData.ol.HiC$point_D <- end(HiC_SECOND_GR.anno)
         annoData.ol.HiC$point_X <- start(annoData.ol.HiC.pos)
         annoData.ol.HiC$HiC.idx <- subjectHits(ol)
         annoData.ol.HiC
@@ -184,7 +216,7 @@ findEnhancers <- function(peaks, annoData, DNAinteractiveData,
         }, simplify = FALSE)
     }
     
-    for(i in 1:length(anno.ol.HiCdata)){
+    for(i in seq_along(anno.ol.HiCdata)){
         this.name <- names(anno.ol.HiCdata)[i]
         this.data <- anno.ol.HiCdata[[i]]
         this.data <- this.data[this.data$HiC.idx %in% HiC.idx]

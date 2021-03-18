@@ -70,6 +70,12 @@ makeVennDiagram(ol, fill=c("#009E73", "#F0E442"), # circle fill color
 
 Annotation data should be an object of GRanges. Same as import peaks, we use the method `toGRanges`, which can return an object of GRanges, to represent the annotation data. An annotation data be constructed from not only BED, GFF or user defined readable text files, but also EnsDb or TxDb object,  by calling the `toGRanges` method. Please type ?`toGRanges` for more information.
 
+Note that the version of the annotation data must match with the genome used
+for mapping because the coordinates may differ for different genome releases.
+For example, if you are using Mus_musculus.v103 for mapping, 
+you'd best also use EnsDb.Mmusculus.v103 for annotation. 
+For more information about how to prepare the annotation data, 
+please refer ?getAnnotation.
 
 ```{r annoData}
 library(EnsDb.Hsapiens.v75) ##(hg19)

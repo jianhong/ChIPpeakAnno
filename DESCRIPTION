@@ -3,7 +3,7 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.25.1
+Version: 3.25.2
 Encoding: UTF-8
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Kai Hu, Haibo Liu, 
     Hervé Pagès, Claude Gazin,
@@ -36,6 +36,7 @@ Imports:
     graph,
     graphics,
     grid,
+    InteractionSet,
     KEGGREST,
     matrixStats,
     multtest,
@@ -44,6 +45,7 @@ Imports:
     stats,
     utils
 Suggests:
+    AnnotationHub,
     BSgenome,
     limma,
     reactome.db,

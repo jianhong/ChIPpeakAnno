@@ -69,7 +69,7 @@ preparePool <- function(TxDb, template, bindingDistribution,
     diff <- bindingDistribution$halfBinSize
     N <- bindingDistribution$counts
     
-    if(!is.na(seqn)) tx <- tx[as.character(seqnames(tx)) %in% seqn]
+    if(!is.na(seqn[1])) tx <- tx[as.character(seqnames(tx)) %in% seqn]
     
     grs <- lapply(offset, function(.off){
         x <- NULL

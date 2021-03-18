@@ -1,6 +1,6 @@
 #' @importFrom stats rexp
 randPeaks <- function(A, grs, N, ...){
-    len <- sapply(grs, length)
+    len <- lengths(grs)
     if(any(len<1)){
         stop("All length of grs must be greater than 0")
     }

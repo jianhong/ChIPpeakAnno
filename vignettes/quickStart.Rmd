@@ -30,9 +30,16 @@ The purpose of this quick start is to introduce the four newly implemented funct
 1 Read peak data with `toGRanges`
 2 Generate annotation data with `toGRanges`
 3 Annotate peaks with `annotatePeakInBatch`
-4 Add additional informations with `addGeneIDs`
+4 Add additional information with `addGeneIDs`
 
 Most of time user can use the default settings of the arguments of those functions. This makes the annotation pipeline straightforward and easy to use.
+
+Note that the version of the annotation data must match with the genome used
+for mapping because the coordinates may differ for different genome releases.
+For example, if you are using Mus_musculus.v103 for mapping, 
+you'd best also use EnsDb.Mmusculus.v103 for annotation. 
+For more information about how to prepare the annotation data, 
+please refer ?getAnnotation.
 
 # Use case 1: Four steps to annotate peak data with **EnsDb**
 ## Step 1: Convert the peak data to `GRanges` with `toGRanges`
