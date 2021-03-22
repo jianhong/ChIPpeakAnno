@@ -25,7 +25,7 @@ object}
 informations, \link[InteractionSet:InteractionSet]{GInteractions} object, 
 or BEDPE file which could be imported by 
 \link[trackViewer:importGInteractions]{importGInteractions} or 
-rtracklayer::\link[rtracklayer]{import} or assembly in following list:
+rtracklayer::\link[BiocIO:export]{import} or assembly in following list:
 hg38, hg19, mm10, danRer10, danRer11.}
 
 \item{bindingType}{Specifying the criteria to associate peaks with
