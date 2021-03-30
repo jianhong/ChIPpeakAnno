@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.24.2
+-------------------------
+
+    o add choice endMinusStart for PeakLocForDistance for annotatePeakInBatch
+    
 CHANGES IN VERSION 3.24.1
 -------------------------
 

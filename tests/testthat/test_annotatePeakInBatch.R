@@ -272,6 +272,67 @@ test_that("annotatePeakInBatch works not correct", {
     expect_equal(length(annotation), 2)
     expect_equal(length(annotation1), 3)
     
+    ## examples from Julie
+    test.GR = GRanges(seqnames = 4, IRanges(start = 100,
+                                            end = 1000, 
+                                            name = "peak1"))
+    
+    testAnno.GR <- GRanges(seqnames = c(4, 4, 4),
+                           IRanges(start=c(400, 1005, 80),
+                                   end = c(450, 1010, 90 ),
+                                   names = c("Plus", "Minus1", "Minus2")),
+                           strand=c("+", "-", "-"))
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "start")
+    expect_equal(test.anno$feature, "Minus2")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "end")
+    expect_equal(test.anno$feature, "Minus1")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "middle")
+    expect_equal(test.anno$feature, "Plus")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "endMinusStart")
+    expect_equal(test.anno$feature, "Minus2")
+    
+    test.GR = GRanges(seqnames = 4,
+                      IRanges(start = 300, end = 600,
+                              name = "peak1"))
+    
+    testAnno.GR <- GRanges(seqnames = c(4, 4, 4),
+                           IRanges(start=c(265, 200, 80),
+                                   end = c(270, 700, 260 ),
+                                   names = c("Plus", "Minus1", "Minus2")),
+                           strand=c("+", "-", "-"))
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "start")
+    expect_equal(test.anno$feature, "Plus")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "end")
+    expect_equal(test.anno$feature, "Minus1")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "middle")
+    expect_equal(test.anno$feature, "Plus")
+    
+    test.anno <- annotatePeakInBatch(test.GR,
+                                     AnnotationData = testAnno.GR,
+                                     PeakLocForDistance = "endMinusStart")
+    expect_equal(test.anno$feature, "Minus2")
+    
     #check distance is correct. real data
     testPeaks <- GRanges("chr6", 
                          IRanges(c(114643757, 114644908, 114706674, 114790153, 
@@ -414,8 +475,60 @@ test_that("annotatePeakInBatch works not correct", {
                                       AnnotationData=exons, 
                                       output="inside")
     expect_equal(exons.anno$peak, exons.anno$feature)
-    exons.anno <- annotatePeakInBatch(exons, 
+    ##### test 1
+    # exons.anno <- annotatePeakInBatch(exons,
+    #                                   AnnotationData=exons,
+    #                                   ignore.strand = FALSE,
+    #                                   output="nearestLocation")
+    # expect_equal(exons.anno$peak, exons.anno$feature)
+    exons.anno <- annotatePeakInBatch(exons,
+                                      AnnotationData=exons,
+                                      PeakLocForDistance = "start", 
+                                      FeatureLocForDistance = "start",
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    exons.anno <- annotatePeakInBatch(exons,
+                                      AnnotationData=exons,
+                                      PeakLocForDistance = "start", 
+                                      FeatureLocForDistance = "start",
+                                      ignore.strand = FALSE,
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    #### test 2
+    exons.anno <- annotatePeakInBatch(exons,
+                                      AnnotationData=exons,
+                                      ignore.strand = FALSE, 
+                                      PeakLocForDistance = "end",
+                                      FeatureLocForDistance = "end",
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    #### test 3
+    exons.anno <- annotatePeakInBatch(exons,
+                                      AnnotationData=exons,
+                                      ignore.strand = FALSE, 
+                                      PeakLocForDistance = "middle",
+                                      FeatureLocForDistance = "middle",
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    #### test 4
+    exons.anno <- annotatePeakInBatch(exons,
                                       AnnotationData=exons, 
+                                      PeakLocForDistance="endMinusStart",
+                                      FeatureLocForDistance="geneEnd",
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    ######## test 5
+    exons.anno <- annotatePeakInBatch(exons[strand(exons) =="-"],
+                                      AnnotationData=exons[strand(exons) == "-"],
+                                      PeakLocForDistance="endMinusStart",
+                                      FeatureLocForDistance="geneEnd",
+                                      output="nearestLocation")
+    expect_equal(exons.anno$peak, exons.anno$feature)
+    ######## test 6
+    exons.anno <- annotatePeakInBatch(exons[strand(exons) =="+"],
+                                      AnnotationData=exons[strand(exons) == "+"],
+                                      PeakLocForDistance="endMinusStart",
+                                      FeatureLocForDistance="geneEnd",
                                       output="nearestLocation")
     expect_equal(exons.anno$peak, exons.anno$feature)
     threeUTRs.anno <- annotatePeakInBatch(threeUTRs, 
