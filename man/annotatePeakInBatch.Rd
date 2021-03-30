@@ -15,7 +15,7 @@ annotatePeakInBatch(
     "upstreamORdownstream", "nearestBiDirectionalPromoters"),
   multiple = c(TRUE, FALSE),
   maxgap = -1L,
-  PeakLocForDistance = c("start", "middle", "end"),
+  PeakLocForDistance = c("start", "middle", "end", "endMinusStart"),
   FeatureLocForDistance = c("TSS", "middle", "start", "end", "geneEnd"),
   select = c("all", "first", "last", "arbitrary"),
   ignore.strand = TRUE,
@@ -75,7 +75,10 @@ considered to be -1.}
 \item{PeakLocForDistance}{Specify the location of peak for calculating
 distance,i.e., middle means using middle of the peak to calculate distance
 to feature, start means using start of the peak to calculate the distance to
-feature. To be compatible with previous version, by default using start}
+feature, endMinusStart means using the end of the peak to calculate the distance
+to features on plus strand and the start of the peak to calculate the distance
+to features on minus strand. To be compatible with previous version, 
+by default using start}
 
 \item{FeatureLocForDistance}{Specify the location of feature for calculating
 distance,i.e., middle means using middle of the feature to calculate
@@ -91,7 +94,9 @@ return the first overlapping peak, "last" will return the last overlapping
 peak and "arbitrary" will return one of the overlapping peaks.}
 
 \item{ignore.strand}{When set to TRUE, the strand information is ignored in
-the annotation.}
+the annotation. Unless you have stranded peaks and you are interested in 
+annotating peaks to the features in the same strand only, you should just 
+use the default setting ignore.strand = TRUE.}
 
 \item{bindingRegion}{Annotation range used for \link{annoPeaks}, which is a
 vector with two integer values, default to c (-5000, 5000). The first one
@@ -146,7 +151,6 @@ locations leveraging IRanges and biomaRt package
 \examples{
 
 
-#if (interactive()){
     ## example 1: annotate myPeakList by TxDb or EnsDb.
     data(myPeakList)
     library(ensembldb)
@@ -196,7 +200,113 @@ locations leveraging IRanges and biomaRt package
                            name=c("peak1", "peak2"))
     test.GR = toGRanges(test.bed)
     annotatePeakInBatch(test.GR, AnnotationData = literature)
-#}
+ 
+ library(testthat)
+  peak <- GRanges(seqnames = "chr1", 
+                  IRanges(start = 24736757, end=24737528,
+                          names = "testPeak"))
+  data(TSS.human.GRCh37)
+  TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001461"]
+  # GRanges object with 1 range and 1 metadata column:
+  # seqnames            ranges strand |            description
+  #<Rle>         <IRanges>  <Rle> |            <character>
+  # ENSG00000001461        1 24742285-24799466      + | NIPA-like domain con..
+  peak
+  #GRanges object with 1 range and 0 metadata columns:
+  #   seqnames            ranges strand
+  #<Rle>         <IRanges>  <Rle>
+  #  testPeak     chr1 24736757-24737528      *
+  TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001460"]
+  #GRanges object with 1 range and 1 metadata column:
+  #   seqnames            ranges strand |            description
+  #<Rle>         <IRanges>  <Rle> |            <character>
+  #   ENSG00000001460        1 24683490-24743424      - | UPF0490 protein C1or..
+  ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37, 
+                            PeakLocForDistance = "start")
+  stopifnot(ap$feature=="ENSG00000001461")
+  ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+                            PeakLocForDistance = "end")
+  stopifnot(ap$feature=="ENSG00000001461")
+  ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+                            PeakLocForDistance = "middle")
+  stopifnot(ap$feature=="ENSG00000001461")
+  ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+                            PeakLocForDistance = "endMinusStart")
+  stopifnot(ap$feature=="ENSG00000001461")
+  ## Let's calculate the distances between the peak and the TSS of the genes
+  ## in the annotation file used for annotating the peaks.
+  ## Please note that we need to compute the distance using the annotation
+  ## file TSS.human.GRCh37.
+  ## If you would like to use  TxDb.Hsapiens.UCSC.hg19.knownGene, 
+  ## then you will need to annotate the peaks
+  ## using TxDb.Hsapiens.UCSC.hg19.knownGene as well.
+  ### using start
+  start(peak) -start(TSS.human.GRCh37[names(TSS.human.GRCh37)== 
+                                      "ENSG00000001461"]) #picked
+  #[1] -5528
+  start(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+                                   "ENSG00000001460"])
+  #[1] -6667
+  #### using middle
+  (start(peak) + end(peak))/2 -
+      start(TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001461"])
+  #[1] -5142.5
+  (start(peak) + end(peak))/2 -
+      end(TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001460"])
+  # [1] 49480566
+  end(peak) -start(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+                                   "ENSG00000001461"]) #picked
+  # [1] -4757
+  end(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+                                 "ENSG00000001460"])
+  # [1] -5896
+  #### using endMinusStart
+  end(peak) - start(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+                                    "ENSG00000001461"]) ## picked
+  # [1] -4575
+  start(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+                                    "ENSG00000001460"])
+  #[1] -6667
+  ###### using txdb object to annotate the peaks
+  library(org.Hs.eg.db)
+  select(org.Hs.eg.db, key="STPG1", keytype="SYMBOL",
+         columns=c("ENSEMBL", "ENTREZID", "SYMBOL"))
+  #  SYMBOL         ENSEMBL ENTREZID
+  #  STPG1 ENSG00000001460    90529
+  select(org.Hs.eg.db, key= "ENSG00000001461", keytype="ENSEMBL",
+         columns=c("ENSEMBL", "ENTREZID", "SYMBOL"))
+  #ENSEMBL ENTREZID SYMBOL
+  # ENSG00000001461    57185 NIPAL3
+  require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  txdb.ann <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  STPG1 <- select(org.Hs.eg.db, key="STPG1", keytype="SYMBOL",
+                  columns=c( "SYMBOL", "ENSEMBL", "ENTREZID"))[1,3]
+  NIPAL3 <- select(org.Hs.eg.db, key="NIPAL3", keytype="SYMBOL",
+                   columns=c( "SYMBOL", "ENSEMBL", "ENTREZID"))[1,3]
+  ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+                            PeakLocForDistance = "start")
+  expect_equal(ap$feature, STPG1)
+  ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+                            PeakLocForDistance = "end")
+  expect_equal(ap$feature, STPG1)
+  ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+                            PeakLocForDistance = "middle")
+  expect_equal(ap$feature, STPG1)
+  ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+                            PeakLocForDistance = "endMinusStart")
+  expect_equal(ap$feature, NIPAL3)
+  txdb.ann[NIPAL3]
+  txdb.ann[txdb.ann$gene_id == NIPAL3]
+  #  GRanges object with 1 range and 1 metadata column:
+  #    seqnames            ranges strand |     gene_id
+  #  <Rle>         <IRanges>  <Rle> | <character>
+  #   57185     chr1 24742245-24799473      + |       57185
+  #-------
+  txdb.ann[txdb.ann$gene_id == STPG1]
+  #   GRanges object with 1 range and 1 metadata column:
+  #     seqnames            ranges strand |     gene_id
+  #  <Rle>         <IRanges>  <Rle> | <character>
+  #     90529     chr1 24683489-24741587      - |       90529
 
 }
 \references{

@@ -49,7 +49,10 @@
 #' @param PeakLocForDistance Specify the location of peak for calculating
 #' distance,i.e., middle means using middle of the peak to calculate distance
 #' to feature, start means using start of the peak to calculate the distance to
-#' feature. To be compatible with previous version, by default using start
+#' feature, endMinusStart means using the end of the peak to calculate the distance
+#' to features on plus strand and the start of the peak to calculate the distance
+#' to features on minus strand. To be compatible with previous version, 
+#' by default using start
 #' @param FeatureLocForDistance Specify the location of feature for calculating
 #' distance,i.e., middle means using middle of the feature to calculate
 #' distance of peak to feature, start means using start of the feature to
@@ -62,7 +65,9 @@
 #' return the first overlapping peak, "last" will return the last overlapping
 #' peak and "arbitrary" will return one of the overlapping peaks.
 #' @param ignore.strand When set to TRUE, the strand information is ignored in
-#' the annotation.
+#' the annotation. Unless you have stranded peaks and you are interested in 
+#' annotating peaks to the features in the same strand only, you should just 
+#' use the default setting ignore.strand = TRUE.
 #' @param bindingRegion Annotation range used for \link{annoPeaks}, which is a
 #' vector with two integer values, default to c (-5000, 5000). The first one
 #' must be no bigger than 0. And the sec ond one must be no less than 1. Once
@@ -123,10 +128,10 @@
 #' @importFrom GenomeInfoDb seqlevels
 #' @importFrom BiocGenerics start end width strand
 #' @importFrom S4Vectors mcols
+#' @importFrom dplyr %>% filter group_by top_n
 #' @examples
 #' 
 #' 
-#' #if (interactive()){
 #'     ## example 1: annotate myPeakList by TxDb or EnsDb.
 #'     data(myPeakList)
 #'     library(ensembldb)
@@ -176,7 +181,113 @@
 #'                            name=c("peak1", "peak2"))
 #'     test.GR = toGRanges(test.bed)
 #'     annotatePeakInBatch(test.GR, AnnotationData = literature)
-#' #}
+#'  
+#'  library(testthat)
+#'   peak <- GRanges(seqnames = "chr1", 
+#'                   IRanges(start = 24736757, end=24737528,
+#'                           names = "testPeak"))
+#'   data(TSS.human.GRCh37)
+#'   TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001461"]
+#'   # GRanges object with 1 range and 1 metadata column:
+#'   # seqnames            ranges strand |            description
+#'   #<Rle>         <IRanges>  <Rle> |            <character>
+#'   # ENSG00000001461        1 24742285-24799466      + | NIPA-like domain con..
+#'   peak
+#'   #GRanges object with 1 range and 0 metadata columns:
+#'   #   seqnames            ranges strand
+#'   #<Rle>         <IRanges>  <Rle>
+#'   #  testPeak     chr1 24736757-24737528      *
+#'   TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001460"]
+#'   #GRanges object with 1 range and 1 metadata column:
+#'   #   seqnames            ranges strand |            description
+#'   #<Rle>         <IRanges>  <Rle> |            <character>
+#'   #   ENSG00000001460        1 24683490-24743424      - | UPF0490 protein C1or..
+#'   ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37, 
+#'                             PeakLocForDistance = "start")
+#'   stopifnot(ap$feature=="ENSG00000001461")
+#'   ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+#'                             PeakLocForDistance = "end")
+#'   stopifnot(ap$feature=="ENSG00000001461")
+#'   ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+#'                             PeakLocForDistance = "middle")
+#'   stopifnot(ap$feature=="ENSG00000001461")
+#'   ap <- annotatePeakInBatch(peak, Annotation=TSS.human.GRCh37,
+#'                             PeakLocForDistance = "endMinusStart")
+#'   stopifnot(ap$feature=="ENSG00000001461")
+#'   ## Let's calculate the distances between the peak and the TSS of the genes
+#'   ## in the annotation file used for annotating the peaks.
+#'   ## Please note that we need to compute the distance using the annotation
+#'   ## file TSS.human.GRCh37.
+#'   ## If you would like to use  TxDb.Hsapiens.UCSC.hg19.knownGene, 
+#'   ## then you will need to annotate the peaks
+#'   ## using TxDb.Hsapiens.UCSC.hg19.knownGene as well.
+#'   ### using start
+#'   start(peak) -start(TSS.human.GRCh37[names(TSS.human.GRCh37)== 
+#'                                       "ENSG00000001461"]) #picked
+#'   #[1] -5528
+#'   start(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+#'                                    "ENSG00000001460"])
+#'   #[1] -6667
+#'   #### using middle
+#'   (start(peak) + end(peak))/2 -
+#'       start(TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001461"])
+#'   #[1] -5142.5
+#'   (start(peak) + end(peak))/2 -
+#'       end(TSS.human.GRCh37[names(TSS.human.GRCh37)== "ENSG00000001460"])
+#'   # [1] 49480566
+#'   end(peak) -start(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+#'                                    "ENSG00000001461"]) #picked
+#'   # [1] -4757
+#'   end(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+#'                                  "ENSG00000001460"])
+#'   # [1] -5896
+#'   #### using endMinusStart
+#'   end(peak) - start(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+#'                                     "ENSG00000001461"]) ## picked
+#'   # [1] -4575
+#'   start(peak) -end(TSS.human.GRCh37[names(TSS.human.GRCh37)==
+#'                                     "ENSG00000001460"])
+#'   #[1] -6667
+#'   ###### using txdb object to annotate the peaks
+#'   library(org.Hs.eg.db)
+#'   select(org.Hs.eg.db, key="STPG1", keytype="SYMBOL",
+#'          columns=c("ENSEMBL", "ENTREZID", "SYMBOL"))
+#'   #  SYMBOL         ENSEMBL ENTREZID
+#'   #  STPG1 ENSG00000001460    90529
+#'   select(org.Hs.eg.db, key= "ENSG00000001461", keytype="ENSEMBL",
+#'          columns=c("ENSEMBL", "ENTREZID", "SYMBOL"))
+#'   #ENSEMBL ENTREZID SYMBOL
+#'   # ENSG00000001461    57185 NIPAL3
+#'   require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+#'   txdb.ann <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+#'   STPG1 <- select(org.Hs.eg.db, key="STPG1", keytype="SYMBOL",
+#'                   columns=c( "SYMBOL", "ENSEMBL", "ENTREZID"))[1,3]
+#'   NIPAL3 <- select(org.Hs.eg.db, key="NIPAL3", keytype="SYMBOL",
+#'                    columns=c( "SYMBOL", "ENSEMBL", "ENTREZID"))[1,3]
+#'   ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+#'                             PeakLocForDistance = "start")
+#'   expect_equal(ap$feature, STPG1)
+#'   ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+#'                             PeakLocForDistance = "end")
+#'   expect_equal(ap$feature, STPG1)
+#'   ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+#'                             PeakLocForDistance = "middle")
+#'   expect_equal(ap$feature, STPG1)
+#'   ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
+#'                             PeakLocForDistance = "endMinusStart")
+#'   expect_equal(ap$feature, NIPAL3)
+#'   txdb.ann[NIPAL3]
+#'   txdb.ann[txdb.ann$gene_id == NIPAL3]
+#'   #  GRanges object with 1 range and 1 metadata column:
+#'   #    seqnames            ranges strand |     gene_id
+#'   #  <Rle>         <IRanges>  <Rle> | <character>
+#'   #   57185     chr1 24742245-24799473      + |       57185
+#'   #-------
+#'   txdb.ann[txdb.ann$gene_id == STPG1]
+#'   #   GRanges object with 1 range and 1 metadata column:
+#'   #     seqnames            ranges strand |     gene_id
+#'   #  <Rle>         <IRanges>  <Rle> | <character>
+#'   #     90529     chr1 24683489-24741587      - |       90529
 #' 
 annotatePeakInBatch <-
     function (myPeakList, mart, featureType = c("TSS", "miRNA", "Exon"),
@@ -188,7 +299,7 @@ annotatePeakInBatch <-
                          "upstreamORdownstream", 
                          "nearestBiDirectionalPromoters"),
               multiple = c(TRUE,FALSE), maxgap = -1L,
-              PeakLocForDistance=c("start","middle","end"),
+              PeakLocForDistance=c("start","middle","end", "endMinusStart"),
               FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd"),
               select=c("all", "first", "last", "arbitrary"),
               ignore.strand=TRUE, bindingRegion=NULL, ...)
@@ -200,27 +311,115 @@ annotatePeakInBatch <-
         output = match.arg(output)
         select = match.arg(select)
         multiple = multiple[1]
-        
-        if ((output == "overlapping" || output == "both")
+        if (PeakLocForDistance == "endMinusStart")
+        {
+            if (missing(AnnotationData) || length(AnnotationData) == 0)
+             {
+              if (missing(mart)) {
+                stop("Error in querying biomart database.
+                     No valid mart object is passed in!
+                     Suggest call getAnnotation before calling
+                     annotatePeakInBatch")
+              }
+              else if(!is(mart, "Mart")){
+                if(is(mart, "GRanges")){
+                    warning("AnnotationData is missing, and a GRanges is passed
+                            to mart parameter. Trying to annotate peaks by
+                            the GRanges you input.")
+                    AnnotationData <- mart
+                    mart <- NULL
+                } else {
+                    stop("Error in querying biomart database.
+                     No valid mart object is passed in!
+                     Suggest call getAnnotation before calling
+                     annotatePeakInBatch")
+                }
+            }
+            else {
+                AnnotationData <- getAnnotation(mart, featureType = featureType)
+            }
+          } 
+          if (!length(names(AnnotationData)) || any(is.na(names(AnnotationData))))
+          {
+             names(AnnotationData) <- paste0("ann", seq_along(AnnotationData))
+          }
+          plusAnno = AnnotationData[strand(AnnotationData) == "+"]
+          minusAnno = AnnotationData[strand(AnnotationData) == "-"]
+          if (length(plusAnno) > 0) 
+             r.plus <- annotatePeakInBatch(myPeakList, 
+                    AnnotationData =  plusAnno,
+                    featureType = featureType,
+                    PeakLocForDistance = "end",
+                    output = output,
+                    multiple = multiple,
+                    select = select,
+                    maxgap = maxgap,
+                    FeatureLocForDistance = FeatureLocForDistance,
+                    ignore.strand = TRUE,
+                    bindingRegion = bindingRegion, ...)
+          if (length(minusAnno) > 0)  
+              r.minus <- annotatePeakInBatch(myPeakList, 
+                    AnnotationData =  minusAnno,
+                    featureType = featureType,
+                    PeakLocForDistance = "start",
+                    output = output,
+                    multiple = multiple,
+                    select = select,
+                    maxgap = maxgap,
+                    FeatureLocForDistance = FeatureLocForDistance,
+                    ignore.strand = TRUE,
+                    bindingRegion = bindingRegion, ...)
+         if (length(plusAnno) > 0 & length(minusAnno) == 0) {
+             return(r.plus)
+         }
+         else if (length(plusAnno) == 0 & length(minusAnno) > 0) {
+	     return(r.minus)
+         }
+         else if (length(plusAnno) > 0 & length(minusAnno) > 0) {
+             r.both  <- c(r.plus, r.minus) 
+             r.both <- r.both[!is.na(r.both$fromOverlappingOrNearest)]
+             r.both.df <- cbind(uid = names(r.both), as.data.frame(r.both))
+             r.both.df %>%
+                filter(fromOverlappingOrNearest == "NearestLocation") %>%        
+    		group_by(peak) %>%
+                top_n(-1, abs(distancetoFeature)) -> r.n.df
+	     if (nrow(r.n.df) == 0)
+		return(r.both)
+             else if (length(r.both[r.both$fromOverlappingOrNearest != "NearestLocation"]) == 0)
+		return(r.both[names(r.both) %in% r.n.df$uid & !is.na(r.both$feature)]) 
+             else
+         	return(r.both[(names(r.both) %in% r.n.df$uid |
+		    r.both$fromOverlappingOrNearest != "NearestLocation") & !is.na(r.both$feature)])
+          }
+       } ### end of if endMinusStart
+       if(output[1]=="nearestStart") output <- "nearestLocation"
+           featureType = match.arg(featureType)
+           PeakLocForDistance = match.arg(PeakLocForDistance)
+           FeatureLocForDistance = match.arg(FeatureLocForDistance)
+           output = match.arg(output)
+           select = match.arg(select)
+           multiple = multiple[1]
+
+      if ((output == "overlapping" || output == "both")
             && select =="all" && multiple==FALSE) {
             warning("Please use select instead of multiple!")
             select = "first"
-        }
-        if(output=="upstream&inside"){
+      }
+      if(output=="upstream&inside"){
             if(FeatureLocForDistance!="TSS") {
                 FeatureLocForDistance <- "TSS"
                 warning("FeatureLocForDistance is set to TSS")
             }
             select <- "all"
         }
-        if(output=="inside&downstream"){
+      if(output=="inside&downstream"){
             if(FeatureLocForDistance!="geneEnd"){
                 FeatureLocForDistance <- "geneEnd"
                 warning("FeatureLocForDistance is set to geneEnd")
             }
             select <- "all"
-        }
-        if (missing(myPeakList)) stop("Missing required argument myPeakList!")
+      }
+      if (missing(myPeakList)) stop("Missing required argument myPeakList!")
         if (!is(myPeakList, "GRanges")) {
             stop("No valid myPeakList passed in. It needs to be GRanges object")
         }
@@ -252,22 +451,26 @@ annotatePeakInBatch <-
                         Better way would be calling getAnnotation before 
                         calling annotatePeakInBatch")
             }
-        }
-        if (!inherits(AnnotationData, 
+       }
+      if (!inherits(AnnotationData, 
                       c("GRanges", "annoGR"))) {
             stop("AnnotationData needs to be GRanges or annoGR object")
-        }
-        if(inherits(AnnotationData, "annoGR")){
+       }
+       if (!length(names(AnnotationData)) || any(is.na(names(AnnotationData))))
+       {
+             names(AnnotationData) <- paste0("ann", seq_along(AnnotationData))
+       }
+       if(inherits(AnnotationData, "annoGR")){
             TSS.ordered <- as(AnnotationData, "GRanges")
-        }else{
+       }else{
             TSS.ordered <- AnnotationData
-        }
+       }
         nAnno <- length(TSS.ordered)
         
         rm(AnnotationData)
         rm(nAnno)
         
-        if(length(bindingRegion)>1){
+      if(length(bindingRegion)>1){
             message("Annotate peaks by annoPeaks, see ?annoPeaks for details.")
             ## FeatureLocForDistance=c("TSS","middle","start","end", "geneEnd")
             ##"startSite", "endSite", "fullRange"
@@ -299,25 +502,25 @@ annotatePeakInBatch <-
             }else{
                 message("bindingRegion will be ignored.")
             }
-        }
+      }
         
-        if (is.null(names(TSS.ordered))){
-            names(TSS.ordered) <- formatC(1:length(TSS.ordered),
+      if (is.null(names(TSS.ordered))){
+            names(TSS.ordered) <- formatC(seq_along(TSS.ordered),
                                           width=nchar(length(TSS.ordered)),
                                           flag="0")
         }
-        if (is.null(names(myPeakList))) {
-            names(myPeakList) <- formatC(1:length(myPeakList),
+      if (is.null(names(myPeakList))) {
+            names(myPeakList) <- formatC(seq_along(myPeakList),
                                          width = nchar(length(myPeakList)),
                                          flag = "0")
         }
-        if(any(duplicated(names(myPeakList)))){
+      if(any(duplicated(names(myPeakList)))){
             warning("Found duplicated names in myPeakList. 
                     Changing the peak names ...")
-            names(myPeakList) <- formatC(1:length(myPeakList),
+            names(myPeakList) <- formatC(seq_along(myPeakList),
                                          width = nchar(length(myPeakList)),
                                          flag = "0")
-        }
+       }
         savedNames <- names(myPeakList)
         
         ##clear seqnames, the format should be chr+NUM
@@ -325,15 +528,15 @@ annotatePeakInBatch <-
         ## fix by seqlevelsStyle
         TSS.ordered <- formatSeqnames(TSS.ordered, myPeakList)
         #myPeakList <- formatSeqnames(myPeakList)
-        if(!all(seqlevels(myPeakList) %in% seqlevels(TSS.ordered))){
+      if(!all(seqlevels(myPeakList) %in% seqlevels(TSS.ordered))){
             warning("not all the seqnames of myPeakList is 
                     in the AnnotationData.")
-        }
+      }
         
-        if(length(myPeakList)>10000){
+      if(length(myPeakList)>10000){
             ##huge dataset
             myPeakList <- split(myPeakList, 
-                                cut(1:length(myPeakList),
+                                cut(seq_along(myPeakList),
                                     ceiling(length(myPeakList)/5000)))
             myPeakList <- lapply(myPeakList, annotatePeakInBatch, 
                                  AnnotationData=TSS.ordered, 
@@ -348,13 +551,13 @@ annotatePeakInBatch <-
                                                   myPeakList$feature))
             ##myPeakList
             return(myPeakList)
-        }
+      }
         ###STEP1 get nearst annotation for each peak, 
         ###use distanceToNearest(query, subject, ignore.strand=T/F, select)
         ## the distance got here is the shortestDistance
         ## select could only be arbitrary or all, 
         ## if it is "first" or "last", use "all" instead.
-        ## if output=="nearest", annotation should only consider the the start point
+        ## if output=="nearest", annotation should only consider the start point
         ##         ignore.strand <- all(strand(myPeakList)=="*") || 
         ##             all(strand(TSS.ordered)=="*") || 
         ##             all(strand(myPeakList)=="+")
@@ -376,7 +579,14 @@ annotatePeakInBatch <-
                    end=end(featureGR) 
             )
         myPeaksGR <- myPeakList
-        
+        end(myPeaksGR) <-
+            start(myPeaksGR) <-
+            switch(PeakLocForDistance,
+                   middle=round(rowMeans(cbind(start(myPeaksGR),
+                                               end(myPeaksGR)))),
+                   start=start(myPeaksGR),
+                   end=end(myPeaksGR)
+            )
         if(output=="nearestLocation"){
             dist <- as.data.frame(nearest(myPeaksGR, featureGR, 
                                           ignore.strand=ignore.strand, 
@@ -657,7 +867,7 @@ annotatePeakInBatch <-
         ##remove column oid
         myPeakList$oid <- NULL
         ##re-order myPeakList as the original order
-        oid <- 1:length(savedNames)
+        oid <- seq_along(savedNames)
         names(oid) <- savedNames
         oid <- oid[names(myPeakList)]
         if(!any(is.na(oid))){
@@ -670,7 +880,7 @@ annotatePeakInBatch <-
             removeDuplicates <- function(gr){
                 dup <- duplicated(gr$peak)
                 if(any(dup)){
-                    gr$oid <- 1:length(gr)
+                    gr$oid <- seq_along(gr)
                     dup <- gr[dup]
                     gr.dup <- gr[gr$peak %in% dup$peak] 
                     ## bugs peak name must be different.
@@ -697,3 +907,5 @@ annotatePeakInBatch <-
         ##myPeakList
         return(myPeakList)
     }
+
+globalVariables(c("fromOverlappingOrNearest", "peak"))

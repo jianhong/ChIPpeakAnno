@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.25.4
+-------------------------
+
+    o fAdd choice endMinusStart to annotatePeakInBatch.
+    
 CHANGES IN VERSION 3.25.3
 -------------------------
 
