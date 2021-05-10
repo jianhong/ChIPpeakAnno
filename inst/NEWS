@@ -1,7 +1,12 @@
+CHANGES IN VERSION 3.25.5
+-------------------------
+
+    o Add LazyDataCompression in description
+
 CHANGES IN VERSION 3.25.4
 -------------------------
 
-    o fAdd choice endMinusStart to annotatePeakInBatch.
+    o Add choice endMinusStart to annotatePeakInBatch.
     
 CHANGES IN VERSION 3.25.3
 -------------------------

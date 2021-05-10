@@ -26,6 +26,9 @@
 #'     }
 #' 
 estLibSize <- function(bamfiles, index=bamfiles, ...){
+    if(length(i)==0){
+        i <- rep(list(character(0)), length(bamfiles))
+    }
     res <- mapply(function(f, i){
         if(suppressMessages(testPairedEndBam(f, index=i))){
             countBam(f, index=i, 
