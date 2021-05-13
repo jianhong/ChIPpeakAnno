@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.25.6
+-------------------------
+
+    o Fix a bug in estLibSize introduced by last push.
+    
 CHANGES IN VERSION 3.25.5
 -------------------------
 
