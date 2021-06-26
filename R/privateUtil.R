@@ -245,7 +245,7 @@ vennCounts <- function(PeaksList, n, names,
         }
         
         if(length(Peaks)<10000){
-            ol <- as.data.frame(findOverlaps(Peaks, maxgap=maxgap, 
+            ol <- as.data.frame(findOverlaps1(Peaks, maxgap=maxgap, 
                                              minoverlap=minoverlap, 
                                              select="all",
                                              drop.self=TRUE, 
@@ -263,7 +263,7 @@ vennCounts <- function(PeaksList, n, names,
         }else{
             Peaks.list <- split(Peaks, seqnames(Peaks))
             Merged <- lapply(Peaks.list, function(.peaks.list){
-                .ol <- findOverlaps(.peaks.list,
+                .ol <- findOverlaps1(.peaks.list,
                                     maxgap=maxgap, minoverlap=minoverlap, 
                                     select="all",
                                     drop.self=TRUE, drop.redundant=TRUE)
@@ -368,7 +368,55 @@ vennCounts <- function(PeaksList, n, names,
                 Peaks=Peaks))
 }
 
-
+findOverlaps1 <- function(query, subject, maxgap=-1L,
+                          minoverlap=0L, ...){
+  if(minoverlap[1]>0 && minoverlap[1]<1){
+    if(missing(subject)){
+      hits <- findOverlaps(query = query, 
+                           minoverlap = 0L,
+                           maxgap = -1L,
+                           ...)
+      overlaps <- pintersect(query[queryHits(hits)],
+                             query[subjectHits(hits)],
+                             ignore.strand = TRUE)
+      percentOverlap0 <- width(overlaps)/width(query[queryHits(hits)])
+      percentOverlap1 <- width(overlaps)/width(query[subjectHits(hits)])
+      percentOverlap <- ifelse(
+        percentOverlap0>percentOverlap1,
+        percentOverlap0, percentOverlap1
+      )
+    }else{
+      hits <- findOverlaps(query = query, 
+                           subject = subject,
+                           minoverlap = 0L,
+                           maxgap = -1L,
+                           ...)
+      overlaps <- pintersect(query[queryHits(hits)],
+                             subject[subjectHits(hits)],
+                             ignore.strand = TRUE)
+      percentOverlap0 <- width(overlaps)/width(query[queryHits(hits)])
+      percentOverlap1 <- width(overlaps)/width(subject[subjectHits(hits)])
+      percentOverlap <- ifelse(
+        percentOverlap0>percentOverlap1,
+        percentOverlap0, percentOverlap1
+      )
+    }
+    hits[percentOverlap>=minoverlap]
+  }else{
+    if(missing(subject)){
+      findOverlaps(query = query,
+                   maxgap = maxgap,
+                   minoverlap = minoverlap,
+                   ...)
+    }else{
+      findOverlaps(query = query,
+                   subject = subject,
+                   maxgap = maxgap,
+                   minoverlap = minoverlap,
+                   ...)
+    }
+  }
+}
 #' TxDb object to GRanges
 #' 
 #' convert TxDb object to GRanges

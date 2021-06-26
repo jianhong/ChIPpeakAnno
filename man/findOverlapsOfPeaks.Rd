@@ -21,7 +21,10 @@ example below.}
 \item{maxgap, minoverlap}{Used in the internal call to \code{findOverlaps()}
 to detect overlaps. See
 \code{?\link[IRanges:findOverlaps-methods]{findOverlaps}} in the
-\pkg{IRanges} package for a description of these arguments.}
+\pkg{IRanges} package for a description of these arguments. 
+If 0 < minoverlap < 1, the function will find overlaps by percentage
+covered of interval and the filter condition will be set to max covered 
+percentage of overlapping peaks.}
 
 \item{ignore.strand}{When set to TRUE, the strand information is ignored in
 the overlap calculations.}
@@ -76,6 +79,11 @@ t1 <- findOverlapsOfPeaks(peaks1, peaks2, maxgap=1000)
 makeVennDiagram(t1)
 t1$venn_cnt
 t1$peaklist
+t2 <- findOverlapsOfPeaks(peaks1, peaks2, minoverlap = .5)
+makeVennDiagram(t2)
+
+t3 <- findOverlapsOfPeaks(peaks1, peaks2, minoverlap = .90)
+makeVennDiagram(t3)
 
 }
 \references{

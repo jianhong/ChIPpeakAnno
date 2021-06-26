@@ -71,4 +71,17 @@ test_that("findOverlapsOfPeaks works not correct", {
   t1 <- findOverlapsOfPeaks(peaks1, peaks2, peaks3,peaks4, maxgap=1000)
   expect_equal(length(t1$peaksInMergedPeaks)+length(t1$uniquePeaks), 20)
   expect_equal(colnames(mcols(t1$uniquePeaks)), "a")
+  ## check by percentage
+  # GRanges with fixed width 100, set overlaps for 100 regions from 
+  # 1 to 100
+  p1 <- GRanges(seqnames = "chr1",
+                IRanges(start = seq.int(100)*1000, width = 100,
+                        names = paste0("p1_", seq.int(100))))
+  p2 <- GRanges(seqnames = "chr1",
+                IRanges(start = seq.int(100)*1001, width = 100,
+                        names = paste0("p2_", seq.int(100))))
+  for(i in seq.int(99)){
+    ol <- findOverlapsOfPeaks(p1, p2, minoverlap = i/100)
+    expect_equal(as.numeric(ol$venn_cnt[4,"Counts"]), 100-i)
+  }
 })
