@@ -11,8 +11,8 @@ assignChromosomeRegion(
   TSS,
   utr5,
   utr3,
-  proximal.promoter.cutoff = 1000L,
-  immediate.downstream.cutoff = 1000L,
+  proximal.promoter.cutoff = c(upstream = 2000, downstream = 100),
+  immediate.downstream.cutoff = c(upstream = 0, downstream = 1000),
   nucleotideLevel = FALSE,
   precedence = NULL,
   TxDb = NULL
@@ -51,14 +51,14 @@ proximal promoter or enhencer. Peaks that reside within
 proximal.promoter.cutoff upstream from or overlap with transcription start
 site are classified as proximal promoters. Peaks that reside upstream of the
 proximal.promoter.cutoff from gene start are classified as enhancers. The
-default is 1000 bases.}
+default is upstream 2000 bases and downstream 100 bases.}
 
 \item{immediate.downstream.cutoff}{Specify the cutoff in bases to classify
 immediate downstream region or enhancer region. Peaks that reside within
 immediate.downstream.cutoff downstream of gene end but not overlap 3 prime
 UTR are classified as immediate downstream.  Peaks that reside downstream
 over immediate.downstreatm.cutoff from gene end are classified as enhancers.
-The default is 1000 bases.}
+The default is upstream 0 bases and downstream 1000 bases.}
 
 \item{nucleotideLevel}{Logical. Choose between peak centric and nucleotide
 centric view. Default=FALSE}

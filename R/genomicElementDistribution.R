@@ -30,6 +30,7 @@
 #' @param labels list. A list for labels for the genomic elements.
 #' @param labelColors named character vector. The colors for each labels.
 #' @param plot logic. Plot the pie chart for the genomic elements or not.
+#' @param keepExonsInGenesOnly logic. Keep the exons within annotated gene only.
 #' @export
 #' @importFrom ggplot2 ggplot geom_rect xlim coord_polar aes_string geom_bar
 #' coord_flip scale_fill_manual theme_void theme_bw facet_wrap geom_col 
@@ -93,6 +94,7 @@ genomicElementDistribution <-
                            CDS="#0033BF",
                            otherExon="#009E73"),
            plot = TRUE,
+           keepExonsInGenesOnly = TRUE,
            promoterLevel){
     stopifnot("peaks must be an object of GRanges or GRangesList"=
                 inherits(peaks, c("GRanges", "GRangesList")))
@@ -250,6 +252,21 @@ genomicElementDistribution <-
         "ExonIntron" = {
           exon <- exons(TxDb)
           intron <- unlist(intronsByTranscript(TxDb))
+          if(keepExonsInGenesOnly){
+            suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+            ole <- findOverlaps(exon, g, type = "within")
+            oli <- findOverlaps(intron, g, type = "within")
+            ole <- !seq_along(exon) %in% queryHits(ole)
+            oli <- !seq_along(intron) %in% queryHits(oli)
+            if(sum(ole)>0 || sum(oli)>0){
+              warning(paste(sum(ole), "exons were dropped because there is no",
+                            "relative gene level annotations.",
+                            sum(oli), "introns were dropped because there is no",
+                            "relative gene level annotations."))
+              exon <- exon[!ole]
+              intron <- intron[!oli]
+            }
+          }
           intergenic <- gaps(reduce(c(exon, intron), ignore.strand=FALSE))
           intergenic <- intergenic[!strand(intergenic) %in% "*"] 
           current_anno <- GRanges()
@@ -274,6 +291,31 @@ genomicElementDistribution <-
           utr3 <- unlist(threeUTRsByTranscript(TxDb))
           CDS <- cds(TxDb)
           exon <- exons(TxDb)
+          if(keepExonsInGenesOnly){
+            suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+            ole <- findOverlaps(exon, g, type = "within")
+            olc <- findOverlaps(CDS, g, type = "within")
+            ol5 <- findOverlaps(utr5, g, type = "within")
+            ol3 <- findOverlaps(utr3, g, type = "within")
+            ole <- !seq_along(exon) %in% queryHits(ole)
+            olc <- !seq_along(CDS) %in% queryHits(olc)
+            ol5 <- !seq_along(utr5) %in% queryHits(ol5)
+            ol3 <- !seq_along(utr3) %in% queryHits(ol3)
+            if(sum(ole)>0 || sum(olc)>0 || sum(ol5)>0 || sum(ol3)){
+              warning(paste(sum(ole), "exons were dropped because there is no",
+                            "relative gene level annotations.",
+                            sum(olc), "CDS were dropped because there is no",
+                            "relative gene level annotations.",
+                            sum(ol5), "utr5 were dropped because there is no",
+                            "relative gene level annotations.",
+                            sum(ol3), "utr3 were dropped because there is no",
+                            "relative gene level annotations."))
+              exon <- exon[!ole]
+              CDS <- CDS[!olc]
+              utr5 <- utr5[!ol5]
+              utr3 <- utr3[!ol3]
+            }
+          }
           current_anno <- GRanges()
           ## set precedence
           for(j in names(labs[["Exons"]])){

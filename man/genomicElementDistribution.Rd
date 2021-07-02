@@ -23,6 +23,7 @@ genomicElementDistribution(
     intergenic = "#DDDDDD", utr5 = "#0072B2", utr3 = "#56B4E9", CDS = "#0033BF",
     otherExon = "#009E73"),
   plot = TRUE,
+  keepExonsInGenesOnly = TRUE,
   promoterLevel
 )
 }
@@ -52,6 +53,8 @@ gene downstream region.}
 \item{labelColors}{named character vector. The colors for each labels.}
 
 \item{plot}{logic. Plot the pie chart for the genomic elements or not.}
+
+\item{keepExonsInGenesOnly}{logic. Keep the exons within annotated gene only.}
 
 \item{promoterLevel}{list. The breaks, labels, and colors for divided range 
 of promoters. The breaks must be from 5' -> 3' and the percentage will use

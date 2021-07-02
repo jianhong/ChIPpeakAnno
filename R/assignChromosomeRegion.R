@@ -36,13 +36,13 @@
 #' proximal.promoter.cutoff upstream from or overlap with transcription start
 #' site are classified as proximal promoters. Peaks that reside upstream of the
 #' proximal.promoter.cutoff from gene start are classified as enhancers. The
-#' default is 1000 bases.
+#' default is upstream 2000 bases and downstream 100 bases.
 #' @param immediate.downstream.cutoff Specify the cutoff in bases to classify
 #' immediate downstream region or enhancer region. Peaks that reside within
 #' immediate.downstream.cutoff downstream of gene end but not overlap 3 prime
 #' UTR are classified as immediate downstream.  Peaks that reside downstream
 #' over immediate.downstreatm.cutoff from gene end are classified as enhancers.
-#' The default is 1000 bases.
+#' The default is upstream 0 bases and downstream 1000 bases.
 #' @param nucleotideLevel Logical. Choose between peak centric and nucleotide
 #' centric view. Default=FALSE
 #' @param precedence If no precedence specified, double count will be enabled,
@@ -116,8 +116,8 @@
 #' 
 assignChromosomeRegion <-
     function(peaks.RD, exon, TSS, utr5, utr3, 
-             proximal.promoter.cutoff=1000L, 
-             immediate.downstream.cutoff=1000L, 
+             proximal.promoter.cutoff=c(upstream=2000, downstream=100), 
+             immediate.downstream.cutoff=c(upstream=0, downstream=1000), 
              nucleotideLevel=FALSE, 
              precedence=NULL, TxDb=NULL)
     {
@@ -145,12 +145,14 @@ assignChromosomeRegion <-
             options(warn = -1)
             try({
                 promoters <- 
-                    unique(promoters(TxDb, upstream=proximal.promoter.cutoff, 
-                                     downstream=0))
+                    unique(promoters(TxDb, upstream=proximal.promoter.cutoff["upstream"], 
+                                     downstream=proximal.promoter.cutoff["downstream"]))
                 immediateDownstream <- 
-                    unique(flank(transcripts, 
-                                 width=immediate.downstream.cutoff, 
-                                 start=FALSE, use.names=FALSE))
+                    unique(downstreams(transcripts, 
+                                 upstream=immediate.downstream.cutoff["upstream"], 
+                                 downstream=immediate.downstream.cutoff["downstream"]))
+                promoters <- GenomicRanges::trim(promoters)
+                immediateDownstream <- GenomicRanges::trim(immediateDownstream)
             })
             microRNAs <- tryCatch(microRNAs(TxDb), 
                                   error=function(e) return(NULL))

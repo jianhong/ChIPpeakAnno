@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.27.2
+-------------------------
+
+    o add keepExonsInGenesOnly for genomicElementDistribution
+    o add upstream and downstream for assignChromosomeRegion function when define promoter and downstream regions.
+    
 CHANGES IN VERSION 3.27.1
 -------------------------
 
