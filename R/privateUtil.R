@@ -655,7 +655,7 @@ EnsDb2GR <- function(ranges, feature){
                }
         )
     #seqlevelsStyle(gr) <- "UCSC"
-    formatSeqnames(gr, GRanges("chr1", IRanges(1, 2)))
+    gr <- formatSeqnames(gr, GRanges("chr1", IRanges(1, 2)))
     return(gr)
 }
 
