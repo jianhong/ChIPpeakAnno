@@ -16,15 +16,7 @@ formatStrand <- function(strand){
 ###clear seqnames, the format should be chr+NUM
 #' @importFrom GenomeInfoDb `seqlevels<-` `seqlevelsStyle` `seqlevelsStyle<-`
 formatSeqnames <- function(from, to) {
-  tryCatch({
-    seql <- seqlevelsStyle(to)
-    seqf <- seqlevelsStyle(from)
-    if(!seql[1] %in% seqf){
-      seqlevelsStyle(from) <- seql[1]
-    }
-    from
-  }, error = function(e){
-    message(e)
+  forceFormatSeqnames <- function(from, to){
     message("\n Try to keep the seqname style consistent.")
     seql <- seqlevels(to)
     getPrefix <- function(x, seql){
@@ -68,9 +60,23 @@ formatSeqnames <- function(from, to) {
       seqlevels(from) <- sub("^chr", prefix, seqlevels(from), 
                              ignore.case = TRUE)
     }
-    
-     from
+    from
+  }
+  seql <- seqlevelsStyle(to)
+  seqf <- seqlevelsStyle(from)
+  from <- tryCatch({
+    if(!seql[1] %in% seqf){
+      seqlevelsStyle(from) <- seql[1]
+    }
+    from
+  }, error = function(e){
+    message(e)
+    forceFormatSeqnames(from, to)
   })
+  if(length(intersect(seql, seqf))==0){
+    from <- forceFormatSeqnames(from, to)
+  }
+  from
 }
 
 getRelationship <- function(queryHits, subjectHits){
@@ -648,7 +654,8 @@ EnsDb2GR <- function(ranges, feature){
                    t
                }
         )
-    seqlevelsStyle(gr) <- "UCSC"
+    #seqlevelsStyle(gr) <- "UCSC"
+    formatSeqnames(gr, GRanges("chr1", IRanges(1, 2)))
     return(gr)
 }
 
