@@ -73,6 +73,8 @@ formatSeqnames <- function(from, to) {
     message(e)
     forceFormatSeqnames(from, to)
   })
+  seql <- seqlevelsStyle(to)
+  seqf <- seqlevelsStyle(from)
   if(length(intersect(seql, seqf))==0){
     from <- forceFormatSeqnames(from, to)
   }

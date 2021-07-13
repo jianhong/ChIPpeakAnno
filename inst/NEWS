@@ -2,6 +2,12 @@ CHANGES IN VERSION 3.27.3
 -------------------------
 
     o use formatSeqnames function to handle the error from seqlevelsStyle:
+    "cannot switch some of GRCm38's seqlevels from NCBI to UCSC style"
+    
+CHANGES IN VERSION 3.27.3
+-------------------------
+
+    o use formatSeqnames function to handle the error from seqlevelsStyle:
     "!anyNA(m31) is not TRUE "
     
 CHANGES IN VERSION 3.27.2
