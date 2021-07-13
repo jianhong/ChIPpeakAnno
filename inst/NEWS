@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.26.1
+-------------------------
+
+    o Fix the error that "cannot switch some of GRCm38's seqlevels from NCBI to UCSC style"
+    
 CHANGES IN VERSION 3.25.6
 -------------------------
 
