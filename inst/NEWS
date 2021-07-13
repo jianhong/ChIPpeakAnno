@@ -1,4 +1,4 @@
-CHANGES IN VERSION 3.27.3
+CHANGES IN VERSION 3.27.4
 -------------------------
 
     o use formatSeqnames function to handle the error from seqlevelsStyle:
