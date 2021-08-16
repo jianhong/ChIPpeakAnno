@@ -140,7 +140,7 @@ You can also overview your data by ideogram.
 
 ```{r}
 library(trackViewer)
-ideo <- loadIdeogram(genome = "hg19")
+ideo <- loadIdeogram(genome = "hg19", chrom = c("chr1", "chr3", "chr22"))
 dataList <- GRangesList(gr1)
 ideogramPlot(ideo, dataList, layout = list("chr1", c("chr3", "chr22")), 
              parameterList = list(ideoHeight=unit(.25, "npc")))
