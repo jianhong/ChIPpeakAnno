@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.26.4
+-------------------------
+
+    o Fix the error undefined columns selected in enrichment Plot
+    
 CHANGES IN VERSION 3.26.3
 -------------------------
 
