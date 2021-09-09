@@ -57,6 +57,11 @@ enrichmentPlot <- function(res, n=20, strlength=30,
     if(length(.ele$source)!=nrow(.ele)){
       .ele$source <- "undefined"
     }
+    if(nrow(.ele)==0) return(data.frame())
+    if(!all(c(cn.id, cn.term, "pvalue", "count.InDataset", 
+             "count.InGenome", "source") %in% colnames(.ele))){
+      return(data.frame())
+    }
     plotdata <- .ele[!is.na(.ele$pvalue), 
                      c(cn.id, cn.term, "pvalue", "count.InDataset", 
                        "count.InGenome", "source")]

@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.27.6
+-------------------------
+
+    o Fix the error "pvalue" undefined columns selected in enrichmentPlot
+    
 CHANGES IN VERSION 3.27.5
 -------------------------
 
