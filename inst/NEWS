@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.27.7
+-------------------------
+
+    o Fix the error "!anyNA(m32) is not TRUE" in seqlevelsStyle is not
+    handled.
+    
 CHANGES IN VERSION 3.27.6
 -------------------------
 

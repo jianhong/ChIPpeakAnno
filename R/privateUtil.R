@@ -64,15 +64,15 @@ formatSeqnames <- function(from, to) {
   }
   seql <- seqlevelsStyle(to)
   seqf <- seqlevelsStyle(from)
-  from <- tryCatch({
-    if(!seql[1] %in% seqf){
+  if(!seql[1] %in% seqf){
+    tried <- try({
       seqlevelsStyle(from) <- seql[1]
+    })
+    if(inherits(tried, "try-error")){
+      from <- forceFormatSeqnames(from, to)
     }
-    from
-  }, error = function(e){
-    message(e)
-    forceFormatSeqnames(from, to)
-  })
+  }
+  
   seql <- seqlevelsStyle(to)
   seqf <- seqlevelsStyle(from)
   if(length(intersect(seql, seqf))==0){
@@ -490,21 +490,21 @@ TxDb2GR <- function(ranges, feature, OrganismDb){
                    exon <- c(left, anno) ## merge ncRNA with anno
                    if(!missing(OrganismDb)){
                        if(inherits(OrganismDb, c("OrganismDb"))){
-                           symbol <- tryCatch(
-                               select(OrganismDb, 
-                                      keys=unique(exon$tx_name),
-                                      columns="SYMBOL",
-                                      keytype="TXNAME"),
-                               error=function(e) {
-                                   message(e)
-                                   return(NULL)
-                               })
-                           if(length(symbol)>0){
-                               exon$symbol <- 
-                                   symbol[match(exon$tx_name, 
-                                                symbol[, 1]),
-                                          "SYMBOL"]
-                           }
+                         tried <- try({
+                           symbol <- select(OrganismDb, 
+                                            keys=unique(exon$tx_name),
+                                            columns="SYMBOL",
+                                            keytype="TXNAME")
+                           })
+                         if(inherits(tried, "try-error")){
+                           symbol <- NULL
+                         }
+                         if(length(symbol)>0){
+                           exon$symbol <- 
+                             symbol[match(exon$tx_name, 
+                                          symbol[, 1]),
+                                    "SYMBOL"]
+                         }
                        }else{
                            message("OrganismDb must be an object of OrganismDb")
                        }
