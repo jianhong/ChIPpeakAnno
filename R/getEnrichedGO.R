@@ -23,6 +23,15 @@
 #' from the list.
 #' @param keepByLevel If the shortest path from the go term to 'all' is greater
 #' than the given level, the term will be removed.
+#' @param subGroupComparison A logical vector to split the peaks into two 
+#' groups. The enrichment analysis will compare the over-present GO terms
+#' in TRUE group and FALSE group separately. The analysis will split into 
+#' two steps: 1. enrichment analysis for TRUE group by hypergeometric
+#' test; 2. enrichment analysis for TRUE over FALSE group
+#' by Fisher's Exact test for the enriched GO terms.
+#' To keep the output same format, if you want to compare FALSE vs TRUE,
+#' please repeat the analysis by inverting the parameter.
+#' Default is NULL.
 #' @return A list with 3 elements \item{list("bp")}{ enriched biological
 #' process with the following 9 variables
 #' 
@@ -86,7 +95,7 @@
 #' totaltermInGenome: count of all GO terms in the genome
 #' 
 #' }
-#' @author Lihua Julie Zhu
+#' @author Lihua Julie Zhu. Jianhong Ou for subGroupComparison
 #' @seealso phyper, hyperGtest
 #' @references Johnson, N. L., Kotz, S., and Kemp, A. W. (1992) Univariate
 #' Discrete Distributions, Second Edition. New York: Wiley
@@ -95,7 +104,7 @@
 #' @importFrom AnnotationDbi mappedkeys
 #' @importFrom multtest mt.rawp2adjp
 #' @importFrom AnnotationDbi Definition Ontology Term
-#' @importFrom stats phyper
+#' @importFrom stats phyper fisher.test
 #' @examples
 #' 
 #'   data(enrichedGO)
@@ -123,8 +132,12 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                           minGOterm=10, multiAdjMethod=NULL,
                           condense=FALSE,
                           removeAncestorByPval=NULL,
-                          keepByLevel=NULL){
+                          keepByLevel=NULL,
+                          subGroupComparison=NULL){
   if(is(annotatedPeak, "GRangesList")){
+    if(length(subGroupComparison)){
+      stop("subGroupComparison parameter is not supported for list of peaks.")
+    }
     args <- as.list(match.call())
     res <- lapply(annotatedPeak, function(.ele){
       args$annotatedPeak <- .ele
@@ -160,26 +173,41 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
              http://www.bioconductor.org/packages/release/data/annotation/ 
              for available org.xx.eg.db packages")
     }
+    groupFALSE <- NULL
+    feature_ids_FALSE <- NULL
+    entrezIDs_FALSE <- NULL
+    if(length(subGroupComparison)){
+      if(length(subGroupComparison)!=length(annotatedPeak)){
+        stop("Length of subGroupComparison should keep same as",
+             "length of annotatedPeak")
+      }
+      stopifnot(is(subGroupComparison, "logical"))
+      groupFALSE <- annotatedPeak[!subGroupComparison]
+      annotatedPeak <- annotatedPeak[subGroupComparison]
+    }
     if (inherits(annotatedPeak, what=c("GRanges")))
     {
         feature_ids = unique(as.character(annotatedPeak$feature))
-    }
-    else if (is.character(annotatedPeak))
+        if(length(groupFALSE)){
+          feature_ids_FALSE = unique(as.character(groupFALSE$feature))
+        }
+    }else if(is.character(annotatedPeak))
     {
         feature_ids = unique(annotatedPeak)
-    }
-    else
-    {
+        if(length(groupFALSE)){
+          feature_ids_FALSE = unique(groupFALSE)
+        }
+    }else{
         stop("annotatedPeak needs to be GRanges type with feature 
              variable holding the feature id or a character vector 
              holding the IDs of the features used to annotate the peaks!")
     }
-    if (feature_id_type == "entrez_id")
-    {
+    if (feature_id_type == "entrez_id"){
         entrezIDs <- feature_ids
-    }
-    else
-    {
+        if(length(groupFALSE)){
+          entrezIDs_FALSE <- feature_ids_FALSE
+        }
+    }else{
         cov2EntrezID <- function(IDs, orgAnn, ID_type="ensembl_gene_id"){
             GOgenome = sub(".db","",orgAnn)
             orgAnn <- switch(ID_type,
@@ -204,12 +232,15 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             ids
         }
         entrezIDs <- cov2EntrezID(feature_ids, orgAnn, feature_id_type)
+        if(length(groupFALSE)){
+          entrezIDs_FALSE <- cov2EntrezID(feature_ids_FALSE,
+                                          orgAnn, feature_id_type)
+        }
     }
     if(length(entrezIDs)<2){
         stop("The number of gene is less than 2. 
              Please double check your feature_id_type.")
     }
-    
     goAnn <- get(paste(GOgenome,"GO", sep=""))
     mapped_genes <- mappedkeys(goAnn)
     totalN.genes=length(unique(mapped_genes))
@@ -221,6 +252,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                     rep(names(xx), elementNROWS(xx)))
     all.GO <- unique(all.GO)## incalse the database is not unique
     this.GO <- all.GO[all.GO[, 4] %in% entrezIDs, , drop=FALSE]
+    FALSE.GO <- all.GO[all.GO[, 4] %in% entrezIDs_FALSE, , drop=FALSE]
     
     addAnc <- function(go.ids,
                        onto=c("bp", "cc", "mf")){
@@ -309,6 +341,24 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     all.mf.count <- table(as.character(mf.go.all[mf.go.all!=""]))
     all.cc.count <- table(as.character(cc.go.all[cc.go.all!=""]))
     
+    if(length(groupFALSE)){
+      bp.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="BP",],"bp")
+      cc.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="CC",], "cc")
+      mf.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="MF",],"mf")
+      
+      bp.go.FALSE  = bp.go.FALSE.withEntrez[,1]
+      cc.go.FALSE = cc.go.FALSE.withEntrez[,1]
+      mf.go.FALSE = mf.go.FALSE.withEntrez[,1]
+      
+      FALSE.mf = length(mf.go.FALSE)
+      FALSE.cc = length(cc.go.FALSE)
+      FALSE.bp = length(bp.go.FALSE)
+      
+      FALSE.bp.count <- table(as.character(bp.go.FALSE[bp.go.FALSE!=""]))
+      FALSE.mf.count <- table(as.character(mf.go.FALSE[mf.go.FALSE!=""]))
+      FALSE.cc.count <- table(as.character(cc.go.FALSE[cc.go.FALSE!=""]))
+    }
+    
     hyperGT <- function(alltermcount, thistermcount, 
                         totaltermInGenome, totaltermInPeakList){
         m <- as.numeric(alltermcount[names(thistermcount)])
@@ -337,8 +387,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                              total.cc, 
                              this.cc)
     
-    if (length(multiAdjMethod)<1)
-    {
+    if (length(multiAdjMethod)<1){
         bp.s = 
             bp.selected[
                 as.numeric(as.character(bp.selected[,4]))<maxP & 
@@ -351,9 +400,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             cc.selected[
                 as.numeric(as.character(cc.selected[,4]))<maxP & 
                     as.numeric(as.character(cc.selected[,3]))>=minGOterm,]
-    }
-    else
-    {
+    }else{
         procs = c(multiAdjMethod)
         res <- mt.rawp2adjp(as.numeric(as.character(bp.selected[,4])), procs)
         adjp = unique(res$adjp)
@@ -411,6 +458,32 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     bp.selected1 = merge(goterm.bp, bp.s,by="go.id")
     mf.selected1 = merge(goterm.mf, mf.s,by="go.id")
     cc.selected1 = merge(goterm.cc, cc.s,by="go.id")
+    
+    if(length(groupFALSE)){ ## add counts for FALSE group and do Fisher's exact test
+      bp.selected1$count.InBackgroundDataset = FALSE.bp.count[bp.selected1$go.id]
+      mf.selected1$count.InBackgroundDataset = FALSE.mf.count[mf.selected1$go.id]
+      cc.selected1$count.InBackgroundDataset = FALSE.cc.count[cc.selected1$go.id]
+      
+      multiFisher <- function(.data){
+        rowFisher <- function(x, ...){
+          return(fisher.test(matrix(x, nrow = 2, byrow = TRUE), ...)$p.value)
+        }
+        .data0 <- .data[, c("count.InDataset", "count.InBackgroundDataset")]
+        .data0 <- as.matrix(.data0)
+        .data0 <- cbind(.data0, .data[, "count.InGenome"] - .data0)
+        apply(.data0, 1, rowFisher, alternative = "greater")
+      }
+      bp.selected1$dataset.vs.background.pval <- multiFisher(bp.selected1)
+      mf.selected1$dataset.vs.background.pval <- multiFisher(mf.selected1)
+      cc.selected1$dataset.vs.background.pval <- multiFisher(cc.selected1)
+      
+      bp.selected1 <-
+        bp.selected1[bp.selected1$dataset.vs.background.pval<maxP, , drop=FALSE]
+      mf.selected1 <-
+        mf.selected1[mf.selected1$dataset.vs.background.pval<maxP, , drop=FALSE]
+      cc.selected1 <-
+        cc.selected1[cc.selected1$dataset.vs.background.pval<maxP, , drop=FALSE]
+    }
     
     if(condense){
         bp.go.this.withEntrez <- 

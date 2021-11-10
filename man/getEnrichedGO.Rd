@@ -13,7 +13,8 @@ getEnrichedGO(
   multiAdjMethod = NULL,
   condense = FALSE,
   removeAncestorByPval = NULL,
-  keepByLevel = NULL
+  keepByLevel = NULL,
+  subGroupComparison = NULL
 )
 }
 \arguments{
@@ -42,6 +43,16 @@ from the list.}
 
 \item{keepByLevel}{If the shortest path from the go term to 'all' is greater
 than the given level, the term will be removed.}
+
+\item{subGroupComparison}{A logical vector to split the peaks into two 
+groups. The enrichment analysis will compare the over-present GO terms
+in TRUE group and FALSE group separately. The analysis will split into 
+two steps: 1. enrichment analysis for TRUE group by hypergeometric
+test; 2. enrichment analysis for TRUE over FALSE group
+by Fisher's Exact test for the enriched GO terms.
+To keep the output same format, if you want to compare FALSE vs TRUE,
+please repeat the analysis by inverting the parameter.
+Default is NULL.}
 }
 \value{
 A list with 3 elements \item{list("bp")}{ enriched biological
@@ -144,6 +155,6 @@ Discrete Distributions, Second Edition. New York: Wiley
 phyper, hyperGtest
 }
 \author{
-Lihua Julie Zhu
+Lihua Julie Zhu. Jianhong Ou for subGroupComparison
 }
 \keyword{misc}

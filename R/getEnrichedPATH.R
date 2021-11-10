@@ -18,6 +18,15 @@
 #' @param minPATHterm minimum count in a genome for a path to be included
 #' @param multiAdjMethod multiple testing procedures, for details, see
 #' mt.rawp2adjp in multtest package
+#' @param subGroupComparison A logical vector to split the peaks into two 
+#' groups. The enrichment analysis will compare the over-present GO terms
+#' in TRUE group and FALSE group separately. The analysis will split into 
+#' two steps: 1. enrichment analysis for TRUE group by hypergeometric
+#' test; 2. enrichment analysis for TRUE over FALSE group
+#' by Fisher's Exact test for the enriched GO terms.
+#' To keep the output same format, if you want to compare FALSE vs TRUE,
+#' please repeat the analysis by inverting the parameter.
+#' Default is NULL.
 #' @return A dataframe of enriched path with the following variables.
 #' \item{path.id}{KEGG PATH ID} \item{EntrezID}{Entrez ID}
 #' \item{count.InDataset}{count of this PATH in this dataset}
@@ -54,7 +63,8 @@
 #' 
 getEnrichedPATH <- function(annotatedPeak, orgAnn, pathAnn, 
                             feature_id_type="ensembl_gene_id", 
-                            maxP=0.01, minPATHterm=10, multiAdjMethod=NULL)
+                            maxP=0.01, minPATHterm=10, multiAdjMethod=NULL,
+                            subGroupComparison=NULL)
 {
     if (missing(annotatedPeak)){
         stop("Missing required argument annotatedPeak!")	
@@ -92,11 +102,29 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
                    "before using getEnrichedPATH. Try \n\"library(",
                    pathAnn,")\""))
     }
-
+    
+    groupFALSE <- NULL
+    feature_ids_FALSE <- NULL
+    entrezIDs_FALSE <- NULL
+    if(length(subGroupComparison)){
+        if(length(subGroupComparison)!=length(annotatedPeak)){
+            stop("Length of subGroupComparison should keep same as",
+                 "length of annotatedPeak")
+        }
+        stopifnot(is(subGroupComparison, "logical"))
+        groupFALSE <- annotatedPeak[!subGroupComparison]
+        annotatedPeak <- annotatedPeak[subGroupComparison]
+    }
     if (inherits(annotatedPeak, what=c("GRanges"))){
         feature_ids = unique(as.character(annotatedPeak$feature))
+        if(length(groupFALSE)){
+            feature_ids_FALSE = unique(as.character(groupFALSE$feature))
+        }
     }else if (is.character(annotatedPeak)){
         feature_ids = unique(annotatedPeak)
+        if(length(groupFALSE)){
+            feature_ids_FALSE = unique(groupFALSE)
+        }
     }else{
         stop("annotatedPeak needs to be GRanges with feature variable 
              holding the feature id or a character vector holding the IDs of 
@@ -104,8 +132,15 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     }
     if (feature_id_type == "entrez_id"){
         entrezIDs <- feature_ids
+        if(length(groupFALSE)){
+            entrezIDs_FALSE <- feature_ids_FALSE
+        }
     }else{
         entrezIDs <- convert2EntrezID(feature_ids, orgAnn, feature_id_type)
+        if(length(groupFALSE)){
+            entrezIDs_FALSE <- convert2EntrezID(feature_ids_FALSE,
+                                            orgAnn, feature_id_type)
+        }
     }
     if(length(entrezIDs)<2){
         stop("The number of gene is less than 2. 
@@ -186,6 +221,24 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     all.count = getUniqueGOidCount(as.character(path.all[path.all!=""]))
     this.count = getUniqueGOidCount(as.character(path.this[path.this!=""]))
     
+    if(length(groupFALSE)){
+        FALSE.PATH <- do.call(rbind, lapply(entrezIDs_FALSE,function(x1)
+        {
+            temp = unlist(xx[names(xx) ==x1])
+            if (length(temp) >0)
+            {
+                temp1 =matrix(temp,ncol=1,byrow=TRUE)
+                cbind(temp1,rep(x1,dim(temp1)[1]))
+            }
+        }))
+        FALSE.PATH <- unique(FALSE.PATH)
+        colnames(FALSE.PATH)<-c("path.id","EntrezID")
+        path.FALSE<-as.character(FALSE.PATH[,"path.id"])
+        FALSE.count = getUniqueGOidCount(as.character(path.FALSE[path.FALSE!=""]))
+        names(FALSE.count[[2]]) <- FALSE.count[[1]]
+        FALSE.count <- FALSE.count[[2]]
+    }
+    
     selected = hyperGtest(all.count,this.count, total, this)
     
     selected = data.frame(selected)
@@ -252,6 +305,25 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     }
     
     selected = merge(this.PATH, s)
+    
+    if(length(groupFALSE)){ ## add counts for FALSE group and do Fisher's exact test
+        selected$count.InBackgroundDataset = FALSE.count[selected$path.id]
+
+        multiFisher <- function(.data){
+            rowFisher <- function(x, ...){
+                return(fisher.test(matrix(x, nrow = 2, byrow = TRUE), ...)$p.value)
+            }
+            .data0 <- .data[, c("count.InDataset", "count.InBackgroundDataset")]
+            .data0 <- as.matrix(.data0)
+            .data0 <- cbind(.data0, .data[, "count.InGenome"] - .data0)
+            apply(.data0, 1, rowFisher, alternative = "greater")
+        }
+        selected$dataset.vs.background.pval <- multiFisher(selected)
+
+        selected <-
+            selected[selected$dataset.vs.background.pval<maxP, , drop=FALSE]
+    }
+    
     
     selected
     }

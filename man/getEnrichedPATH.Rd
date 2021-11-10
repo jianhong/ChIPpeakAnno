@@ -11,7 +11,8 @@ getEnrichedPATH(
   feature_id_type = "ensembl_gene_id",
   maxP = 0.01,
   minPATHterm = 10,
-  multiAdjMethod = NULL
+  multiAdjMethod = NULL,
+  subGroupComparison = NULL
 )
 }
 \arguments{
@@ -33,6 +34,16 @@ ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
 
 \item{multiAdjMethod}{multiple testing procedures, for details, see
 mt.rawp2adjp in multtest package}
+
+\item{subGroupComparison}{A logical vector to split the peaks into two 
+groups. The enrichment analysis will compare the over-present GO terms
+in TRUE group and FALSE group separately. The analysis will split into 
+two steps: 1. enrichment analysis for TRUE group by hypergeometric
+test; 2. enrichment analysis for TRUE over FALSE group
+by Fisher's Exact test for the enriched GO terms.
+To keep the output same format, if you want to compare FALSE vs TRUE,
+please repeat the analysis by inverting the parameter.
+Default is NULL.}
 }
 \value{
 A dataframe of enriched path with the following variables.
