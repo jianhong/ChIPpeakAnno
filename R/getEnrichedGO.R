@@ -178,8 +178,8 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     entrezIDs_FALSE <- NULL
     if(length(subGroupComparison)){
       if(length(subGroupComparison)!=length(annotatedPeak)){
-        stop("Length of subGroupComparison should keep same as",
-             "length of annotatedPeak")
+        stop("Length of subGroupComparison should keep same as ",
+             "length of annotatedPeak or check your input annotatedPeak type.")
       }
       stopifnot(is(subGroupComparison, "logical"))
       groupFALSE <- annotatedPeak[!subGroupComparison]
@@ -470,6 +470,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         }
         .data0 <- .data[, c("count.InDataset", "count.InBackgroundDataset")]
         .data0 <- as.matrix(.data0)
+        .data0[is.na(.data0)] <- 0
         .data0 <- cbind(.data0, .data[, "count.InGenome"] - .data0)
         apply(.data0, 1, rowFisher, alternative = "greater")
       }
