@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.29.2
+-------------------------
+
+    o fix the error: trying to generate an object from a virtual class "DataFrame".
+    
 CHANGES IN VERSION 3.29.1
 -------------------------
 

@@ -108,8 +108,18 @@ newAnnoGR <- function (seqnames = Rle(),
         stop("'mcols' must be a DataFrame object")
     if (ncol(mcols) == 0L) {
         mcols <- mcols(ranges)
-        if (is.null(mcols)) 
-            mcols <- new("DataFrame", nrows = length(seqnames))
+        if (is.null(mcols)){
+            rn <- names(ranges)
+            removenames <- FALSE
+            if(length(rn)!=length(ranges)){
+                removenames <- TRUE
+                rn <- seq_along(ranges)
+            }
+            mcols <- DataFrame(row.names = rn)
+            if(removenames){
+                rownames(mcols) <- NULL
+            }
+        }
     }
     if (!is.null(mcols(ranges))) 
         mcols(ranges) <- NULL
