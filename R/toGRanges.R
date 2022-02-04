@@ -89,6 +89,11 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
         start(gr) <- start(gr) + 1 ## bed file is (start, end]
         if(length(gr$thickStart)>0 &
            length(gr$thickEnd)>0){
+            if(!(all(gr$thickStart==round(gr$thickStart)) && 
+               all(gr$thickEnd==round(gr$thickEnd)))){
+              stop("This is not a standard BED file. ",
+                   "Maybe it is narrowPeak or broadPeak")
+            }
             gr$thick <- IRanges(gr$thickStart+1, gr$thickEnd)
             gr$thickStart <- NULL
             gr$thickEnd <- NULL
