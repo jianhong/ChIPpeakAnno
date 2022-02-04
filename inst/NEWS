@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.28.1
+-------------------------
+
+    o handle the error of "non-standard bed file"
+    
 CHANGES IN VERSION 3.27.7
 -------------------------
 
