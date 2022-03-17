@@ -136,15 +136,6 @@ x <- genomicElementUpSetR(overlaps,
 upset(x$plotData, nsets=13, nintersects=NA)
 ```
 
-You can also overview your data by ideogram.
-
-```{r}
-library(trackViewer)
-ideo <- loadIdeogram(genome = "hg19", chrom=c("chr1", "chr3", "chr22"))
-dataList <- GRangesList(gr1)
-ideogramPlot(ideo, dataList, layout = list("chr1", c("chr3", "chr22")), 
-             parameterList = list(ideoHeight=unit(.25, "npc")))
-```
 Metagene plot may also provide information for annotation.
 
 ```{r}
@@ -169,7 +160,9 @@ overlaps.anno <- addGeneIDs(overlaps.anno,
                             "org.Hs.eg.db",
                             IDs2Add = "entrez_id")
 head(overlaps.anno)
-write.csv(as.data.frame(unname(overlaps.anno)), "anno.csv")
+ol.anno.out <- unname(overlaps.anno)
+ol.anno.out$peakNames <- NULL # remove the CharacterList to avoid error message.
+write.csv(as.data.frame(ol.anno.out), "anno.csv")
 ```
 
 The distribution of the common peaks around features can be visualized using a pie chart.

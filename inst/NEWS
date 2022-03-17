@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.29.5
+-------------------------
+
+    o update the pipeline documentation to avoid the error when converting the
+    GRanges object to data.frame.
+
 CHANGES IN VERSION 3.29.3
 -------------------------
 
