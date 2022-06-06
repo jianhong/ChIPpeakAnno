@@ -16,4 +16,10 @@ test_that("assignChromosomeRegion works not correct", {
         assignChromosomeRegion(fiveUTRs, precedence="fiveUTRs", TxDb=TxDb)
     expect_equal(as.integer(Feature.distribution$percentage["Exons"]), 0)
     expect_equal(as.integer(Feature.distribution$percentage["fiveUTRs"]), 100)
+    expect_error(assignChromosomeRegion(fiveUTRs,
+                                        proximal.promoter.cutoff=1000,
+                                        TxDb=TxDb))
+    expect_error(assignChromosomeRegion(fiveUTRs,
+                                        immediate.downstream.cutoff=1000,
+                                        TxDb=TxDb))
 })
