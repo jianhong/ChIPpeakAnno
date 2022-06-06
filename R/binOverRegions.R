@@ -398,6 +398,12 @@ plotBinOverRegions <- function(dat, ...){
     legend.arg <- legend.arg[!duplicated(names(legend.arg))]
     legend.arg <- legend.arg[legend.arg.names]
     legend.arg <- legend.arg[lengths(legend.arg)>0]
+    cex <- 1
+    text.col <- par("col")
+    text.font <- NULL
+    if(is.null(legend.arg[["cex"]])){
+      legend.arg[["cex"]] <- cex
+    }
     do.call(legend, legend.arg)
 }
 

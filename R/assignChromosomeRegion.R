@@ -128,6 +128,14 @@ assignChromosomeRegion <-
                      try\n?TxDb\tto see more info.")
             if(!inherits(peaks.RD, c("GRanges"))) 
                 stop("peaks.RD must be a GRanges object.")
+            if(!all(c("upstream", "downstream") %in%
+                    names(proximal.promoter.cutoff))){
+                stop("proximal.promoter.cutoff must contain elements upstream and downstream")
+            }
+            if(!all(c("upstream", "downstream") %in%
+                    names(immediate.downstream.cutoff))){
+              stop("immediate.downstream.cutoff must contain elements upstream and downstream")
+            }
             if(!is.null(precedence)) {
                 if(!all(precedence %in% c("Exons", "Introns", "fiveUTRs", 
                                           "threeUTRs", "Promoters", 

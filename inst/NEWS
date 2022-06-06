@@ -1,3 +1,10 @@
+CHANGES IN VERSION 3.30.1
+-------------------------
+
+    o add parameter check of proximal.promoter.cutoff and
+    immediate.downstream.cutoff for assignChromosomeRegion.
+    o fix the bug in `plotBinOverRegions`
+
 CHANGES IN VERSION 3.29.6
 -------------------------
 
