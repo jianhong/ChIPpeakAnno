@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.31.1
 -------------------------
 
+    o use 'entrez_id' instead of 'EntrezID' for getEnrichedPATH() output
+    
+CHANGES IN VERSION 3.31.1
+-------------------------
+
     o add parameter check of proximal.promoter.cutoff and
     immediate.downstream.cutoff for assignChromosomeRegion.
     o fix the bug in `plotBinOverRegions`

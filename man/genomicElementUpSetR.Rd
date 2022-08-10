@@ -9,12 +9,12 @@ genomicElementUpSetR(
   TxDb,
   seqlev,
   ignore.strand = TRUE,
-  breaks = list(distal_upstream = c(-1e+05, -10000, -1, 1), proximal_upstream =
-    c(-10000, -5000, -1, 1), distal_promoter = c(-5000, -2000, -1, 1), proximal_promoter
-    = c(-2000, 200, -1, 0), `5'UTR` = fiveUTRsByTranscript, `3'UTR` =
-    threeUTRsByTranscript, CDS = cds, exon = exons, intron = intronsByTranscript,
-    gene_body = genes, immediate_downstream = c(0, 2000, 1, 1), proximal_downstream =
-    c(2000, 5000, 1, 1), distal_downstream = c(5000, 1e+05, 1, 1))
+  breaks = list(distal_upstream = c(-1e+05, -10000, -1, 1), proximal_upstream = c(-10000,
+    -5000, -1, 1), distal_promoter = c(-5000, -2000, -1, 1), proximal_promoter = c(-2000,
+    200, -1, 0), `5'UTR` = fiveUTRsByTranscript, `3'UTR` = threeUTRsByTranscript, CDS =
+    cds, exon = exons, intron = intronsByTranscript, gene_body = genes,
+    immediate_downstream = c(0, 2000, 1, 1), proximal_downstream = c(2000, 5000, 1, 1),
+    distal_downstream = c(5000, 1e+05, 1, 1))
 )
 }
 \arguments{

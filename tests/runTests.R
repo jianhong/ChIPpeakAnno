@@ -6,5 +6,6 @@ require("BSgenome.Celegans.UCSC.ce10") || stop("unable to load Package:BSgenome.
 require("EnsDb.Hsapiens.v79") || stop("unable to load Package:EnsDb.Hsapiens.v79")
 require("TxDb.Hsapiens.UCSC.hg38.knownGene") || stop("unable to load TxDb.Hsapiens.UCSC.hg38.knownGene")
 require("biomaRt") || stop("unable to load biomaRt")
+require("reactome.db") || stop("unable to load reactome.db")
 require("testthat") || stop("unable to load testthat")
 test_check("ChIPpeakAnno")

@@ -6,8 +6,8 @@
 \usage{
 mergePlusMinusPeaks(
   peaks.file,
-  columns = c("name", "chromosome", "start", "end", "strand", "count", "count",
-    "count", "count"),
+  columns = c("name", "chromosome", "start", "end", "strand", "count", "count", "count",
+    "count"),
   sep = "\\t",
   header = TRUE,
   distance.threshold = 100,

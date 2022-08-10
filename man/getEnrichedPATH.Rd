@@ -35,9 +35,9 @@ ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
 \item{multiAdjMethod}{multiple testing procedures, for details, see
 mt.rawp2adjp in multtest package}
 
-\item{subGroupComparison}{A logical vector to split the peaks into two 
+\item{subGroupComparison}{A logical vector to split the peaks into two
 groups. The enrichment analysis will compare the over-present GO terms
-in TRUE group and FALSE group separately. The analysis will split into 
+in TRUE group and FALSE group separately. The analysis will split into
 two steps: 1. enrichment analysis for TRUE group by hypergeometric
 test; 2. enrichment analysis for TRUE over FALSE group
 by Fisher's Exact test for the enriched GO terms.
@@ -66,12 +66,12 @@ if (interactive()||Sys.getenv("USER")=="jianhongou") {
 data(annotatedPeak)
 library(org.Hs.eg.db)
 library(reactome.db)
-enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+enriched.PATH = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db",
                  feature_id_type="ensembl_gene_id",
                  pathAnn="reactome.db", maxP=0.01,
                  minPATHterm=10, multiAdjMethod=NULL)
  head(enriched.PATH)
- enrichedKEGG = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db", 
+ enrichedKEGG = getEnrichedPATH(annotatedPeak, orgAnn="org.Hs.eg.db",
                  feature_id_type="ensembl_gene_id",
                  pathAnn="KEGGREST", maxP=0.01,
                  minPATHterm=10, multiAdjMethod=NULL)
