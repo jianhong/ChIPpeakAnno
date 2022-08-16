@@ -158,7 +158,7 @@ switchColNames <- function(format=c("BED", "GFF",
            broadPeak=c("space", "start", "end", "names",
                        "score", "strand", "signalValue",
                        "pValue", "qValue"),
-           CSV=c("seqnames", "start", "end", "strand"),
+           CSV=c("space", "start", "end", "strand"),
            others=colNames,
            colNames)
 }
