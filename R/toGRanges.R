@@ -5,14 +5,14 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     }
     if ((!is(data, "data.frame")) || dim(data)[2] <3)
     {
-        stop("No valid data passed in. For example a data frame as BED format 
-             file with at least 3 fields in the order of: chromosome, start and end. 
-             Optional fields are name, score and strand etc. 
+        stop("No valid data passed in. For example a data frame as BED format
+             file with at least 3 fields in the order of: chromosome, start and end.
+             Optional fields are name, score and strand etc.
              Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
     }
     if(is.null(colNames)) colNames <- colnames(data)
-    colNames_space <- 
-        tolower(colNames) %in% c("space", "seqnames", "chr", "chrom", 
+    colNames_space <-
+        tolower(colNames) %in% c("space", "seqnames", "chr", "chrom",
                                  "chromosome", "chromosomes")
     if(length(sum(colNames_space))==1){
         colNames[colNames_space] <- "space"
@@ -22,17 +22,17 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     if(!all(c("space","start","end") %in% colNames)){
         stop("colname must contain space/seqnames, start and end.")
     }
-    if(length(colNames)<ncol(data)) 
+    if(length(colNames)<ncol(data))
         stop("the length of colNames is less than number of columns of data")
     colnames(data) <- colNames[1:ncol(data)]
-    
+
     getCol <- function(pattern, words, default){
         ss <- grep(pattern, colnames(data), ignore.case=TRUE)
-        if(length(ss)>1) 
+        if(length(ss)>1)
             stop(paste("input data has multiple columns for",words,"information"))
         if(length(ss)==1){
             re <- data[,ss]
-            data[, ss] <<- NULL 
+            data[, ss] <<- NULL
         }else{
             re <- default
         }
@@ -41,7 +41,7 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     ##prepare strand
     strand <- getCol("^strand$", "strand", "*")
     strand <- formatStrand(strand)
-    
+
     ##prepare name, memory comsume step. TODO, change it.
     names <- getCol("^name(s)?$", "names", NA)
     if(any(is.na(names)) || any(duplicated(names))) {
@@ -51,13 +51,13 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
         names <- sprintf(paste("X%0",nchar(as.character(n)),"d", sep=""), 1:n)
     }
     names <- make.names(names)
-    
+
     ##prepare score
     #   score <- getCol("^score$", "score", 1L)
     #   if(length(score)==1) score <- rep(1, nrow(data))
     #   if(all(is.na(score))) score <- rep(1, nrow(data))
     #   score <- as.numeric(as.character(score))
-    
+
     ##prepare start, end, seqnames
     start <- data$start
     end <- data$end
@@ -67,29 +67,29 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     if(!is.character(seqnames[1])) seqnames <- as.character(data$space)
     ## trim seqnames
     seqnames <- gsub("^\\s+|\\s+$", "", seqnames)
-    
-    gr <- GRanges(seqnames=seqnames, 
-                  ranges=IRanges(start=start, 
-                                 end=end, 
-                                 names = names), 
+
+    gr <- GRanges(seqnames=seqnames,
+                  ranges=IRanges(start=start,
+                                 end=end,
+                                 names = names),
                   strand=strand)
     rm(list=c("start", "end", "names", "strand", "seqnames"))
     metadata <- colnames(data)
-    metadata <- metadata[!metadata %in% c("seqnames", "space", "ranges", 
-                                          "strand", "seqlevels", 
-                                          "seqlengths", "isCircular", 
-                                          "genome", "start", 
+    metadata <- metadata[!metadata %in% c("seqnames", "space", "ranges",
+                                          "strand", "seqlevels",
+                                          "seqlengths", "isCircular",
+                                          "genome", "start",
                                           "end", "width", "element")]
     for(col in metadata){
         mcols(gr)[,col]<-data[,col]
     }
     rm(data)
     #  gc(verbose=FALSE, reset=TRUE)
-    if(format=="BED"){ 
+    if(format=="BED"){
         start(gr) <- start(gr) + 1 ## bed file is (start, end]
         if(length(gr$thickStart)>0 &
            length(gr$thickEnd)>0){
-            if(!(all(gr$thickStart==round(gr$thickStart)) && 
+            if(!(all(gr$thickStart==round(gr$thickStart)) &&
                all(gr$thickEnd==round(gr$thickEnd)))){
               stop("This is not a standard BED file. ",
                    "Maybe it is narrowPeak or broadPeak")
@@ -111,7 +111,7 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
                 gr$itemRgb <- NA
             }
         }
-        if(length(gr$blockCount)>0 & 
+        if(length(gr$blockCount)>0 &
            length(gr$blockSizes)>0 &
            length(gr$blockStarts)>0){
             blocksizes <- strsplit(as.character(gr$blockSizes), ",")
@@ -131,44 +131,45 @@ df2GRanges <- function(data, colNames=NULL, format="", ...){
     return(gr)
 }
 
-switchColNames <- function(format=c("BED", "GFF",  
+switchColNames <- function(format=c("BED", "GFF",
                                     "MACS", "MACS2", "MACS2.broad",
-                                    "narrowPeak", "broadPeak",
+                                    "narrowPeak", "broadPeak", "CSV",
                                     "others"), colNames=NULL){
     format <- match.arg(format)
     switch(format,
-           BED=c("space", "start", "end", "names", 
-                 "score", "strand", "thickStart", 
-                 "thickEnd", "itemRgb", "blockCount", 
+           BED=c("space", "start", "end", "names",
+                 "score", "strand", "thickStart",
+                 "thickEnd", "itemRgb", "blockCount",
                  "blockSizes", "blockStarts"),
-           GFF=c("space", "source", "names", "start", 
+           GFF=c("space", "source", "names", "start",
                  "end", "score", "strand", "frame", "group"),
-           MACS=c("space", "start", "end", "length", 
-                  "summit", "tags", "-10*log10(pvalue)", 
+           MACS=c("space", "start", "end", "length",
+                  "summit", "tags", "-10*log10(pvalue)",
                   "fold_enrichment", "FDR"),
-           MACS2=c("space", "start", "end", "length", 
-                   "abs_summit", "pileup", "-log10(pvalue)", 
+           MACS2=c("space", "start", "end", "length",
+                   "abs_summit", "pileup", "-log10(pvalue)",
                    "fold_enrichment", "-log10(qvalue)", "names"),
-           MACS2.broad=c("space", "start", "end", "length", 
-                         "pileup", "-log10(pvalue)", 
+           MACS2.broad=c("space", "start", "end", "length",
+                         "pileup", "-log10(pvalue)",
                          "fold_enrichment", "-log10(qvalue)", "names"),
-           narrowPeak=c("space", "start", "end", "names", 
-                        "score", "strand", "signalValue", 
+           narrowPeak=c("space", "start", "end", "names",
+                        "score", "strand", "signalValue",
                         "pValue", "qValue", "peak"),
-           broadPeak=c("space", "start", "end", "names", 
-                       "score", "strand", "signalValue", 
+           broadPeak=c("space", "start", "end", "names",
+                       "score", "strand", "signalValue",
                        "pValue", "qValue"),
+           CSV=c("seqnames", "start", "end", "strand"),
            others=colNames,
            colNames)
 }
 
 #' Convert dataset to GRanges
-#' 
+#'
 #' Convert UCSC BED format and its variants, such as GFF, or any user defined
 #' dataset such as MACS output file to GRanges
-#' 
+#'
 #' @rdname toGRanges
-#' @aliases toGRanges toGRanges,data.frame-method 
+#' @aliases toGRanges toGRanges,data.frame-method
 #' @param data an object of data.frame, \link[GenomicFeatures:TxDb-class]{TxDb}
 #' or \link[ensembldb]{EnsDb}, or the file name of data to be imported.
 #' Alternatively, data can be a readable txt-mode connection (See ?read.table).
@@ -176,7 +177,7 @@ switchColNames <- function(format=c("BED", "GFF",
 #' narrowPeak or broadPeak, please refer to
 #' http://genome.ucsc.edu/FAQ/FAQformat#format1 for column order. "MACS" is for
 #' converting the excel output file from MACS1. "MACS2" is for converting the
-#' output file from MACS2.
+#' output file from MACS2. If set to CSV, must have columns: seqnames, start, end, strand.
 #' @param feature annotation type
 #' @param header A logical value indicating whether the file contains the names
 #' of the variables as its first line. If missing, the value is determined from
@@ -198,7 +199,7 @@ switchColNames <- function(format=c("BED", "GFF",
 #' @exportMethod toGRanges
 #' @export toGRanges
 #' @examples
-#' 
+#'
 #'   macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
 #'   macsOutput <- toGRanges(macs, format="MACS")
 #'   if(interactive() || Sys.getenv("USER")=="jianhongou"){
@@ -216,6 +217,9 @@ switchColNames <- function(format=c("BED", "GFF",
 #'     ## broadPeak
 #'     toGRanges(system.file("extdata", "TAF.broadPeak", package="ChIPpeakAnno"),
 #'                 format="broadPeak")
+#'     ## CSV
+#'     toGRanges(system.file("extdata", "peaks.csv", package="ChIPpeakAnno"),
+#'                 format="CSV")
 #'     ## MACS2
 #'     toGRanges(system.file("extdata", "MACS2_peaks.xls", package="ChIPpeakAnno"),
 #'                 format="MACS2")
@@ -233,11 +237,11 @@ switchColNames <- function(format=c("BED", "GFF",
 #'     macs <- read.delim(macs, comment.char="#")
 #'     toGRanges(macs)
 #'   }
-#' 
+#'
 #' @importFrom grDevices rgb
-#' 
+#'
 setGeneric("toGRanges", function(data, ...) standardGeneric("toGRanges"))
-setMethod("toGRanges", "data.frame", 
+setMethod("toGRanges", "data.frame",
           function(data, colNames=NULL, ...){
               this.call <- match.call(expand.dots=TRUE)
               this.call[[1]] <- df2GRanges
@@ -248,7 +252,7 @@ setMethod("toGRanges", "data.frame",
 
 
 message4GTF <- function(con){
-  message("If you are importing files downloaded from ensembl, 
+  message("If you are importing files downloaded from ensembl,
           it will be better to import the files into a TxDb object,
           and then convert to GRanges by toGRanges. Here is the sample code:
           library(GenomicFeatures)
@@ -260,11 +264,11 @@ message4GTF <- function(con){
 #' @importFrom utils read.table
 #' @rdname toGRanges
 #' @aliases toGRanges,connection-method
-setMethod("toGRanges", "connection", 
-          function(data, format=c("BED", "GFF", "GTF", 
-                                  "MACS", "MACS2", "MACS2.broad", 
+setMethod("toGRanges", "connection",
+          function(data, format=c("BED", "GFF", "GTF",
+                                  "MACS", "MACS2", "MACS2.broad",
                                   "narrowPeak", "broadPeak",
-                                  "others"), 
+                                  "others"),
                    header=FALSE, comment.char="#", colNames=NULL, ...){
               format <- match.arg(format)
               if(format %in% c("GFF", "GTF")){
@@ -273,16 +277,16 @@ setMethod("toGRanges", "connection",
                 return(gr)
               }
               colNames <- switchColNames(format, colNames)
-              if(is.null(colNames)) 
+              if(is.null(colNames))
                   stop("colNames is required for unkown format.")
               if(format %in% c("narrowPeak", "broadPeak")){
-                  data <- read.table(data, header=FALSE, 
+                  data <- read.table(data, header=FALSE,
                                      fill=TRUE, stringsAsFactors=FALSE)
                   data <- data[!grepl("track|browser", data[, 1]), 1:ncol(data)]
-                  classes <- c("character", "integer", "integer", "character", 
-                               "integer", "character", "numeric", "numeric", 
+                  classes <- c("character", "integer", "integer", "character",
+                               "integer", "character", "numeric", "numeric",
                                "numeric", "integer")[1:ncol(data)]
-                  for(i in 1:ncol(data)){ 
+                  for(i in 1:ncol(data)){
                       class(data[, i]) <- mode(data[, i]) <- classes[i]
                   }
               }else{
@@ -290,7 +294,7 @@ setMethod("toGRanges", "connection",
                       header <- TRUE
                       comment.char <- "#"
                   }
-                  data <- read.table(data, header=header, 
+                  data <- read.table(data, header=header,
                                      comment.char=comment.char,
                                      ...)
               }
@@ -304,7 +308,7 @@ setMethod("toGRanges", "connection",
 
 #' @rdname toGRanges
 #' @aliases toGRanges,TxDb-method
-setMethod("toGRanges", "TxDb", 
+setMethod("toGRanges", "TxDb",
           function(data, feature=c("gene", "transcript", "exon",
                                    "CDS", "fiveUTR", "threeUTR",
                                    "microRNA", "tRNAs", "geneModel"),
@@ -318,9 +322,9 @@ setMethod("toGRanges", "TxDb",
           })
 
 #' @rdname toGRanges
-#' @aliases toGRanges,EnsDb-method 
-setMethod("toGRanges", "EnsDb", 
-          function(data, 
+#' @aliases toGRanges,EnsDb-method
+setMethod("toGRanges", "EnsDb",
+          function(data,
                    feature=c("gene", "transcript", "exon", "disjointExons"),
                    ...){
               feature <- match.arg(feature)
@@ -329,52 +333,62 @@ setMethod("toGRanges", "EnsDb",
 
 #' @rdname toGRanges
 #' @aliases toGRanges,character-method
-setMethod("toGRanges", "character", 
-          function(data, format=c("BED", "GFF", "GTF", 
-                                  "MACS", "MACS2", "MACS2.broad", 
-                                  "narrowPeak", "broadPeak",
-                                  "others"), 
+setMethod("toGRanges", "character",
+          function(data, format=c("BED", "GFF", "GTF",
+                                  "MACS", "MACS2", "MACS2.broad",
+                                  "narrowPeak", "broadPeak", "CSV",
+                                  "others"),
                    header=FALSE, comment.char="#", colNames=NULL, ...){
               format <- match.arg(format)
               if(format %in% c("GFF", "GTF")){
                 message4GTF(data)
                 gr <- import(data, format=format)
                 return(gr)
-              }
-              if(format %in% c("narrowPeak", "broadPeak")){
-                  data <- read.table(data, header=FALSE, 
+              } else if (format %in% c("narrowPeak", "broadPeak")){
+                  data <- read.table(data, header=FALSE,
                                      fill=TRUE, stringsAsFactors=FALSE)
                   data <- data[!grepl("track|browser", data[, 1]), 1:ncol(data)]
-                  classes <- c("character", "integer", "integer", "character", 
-                               "integer", "character", "numeric", "numeric", 
+                  classes <- c("character", "integer", "integer", "character",
+                               "integer", "character", "numeric", "numeric",
                                "numeric", "integer")[1:ncol(data)]
-                  for(i in 1:ncol(data)){ 
+                  for(i in 1:ncol(data)){
                       class(data[, i]) <- mode(data[, i]) <- classes[i]
                   }
-              }else{
+              } else if (format %in% c("CSV")) {
+                  data <- read.csv(data, header=TRUE)
+                  cols_data <- colnames(data)
+                  cols_need <- c("start", "end", "strand")
+                  if (!("seqnames" %in% cols_data) && !("space" %in% cols_data)) {
+                    stop("CSV file lacks column: seqnames or space!")
+                  } else if (!all(cols_need %in% cols_data)) {
+                    stop(paste0("CSV file must have columns: ", gsub(',$', '', paste0(cols_need, collapse = "", sep = ",")), " !"))
+                  }
+                  colnames(data) <- gsub("seqnames", "space", colnames(data))
+                  data <- data[,c("space", cols_need)]
+              } else {
                   if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                       header <- TRUE
                       comment.char <- "#"
                   }
-                  tab5rows <- read.table(data, header=header, 
-                                         comment.char=comment.char, ..., 
+                  tab5rows <- read.table(data, header=header,
+                                         comment.char=comment.char, ...,
                                          nrows=5)
                   classes <- sapply(tab5rows, class)
                   if(format=="BED"){##check class of column 2 and 3
                       if(classes[2]!="integer"||classes[3]!="integer")
-                          stop("No valid data passed in. For example a data frame as 
-                               BED format file with at least 3 fields in the order of: 
+                          stop("No valid data passed in. For example a data frame as
+                               BED format file with at least 3 fields in the order of:
                                chromosome, start and end. Optional fields are name, score and strand etc.
-                               Column 2 and 3 must be integer. 
+                               Column 2 and 3 must be integer.
                                Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
                       if(!is.na(classes[5])) classes[5] <- "numeric"
                       classes[1] <- "character"
                   }else{
                       if(format=="GFF"){##check class of column 4 and 5
                           if(classes[4]!="integer"||classes[5]!="integer")
-                              stop("No valid data passed in. 
+                              stop("No valid data passed in.
                                    For example a data frame as
-                                   GFF format file with 9 fields in the order of: 
+                                   GFF format file with 9 fields in the order of:
                                    seqname, source, feature, start, end, score, strand, frame and group.
                                    Column 4 and 5 must be integer.
                                    Please refer to http://genome.ucsc.edu/FAQ/FAQformat#format1 for details.")
@@ -389,11 +403,11 @@ setMethod("toGRanges", "character",
                           }
                       }
                   }
-                  if(format=="BED" && length(classes)>12) 
+                  if(format=="BED" && length(classes)>12)
                       classes[13:length(classes)] <- rep("NULL", length(classes)-12)
-                  
-                  data <- read.table(data, header=header, 
-                                     comment.char=comment.char, ..., 
+
+                  data <- read.table(data, header=header,
+                                     comment.char=comment.char, ...,
                                      colClasses=classes)
                   rm(list=c("tab5rows", "classes"))
               }
