@@ -158,7 +158,6 @@ switchColNames <- function(format=c("BED", "GFF",
            broadPeak=c("space", "start", "end", "names",
                        "score", "strand", "signalValue",
                        "pValue", "qValue"),
-           CSV=c("space", "start", "end", "strand"),
            others=colNames,
            colNames)
 }
@@ -181,8 +180,8 @@ switchColNames <- function(format=c("BED", "GFF",
 #' @param feature annotation type
 #' @param header A logical value indicating whether the file contains the names
 #' of the variables as its first line. If missing, the value is determined from
-#' the file format: header is set to TRUE if and only if the first row contains
-#' one fewer field than the number of columns.
+#' the file format: header is set to TRUE if the first row contains
+#' one fewer field than the number of columns or the format is set to 'CSV'.
 #' @param comment.char character: a character vector of length one containing a
 #' single character or an empty string. Use "" to turn off the interpretation
 #' of comments altogether.
@@ -198,6 +197,7 @@ switchColNames <- function(format=c("BED", "GFF",
 #' @keywords misc
 #' @exportMethod toGRanges
 #' @export toGRanges
+#' @importFrom utils read.csv
 #' @examples
 #'
 #'   macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
@@ -267,7 +267,7 @@ message4GTF <- function(con){
 setMethod("toGRanges", "connection",
           function(data, format=c("BED", "GFF", "GTF",
                                   "MACS", "MACS2", "MACS2.broad",
-                                  "narrowPeak", "broadPeak",
+                                  "narrowPeak", "broadPeak", "CSV",
                                   "others"),
                    header=FALSE, comment.char="#", colNames=NULL, ...){
               format <- match.arg(format)
@@ -276,9 +276,6 @@ setMethod("toGRanges", "connection",
                 gr <- import(data, format=format)
                 return(gr)
               }
-              colNames <- switchColNames(format, colNames)
-              if(is.null(colNames))
-                  stop("colNames is required for unkown format.")
               if(format %in% c("narrowPeak", "broadPeak")){
                   data <- read.table(data, header=FALSE,
                                      fill=TRUE, stringsAsFactors=FALSE)
@@ -289,6 +286,13 @@ setMethod("toGRanges", "connection",
                   for(i in 1:ncol(data)){
                       class(data[, i]) <- mode(data[, i]) <- classes[i]
                   }
+              } else if (format %in% c("CSV")) {
+                data <- read.csv(data, header=TRUE)
+                if(any(colnames(data)=="X") &
+                   all(!colnames(data) %in% c("names", "name"))){
+                  colnames(data)[colnames(data)=="X"] <- "names"
+                }
+                colNames <- colnames(data)
               }else{
                   if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                       header <- TRUE
@@ -298,10 +302,9 @@ setMethod("toGRanges", "connection",
                                      comment.char=comment.char,
                                      ...)
               }
-              nc <- min(length(colNames), ncol(data))
-              data <- data[, 1:nc, drop=FALSE]
-              colNames <- colNames[1:nc]
-              colnames(data) <- colNames
+              colNames <- switchColNames(format, colNames)
+              if(is.null(colNames))
+                stop("colNames is required for unkown format.")
               gr <- df2GRanges(data, colNames, format, ...)
               return(gr)
           })
@@ -356,15 +359,11 @@ setMethod("toGRanges", "character",
                   }
               } else if (format %in% c("CSV")) {
                   data <- read.csv(data, header=TRUE)
-                  cols_data <- colnames(data)
-                  cols_need <- c("start", "end", "strand")
-                  if (!("seqnames" %in% cols_data) && !("space" %in% cols_data)) {
-                    stop("CSV file lacks column: seqnames or space!")
-                  } else if (!all(cols_need %in% cols_data)) {
-                    stop(paste0("CSV file must have columns: ", gsub(',$', '', paste0(cols_need, collapse = "", sep = ",")), " !"))
+                  if(any(colnames(data)=="X") &
+                     all(!colnames(data) %in% c("names", "name"))){
+                    colnames(data)[colnames(data)=="X"] <- "names"
                   }
-                  colnames(data) <- gsub("seqnames", "space", colnames(data))
-                  data <- data[,c("space", cols_need)]
+                  colNames <- colnames(data)
               } else {
                   if(format %in% c("MACS", "MACS2", "MACS2.broad")){
                       header <- TRUE

@@ -14,6 +14,11 @@ test_that("toGRanges works not correct", {
     gr <- toGRanges(bed, format="BED")
     expect_equal(seqlevels(gr), c("1", "2"))
     
+    ## csv
+    gr <- toGRanges(system.file("extdata", "peaks.csv",
+                                package="ChIPpeakAnno"),
+                    format="CSV")
+    
     ##data.frame
     gr <- toGRanges(bed)
     expect_equal(start(gr), c(100, 1000))

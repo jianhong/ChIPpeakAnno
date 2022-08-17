@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.31.1
+CHANGES IN VERSION 3.31.2
+-------------------------
+
+    o support `CSV` format for `toGRanges`
+    
+CHANGES IN VERSION 3.31.2
 -------------------------
 
     o use 'entrez_id' instead of 'EntrezID' for getEnrichedPATH() output

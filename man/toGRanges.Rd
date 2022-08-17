@@ -14,7 +14,7 @@ toGRanges(data, ...)
 \S4method{toGRanges}{connection}(
   data,
   format = c("BED", "GFF", "GTF", "MACS", "MACS2", "MACS2.broad", "narrowPeak",
-    "broadPeak", "others"),
+    "broadPeak", "CSV", "others"),
   header = FALSE,
   comment.char = "#",
   colNames = NULL,
@@ -38,7 +38,7 @@ toGRanges(data, ...)
 \S4method{toGRanges}{character}(
   data,
   format = c("BED", "GFF", "GTF", "MACS", "MACS2", "MACS2.broad", "narrowPeak",
-    "broadPeak", "others"),
+    "broadPeak", "CSV", "others"),
   header = FALSE,
   comment.char = "#",
   colNames = NULL,
@@ -56,12 +56,12 @@ Alternatively, data can be a readable txt-mode connection (See ?read.table).}
 narrowPeak or broadPeak, please refer to
 http://genome.ucsc.edu/FAQ/FAQformat#format1 for column order. "MACS" is for
 converting the excel output file from MACS1. "MACS2" is for converting the
-output file from MACS2.}
+output file from MACS2. If set to CSV, must have columns: seqnames, start, end, strand.}
 
 \item{header}{A logical value indicating whether the file contains the names
 of the variables as its first line. If missing, the value is determined from
-the file format: header is set to TRUE if and only if the first row contains
-one fewer field than the number of columns.}
+the file format: header is set to TRUE if the first row contains
+one fewer field than the number of columns or the format is set to 'CSV'.}
 
 \item{comment.char}{character: a character vector of length one containing a
 single character or an empty string. Use "" to turn off the interpretation
@@ -103,6 +103,9 @@ dataset such as MACS output file to GRanges
     ## broadPeak
     toGRanges(system.file("extdata", "TAF.broadPeak", package="ChIPpeakAnno"),
                 format="broadPeak")
+    ## CSV
+    toGRanges(system.file("extdata", "peaks.csv", package="ChIPpeakAnno"),
+                format="CSV")
     ## MACS2
     toGRanges(system.file("extdata", "MACS2_peaks.xls", package="ChIPpeakAnno"),
                 format="MACS2")
