@@ -6,7 +6,6 @@
 #' @param sequence The sequences packaged in DNAStringSet, DNAString object or
 #' output of function \link{getAllPeakSequence}.
 #' @param MarkovOrder Markov order.
-#' @param last The sequence size to be analyzed.
 #' @return A numeric vector.
 #' @author Jianhong Ou
 #' @seealso See Also as \code{\link{oligoSummary}}
@@ -17,38 +16,29 @@
 #'     library(Biostrings)
 #'     oligoFrequency(DNAString("AATTCGACGTACAGATGACTAGACT"))
 #' 
-oligoFrequency <- function(sequence, MarkovOrder=3L, last=1e6){
+oligoFrequency <- function(sequence, MarkovOrder=3L){
     stopifnot(is.numeric(MarkovOrder))
     stopifnot(MarkovOrder>0)
     stopifnot("The seqinr package is required." = 
                   requireNamespace("seqinr", quietly = TRUE))
     if(is(sequence, "GRanges")){
         sequence <- sequence$sequence
-    }else{
-        if(inherits(sequence, c("DNAStringSet", "DNAString"))){
-            sequence <- as.character(sequence)
-        }else{
-            if(!is.character(sequence)){
-                stop("sequence must be an object of DNAStringSet or DNAString",
-                     "or output of getAllPeakSequence")
-            }
-        }
+    }
+    if(is.character(sequence)){
+      sequence <- DNAStringSet(sequence)
+    }
+    if(!inherits(sequence, c("DNAStringSet", "DNAString"))){
+      stop("sequence must be an object of DNAStringSet or DNAString",
+           "or output of getAllPeakSequence")
     }
     MarkovOrder <- as.integer(MarkovOrder)
-    if(length(sequence)<=1){
-        seqInOne <- tolower(sequence)
-    }else{
-        seqInOne <- tolower(paste0(sequence, collapse="NNN"))
-    }
-    if(nchar(seqInOne)>last){
-        message("The size of input sequence is too big! ",
-                "Only subset is uesed for frequency calculation.")
-        seqInOne <- substring(seqInOne, 1, last)
-    }
+    total <- sum(nchar(sequence))
     freqs <- lapply(unique(c(1, MarkovOrder, MarkovOrder+1)), function(m){
-        seqinr::count(seqinr::s2c(seqInOne), 
-                      wordsize=m, freq = TRUE,
-                      alphabet=c("a", "c", "g", "t"))
+        of <- oligonucleotideFrequency(sequence,
+                                       width = m,
+                                       as.prob = FALSE)
+        if(length(dim(of))==2) of <- colSums(of)
+        of/total
     })
     unlist(freqs, recursive = FALSE)
 }

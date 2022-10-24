@@ -4,15 +4,13 @@
 \alias{oligoFrequency}
 \title{get the oligonucleotide frequency}
 \usage{
-oligoFrequency(sequence, MarkovOrder = 3L, last = 1e+06)
+oligoFrequency(sequence, MarkovOrder = 3L)
 }
 \arguments{
 \item{sequence}{The sequences packaged in DNAStringSet, DNAString object or
 output of function \link{getAllPeakSequence}.}
 
 \item{MarkovOrder}{Markov order.}
-
-\item{last}{The sequence size to be analyzed.}
 }
 \value{
 A numeric vector.

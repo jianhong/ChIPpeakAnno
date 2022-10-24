@@ -201,9 +201,9 @@ os <- oligoSummary(seq, oligoLength=6, MarkovOrder=3,
                    quickMotif=FALSE, freqs=freqs)
 ## plot the results
 zscore <- sort(os$zscore)
-h <- hist(zscore, breaks=100, xlim=c(-50, 50), main="Histogram of Z-score")
-text(zscore[length(zscore)], max(h$counts)/10, 
-     labels=names(zscore[length(zscore)]), adj=1)
+h <- hist(zscore, breaks=100, main="Histogram of Z-score")
+text(zscore[length(zscore)], h$counts[length(h$counts)]+1, 
+     labels=names(zscore[length(zscore)]), adj=0, srt=90)
 ```
 ```{r simulation, fig.cap="Histogram of Z-score of simulation data", fig.width=6, fig.height=6}
 ## We can also try simulation data

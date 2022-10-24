@@ -1,4 +1,10 @@
-CHANGES IN VERSION 3.31.2
+CHANGES IN VERSION 3.31.4
+-------------------------
+
+    o update the oligoFrequency function to remove the limitation of sequence
+    length
+    
+CHANGES IN VERSION 3.31.3
 -------------------------
 
     o support `CSV` format for `toGRanges`
