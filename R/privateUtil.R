@@ -607,15 +607,13 @@ TxDb2GR <- function(ranges, feature, OrganismDb){
 #' @param ranges an EnsDb object
 #' @param feature feature type, could be disjointExons, gene, exon and 
 #' transcript
-#' @importFrom ensembldb disjointExons
+#' @importFrom GenomicFeatures exonicParts
 #' @importFrom GenomeInfoDb `seqlevelsStyle<-`
 EnsDb2GR <- function(ranges, feature){
     gr <- 
         switch(feature,
                disjointExons={
-                   e <- disjointExons(ranges,
-                                      aggregateGenes=FALSE,
-                                      includeTranscripts=TRUE)
+                   e <- exonicParts(ranges, linked.to.single.gene.only=TRUE)
                    l <- length(e)
                    names(e) <- make.names(
                        formatC(seq_len(l), 
