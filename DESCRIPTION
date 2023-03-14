@@ -3,7 +3,7 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.33.1
+Version: 3.33.2
 Encoding: UTF-8
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Kai Hu, Haibo Liu, 
     Hervé Pagès, Claude Gazin,
@@ -92,4 +92,4 @@ LazyData: true
 LazyDataCompression: xz
 biocViews: Annotation, ChIPSeq, ChIPchip
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

@@ -23,7 +23,7 @@ feature IDs}
 org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
 org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish}
 
-\item{pathAnn}{pathway annotation package such as KEGG.db, reactome.db, KEGGREST}
+\item{pathAnn}{pathway annotation package such as KEGG.db (deprecated), reactome.db, KEGGREST}
 
 \item{feature_id_type}{the feature type in annotatedPeakRanges such as
 ensembl_gene_id, refseq_id, gene_symbol or entrez_id}
