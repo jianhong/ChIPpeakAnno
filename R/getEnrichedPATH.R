@@ -11,7 +11,7 @@
 #' @param orgAnn organism annotation package such as org.Hs.eg.db for human and
 #' org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
 #' org.Sc.eg.db for yeast and org.Dr.eg.db for zebrafish
-#' @param pathAnn pathway annotation package such as KEGG.db, reactome.db, KEGGREST
+#' @param pathAnn pathway annotation package such as KEGG.db (deprecated), reactome.db, KEGGREST
 #' @param feature_id_type the feature type in annotatedPeakRanges such as
 #' ensembl_gene_id, refseq_id, gene_symbol or entrez_id
 #' @param maxP maximum p-value to be considered to be significant
@@ -143,10 +143,11 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         }
     }
     if(length(entrezIDs)<2){
-        stop("The number of gene is less than 2.
-             Please double check your feature_id_type.")
+        stop('The number of gene is less than 2. Please double check your feature_id_type. If using "ensembl_gene_id", do not include the version number. E.g. "ENSG00000139618" is okay while "ENSG00000139618.2" is not compatible. Use `ensembl_gene_id <- sub("\\.[^.]+$", "", ensembl_gene_id)` to batch remove the version number if needed.')
     }
-
+    if (pathAnn %in% c("KEGG.db")) {
+      stop('`pathAnn = "KEGG.db"` has been deprecated, use `pathAnn = "KEGGREST"` instead.')
+    }
     if (pathAnn %in% c("reactome.db", "KEGG.db")) {
         extid2path<- paste(gsub(".db$","",pathAnn),"EXTID2PATHID", sep="")
         path2name<- paste(gsub(".db$","",pathAnn),"PATHID2NAME", sep="")
