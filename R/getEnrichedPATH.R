@@ -211,7 +211,7 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
     all.PATH <- unique(all.PATH)## in case the database is not unique
     this.PATH <- unique(this.PATH)
     if (is.null(all.PATH) | is.null(this.PATH)) {
-    	return("No enriched pathway found!")
+    	return(data.frame(log = "No enriched pathway found!"))
     }
     colnames(all.PATH)<-c("path.id","entrez_id")
     colnames(this.PATH)<-c("path.id","entrez_id")
