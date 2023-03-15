@@ -249,12 +249,21 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     xx <- mget(mapped_genes, goAnn, ifnotfound=NA)
     all.GO <- cbind(matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE),
                     rep(names(xx), elementNROWS(xx)))
-    all.GO <- unique(all.GO)## incalse the database is not unique
+    all.GO <- unique(all.GO)## in case the database is not unique
+    if (!(inherits(all.GO, "matrix"))) {
+      all.GO <- matrix(all.GO, nrow = 1)
+    }
     this.GO <- all.GO[all.GO[, 4] %in% entrezIDs, , drop=FALSE]
+    if (!(inherits(this.GO, "matrix"))) {
+      this.GO <- matrix(this.GO, nrow = 1)
+    }
     FALSE.GO <- all.GO[all.GO[, 4] %in% entrezIDs_FALSE, , drop=FALSE]
 
     addAnc <- function(go.ids,
                        onto=c("bp", "cc", "mf")){
+    		if (!(inherits(go.ids, "matrix"))) {
+    			go.ids <- matrix(go.ids, nrow = 1)
+    		}
         ##replace the function addAncestors
         GOIDs <- unique(as.character(go.ids[, 1]))
         empty <- matrix(nrow=0, ncol=2)
@@ -309,9 +318,9 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         re
     }
 
-    bp.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="BP",],"bp")
+    bp.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="BP",], "bp")
     cc.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="CC",], "cc")
-    mf.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="MF",],"mf")
+    mf.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="MF",], "mf")
 
     bp.go.all.withEntrez  = addAnc(all.GO[all.GO[,3]=="BP",], "bp")
     cc.go.all.withEntrez = addAnc(all.GO[all.GO[,3]=="CC",], "cc")

@@ -207,12 +207,14 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
         }
     }))
 
-    all.PATH <- unique(all.PATH)## incase the database is not unique
-    this.PATH <- unique(this.PATH)
 
+    all.PATH <- unique(all.PATH)## in case the database is not unique
+    this.PATH <- unique(this.PATH)
+    if (is.null(all.PATH) | is.null(this.PATH)) {
+    	return("No enriched pathway found!")
+    }
     colnames(all.PATH)<-c("path.id","entrez_id")
     colnames(this.PATH)<-c("path.id","entrez_id")
-
     path.all<-as.character(all.PATH[,"path.id"])
     path.this<-as.character(this.PATH[,"path.id"])
 
@@ -246,7 +248,7 @@ Entrez Gene to pathway identifies named as xxxxxEXTID2PATHID
 
     colnames(selected) = c("path.id", "count.InDataset", "count.InGenome",
                            "pvalue", "totaltermInDataset", "totaltermInGenome")
-
+		
     annoTerms <- function(termids){
         if(length(termids)<1){
             goterm <- matrix(ncol=2)
