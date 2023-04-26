@@ -121,7 +121,7 @@ makeVennDiagram <- function(Peaks, NameOfPeaks, maxgap=-1L, minoverlap=0L,
     on.exit(par(op))
     grid.newpage()
     dots$x <- vennx
-    dots <- c(dots, filename=list(NULL))
+    dots <- c(dots, filename=list(NULL), disable.logging = TRUE)
     venngrid <- do.call(venn.diagram, dots)
     unlink(dir(pattern="^VennDiagram[0-9_\\-]+.log$")) ## delete the log file
     if(grepl("^count\\.", colnames(venn_cnt)[ncol(venn_cnt)]) && 
