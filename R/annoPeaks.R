@@ -75,7 +75,17 @@ annoPeaks <- function(peaks, annoData,
     }
     stopifnot(inherits(peaks, "GRanges"))
     stopifnot(inherits(annoData, c("annoGR", "GRanges")))
-    stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
+    check_seqlevel <- tryCatch({
+    	seqlevelsStyle(peaks)
+    	seqlevelsStyle(annoData)
+    }, error = function(w) {
+    	message("Warning: seqlevel style not recognized, you are probably using custom GRange objects: ", w$message)
+    	return(NA)
+    })
+    if (!is.na(check_seqlevel)) {
+    	stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
+    }
+    # stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
     stopifnot(length(bindingRegion)==2)
     stopifnot(bindingRegion[1]<=0 && bindingRegion[2]>=1)
     if(ignore.peak.strand){
