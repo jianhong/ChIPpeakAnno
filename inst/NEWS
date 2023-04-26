@@ -1,4 +1,9 @@
-CHANGES IN VERSION 3.33.1
+CHANGES IN VERSION 3.35.1
+-------------------------
+
+    o fix the seqlevelsStyle check for custom species.
+
+CHANGES IN VERSION 3.33.2
 -------------------------
 
     o update the documentation for enrichment analysis

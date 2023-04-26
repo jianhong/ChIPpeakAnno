@@ -82,7 +82,7 @@ annoPeaks <- function(peaks, annoData,
     	message("Warning: seqlevel style not recognized, you are probably using custom GRange objects: ", w$message)
     	return(NA)
     })
-    if (!is.na(check_seqlevel)) {
+    if (!any(is.na(check_seqlevel))) {
     	stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
     }
     # stopifnot(length(intersect(seqlevelsStyle(peaks),seqlevelsStyle(annoData)))>0)
