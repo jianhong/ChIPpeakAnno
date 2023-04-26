@@ -10,6 +10,7 @@
 #' @author Jianhong Ou
 #' @seealso See Also as \code{\link{oligoSummary}}
 #' @keywords misc
+#' @importFrom Biostrings oligonucleotideFrequency
 #' @export
 #' @examples
 #'     library(seqinr)
