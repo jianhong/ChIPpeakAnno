@@ -623,7 +623,7 @@ annotatePeakInBatch <-
             distN <- distN[!is.na(distN$subjectHits),]
             distO$output <- rep("Overlapping", nrow(distO))
             distO <- distO[!is.na(distO$subjectHits),]
-            dist <- rbind(distN, distO)
+            dist <- rbind(distO, distN)
             dist <- dist[!duplicated(dist[,c("queryHits", "subjectHits")]),
                          ,drop=FALSE]
             dist <- dist[order(dist$queryHits, dist$subjectHits),,drop=FALSE]

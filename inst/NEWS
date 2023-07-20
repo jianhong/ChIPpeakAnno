@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.35.2
+-------------------------
+
+    o fix the order issue when "both" method is used for annotatePeakInBatch.
+
 CHANGES IN VERSION 3.35.1
 -------------------------
 
