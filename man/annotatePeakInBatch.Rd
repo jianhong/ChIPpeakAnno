@@ -2,8 +2,7 @@
 % Please edit documentation in R/annotatePeakInBatch.R
 \name{annotatePeakInBatch}
 \alias{annotatePeakInBatch}
-\title{Obtain the distance to the nearest TSS, miRNA, and/or exon for a list of
-peaks}
+\title{Obtain the distance to the nearest TSS, miRNA, and/or exon for a list of peaks}
 \usage{
 annotatePeakInBatch(
   myPeakList,
@@ -30,31 +29,36 @@ annotatePeakInBatch(
 useMart of bioMaRt package for details}
 
 \item{featureType}{A charcter vector used with mart argument if
-AnnotationData is not supplied; it's value is "TSS"", "miRNA"" or "Exon"}
+AnnotationData is not supplied; choose from "TSS", "miRNA" or "Exon"}
 
 \item{AnnotationData}{A \link[GenomicRanges:GRanges-class]{GRanges} or
-\link{annoGR} oject.  It can be obtained from function getAnnotation or
+\link{annoGR} object. It can be obtained from the function getAnnotation or
 customized annotation of class GRanges containing additional variable:
 strand (1 or + for plus strand and -1 or - for minus strand). Pre-compliled
 annotations, such as TSS.human.NCBI36, TSS.mouse.NCBIM37, TSS.rat.RGSC3.4
 and TSS.zebrafish.Zv8, are provided by this package (attach them with data()
 function). Another method to provide annotation data is to obtain through
-biomaRt real time by using the parameters of mart and featureType}
+biomaRt in real time by using the mart and featureType option}
 
-\item{output}{\describe{ \item{nearestLocation (default)}{will output the
-nearest features calculated as PeakLoc - FeatureLocForDistance}
+\item{output}{\describe{ 
+\item{nearestLocation (default)}{will 
+output the nearest features calculated as PeakLoc - FeatureLocForDistance; when
+selected, the output can consist of both "strictly nearest features 
+(non-overlapping)" and "overlapping features" as long as they are the nearest}
 \item{overlapping}{will output overlapping features with maximum gap
-specified as maxgap between peak range and feature range}
-\item{shortestDistance}{will output nearest features} \item{both}{will
-output all the nearest features, in addition, will output any features that
-overlap the peak that is not the nearest features}
-\item{upstream&inside}{will output all upstream and overlapping features
-with maximum gap} \item{inside&downstream}{will output all downstream and
-overlapping features with maximum gap} \item{upstream}{will output all
-upstream features with maximum gap.} \item{downstream}{will output all
-downstream features with maximum gap.} \item{upstreamORdownstream}{will
-output all upstream features with maximum gap or downstream with maximum
-gap} \item{nearestBiDirectionalPromoters}{will use \link{annoPeaks} to
+specified as maxgap between peak range and feature range; it is possible for a
+peak to be annotated with zero ("NA" will be returned) or multiple overlapping features if exist}
+\item{both}{will output all the nearest features as well as any features
+that overlap with the peak that is not the nearest}
+\item{shortestDistance}{will output the features with the shortest distance;
+the "shortest distance" is determined from either ends of the feature to either
+ends of the peak} 
+\item{upstream&inside}{will output all upstream and overlapping features with maximum gap} 
+\item{inside&downstream}{will output all downstream and overlapping features with maximum gap}
+\item{upstream}{will output all upstream features with maximum gap} 
+\item{downstream}{will output all downstream features with maximum gap} 
+\item{upstreamORdownstream}{will output all upstream features with maximum gap or downstream with maximum gap} 
+\item{nearestBiDirectionalPromoters}{will use \link{annoPeaks} to
 annotate peaks. Nearest promoters from both direction of the peaks (strand
 is considered). It will report bidirectional promoters if there are
 promoters in both directions in the given region (defined by bindingRegion).
@@ -139,14 +143,13 @@ location of feature for calculating this}
 \item{list("strand")}{1 or + for positive strand and -1 or - for negative
 strand where the feature is located} \item{list("shortestDistance")}{The
 shortest distance from either end of peak to either end the feature.  }
-\item{list("fromOverlappingOrNearest")}{nearest: indicates this feature's
-start (feature's end for features at minus strand) is closest to the peak
-start; Overlapping: indicates this feature overlaps with this peak although
-it is not the nearest feature start }
+\item{list("fromOverlappingOrNearest")}{Relevant only when output is set to "both". If "nearestLocation": indicates this feature's
+start (feature's end for features from minus strand) is the closest to the peak
+start ("strictly nearest" or "nearest overlapping"); if "Overlapping": indicates this
+feature overlaps with this peak although it is not the nearest (non-nearest overlapping) }
 }
 \description{
-Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak
-locations leveraging IRanges and biomaRt package
+Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
 }
 \examples{
 
