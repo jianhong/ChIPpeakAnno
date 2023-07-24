@@ -1,6 +1,8 @@
-#' Obtain the distance to the nearest TSS, miRNA, and/or exon for a list of peaks
+#' Obtain the distance to the nearest TSS, miRNA, and/or exon for a list of 
+#' peaks
 #' 
-#' Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak locations leveraging IRanges and biomaRt package
+#' Obtain the distance to the nearest TSS, miRNA, exon et al for a list of peak 
+#' locations leveraging IRanges and biomaRt package
 #' 
 #' 
 #' @param myPeakList A \link[GenomicRanges:GRanges-class]{GRanges} object
@@ -17,23 +19,27 @@
 #' function). Another method to provide annotation data is to obtain through
 #' biomaRt in real time by using the mart and featureType option
 #' @param output \describe{ 
-#' \item{nearestLocation (default)}{will 
-#' output the nearest features calculated as PeakLoc - FeatureLocForDistance; when
-#' selected, the output can consist of both "strictly nearest features 
-#' (non-overlapping)" and "overlapping features" as long as they are the nearest}
+#' \item{nearestLocation (default)}{will output the nearest features calculated 
+#' as PeakLoc - FeatureLocForDistance; when selected, the output can consist of 
+#' both "strictly nearest features (non-overlapping)" and "overlapping features"
+#' as long as they are the nearest}
 #' \item{overlapping}{will output overlapping features with maximum gap
-#' specified as maxgap between peak range and feature range; it is possible for a
-#' peak to be annotated with zero ("NA" will be returned) or multiple overlapping features if exist}
+#' specified as maxgap between peak range and feature range; it is possible for 
+#' a peak to be annotated with zero ("NA" will be returned) or multiple 
+#' overlapping features if exist}
 #' \item{both}{will output all the nearest features as well as any features
 #' that overlap with the peak that is not the nearest}
 #' \item{shortestDistance}{will output the features with the shortest distance;
-#' the "shortest distance" is determined from either ends of the feature to either
-#' ends of the peak} 
-#' \item{upstream&inside}{will output all upstream and overlapping features with maximum gap} 
-#' \item{inside&downstream}{will output all downstream and overlapping features with maximum gap}
+#' the "shortest distance" is determined from either ends of the feature to 
+#' either ends of the peak} 
+#' \item{upstream&inside}{will output all upstream and overlapping features with 
+#' maximum gap} 
+#' \item{inside&downstream}{will output all downstream and overlapping features 
+#' with maximum gap}
 #' \item{upstream}{will output all upstream features with maximum gap} 
 #' \item{downstream}{will output all downstream features with maximum gap} 
-#' \item{upstreamORdownstream}{will output all upstream features with maximum gap or downstream with maximum gap} 
+#' \item{upstreamORdownstream}{will output all upstream features with maximum 
+#' gap or downstream with maximum gap} 
 #' \item{nearestBiDirectionalPromoters}{will use \link{annoPeaks} to
 #' annotate peaks. Nearest promoters from both direction of the peaks (strand
 #' is considered). It will report bidirectional promoters if there are
@@ -52,10 +58,10 @@
 #' @param PeakLocForDistance Specify the location of peak for calculating
 #' distance,i.e., middle means using middle of the peak to calculate distance
 #' to feature, start means using start of the peak to calculate the distance to
-#' feature, endMinusStart means using the end of the peak to calculate the distance
-#' to features on plus strand and the start of the peak to calculate the distance
-#' to features on minus strand. To be compatible with previous version, 
-#' by default using start
+#' feature, endMinusStart means using the end of the peak to calculate the 
+#' distance to features on plus strand and the start of the peak to calculate 
+#' the distance to features on minus strand. To be compatible with previous 
+#' version, by default using start
 #' @param FeatureLocForDistance Specify the location of feature for calculating
 #' distance,i.e., middle means using middle of the feature to calculate
 #' distance of peak to feature, start means using start of the feature to
@@ -109,10 +115,12 @@
 #' \item{list("strand")}{1 or + for positive strand and -1 or - for negative
 #' strand where the feature is located} \item{list("shortestDistance")}{The
 #' shortest distance from either end of peak to either end the feature.  }
-#' \item{list("fromOverlappingOrNearest")}{Relevant only when output is set to "both". If "nearestLocation": indicates this feature's
-#' start (feature's end for features from minus strand) is the closest to the peak
-#' start ("strictly nearest" or "nearest overlapping"); if "Overlapping": indicates this
-#' feature overlaps with this peak although it is not the nearest (non-nearest overlapping) }
+#' \item{list("fromOverlappingOrNearest")}{Relevant only when output is set to 
+#' "both". If "nearestLocation": indicates this feature's start (feature's end 
+#' for features from minus strand) is the closest to the peak start ("strictly 
+#' nearest" or "nearest overlapping"); if "Overlapping": indicates this feature 
+#' overlaps with this peak although it is not the nearest (non-nearest 
+#' overlapping) }
 #' @author Lihua Julie Zhu, Jianhong Ou
 #' @seealso \link{getAnnotation}, \link{findOverlappingPeaks},
 #' \link{makeVennDiagram}, \link{addGeneIDs}, \link{peaksNearBDP},
