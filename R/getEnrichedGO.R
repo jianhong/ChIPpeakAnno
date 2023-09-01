@@ -1,11 +1,11 @@
 #' Obtain enriched gene ontology (GO) terms that near the peaks
-#'
+#' 
 #' Obtain enriched gene ontology (GO) terms based on the features near the
 #' enriched peaks using GO.db package and GO gene mapping package such as
 #' org.Hs.db.eg to obtain the GO annotation and using hypergeometric test
 #' (phyper) and multtest package for adjusting p-values
-#'
-#'
+#' 
+#' 
 #' @param annotatedPeak A GRanges object or a vector of feature IDs
 #' @param orgAnn Organism annotation package such as org.Hs.eg.db for human and
 #' org.Mm.eg.db for mouse, org.Dm.eg.db for fly, org.Rn.eg.db for rat,
@@ -23,9 +23,9 @@
 #' from the list.
 #' @param keepByLevel If the shortest path from the go term to 'all' is greater
 #' than the given level, the term will be removed.
-#' @param subGroupComparison A logical vector to split the peaks into two
+#' @param subGroupComparison A logical vector to split the peaks into two 
 #' groups. The enrichment analysis will compare the over-present GO terms
-#' in TRUE group and FALSE group separately. The analysis will split into
+#' in TRUE group and FALSE group separately. The analysis will split into 
 #' two steps: 1. enrichment analysis for TRUE group by hypergeometric
 #' test; 2. enrichment analysis for TRUE over FALSE group
 #' by Fisher's Exact test for the enriched GO terms.
@@ -34,66 +34,66 @@
 #' Default is NULL.
 #' @return A list with 3 elements \item{list("bp")}{ enriched biological
 #' process with the following 9 variables
-#'
+#' 
 #' go.id:GO biological process id
-#'
+#' 
 #' go.term:GO biological process term
-#'
+#' 
 #' go.Definition:GO biological process description
-#'
+#' 
 #' Ontology: Ontology branch, i.e. BP for biological process
-#'
+#' 
 #' count.InDataset: count of this GO term in this dataset
-#'
+#' 
 #' count.InGenome: count of this GO term in the genome
-#'
+#' 
 #' pvalue: pvalue from the hypergeometric test
-#'
+#' 
 #' totaltermInDataset: count of all GO terms in this dataset
-#'
+#' 
 #' totaltermInGenome: count of all GO terms in the genome
-#'
+#' 
 #' } \item{list("mf")}{enriched molecular function with the following 9
 #' variables
-#'
+#' 
 #' go.id:GO molecular function id
-#'
+#' 
 #' go.term:GO molecular function term
-#'
+#' 
 #' go.Definition:GO molecular function description
-#'
+#' 
 #' Ontology: Ontology branch, i.e. MF for molecular function
-#'
+#' 
 #' count.InDataset: count of this GO term in this dataset
-#'
+#' 
 #' count.InGenome: count of this GO term in the genome
-#'
+#' 
 #' pvalue: pvalue from the hypergeometric test
-#'
+#' 
 #' totaltermInDataset: count of all GO terms in this dataset
-#'
+#' 
 #' totaltermInGenome: count of all GO terms in the genome
-#'
+#' 
 #' } \item{list("cc")}{enriched cellular component the following 9 variables
-#'
+#' 
 #' go.id:GO cellular component id
-#'
+#' 
 #' go.term:GO cellular component term
-#'
+#' 
 #' go.Definition:GO cellular component description
-#'
+#' 
 #' Ontology: Ontology type, i.e. CC for cellular component
-#'
+#' 
 #' count.InDataset: count of this GO term in this dataset
-#'
+#' 
 #' count.InGenome: count of this GO term in the genome
-#'
+#' 
 #' pvalue: pvalue from the hypergeometric test
-#'
+#' 
 #' totaltermInDataset: count of all GO terms in this dataset
-#'
+#' 
 #' totaltermInGenome: count of all GO terms in the genome
-#'
+#' 
 #' }
 #' @author Lihua Julie Zhu. Jianhong Ou for subGroupComparison
 #' @seealso phyper, hyperGtest
@@ -106,7 +106,7 @@
 #' @importFrom AnnotationDbi Definition Ontology Term
 #' @importFrom stats phyper fisher.test
 #' @examples
-#'
+#' 
 #'   data(enrichedGO)
 #'   enrichedGO$mf[1:10,]
 #'   enrichedGO$bp[1:10,]
@@ -115,8 +115,8 @@
 #'      data(annotatedPeak)
 #'      library(org.Hs.eg.db)
 #'      library(GO.db)
-#'      enriched.GO = getEnrichedGO(annotatedPeak[1:6,],
-#'                                  orgAnn="org.Hs.eg.db",
+#'      enriched.GO = getEnrichedGO(annotatedPeak[1:6,], 
+#'                                  orgAnn="org.Hs.eg.db", 
 #'                                  maxP=0.01,
 #'                                  minGOterm=10,
 #'                                  multiAdjMethod= NULL)
@@ -125,9 +125,9 @@
 #'      dim(enriched.GO$bp)
 #'      enriched.GO$cc
 #' }
-#'
-getEnrichedGO <- function(annotatedPeak, orgAnn,
-                          feature_id_type="ensembl_gene_id",
+#' 
+getEnrichedGO <- function(annotatedPeak, orgAnn, 
+                          feature_id_type="ensembl_gene_id", 
                           maxP=0.01,
                           minGOterm=10, multiAdjMethod=NULL,
                           condense=FALSE,
@@ -145,32 +145,32 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     })
   }
   stopifnot("The 'GO.db' package is required"=
-              requireNamespace("GO.db", quietly = TRUE))
+              requireNamespace("GO.db", quietly = TRUE)) 
     if (missing(annotatedPeak))
     {
-        stop("Missing required argument annotatedPeak!")
+        stop("Missing required argument annotatedPeak!")    
     }
     if(length(multiAdjMethod)>0){
-        multiAdjMethod <- match.arg(multiAdjMethod,
-                                    c("Bonferroni", "Holm", "Hochberg",
+        multiAdjMethod <- match.arg(multiAdjMethod, 
+                                    c("Bonferroni", "Holm", "Hochberg", 
                                       "SidakSS", "SidakSD", "BH", "BY",
                                       "ABH","TSBH"))
     }
     if (missing(orgAnn))
     {
-        message("No valid organism specific GO gene mapping package
+        message("No valid organism specific GO gene mapping package 
                 as argument orgAnn is passed in!")
-        stop("Please refer
-             http://www.bioconductor.org/packages/release/data/annotation/
+        stop("Please refer 
+             http://www.bioconductor.org/packages/release/data/annotation/ 
              for available org.xx.eg.db packages")
     }
     GOgenome = sub(".db","",orgAnn)
     if (nchar(GOgenome) <1)
     {
-        message("No valid organism specific GO gene mapping package as
+        message("No valid organism specific GO gene mapping package as 
                 parameter orgAnn is passed in!")
-        stop("Please refer
-             http://www.bioconductor.org/packages/release/data/annotation/
+        stop("Please refer 
+             http://www.bioconductor.org/packages/release/data/annotation/ 
              for available org.xx.eg.db packages")
     }
     groupFALSE <- NULL
@@ -198,8 +198,8 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
           feature_ids_FALSE = unique(groupFALSE)
         }
     }else{
-        stop("annotatedPeak needs to be GRanges type with feature
-             variable holding the feature id or a character vector
+        stop("annotatedPeak needs to be GRanges type with feature 
+             variable holding the feature id or a character vector 
              holding the IDs of the features used to annotate the peaks!")
     }
     if (feature_id_type == "entrez_id"){
@@ -220,8 +220,8 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
                      ensembl_gene_id, refseq_id and gene_symbol!")
             orgAnn <- get(paste(GOgenome, orgAnn, sep=""))
             if(!is(orgAnn, "AnnDbBimap")){
-                stop("orgAnn is not a valid annotation dataset!
-                     For example, orgs.Hs.eg.db package for human and
+                stop("orgAnn is not a valid annotation dataset! 
+                     For example, orgs.Hs.eg.db package for human and 
                      the org.Mm.eg.db package for mouse.")
             }
             IDs <- unique(IDs[!is.na(IDs)])
@@ -238,32 +238,24 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         }
     }
     if(length(entrezIDs)<2){
-        stop('The number of gene is less than 2. Please double check your feature_id_type. If using "ensembl_gene_id", do not include the version number. E.g. "ENSG00000139618" is okay while "ENSG00000139618.2" is not compatible. Use `ensembl_gene_id <- sub("\\.[^.]+$", "", ensembl_gene_id)` to batch remove the version number if needed.')
+        stop("The number of gene is less than 2. 
+             Please double check your feature_id_type.")
     }
     goAnn <- get(paste(GOgenome,"GO", sep=""))
     mapped_genes <- mappedkeys(goAnn)
     totalN.genes=length(unique(mapped_genes))
     thisN.genes = length(unique(entrezIDs))
     #xx <- as.list(goAnn[mapped_genes])
-
+    
     xx <- mget(mapped_genes, goAnn, ifnotfound=NA)
     all.GO <- cbind(matrix(unlist(unlist(xx)),ncol=3,byrow=TRUE),
                     rep(names(xx), elementNROWS(xx)))
-    all.GO <- unique(all.GO)## in case the database is not unique
-    if (!(inherits(all.GO, "matrix"))) {
-      all.GO <- matrix(all.GO, nrow = 1)
-    }
+    all.GO <- unique(all.GO)## incalse the database is not unique
     this.GO <- all.GO[all.GO[, 4] %in% entrezIDs, , drop=FALSE]
-    if (!(inherits(this.GO, "matrix"))) {
-      this.GO <- matrix(this.GO, nrow = 1)
-    }
     FALSE.GO <- all.GO[all.GO[, 4] %in% entrezIDs_FALSE, , drop=FALSE]
-
+    
     addAnc <- function(go.ids,
                        onto=c("bp", "cc", "mf")){
-    		if (!(inherits(go.ids, "matrix"))) {
-    			go.ids <- matrix(go.ids, nrow = 1)
-    		}
         ##replace the function addAncestors
         GOIDs <- unique(as.character(go.ids[, 1]))
         empty <- matrix(nrow=0, ncol=2)
@@ -272,7 +264,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             return(empty)
         }
         onto <- match.arg(onto)
-        Ancestors <- switch(onto,
+        Ancestors <- switch(onto, 
                             bp=mget(GOIDs, GO.db::GOBPANCESTOR, ifnotfound = NA),
                             cc=mget(GOIDs, GO.db::GOCCANCESTOR, ifnotfound = NA),
                             mf=mget(GOIDs, GO.db::GOMFANCESTOR, ifnotfound = NA))
@@ -283,26 +275,26 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             children <- unique(children)
             children.s <- split(children[, 2], children[, 1])
             Ancestors <- switch(onto,
-                               bp=mget(Ancestors,
-                                       GO.db::GOBPOFFSPRING,
+                               bp=mget(Ancestors, 
+                                       GO.db::GOBPOFFSPRING, 
                                        ifnotfound = NA),
-                               cc=mget(Ancestors,
-                                       GO.db::GOCCOFFSPRING,
+                               cc=mget(Ancestors, 
+                                       GO.db::GOCCOFFSPRING, 
                                        ifnotfound = NA),
-                               mf=mget(Ancestors,
-                                       GO.db::GOMFOFFSPRING,
+                               mf=mget(Ancestors, 
+                                       GO.db::GOMFOFFSPRING, 
                                        ifnotfound = NA))
             Ancestors <- cbind(Ancestor=rep(names(Ancestors),
                                            elementNROWS(Ancestors)),
                               child=unlist(Ancestors))
-            Ancestors <-
-                Ancestors[Ancestors[, "child"] %in% names(children.s),
+            Ancestors <- 
+                Ancestors[Ancestors[, "child"] %in% names(children.s), 
                           , drop=FALSE]
             temp <- cbind(Ancestor=children[, 1], child=children[, 1])
             Ancestors <- rbind(Ancestors, temp)
             Ancestors <- unique(Ancestors)
             Ancestors.ezid <- children.s[Ancestors[, "child"]]
-            temp <- cbind(rep(Ancestors[, "Ancestor"],
+            temp <- cbind(rep(Ancestors[, "Ancestor"], 
                                     elementNROWS(Ancestors.ezid)),
                           unlist(Ancestors.ezid))
             temp <- unique(temp) #time....
@@ -317,96 +309,96 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         colnames(re) <- c("go.id", "EntrezID")
         re
     }
-
-    bp.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="BP",], "bp")
+    
+    bp.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="BP",],"bp")
     cc.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="CC",], "cc")
-    mf.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="MF",], "mf")
-
+    mf.go.this.withEntrez = addAnc(this.GO[this.GO[,3]=="MF",],"mf")
+    
     bp.go.all.withEntrez  = addAnc(all.GO[all.GO[,3]=="BP",], "bp")
     cc.go.all.withEntrez = addAnc(all.GO[all.GO[,3]=="CC",], "cc")
     mf.go.all.withEntrez = addAnc(all.GO[all.GO[,3]=="MF",], "mf")
-
+    
     bp.go.this  = bp.go.this.withEntrez[,1]
     cc.go.this = cc.go.this.withEntrez[,1]
     mf.go.this = mf.go.this.withEntrez[,1]
-
+    
     bp.go.all  = bp.go.all.withEntrez[,1]
     cc.go.all = cc.go.all.withEntrez[,1]
     mf.go.all = mf.go.all.withEntrez[,1]
-
+    
     total.mf = length(mf.go.all)
     total.cc = length(cc.go.all)
     total.bp = length(bp.go.all)
     this.mf = length(mf.go.this)
     this.cc = length(cc.go.this)
     this.bp = length(bp.go.this)
-
+    
     this.bp.count <- table(as.character(bp.go.this[bp.go.this!=""]))
     this.mf.count <- table(as.character(mf.go.this[mf.go.this!=""]))
     this.cc.count <- table(as.character(cc.go.this[cc.go.this!=""]))
-
+    
     all.bp.count <- table(as.character(bp.go.all[bp.go.all!=""]))
     all.mf.count <- table(as.character(mf.go.all[mf.go.all!=""]))
     all.cc.count <- table(as.character(cc.go.all[cc.go.all!=""]))
-
+    
     if(length(groupFALSE)){
       bp.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="BP",],"bp")
       cc.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="CC",], "cc")
       mf.go.FALSE.withEntrez = addAnc(FALSE.GO[FALSE.GO[,3]=="MF",],"mf")
-
+      
       bp.go.FALSE  = bp.go.FALSE.withEntrez[,1]
       cc.go.FALSE = cc.go.FALSE.withEntrez[,1]
       mf.go.FALSE = mf.go.FALSE.withEntrez[,1]
-
+      
       FALSE.mf = length(mf.go.FALSE)
       FALSE.cc = length(cc.go.FALSE)
       FALSE.bp = length(bp.go.FALSE)
-
+      
       FALSE.bp.count <- table(as.character(bp.go.FALSE[bp.go.FALSE!=""]))
       FALSE.mf.count <- table(as.character(mf.go.FALSE[mf.go.FALSE!=""]))
       FALSE.cc.count <- table(as.character(cc.go.FALSE[cc.go.FALSE!=""]))
     }
-
-    hyperGT <- function(alltermcount, thistermcount,
+    
+    hyperGT <- function(alltermcount, thistermcount, 
                         totaltermInGenome, totaltermInPeakList){
         m <- as.numeric(alltermcount[names(thistermcount)])
         q <- as.numeric(thistermcount)
         n <- as.numeric(totaltermInGenome)
         k <- as.numeric(totaltermInPeakList)
         pvalue <- phyper(q-1, m, n-m, k, lower.tail = FALSE, log.p = FALSE)
-        data.frame(go.id=names(thistermcount),
+        data.frame(go.id=names(thistermcount), 
                    count.InDataset=q,
-                   count.InGenome=m,
+                   count.InGenome=m, 
                    pvalue=pvalue,
-                   totaltermInDataset=k,
+                   totaltermInDataset=k, 
                    totaltermInGenome=n)
     }
-
+    
     bp.selected = hyperGT(all.bp.count,
-                             this.bp.count,
-                             total.bp,
+                             this.bp.count, 
+                             total.bp, 
                              this.bp)
     mf.selected = hyperGT(all.mf.count,
-                             this.mf.count,
-                             total.mf,
+                             this.mf.count, 
+                             total.mf, 
                              this.mf)
     cc.selected = hyperGT(all.cc.count,
-                             this.cc.count,
-                             total.cc,
+                             this.cc.count, 
+                             total.cc, 
                              this.cc)
-
+    
     if (length(multiAdjMethod)<1){
-        bp.s =
+        bp.s = 
             bp.selected[
-                as.numeric(as.character(bp.selected[,4]))<maxP &
+                as.numeric(as.character(bp.selected[,4]))<maxP & 
                     as.numeric(as.character(bp.selected[,3]))>=minGOterm,]
-        mf.s =
+        mf.s = 
             mf.selected[
-                as.numeric(as.character(mf.selected[,4]))<maxP &
+                as.numeric(as.character(mf.selected[,4]))<maxP & 
                     as.numeric(as.character(mf.selected[,3]))>=minGOterm,]
-        cc.s =
+        cc.s = 
             cc.selected[
-                as.numeric(as.character(cc.selected[,4]))<maxP &
+                as.numeric(as.character(cc.selected[,4]))<maxP & 
                     as.numeric(as.character(cc.selected[,3]))>=minGOterm,]
     }else{
         procs = c(multiAdjMethod)
@@ -416,32 +408,32 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
         colnames(adjp)[2] = paste(multiAdjMethod, "adjusted.p.value", sep=".")
         bp.selected[,4] = as.numeric(as.character(bp.selected[,4]))
         bp1 = merge(bp.selected, adjp, all.x=TRUE)
-
+        
         res <- mt.rawp2adjp(as.numeric(as.character(mf.selected[,4])), procs)
         adjp = unique(res$adjp)
         colnames(adjp)[1] = colnames(mf.selected)[4]
         colnames(adjp)[2] = paste(multiAdjMethod, "adjusted.p.value", sep=".")
         mf.selected[,4] = as.numeric(as.character(mf.selected[,4]))
         mf1 = merge(mf.selected, adjp, all.x=TRUE)
-
+        
         res <- mt.rawp2adjp(as.numeric(as.character(cc.selected[,4])), procs)
         adjp = unique(res$adjp)
         colnames(adjp)[1] = colnames(cc.selected)[4]
         colnames(adjp)[2] = paste(multiAdjMethod, "adjusted.p.value", sep=".")
         cc.selected[,4] = as.numeric(as.character(cc.selected[,4]))
         cc1 = merge(cc.selected, adjp, all.x=TRUE)
-
-        bp.s = bp1[as.numeric(as.character(bp1[,dim(bp1)[2]]))<maxP &
-                       !is.na(bp1[,dim(bp1)[2]]) &
+        
+        bp.s = bp1[as.numeric(as.character(bp1[,dim(bp1)[2]]))<maxP &  
+                       !is.na(bp1[,dim(bp1)[2]]) & 
                        as.numeric(as.character(bp1[,4]))>=minGOterm,]
-        mf.s = mf1[as.numeric(as.character(mf1[,dim(mf1)[2]]))<maxP &
-                       !is.na(mf1[,dim(mf1)[2]]) &
+        mf.s = mf1[as.numeric(as.character(mf1[,dim(mf1)[2]]))<maxP & 
+                       !is.na(mf1[,dim(mf1)[2]]) & 
                        as.numeric(as.character(mf1[,4]))>=minGOterm,]
-        cc.s = cc1[as.numeric(as.character(cc1[,dim(cc1)[2]]))<maxP &
-                       !is.na(cc1[,dim(cc1)[2]]) &
+        cc.s = cc1[as.numeric(as.character(cc1[,dim(cc1)[2]]))<maxP & 
+                       !is.na(cc1[,dim(cc1)[2]]) & 
                        as.numeric(as.character(cc1[,4]))>=minGOterm,]
     }
-
+    
     annoTerms <- function(goids){
         if(length(goids)<1){
             goterm <- matrix(ncol=4)
@@ -450,7 +442,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
             terms <- Term(goids)
             definition <- Definition(goids)
             ontology <- Ontology(goids)
-            goterm <- cbind(goids,
+            goterm <- cbind(goids, 
                             terms[match(goids, names(terms))],
                             definition[match(goids, names(definition))],
                             ontology[match(goids, names(ontology))])
@@ -462,16 +454,16 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
     goterm.bp <- annoTerms(bp.s$go.id)
     goterm.mf <- annoTerms(mf.s$go.id)
     goterm.cc <- annoTerms(cc.s$go.id)
-
+    
     bp.selected1 = merge(goterm.bp, bp.s,by="go.id")
     mf.selected1 = merge(goterm.mf, mf.s,by="go.id")
     cc.selected1 = merge(goterm.cc, cc.s,by="go.id")
-
+    
     if(length(groupFALSE)){ ## add counts for FALSE group and do Fisher's exact test
       bp.selected1$count.InBackgroundDataset = FALSE.bp.count[bp.selected1$go.id]
       mf.selected1$count.InBackgroundDataset = FALSE.mf.count[mf.selected1$go.id]
       cc.selected1$count.InBackgroundDataset = FALSE.cc.count[cc.selected1$go.id]
-
+      
       multiFisher <- function(.data){
         rowFisher <- function(x, ...){
           return(fisher.test(matrix(x, nrow = 2, byrow = TRUE), ...)$p.value)
@@ -485,7 +477,7 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
       bp.selected1$dataset.vs.background.pval <- multiFisher(bp.selected1)
       mf.selected1$dataset.vs.background.pval <- multiFisher(mf.selected1)
       cc.selected1$dataset.vs.background.pval <- multiFisher(cc.selected1)
-
+      
       bp.selected1 <-
         bp.selected1[bp.selected1$dataset.vs.background.pval<maxP, , drop=FALSE]
       mf.selected1 <-
@@ -493,32 +485,32 @@ getEnrichedGO <- function(annotatedPeak, orgAnn,
       cc.selected1 <-
         cc.selected1[cc.selected1$dataset.vs.background.pval<maxP, , drop=FALSE]
     }
-
+    
     if(condense){
-        bp.go.this.withEntrez <-
+        bp.go.this.withEntrez <- 
             condenseMatrixByColnames(bp.go.this.withEntrez, iname="go.id")
-        mf.go.this.withEntrez <-
+        mf.go.this.withEntrez <- 
             condenseMatrixByColnames(mf.go.this.withEntrez, iname="go.id")
-        cc.go.this.withEntrez <-
+        cc.go.this.withEntrez <- 
             condenseMatrixByColnames(cc.go.this.withEntrez, iname="go.id")
     }
-
+    
     bp.selected = merge(bp.selected1, bp.go.this.withEntrez)
     mf.selected = merge(mf.selected1, mf.go.this.withEntrez)
     cc.selected = merge(cc.selected1, cc.go.this.withEntrez)
-
+    
     if(length(removeAncestorByPval)>0){
-      if(is.numeric(removeAncestorByPval[1]) ||
+      if(is.numeric(removeAncestorByPval[1]) || 
          is.integer(removeAncestorByPval[1])){
-        bp.selected <- removeAncestor(bp.selected, onto="BP",
+        bp.selected <- removeAncestor(bp.selected, onto="BP", 
                                       cutoffPvalue=removeAncestorByPval)
-        mf.selected <- removeAncestor(mf.selected, onto="MF",
+        mf.selected <- removeAncestor(mf.selected, onto="MF", 
                                       cutoffPvalue=removeAncestorByPval)
-        cc.selected <- removeAncestor(cc.selected, onto="CC",
+        cc.selected <- removeAncestor(cc.selected, onto="CC", 
                                       cutoffPvalue=removeAncestorByPval)
       }
     }
-
+    
     if(length(keepByLevel)>0){
       if(is.numeric(keepByLevel[1]) || is.integer(keepByLevel[1])){
         bp.selected <- filterByLevel(bp.selected, onto="BP", level=keepByLevel)
