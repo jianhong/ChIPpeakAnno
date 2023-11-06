@@ -7,10 +7,14 @@
 #' @param format Either "fasta" (default) or "fastq".
 #'
 #' @param peaks GRanges containing the peaks.
+#' 
+#' @param upstream upstream of peak
+#' 
+#' @param downstream downstream of peak
 #'
 #' @param genome BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details
 #'
-#' @param background The method to get the background of compared oligonucleotide. "randomlyPick" (default) or "shuffle".
+#' @param methodBackground The method to get the background of compared oligonucleotide. "chromSelectRandomly" (default) is used to select background chromosomes from all chromosomesor "shuffle".
 #'
 #' @param chromosome Specify which chromosome will be selected to randomly pick back ground sequences. Default is the chromosome in peaks. Note that this parameter is valid for 'randomlyPick' method.
 #'
@@ -26,11 +30,15 @@
 #'
 #' @details
 #'
-#' For the paramter k, method, nthreads, window, window.size and window.overlap, please see \link[universalmotif]{shuffle_sequences} for more information.
+#' Please see \link[universalmotif]{shuffle_sequences} for the paramter k, method, nthreads, window, window.size and window.overlap.
 #'
 #' @author Junhui Li
 #'
-#' @import  Biostrings
+#' @importFrom  Biostrings oligonucleotideFrequency
+#' 
+#' @importFrom  Biostrings readDNAStringSet
+#' 
+#' @importFrom  Biostrings reverseComplement
 #' 
 #' @importFrom stats binom.test
 #' 
@@ -47,89 +55,82 @@
 #' result <- oligoNucleotideEnrichment(filepath=filepath,
 #' peaks=peaks,
 #' genome=Hsapiens,
-#' background="randomPick")
+#' background="chromSelectRandomly")
 #' }
 #' @export
 
 oligoNucleotideEnrichment <- function(filepath,
                                       format="fasta",
                                       peaks,
+                                      upstream = 0,
+                                      downstream = 0,
                                       genome,
-                                      background=c("randomPick","shuffle"),
-                                      chromosome=NULL,
+                                      background = c("chromSelectRandomly","shuffle"),
+                                      chromosome = NULL,
                                       ...,
-                                      times=1000,
-                                      alpha=0.05){
-  if(!file.exists(filepath)){
-    stop("file doesn't exist!")
-  }
-  background <- match.arg(background)
-  method <- match.arg(method)
-  if(!is(genome, "BSgenome") & !is(genome, "Mart") | missing(genome)){
-    stop("genome is required parameter, 
-             please pass in either a BSgenome object or a Mart object!")
-  }
-  if(round(times*alpha,0)==0){
-    stop("The paramter 'times' should be increased to large enough!")
-  }
+                                      times = 1000,
+                                      alpha = 0.05){
+  stopifnot("file doesn't exist!"=file.exists(filepath))
+  background <- match.arg(methodBackground)
+  stopifnot("genome is required parameter, 
+           please pass in either a BSgenome object or a Mart object."=
+              is(genome, "BSgenome") | is(genome, "Mart"))
+  stopifnot("The 'times' parameter should be increased to a sufficient extent."=round(times*alpha,0) != 0)
   nPeak <- length(peaks)
+  stopifnot("There is no peak, please check your data."=nPeak != 0)
   allseqLen <- seqlengths(genome)
   seqWidth <- width(peaks)
   candiChrom <- names(allseqLen >= max(seqWidth))
-  if(any(seqWidth > allseqLen[as.character(seqnames(peaks)@values)])){
-    stop("The length of sequence should be less than the length of chromosomes")
-  }
-  actualSeqs <- getAllPeakSequence(peaks, upstream = 0, downstream = 0, genome = genome)
-  actualP <- oligoNucleotideSummary(filepath,format=format,seqs=actualSeqs)
+  stopifnot("The length of peak sequence should be less than the length of chromosomes"=
+              all(seqWidth < allseqLen[as.character(seqnames(peaks)@values)]))
+  peakSeq <- getAllPeakSequence(peaks, upstream = upstream, downstream = downstream, genome = genome)
+  peakPvalue <- oligoNucleotideSummary(filepath, format = format, seqs = peakSeq)
   
-  statDist <- matrix(NA,0,4)
-  colnames(statDist) <- c("x","n","prop.background","binom.pvalue")
-  if(background=="randomPick"){
-    statDist <- do.call(rbind,lapply(seq.int(times),function(n) {
-      if(is.null(chromosome)==TRUE){
+  backgroundStatDistribution <- matrix(NA,0,4)
+  colnames(backgroundStatDistribution) <- c("x","n","prop_background","binom_pvalue")
+  if(methodBackground == "chromSelectRandomly"){
+    backgroundStatDistribution <- do.call(rbind,lapply(seq.int(times),function(n) {
+      if(is.null(chromosome)){
         chrs <- as.character(seqnames(peaks))
-        givenSeqLen <- allseqLen[as.character(seqnames(peaks))]
+        givenSeqLen <- allseqLen[chrs]
       }else{
         chrs <- sample(candiChrom,nPeak)
         givenSeqLen <- allseqLen[chrs]
       }
-      startPos <- sapply(givenSeqLen-seqWidth,function(x){sample(seq.int(x),1)})
+      startPos <- vapply(givenSeqLen-seqWidth,function(x){sample(seq.int(x),1)},numeric(1))
       endPos <- startPos + seqWidth - 1
-      backPeak <- GRanges(seqnames=chrs,
-                          IRanges(start=startPos,
-                                  end=endPos,
-                                  names=paste0("peak",seq.int(nPeak))))
-      backSeq <- getAllPeakSequence(backPeak, upstream = 0, downstream = 0, genome = genome)
-      statTmp <- oligoNucleotideSummary(filepath,format=format,seqs=backSeq)
-      rownames(statTmp) <- paste0(n,"_",rownames(statTmp))
-      statTmp
+      backGroundPeak <- GRanges(seqnames = chrs,
+                          IRanges(start = startPos,
+                                  end = endPos,
+                                  names = paste0("peak",seq.int(nPeak))))
+      backGroundSeq <- getAllPeakSequence(backGroundPeak, upstream = 0, downstream = 0, genome = genome)
+      statEachTime <- oligoNucleotideSummary(filepath,format=format,seqs=backGroundSeq)
+      rownames(statEachTime) <- paste0(n,"_",rownames(statEachTime))
+      statEachTime
     }))
-  }else if(background=="shuffle"){
-    colnames(mcols(actualSeqs))[3] <- "orig.sequence"
-    names(actualSeqs$orig.sequence) <- do.call(paste, c(as.data.frame(actualSeqs)[,1:3], sep="_"))
-    inputSeq <- DNAStringSet(actualSeqs$orig.sequence)
-    statDist <- do.call(rbind,lapply(seq.int(times),function(n){
+  }else if(methodBackground=="shuffle"){
+    colnames(mcols(peakSeq))[3] <- "orig.sequence"
+    names(peakSeq$orig.sequence) <- do.call(paste, c(as.data.frame(peakSeq)[,1:3], sep="_"))
+    inputSeq <- DNAStringSet(peakSeq$orig.sequence)
+    backgroundStatDistribution <- do.call(rbind,lapply(seq.int(times),function(n){
       sequences.shuffled <- universalmotif::shuffle_sequences(inputSeq, ...)
-      actualSeqs$sequence <- as.vector(sequences.shuffled)
-      statTmp <- oligoNucleotideSummary(filepath,format=format,seqs=actualSeqs)
-      rownames(statTmp) <- paste0(n,"_",rownames(statTmp))
-      statTmp
+      peakSeq$sequence <- as.vector(sequences.shuffled)
+      statEachTime <- oligoNucleotideSummary(filepath,format=format,seqs=peakSeq)
+      rownames(statEachTime) <- paste0(n,"_",rownames(statEachTime))
+      statEachTime
     }))
   }
-  sortStatDist <- do.call(cbind,lapply(seq.int(nrow(actualP)),function(i){
-    sort(as.numeric(statDist[seq(i,nrow(statDist),nrow(actualP)),4]))
+
+  backgroundPvalue <- do.call(cbind,lapply(seq.int(nrow(peakPvalue)),function(i){
+    sort(as.numeric(backgroundStatDistribution[seq(i,nrow(backgroundStatDistribution),nrow(peakPvalue)),4]))
   }))
-  colnames(sortStatDist) <- seq.int(nrow(actualP))
-  thresholdP <- sortStatDist[round(times*alpha,0),]
-  actualP <- cbind(actualP,thresholdP)
-  colnames(actualP)[5] <- "threshold"
-  return(actualP)
+  colnames(backgroundPvalue) <- seq.int(nrow(peakPvalue))
+  peakPvalue$cutoff <- backgroundPvalue[round(times*alpha,0),]
+  return(peakPvalue)
 }
 
 oligoNucleotideSummary <- function(filepath,format="fasta",seqs){
-  if(!file.exists(filepath)){
-    stop("file doesn't exist!")
-  }
+  stopifnot("File doesn't exist!"=file.exists(filepath))
   oligoNset = readDNAStringSet(filepath=filepath, format=format, use.names = TRUE)
   patternName <- names(oligoNset)
   revcomp.pattern = reverseComplement(oligoNset)
@@ -139,50 +140,48 @@ oligoNucleotideSummary <- function(filepath,format="fasta",seqs){
   revcomp.pattern.t = translatePattern(revcomp.pattern)
 
   ## get frequency of single nuleotide in seqs
-  singleNucCount <- colSums(oligonucleotideFrequency(DNAStringSet(seqs$sequence),width=1))
-  singleNucFre <- singleNucCount/sum(singleNucCount)
-  D <- sum(singleNucFre[c("G","A","T")])
-  H <- sum(singleNucFre[c("C","A","T")])
-  B <- sum(singleNucFre[c("G","C","T")])
-  V <- sum(singleNucFre[c("G","A","C")])
-  W <- sum(singleNucFre[c("A","T")])
-  S <- sum(singleNucFre[c("G","C")])
-  K <- sum(singleNucFre[c("G","T")])
-  M <- sum(singleNucFre[c("C","A")])
-  Y <- sum(singleNucFre[c("C","T")])
-  R <- sum(singleNucFre[c("G","A")])
-  N <- 1
-  nucFre <- c(singleNucFre,B,D,H,K,M,N,R,S,V,W,Y)
-  names(nucFre) <- c(names(singleNucFre),"B","D","H","K","M","N","R","S","V","W","Y")
+  ACGTcount <- colSums(oligonucleotideFrequency(DNAStringSet(seqs$sequence),width=1))
+  allBaseFreq <- ACGTcount/sum(ACGTcount)
+  allBaseFreq['D'] <- sum(ACGTfreq[c("G","A","T")])
+  allBaseFreq['H'] <- sum(ACGTfreq[c("C","A","T")])
+  allBaseFreq['B'] <- sum(ACGTfreq[c("G","C","T")])
+  allBaseFreq['V'] <- sum(ACGTfreq[c("G","A","C")])
+  allBaseFreq['W'] <- sum(ACGTfreq[c("A","T")])
+  allBaseFreq['S'] <- sum(ACGTfreq[c("G","C")])
+  allBaseFreq['K'] <- sum(ACGTfreq[c("G","T")])
+  allBaseFreq['M'] <- sum(ACGTfreq[c("C","A")])
+  allBaseFreq['Y'] <- sum(ACGTfreq[c("C","T")])
+  allBaseFreq['R'] <- sum(ACGTfreq[c("G","A")])
+  allBaseFreq['N'] <- 1
+  
   ## get expected frequency of fasta
-  expFreList <- do.call(append,lapply(seq.int(length(thispattern)),function(i){
-    subPattern <- thispattern[i]
-    rcSubPattern <- reverseComplement(DNAString(subPattern))
-    patternTab <- table(unlist(strsplit(subPattern,"")))
-    rcPatternTab <- table(unlist(strsplit(as.character(rcSubPattern),"")))
-    forwardExpFre <- prod(nucFre[names(patternTab)]^patternTab)
-    backwardExpFre <- prod(nucFre[names(rcPatternTab)]^rcPatternTab)
-    names(forwardExpFre) <- names(backwardExpFre) <- names(thispattern[i])
-    forwardExpFre+backwardExpFre
-  }))
+  expFreqSet <- sapply(thispattern,function(i){
+    rcSubPattern <- toString(reverseComplement(DNAString(i)))
+    patternTab <- table(strsplit(i,"")[[1]])
+    rcPatternTab <- table(strsplit(rcSubPattern,"")[[1]])
+    forwardExpFre <- prod(allBaseFreq[names(patternTab)]^patternTab)
+    backwardExpFre <- prod(allBaseFreq[names(rcPatternTab)]^rcPatternTab)
+    expFreq <- forwardExpFre+backwardExpFre
+    names(expFreq) <- names(i)
+    expFreq
+  })
+
   ## get real frequency of input seq in peak region
-  XNmatrix <- matrix(0,length(patternName),3)
-  rownames(XNmatrix) <- patternName
-  colnames(XNmatrix) <- c("x","n","prop.background")
-  for(i in unique(width(oligoNset))){
-    oligoNVec <- colSums(Biostrings::oligonucleotideFrequency(DNAStringSet(seqs$sequence),width=i))
-    n <- which(width(oligoNset) %in% i)
-    XNmatrix[n,1:2] <- do.call(rbind,lapply(n,function(j){
-      pos.plus = gregexpr(thispattern.t[j], names(oligoNVec), perl = TRUE)
-      pos.minus = gregexpr(revcomp.pattern.t[j], names(oligoNVec), perl = TRUE)
-      c(sum(oligoNVec[which(sapply(pos.plus, "[[", 1) > 0)]) + sum(oligoNVec[which(sapply(pos.minus, "[[", 1) > 0)]),sum(oligoNVec))
-    }))
-  }
-  XNmatrix[,3] <- expFreList
-  binom.pvalue <- do.call(rbind,lapply(seq.int(nrow(XNmatrix)),function(i){
-    binom.result <- stats::binom.test(XNmatrix[i,1],XNmatrix[i,2],XNmatrix[i,3],alternative="greater")
-    binom.result$p.value
+  peakFreq <- matrix(0,length(patternName),3)
+  rownames(peakFreq) <- patternName
+  colnames(peakFreq) <- c("x","n","prop_background")
+  peakFreq[,3] <- expFreqSet
+  
+  peakFreq[,1:2] <- t(sapply(seq.int(width(oligoNset)),function(i){
+    oligoNVec <- colSums(oligonucleotideFrequency(DNAStringSet(seqs$sequence),width=width(oligoNset)[i]))
+    pos.plus = gregexpr(thispattern.t[i], names(oligoNVec), perl = TRUE)
+    pos.minus = gregexpr(revcomp.pattern.t[i], names(oligoNVec), perl = TRUE)
+    c(sum(oligoNVec[which(sapply(pos.plus, "[[", 1) > 0)]) + sum(oligoNVec[which(sapply(pos.minus, "[[", 1) > 0)]),sum(oligoNVec))
   }))
-  XNmatrix <- data.frame(XNmatrix,binom.pvalue)
-  return(XNmatrix)
+
+  binom_pvalue <- sapply(seq.int(nrow(peakFreq)),function(i){
+    stats::binom.test(peakFreq[i,1],peakFreq[i,2],peakFreq[i,3],alternative="greater")$p.value
+  })
+  peakFreq <- data.frame(peakFreq,binom_pvalue)
+  return(peakFreq)
 }
