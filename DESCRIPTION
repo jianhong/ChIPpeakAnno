@@ -87,7 +87,7 @@ Description: The package includes functions to retrieve the sequences
     adding other IDs to annotated peaks or enrichedGO (addGeneIDs).
     This package leverages the biomaRt, IRanges, Biostrings,
     BSgenome, GO.db, multtest and stat packages.
-License: MIT + file LICENSE
+License: GPL (>= 2)
 LazyLoad: yes
 LazyData: true
 LazyDataCompression: xz
