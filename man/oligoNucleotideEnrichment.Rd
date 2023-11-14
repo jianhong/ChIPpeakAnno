@@ -8,8 +8,10 @@ oligoNucleotideEnrichment(
   filepath,
   format = "fasta",
   peaks,
+  upstream = 0,
+  downstream = 0,
   genome,
-  background = c("randomPick", "shuffle"),
+  methodBackground = c("selectChromRandomly", "shuffle"),
   chromosome = NULL,
   ...,
   times = 1000,
@@ -23,11 +25,15 @@ oligoNucleotideEnrichment(
 
 \item{peaks}{GRanges containing the peaks.}
 
+\item{upstream}{upstream of peak}
+
+\item{downstream}{downstream of peak}
+
 \item{genome}{BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details}
 
-\item{background}{The method to get the background of compared oligonucleotide. "randomlyPick" (default) or "shuffle".}
+\item{methodBackground}{The method to get the background of compared oligonucleotide. "selectChromRandomly" (default) is used to select background chromosomes from all chromosomesor, and "shuffle" will  shuffle the letters within input sequences with any k-let size.}
 
-\item{chromosome}{Specify which chromosome will be selected to randomly pick back ground sequences. Default is the chromosome in peaks. Note that this parameter is valid for 'randomlyPick' method.}
+\item{chromosome}{Specify which chromosome will be selected to randomly pick back ground sequences. Default is the chromosome in peaks. Note that this parameter is valid for 'selectChromRandomly' method.}
 
 \item{...}{could be parameters of function \code{\link[universalmotif]{shuffle_sequences}}}
 
@@ -42,7 +48,7 @@ A data frame with 5 columns as x (number of match of the pattern), n (total numb
 Test if the oligonucleotide in given region of chromosomes is enriched or not.
 }
 \details{
-For the paramter k, method, nthreads, window, window.size and window.overlap, please see \link[universalmotif]{shuffle_sequences} for more information.
+Please see \link[universalmotif]{shuffle_sequences} for the more information about 'shuffle' method.
 }
 \examples{
 library(BSgenome.Hsapiens.UCSC.hg19)
@@ -55,7 +61,7 @@ peaks = GRanges(seqnames=c("chr17","chr3","chr12","chr8"),
 result <- oligoNucleotideEnrichment(filepath=filepath,
 peaks=peaks,
 genome=Hsapiens,
-background="randomPick")
+methodBackground="selectChromRandomly")
 }
 }
 \author{

@@ -14,9 +14,9 @@
 #'
 #' @param genome BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details
 #'
-#' @param methodBackground The method to get the background of compared oligonucleotide. "chromSelectRandomly" (default) is used to select background chromosomes from all chromosomesor "shuffle".
+#' @param methodBackground The method to get the background of compared oligonucleotide. "selectChromRandomly" (default) is used to select background chromosomes from all chromosomesor, and "shuffle" will  shuffle the letters within input sequences with any k-let size.
 #'
-#' @param chromosome Specify which chromosome will be selected to randomly pick back ground sequences. Default is the chromosome in peaks. Note that this parameter is valid for 'randomlyPick' method.
+#' @param chromosome Specify which chromosome will be selected to randomly pick back ground sequences. Default is the chromosome in peaks. Note that this parameter is valid for 'selectChromRandomly' method.
 #'
 #' @param ... could be parameters of function \code{\link[universalmotif]{shuffle_sequences}}
 #'
@@ -30,7 +30,7 @@
 #'
 #' @details
 #'
-#' Please see \link[universalmotif]{shuffle_sequences} for the paramter k, method, nthreads, window, window.size and window.overlap.
+#' Please see \link[universalmotif]{shuffle_sequences} for the more information about 'shuffle' method.
 #'
 #' @author Junhui Li
 #'
@@ -55,7 +55,7 @@
 #' result <- oligoNucleotideEnrichment(filepath=filepath,
 #' peaks=peaks,
 #' genome=Hsapiens,
-#' background="chromSelectRandomly")
+#' methodBackground="selectChromRandomly")
 #' }
 #' @export
 
@@ -65,13 +65,13 @@ oligoNucleotideEnrichment <- function(filepath,
                                       upstream = 0,
                                       downstream = 0,
                                       genome,
-                                      background = c("chromSelectRandomly","shuffle"),
+                                      methodBackground = c("selectChromRandomly","shuffle"),
                                       chromosome = NULL,
                                       ...,
                                       times = 1000,
                                       alpha = 0.05){
   stopifnot("file doesn't exist!"=file.exists(filepath))
-  background <- match.arg(methodBackground)
+  methodBackground <- match.arg(methodBackground)
   stopifnot("genome is required parameter, 
            please pass in either a BSgenome object or a Mart object."=
               is(genome, "BSgenome") | is(genome, "Mart"))
@@ -88,7 +88,7 @@ oligoNucleotideEnrichment <- function(filepath,
   
   backgroundStatDistribution <- matrix(NA,0,4)
   colnames(backgroundStatDistribution) <- c("x","n","prop_background","binom_pvalue")
-  if(methodBackground == "chromSelectRandomly"){
+  if(methodBackground == "selectChromRandomly"){
     backgroundStatDistribution <- do.call(rbind,lapply(seq.int(times),function(n) {
       if(is.null(chromosome)){
         chrs <- as.character(seqnames(peaks))
@@ -141,7 +141,8 @@ oligoNucleotideSummary <- function(filepath,format="fasta",seqs){
 
   ## get frequency of single nuleotide in seqs
   ACGTcount <- colSums(oligonucleotideFrequency(DNAStringSet(seqs$sequence),width=1))
-  allBaseFreq <- ACGTcount/sum(ACGTcount)
+  ACGTfreq <- ACGTcount/sum(ACGTcount)
+  allBaseFreq <- ACGTfreq
   allBaseFreq['D'] <- sum(ACGTfreq[c("G","A","T")])
   allBaseFreq['H'] <- sum(ACGTfreq[c("C","A","T")])
   allBaseFreq['B'] <- sum(ACGTfreq[c("G","C","T")])

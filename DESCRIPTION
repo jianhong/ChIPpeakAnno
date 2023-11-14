@@ -3,7 +3,7 @@ Type: Package
 Title: Batch annotation of the peaks identified from either ChIP-seq,
     ChIP-chip experiments or any experiments resulted in large
     number of chromosome ranges
-Version: 3.37.0
+Version: 3.37.1
 Encoding: UTF-8
 Author: Lihua Julie Zhu, Jianhong Ou, Jun Yu, Kai Hu, Haibo Liu, Junhui Li, 
     Hervé Pagès, Claude Gazin,
@@ -44,7 +44,8 @@ Imports:
     regioneR,
     rtracklayer,
     stats,
-    utils
+    utils,
+    universalmotif
 Suggests:
     AnnotationHub,
     BSgenome,
@@ -86,7 +87,7 @@ Description: The package includes functions to retrieve the sequences
     adding other IDs to annotated peaks or enrichedGO (addGeneIDs).
     This package leverages the biomaRt, IRanges, Biostrings,
     BSgenome, GO.db, multtest and stat packages.
-License: GPL (>= 2)
+License: MIT + file LICENSE
 LazyLoad: yes
 LazyData: true
 LazyDataCompression: xz
