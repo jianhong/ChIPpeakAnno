@@ -1,3 +1,9 @@
+CHANGES IN VERSION 3.37.1
+-------------------------
+
+    o export disable.logging parameter for venn.diagram called by
+    makeVennDiagram
+
 CHANGES IN VERSION 3.35.3
 -------------------------
 
