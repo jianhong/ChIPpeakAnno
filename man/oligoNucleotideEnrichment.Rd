@@ -25,9 +25,9 @@ oligoNucleotideEnrichment(
 
 \item{peaks}{GRanges containing the peaks.}
 
-\item{upstream}{upstream of peak}
+\item{upstream}{upstream of the peak}
 
-\item{downstream}{downstream of peak}
+\item{downstream}{downstream of the peak}
 
 \item{genome}{BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details}
 

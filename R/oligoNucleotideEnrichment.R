@@ -8,9 +8,9 @@
 #'
 #' @param peaks GRanges containing the peaks.
 #' 
-#' @param upstream upstream of peak
+#' @param upstream upstream of the peak
 #' 
-#' @param downstream downstream of peak
+#' @param downstream downstream of the peak
 #'
 #' @param genome BSgenome object or mart object. Please refer to available.genomes in BSgenome package and useMart in bioMaRt package for details
 #'
