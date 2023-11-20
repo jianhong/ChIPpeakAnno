@@ -44,9 +44,9 @@ from the list.}
 \item{keepByLevel}{If the shortest path from the go term to 'all' is greater
 than the given level, the term will be removed.}
 
-\item{subGroupComparison}{A logical vector to split the peaks into two
+\item{subGroupComparison}{A logical vector to split the peaks into two 
 groups. The enrichment analysis will compare the over-present GO terms
-in TRUE group and FALSE group separately. The analysis will split into
+in TRUE group and FALSE group separately. The analysis will split into 
 two steps: 1. enrichment analysis for TRUE group by hypergeometric
 test; 2. enrichment analysis for TRUE over FALSE group
 by Fisher's Exact test for the enriched GO terms.
@@ -135,8 +135,8 @@ org.Hs.db.eg to obtain the GO annotation and using hypergeometric test
      data(annotatedPeak)
      library(org.Hs.eg.db)
      library(GO.db)
-     enriched.GO = getEnrichedGO(annotatedPeak[1:6,],
-                                 orgAnn="org.Hs.eg.db",
+     enriched.GO = getEnrichedGO(annotatedPeak[1:6,], 
+                                 orgAnn="org.Hs.eg.db", 
                                  maxP=0.01,
                                  minGOterm=10,
                                  multiAdjMethod= NULL)
