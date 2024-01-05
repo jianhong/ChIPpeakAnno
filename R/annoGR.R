@@ -150,6 +150,9 @@ if(!isGeneric("info")){
     setGeneric("info", function(object) standardGeneric("info"))
 }
 
+setGeneric("annoGR", function(ranges, ...) standardGeneric("annoGR"))
+setGeneric("info", function(object) standardGeneric("info"))
+
 #' @name coerce
 #' @import GenomicRanges
 #' @rdname annoGR

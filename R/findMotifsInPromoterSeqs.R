@@ -74,7 +74,7 @@
 #' An object of GRanges with metadata "tx_start", "tx_end tx_strand", "tx_id",
 #' "tx_name", "Gene ID", and motif specific information such as motif name,
 #' motif found, motif strand etc.
-#' @author Lihua Julie Zhu
+#' @author Lihua Julie Zhu, Kai Hu
 #' @export
 #' @importFrom GenomicFeatures transcriptsBy 
 #' @importFrom S4Vectors mcols
@@ -133,24 +133,29 @@ findMotifsInPromoterSeqs <-
     
     peaks <- promoters(tx, upstream = upstream, downstream = downstream)
     
-    x1 <- do.call(rbind, lapply(seq_along(peaks),function(i) {
-      thisPeak <- peaks[[i]]
-      mcols(thisPeak)$gene_id = names(peaks)[i]
-      summarizePatternInPeaks(patternFilePath = patternFilePath1, 
-                              format = format,
-                              skip = skip, 
-                              BSgenomeName = BSgenomeName, 
-                              peaks = thisPeak)
-    }
-    ))
-    
-    
-    colnames(x1)[2] = "start"
-    colnames(x1)[3] = "end"
+    x1 <- do.call(rbind, 
+                  lapply(seq_along(peaks),
+                         function(i) {
+                           thisPeak <- peaks[[i]]
+                           mcols(thisPeak)$gene_id = names(peaks)[i]
+                           x <- summarizePatternInPeaks(patternFilePath = patternFilePath1, 
+                                                        format = format,
+                                                        skip = skip, 
+                                                        BSgenomeName = BSgenomeName, 
+                                                        peaks = thisPeak,
+                                                        expectFrequencyMethod = "Naive")
+                           x$motif_occurrence
+                           }
+                         )
+                  )
+    colnames(x1)[1] <- "seqnames"
+    colnames(x1)[2] <- "start"
+    colnames(x1)[3] <- "end"
     colnames(x1)[9] <- "strand"
     colnames(x1)[11] <- "tx_start"
     colnames(x1)[12] <- "tx_end"
     colnames(x1)[14] <- "tx_strand"
+    head(x1, n = 2)
     
     if (!findPairedMotif) {
       if (!missing(outfile))
@@ -161,23 +166,29 @@ findMotifsInPromoterSeqs <-
       stop("missing required parameter patternFilePath2!")
     }
     else {
-      x2 <- do.call(rbind, lapply(seq_along(peaks),function(i) {
-        thisPeak <- peaks[[i]]
-        mcols(thisPeak)$gene_id = names(peaks)[i]
-        summarizePatternInPeaks(patternFilePath = patternFilePath2,
-                                format = format,
-                                skip = skip, 
-                                BSgenomeName = BSgenomeName, 
-                                peaks = thisPeak)
-      }
-      ))
-      
-      colnames(x2)[2] = "start"
-      colnames(x2)[3] = "end"
+      x2 <- do.call(rbind, 
+                    lapply(seq_along(peaks), 
+                           function(i) {
+                             thisPeak <- peaks[[i]]
+                             mcols(thisPeak)$gene_id = names(peaks)[i]
+                             x <- summarizePatternInPeaks(patternFilePath = patternFilePath2,
+                                                          format = format,
+                                                          skip = skip, 
+                                                          BSgenomeName = BSgenomeName, 
+                                                          peaks = thisPeak,
+                                                          expectFrequencyMethod = "Naive")
+                             x <- x$motif_occurrence
+                            }
+                           )
+                    )
+      colnames(x2)[1] <- "seqnames"
+      colnames(x2)[2] <- "start"
+      colnames(x2)[3] <- "end"
       colnames(x2)[9] <- "strand"
       colnames(x2)[11] <- "tx_start"
       colnames(x2)[12] <- "tx_end"
       colnames(x2)[14] <- "tx_strand"
+
       x1.gr <- toGRanges(x1)
       x2.gr <- toGRanges(x2)
       
@@ -205,21 +216,21 @@ findMotifsInPromoterSeqs <-
       
       res <- merge(m2, temp, by = c("feature", "seqnames"))
       colnames(res)[6:14] <- paste(name.motif1, colnames(res)[6:14])
-      res <- res[, -c(1, 21, 28)]
+      res <- res[, -c(1, 20)]
       
       colnames(res)[grep("insideFeature", colnames(res))] <- 
         paste(name.motif1, name.motif2, sep  =   "relatviePositionTo")
       
-      colnames(res)[20:21] <- paste(name.motif2, colnames(res)[20:21])
-      colnames(res)[22] <- paste(name.motif2, "strand", sep ="_")
+      colnames(res)[19:20] <- paste(name.motif2, colnames(res)[19:20])
+      colnames(res)[21] <- paste(name.motif2, "strand", sep ="_")
       
       
       tem <- cbind(as.numeric(res[,5]), as.numeric(res[,6]), 
-                   as.numeric(res[,20]), as.numeric(res[,21]))
+                   as.numeric(res[,19]), as.numeric(res[,20]))
       res2 <- cbind(seqnames = res[,1], compositMotifStart= rowMins(tem),
                     compositMotifEnd = rowMaxs(tem), res[, -1])
       
-      res2 <- res2[, -grep("Offset", colnames(res2))]
+      res2 <- res2[, -grep("InPeak", colnames(res2))]
       
       d.ind <- grep("distancetoFeature", colnames(res2))
       res2 <- cbind(res2[c(1:6, d.ind, 7:dim(res2)[2])])

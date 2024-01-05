@@ -1,3 +1,10 @@
+CHANGES IN VERSION 3.38.1
+-------------------------
+
+    o use an updated and unified single vignette to replace the four old ones
+    o remove oligoNucleotideEnrichment.R and incorporate it into summarizePatternsInPeaks.R
+    o update findMotifsInPromoterSeqs.R to match changes in summarizePatternsInPeaks.R
+    
 CHANGES IN VERSION 3.37.2
 -------------------------
 

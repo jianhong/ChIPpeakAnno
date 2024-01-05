@@ -4,13 +4,20 @@
 #' 
 #' @param res output of \link{getEnrichedGO}, \link{getEnrichedPATH}.
 #' @param n number of terms to be plot.
+#' @param style plot vertically or horizontally
 #' @param strlength shorten the description of term by the number of char.
 #' @param orderBy order the data by pvalue, termId or none.
+#' @param label_wrap soft wrap the labels (i.e. descriptions of the GO or PATHWAY terms), default to 40 characters.
+#' @param label_substring_to_remove remove common substring from label, 
+#' default to NULL. Special characters must be escaped. E.g. if you would like 
+#' to remove "Homo sapiens (humam)" from labels, you must use "Homo sapiens \\(
+#' human\\)".
+#' @author Jianhong Ou, Kai Hu
 #' @return an object of ggplot
-#' @importFrom ggplot2 ggplot aes_string geom_bar scale_y_continuous geom_text
-#' xlab ylab theme_classic theme facet_wrap expansion element_text
+#' @importFrom ggplot2 ggplot aes_string geom_bar geom_point scale_x_discrete scale_y_continuous geom_text
+#' xlab ylab theme_classic theme facet_grid expansion element_text
 #' @importFrom stats as.formula
-#' @importFrom ggplot2 geom_point
+#' @importFrom scales label_wrap
 #' @export
 #' @examples 
 #' data(enrichedGO)
@@ -32,13 +39,18 @@
 #'                     maxP=.05, minGOterm=10, condense=TRUE)
 #'      enrichmentPlot(over)
 #'  }
-enrichmentPlot <- function(res, n=20, strlength=30,
+enrichmentPlot <- function(res, n=20, strlength=Inf,
+                           style = c("v", "h"),
+                           label_wrap = 40,
+                           label_substring_to_remove = NULL,
                            orderBy=c("pvalue", "termId", "none")){
   if(is.data.frame(res)){## output of getEnrichedPATH
     res <- list(path=res)
   }
   stopifnot("n must be a numeric(1)"=is.numeric(n) && length(n)==1)
   orderBy <- match.arg(orderBy)
+  style <- match.arg(style)
+  stopifnot(is.integer(as.integer(label_wrap)))
   if(is.list(res[[1]])&&is.data.frame(res[[1]][[1]])){
     ## list of list, output of getEnrichedGO for multiple samples
     ## dot plot
@@ -80,38 +92,77 @@ enrichmentPlot <- function(res, n=20, strlength=30,
   })
   plotdata <- do.call(rbind, p)
   plotdata$category <- rep(names(res), vapply(p, nrow, FUN.VALUE = 0))
+  # remove specified substring from label if specified:
+  if (!is.null(label_substring_to_remove)) {
+    plotdata$Description <- gsub(label_substring_to_remove, "", plotdata$Description)
+  }
+
   if(nrow(plotdata)<2){
     warning("two less data to plot")
     return(plotdata)
   }
+
   if(all(plotdata$source=="undefined")){
-    ggplot(plotdata, aes_string(x=switch(orderBy,
-                                         "pvalue"=paste0("reorder(Description,",
-                                                         orderBy, ")"),
-                                         "termId"=paste0("reorder(Description,",
-                                                         colnames(plotdata)[2], 
-                                                         ")"),
-                                         "Description"),
-                                y="qvalue", fill="Count", label="Count")) +
+    if (style == "v") {
+      p <- ggplot(plotdata, 
+                  aes_string(x = switch(orderBy,
+                                        "pvalue" = paste0("reorder(Description,", orderBy, ")"),
+                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
+                                        "Description"),
+                             y = "qvalue", fill = "Count", label = "Count"))
+    } else if (style == "h") {
+      p <- ggplot(plotdata, 
+                  aes_string(x = switch(orderBy,
+                                        "pvalue" = paste0("reorder(Description,", orderBy, ", decreasing = TRUE)"),
+                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
+                                        "Description"),
+                             y = "qvalue", fill = "Count", label = "Count"))
+    }
+    p <- p +
       geom_bar(stat="identity") +
+      scale_x_discrete(label = label_wrap(as.integer(label_wrap))) +
       scale_y_continuous(expand = expansion(mult = c(0, .1))) +
-      geom_text(vjust=-.1) + 
       xlab("") + ylab("-log10(p-value)") +
       theme_classic() + 
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) + 
-      facet_wrap(as.formula("~ category"), scales = "free_x")
+      facet_grid(~ category, scales = "free_x", space = "free_x")
+    
+    if (style == "v") {
+      p <- p + 
+            geom_text(vjust=-.1)
+    } else if (style == "h") {
+      p <- p + 
+            geom_text(hjust=-.1) + 
+            coord_flip()
+    }
+    p
   }else{
     ## multiple samples dot plot
-    ggplot(plotdata, aes_string(y=switch(orderBy,
-                                         "pvalue"=paste0("reorder(Description,",
-                                                         orderBy, ")"),
-                                         "termId"=paste0("reorder(Description,",
-                                                         colnames(plotdata)[2], 
-                                                         ")"),
-                                         "Description"),
-                                x="source", color="qvalue", size="GeneRatio")) +
+    if (style == "v") {
+      p <- ggplot(plotdata, 
+                  aes_string(y = switch(orderBy,
+                                        "pvalue" = paste0("reorder(Description,", orderBy, ")"),
+                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
+                                        "Description"),
+                             x = "source", color = "qvalue", size = "GeneRatio"))
+    } else if (style == "h") {
+      p <- ggplot(plotdata, 
+                  aes_string(y = switch(orderBy,
+                                        "pvalue" = paste0("reorder(Description,", orderBy, ", decreasing = TRUE)"),
+                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
+                                        "Description"),
+                             x = "source", color = "qvalue", size = "GeneRatio"))
+    }
+    p <- p +
       geom_point() + theme_classic() +
-      facet_wrap(as.formula("~ category"), scales = "free_x")
+      facet_grid(~ category, scales = "free_x", space = "free_x")
+  
+    if (style == "v") {
+      p
+    } else if (style == "h") {
+      p <- p + coord_flip()
+      p
+    }
   }
   
 }

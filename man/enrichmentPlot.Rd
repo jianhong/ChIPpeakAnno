@@ -7,7 +7,10 @@
 enrichmentPlot(
   res,
   n = 20,
-  strlength = 30,
+  strlength = Inf,
+  style = c("v", "h"),
+  label_wrap = 40,
+  label_substring_to_remove = NULL,
   orderBy = c("pvalue", "termId", "none")
 )
 }
@@ -17,6 +20,15 @@ enrichmentPlot(
 \item{n}{number of terms to be plot.}
 
 \item{strlength}{shorten the description of term by the number of char.}
+
+\item{style}{plot vertically or horizontally}
+
+\item{label_wrap}{soft wrap the labels (i.e. descriptions of the GO or PATHWAY terms), default to 40 characters.}
+
+\item{label_substring_to_remove}{remove common substring from label, 
+default to NULL. Special characters must be escaped. E.g. if you would like 
+to remove "Homo sapiens (humam)" from labels, you must use "Homo sapiens \\(
+human\\)".}
 
 \item{orderBy}{order the data by pvalue, termId or none.}
 }
@@ -46,4 +58,7 @@ if (interactive()||Sys.getenv("USER")=="jianhongou") {
                     maxP=.05, minGOterm=10, condense=TRUE)
      enrichmentPlot(over)
  }
+}
+\author{
+Jianhong Ou, Kai Hu
 }
