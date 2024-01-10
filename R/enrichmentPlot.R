@@ -10,11 +10,11 @@
 #' @param label_wrap soft wrap the labels (i.e. descriptions of the GO or PATHWAY terms), default to 40 characters.
 #' @param label_substring_to_remove remove common substring from label, 
 #' default to NULL. Special characters must be escaped. E.g. if you would like 
-#' to remove "Homo sapiens (humam)" from labels, you must use "Homo sapiens \\(
-#' human\\)".
+#' to remove "Homo sapiens (human)" from labels, you must use "Homo sapiens \\\(
+#' human\\\)".
 #' @author Jianhong Ou, Kai Hu
 #' @return an object of ggplot
-#' @importFrom ggplot2 ggplot aes_string geom_bar geom_point scale_x_discrete scale_y_continuous geom_text
+#' @importFrom ggplot2 ggplot aes geom_bar geom_point scale_x_discrete scale_y_continuous geom_text
 #' xlab ylab theme_classic theme facet_grid expansion element_text
 #' @importFrom stats as.formula
 #' @importFrom scales label_wrap
@@ -37,7 +37,8 @@
 #'      over <- lapply(GRangesList(gr1=gr1.anno, gr2=gr2.anno), 
 #'                     getEnrichedGO, orgAnn="org.Hs.eg.db",
 #'                     maxP=.05, minGOterm=10, condense=TRUE)
-#'      enrichmentPlot(over)
+#'      enrichmentPlot(over$gr1)
+#'      enrichmentPlot(over$gr2, style = "h")
 #'  }
 enrichmentPlot <- function(res, n=20, strlength=Inf,
                            style = c("v", "h"),
@@ -92,10 +93,7 @@ enrichmentPlot <- function(res, n=20, strlength=Inf,
   })
   plotdata <- do.call(rbind, p)
   plotdata$category <- rep(names(res), vapply(p, nrow, FUN.VALUE = 0))
-  # remove specified substring from label if specified:
-  if (!is.null(label_substring_to_remove)) {
-    plotdata$Description <- gsub(label_substring_to_remove, "", plotdata$Description)
-  }
+  plotdata$Description <- removeLabelSubstring(plotdata, label_substring_to_remove)
 
   if(nrow(plotdata)<2){
     warning("two less data to plot")
@@ -105,18 +103,18 @@ enrichmentPlot <- function(res, n=20, strlength=Inf,
   if(all(plotdata$source=="undefined")){
     if (style == "v") {
       p <- ggplot(plotdata, 
-                  aes_string(x = switch(orderBy,
-                                        "pvalue" = paste0("reorder(Description,", orderBy, ")"),
-                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
-                                        "Description"),
-                             y = "qvalue", fill = "Count", label = "Count"))
+                  aes(x = switch(orderBy,
+                                 "pvalue" = reorder(Description, pvalue),
+                                 "termId" = reorder(Description, plotdata[, 2]),
+                                 "Description"),
+                      y = qvalue, fill = Count, label = Count))
     } else if (style == "h") {
       p <- ggplot(plotdata, 
-                  aes_string(x = switch(orderBy,
-                                        "pvalue" = paste0("reorder(Description,", orderBy, ", decreasing = TRUE)"),
-                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
-                                        "Description"),
-                             y = "qvalue", fill = "Count", label = "Count"))
+                  aes(x = switch(orderBy,
+                                 "pvalue" = reorder(Description, pvalue, decreasing = TRUE),
+                                 "termId" = reorder(Description, plotdata[, 2]),
+                                 "Description"),
+                      y = qvalue, fill = Count, label = Count))
     }
     p <- p +
       geom_bar(stat="identity") +
@@ -139,19 +137,19 @@ enrichmentPlot <- function(res, n=20, strlength=Inf,
   }else{
     ## multiple samples dot plot
     if (style == "v") {
-      p <- ggplot(plotdata, 
-                  aes_string(y = switch(orderBy,
-                                        "pvalue" = paste0("reorder(Description,", orderBy, ")"),
-                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
-                                        "Description"),
-                             x = "source", color = "qvalue", size = "GeneRatio"))
+      p <- ggplot(plotdata,
+                  aes(y = switch(orderBy, 
+                                 "pvalue" = reorder(Description, pvalue),
+                                 "termId" = reorder(Description, plotdata[, 2]),
+                                 Description),
+                      x = source, color = qvalue, size = GeneRatio))
     } else if (style == "h") {
       p <- ggplot(plotdata, 
-                  aes_string(y = switch(orderBy,
-                                        "pvalue" = paste0("reorder(Description,", orderBy, ", decreasing = TRUE)"),
-                                        "termId" = paste0("reorder(Description,", colnames(plotdata)[2], ")"),
-                                        "Description"),
-                             x = "source", color = "qvalue", size = "GeneRatio"))
+                  aes(y = switch(orderBy,
+                                 "pvalue" = reorder(Description, pvalue, decreasing = TRUE),
+                                 "termId" = reorder(Description, plotdata[, 2]),
+                                 Description),
+                      x = source, color = qvalue, size = GeneRatio))
     }
     p <- p +
       geom_point() + theme_classic() +
@@ -164,7 +162,14 @@ enrichmentPlot <- function(res, n=20, strlength=Inf,
       p
     }
   }
-  
+}
+
+removeLabelSubstring <- function(plotdata, label_substring_to_remove = NULL) {
+  if (!is.null(label_substring_to_remove)) {
+    gsub(label_substring_to_remove, "", plotdata$Description)
+  } else {
+    plotdata$Description
+  }
 }
 
 shortStrs <- function(strs, len=60){

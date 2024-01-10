@@ -148,6 +148,22 @@ findMotifsInPromoterSeqs <-
                            }
                          )
                   )
+    
+    # original colnames(x1):
+      # 1: motifChr
+      # 2: motifStartInChr
+      # 3: motifEndInChr
+      # 4: motifName
+      # 5: motifPattern
+      # 6: motifStartInPeak
+      # 7: motifEndInPeak
+      # 8: motifFound
+      # 9: motifFoundStrand
+      # 10: peakChr
+      # 11: peakStart
+      # 12: peakEnd
+      # 13: peakWidth
+      # 14: peakStrand
     colnames(x1)[1] <- "seqnames"
     colnames(x1)[2] <- "start"
     colnames(x1)[3] <- "end"
@@ -155,8 +171,7 @@ findMotifsInPromoterSeqs <-
     colnames(x1)[11] <- "tx_start"
     colnames(x1)[12] <- "tx_end"
     colnames(x1)[14] <- "tx_strand"
-    head(x1, n = 2)
-    
+
     if (!findPairedMotif) {
       if (!missing(outfile))
         write.table(x1, file = outfile, sep ="\t", row.names = FALSE)
@@ -181,6 +196,23 @@ findMotifsInPromoterSeqs <-
                             }
                            )
                     )
+  
+      # original colnames(x2):
+        # 1: motifChr
+        # 2: motifStartInChr
+        # 3: motifEndInChr
+        # 4: motifName
+        # 5: motifPattern
+        # 6: motifStartInPeak
+        # 7: motifEndInPeak
+        # 8: motifFound
+        # 9: motifFoundStrand
+        # 10: peakChr
+        # 11: peakStart
+        # 12: peakEnd
+        # 13: peakWidth
+        # 14: peakStrand
+      
       colnames(x2)[1] <- "seqnames"
       colnames(x2)[2] <- "start"
       colnames(x2)[3] <- "end"
@@ -216,6 +248,34 @@ findMotifsInPromoterSeqs <-
       
       res <- merge(m2, temp, by = c("feature", "seqnames"))
       colnames(res)[6:14] <- paste(name.motif1, colnames(res)[6:14])
+      # colnames(res):
+        # 1: feature                  
+        # 2: seqnames                 
+        # 3: motif2_motifName           
+        # 4: motif2_motifPattern         
+        # 5: motif2_motifFound           
+        # 6: motif1_start                   
+        # 7: motif1_end                      
+        # 8: motif1_width                    
+        # 9: motif1_strand                  
+        # 10: motif1_motifName                
+        # 11: motif1_motifPattern             
+        # 12: motif1_motifStartInPeak        
+        # 13: motif1_motifEndInPeak           
+        # 14: motif1_motifFound               
+        # 15: peakChr                 
+        # 16: tx_start                 
+        # 17: tx_end                   
+        # 18: peakWidth               
+        # 19: tx_strand                
+        # 20: peak                     
+        # 21: start_position          
+        # 22: end_position             
+        # 23: feature_strand           
+        # 24: insideFeature           
+        # 25: distancetoFeature        
+        # 26: shortestDistance         
+        # 27: fromOverlappingOrNearest
       res <- res[, -c(1, 20)]
       
       colnames(res)[grep("insideFeature", colnames(res))] <- 

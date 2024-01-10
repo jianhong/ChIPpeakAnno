@@ -4,7 +4,7 @@ Title:
         Batch annotation of the peaks identified from either ChIP-seq,
         ChIP-chip experiments, or any experiments that result in large
         number of genomic interval data
-Version: 3.38.1
+Version: 3.37.3
 Encoding: UTF-8
 Author: 
         Lihua Julie Zhu,
@@ -67,5 +67,3 @@ LazyDataCompression: xz
 biocViews: Annotation, ChIPSeq, ChIPchip
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
-NeedsCompilation: no
-Packaged: 2024-01-04 20:25:18 UTC; kaihu

@@ -149,5 +149,5 @@ unPairedMotifs <- findMotifsInPromoterSeqs(patternFilePath1 = patternFilePath1,
 
 }
 \author{
-Lihua Julie Zhu
+Lihua Julie Zhu, Kai Hu
 }

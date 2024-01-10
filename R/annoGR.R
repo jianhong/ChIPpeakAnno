@@ -143,13 +143,6 @@ newAGR <- function(gr, ...){
               ...)
 }
 
-if(!isGeneric("annoGR")){
-    setGeneric("annoGR", function(ranges, ...) standardGeneric("annoGR"))
-}
-if(!isGeneric("info")){
-    setGeneric("info", function(object) standardGeneric("info"))
-}
-
 setGeneric("annoGR", function(ranges, ...) standardGeneric("annoGR"))
 setGeneric("info", function(object) standardGeneric("info"))
 

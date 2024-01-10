@@ -206,11 +206,8 @@ length(ol$peaklist[["peaks2"]])
 
 To obtain the merged overlapping peaks, you have two options:
 
-+ You can use `ol$peaklist[["peaks1///peaks2"]]`, where `"peaks1///peaks2"` represents a _GRanges_ object that contains all the merged overlapping peaks in _peaks1_ and _peaks2_
-+ You can also use `ol$mergedPeaks` to obtain all the merged overlapping peaks from all the peak sets in `ol`. This means that if you have multiple peak sets, this command will output all the peaks that overlap with peaks from any other peak sets.
-```{r}
-identical(ol$peaklist[["peaks1///peaks2"]], ol$mergedPeaks)
-```
++ You can use `ol$mergedPeaks` to obtain all the merged overlapping peaks from all peak sets in `ol`. This means that if you have multiple peak sets, this command will output all the peaks that overlap with peaks from any other peak sets
++ Alternatively, you can use `ol$peaklist[["peaks1///peaks2"]]`, where `"peaks1///peaks2"` represents a _GRanges_ object that contains all the merged overlapping peaks from _peaks1_ and _peaks2_. When you only have two peak sets, `ol$mergedPeaks` is equivalent to `ol$peaklist[["peaks1///peaks2"]]`. However, if more peak sets are involved, e.g. three peak sets, `ol$peaklist[["peaks1///peaks2///peaks3"]]` would represent merged overlapping peaks that consist of peaks from all three sets. In other words, `ol$mergedPeaks` is equivalent to `ol$peaklist[["peaks1///peaks2"]]` plus `ol$peaklist[["peaks2///peaks3"]]` and `ol$peaklist[["peaks1///peaks2///peaks3"]]`
 
 ### Visualize the overlaps using Venn diagram {#venn}
 The output from `findOverlapsOfPeaks` can be directly fed to `makeVennDiagram` to draw a Venn diagram and evaluate the degree of overlap between peak sets. Additionally, the `makeVennDiagram` function also calculates a P-value, which indicates whether the observed overlap is statistically significant or not. 
@@ -431,11 +428,12 @@ rotate_x(chromosome_region[["percentage"]], 45)
 By default, `nucleotideLevel = FALSE` meaning that peaks are treated as ranges when determining overlaps with genomic features. If a peak intersects with multiple features, the feature assignment is determined by the order specified in the `precedence` argument. If `precedence` is not set, counts for each overlapping feature will be incremented. Otherwise, if `nucleotideLevel = TRUE`, the summit of the peak (a single position, not suitable for broad peaks) will be used when determining overlaps.
 
 ## Plot peak distributions over different feature levels
-In addition to inspecting the peak enrichment pattern by plotting the distribution against genomic features, user can plot distributions over different feature levels, each containing multiple categories, using the  `genomicElementDistribution` function. 
+In addition to inspecting the peak enrichment pattern by plotting the distribution against genomic features, users can plot distributions over different feature levels, each containing multiple categories, using the  `genomicElementDistribution` function. 
 
-+ _Gene Level_: "geneLevel"
++ _Transcript Level_: "geneLevel"
     + "Promoter"
     + "Gene body"
+    + "Downstream"
     + "Distal Intergenic"
     
 + _Exon Level_: "Exons"
@@ -483,7 +481,7 @@ upset(res[["plotData"]],
       nintersects = NA)
 ```
 
-UpSet plot can be considered as a "high dimensional Venn diagram" that allows for the visualization of overlaps for multiple sets. For example, in the above plot, it is evident that the feature set "gene body" (from the "Gene Level") and the feature set "intron" (from the "Exon/Intron/Intergenic") share the highest number of common peaks. Type `?genomicElementUpSetR` for the definition of `distal_promoter`.
+UpSet plot can be considered as a "high dimensional Venn diagram" that allows for the visualization of overlaps for multiple sets. For example, in the above plot, it is evident that the feature set "gene body" (from the "Transcript Level") and the feature set "intron" (from the "Exon/Intron/Intergenic") share the highest number of common peaks. Type `?genomicElementUpSetR` for the definition of `distal_promoter`.
 
 # Annotate peaks {#annopeaks}
 With the annotation data, you can assign the peaks identified in your experiments to nearby features of your choice such as genes and transcripts. This process is known as peak annotation. The `annotatePeakInBatch` function offers a highly flexible approach to perform peak annotation with various `output` option. 
@@ -1027,7 +1025,7 @@ For the overlapping peak counts:
 venn1[["vennCounts"]]
 ```
 
-The parameter `connectedPeaks = "keepAll"` means that when multiple peaks from different groups overlap, all original peak counts for each group will be displayed in parentheses, while the count of the minimally involved peaks will be displayed outside the parentheses. When `connectedPeaks = "keepFirstListConsistent"` is set, the counts from the first group will be consistently maintained.
+The parameter `connectedPeaks` denotes how to calculate peak counts when multiple peaks from different groups overlap. If `connectedPeaks = "keepFirstListConsistent"`, the counts from the first group will be consistently displayed in the plot. If `connectedPeaks = "keepAll"`, you will see multiple numbers: all original peak counts for each group will be displayed in parentheses, while the count of the minimally involved peaks will be displayed outside the parentheses. 
 ```{r, results = "hide", fig.cap = "Venn diagram2 showing overlapping peaks", fig.small = TRUE}
 venn2 <- makeVennDiagram(overlapping_peaks, 
                          totalTest = total_binding_sites, 
@@ -1254,7 +1252,7 @@ sig_rowsums <- sapply(sig, rowSums, na.rm = TRUE)
 row_distance <- dist(sig_rowsums)
 hc <- hclust(row_distance)
 
-# user hierarchical clustering order to sort
+# use hierarchical clustering order to sort
 gr_TFs_ol_center$sort_by <- hc$order
 featureAlignedHeatmap(sig, gr_TFs_ol_center, 
                       upper.extreme = c(3, 0.5, 4),

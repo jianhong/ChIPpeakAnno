@@ -27,8 +27,8 @@ enrichmentPlot(
 
 \item{label_substring_to_remove}{remove common substring from label, 
 default to NULL. Special characters must be escaped. E.g. if you would like 
-to remove "Homo sapiens (humam)" from labels, you must use "Homo sapiens \\(
-human\\)".}
+to remove "Homo sapiens (human)" from labels, you must use "Homo sapiens \\\(
+human\\\)".}
 
 \item{orderBy}{order the data by pvalue, termId or none.}
 }
@@ -56,7 +56,8 @@ if (interactive()||Sys.getenv("USER")=="jianhongou") {
      over <- lapply(GRangesList(gr1=gr1.anno, gr2=gr2.anno), 
                     getEnrichedGO, orgAnn="org.Hs.eg.db",
                     maxP=.05, minGOterm=10, condense=TRUE)
-     enrichmentPlot(over)
+     enrichmentPlot(over$gr1)
+     enrichmentPlot(over$gr2, style = "h")
  }
 }
 \author{
