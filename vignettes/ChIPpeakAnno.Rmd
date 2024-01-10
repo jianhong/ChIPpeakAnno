@@ -35,9 +35,6 @@ knitr::opts_chunk$set(message = FALSE,
           					  fig.width = 6, 
           					  fig.height = 6,
           					  fig.align = "center")
-
-# for dev only:
-devtools::load_all("/Users/kaihu/GitHub/ChIPpeakAnno")
 ```
 
 # Introduction
@@ -940,7 +937,7 @@ As evident from the simulation results, the higher the probability of the motif,
 ```{r, fig.small = TRUE}
 library(motifStack)
 
-pfm <- new("pfm", mat = motif_summary$motifs[[1]],
+pfm <- new("pfm", mat = motif_summary_simu$motifs[[1]],
            name = "sample motif 1")
 motifStack(pfm)
 ```
@@ -949,8 +946,8 @@ To loop through each element in `motif_summary$motifs`, we can use the `mapply` 
 ```{r, fig.cap = "Plot showing the first motif detected", fig.small = TRUE}
 pfms <- mapply(function(motif, id) { new("pfm", mat = motif, name = as.character(id)) },
                motif_summary$motifs,
-               1:length(motif_summary$motifs))
-        
+               seq_along(motif_summary$motifs))
+
 motifStack(pfms[[1]])
 ```
 
@@ -1167,13 +1164,7 @@ TAF1 <- tfbs_hg38_by_TF[["TAF1"]]
 TEAD4 <- tfbs_hg38_by_TF[["TEAD4"]]
 
 # Step5: remove hot spots from binding pool
-remove_ol <- function(gr, gr_hot_spots) { 
-  # helper function to remove overlaps with hot_spots
-  ol <- findOverlaps(gr, gr_hot_spots)
-  if (length(ol) > 0) gr <- gr[-unique(queryHits(ol))]
-  gr
-}
-tfbs_hg38 <- remove_ol(tfbs_hg38, hot_spots_hg38)
+tfbs_hg38 <- subsetByOverlaps(tfbs_hg38, hot_spots_hg38, invert=TRUE)
 tfbs_hg38 <- reduce(tfbs_hg38)
 
 # Step6: perform permutation test

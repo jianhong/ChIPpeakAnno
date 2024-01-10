@@ -35,17 +35,18 @@ Imports:
         SummarizedExperiment, VennDiagram, biomaRt, ggplot2, grDevices,
         graph, graphics, grid, InteractionSet, KEGGREST, matrixStats,
         multtest, regioneR, rtracklayer, stats, utils, universalmotif,
-        stringr, tibble, tidyr, data.table, scales
+        stringr, tibble, tidyr, data.table, scales, ensembldb
 Suggests: 
         AnnotationHub, BSgenome, limma, reactome.db, BiocManager,
         BiocStyle, BSgenome.Ecoli.NCBI.20080805,
         BSgenome.Hsapiens.UCSC.hg19, org.Ce.eg.db, org.Hs.eg.db,
         BSgenome.Celegans.UCSC.ce10, BSgenome.Drerio.UCSC.danRer7,
         BSgenome.Hsapiens.UCSC.hg38, DelayedArray, idr, seqinr,
-        ensembldb, EnsDb.Hsapiens.v75, EnsDb.Hsapiens.v79,
+        EnsDb.Hsapiens.v75, EnsDb.Hsapiens.v79, EnsDb.Hsapiens.v86,
+        TxDb.Hsapiens.UCSC.hg18.knownGene,
         TxDb.Hsapiens.UCSC.hg19.knownGene,
         TxDb.Hsapiens.UCSC.hg38.knownGene, GO.db, gplots, UpSetR,
-        knitr, rmarkdown, testthat, trackViewer, motifStack,
+        knitr, rmarkdown, reshape2, testthat, trackViewer, motifStack,
         OrganismDbi
 Description: 
         The package encompasses a range of functions for identifying the 

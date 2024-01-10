@@ -34,6 +34,7 @@
 #' @keywords classes
 #' @exportClass annoGR
 #' @import methods
+#' @importFrom ensembldb EnsDb
 #' @examples
 #' 
 #'     if(interactive() || Sys.getenv("USER")=="jianhongou"){
