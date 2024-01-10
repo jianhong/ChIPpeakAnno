@@ -78,21 +78,21 @@ genomicElementDistribution <-
                                utr3="3' UTR",
                                CDS="CDS",
                                otherExon="Other exon"),
-                       group=c(geneLevel="Gene Level",
+                       group=c(geneLevel="Transcript Level",
                                promoterLevel="Promoter Level",
                                Exons="Exon level",
                                ExonIntron="Exon/Intron/Intergenic")),
-           labelColors = c(promoter="#D55E00",
-                           geneDownstream="#E69F00",
-                           geneBody="#51C6E6",
-                           distalIntergenic="#AAAAAA",
-                           exon="#009DDA",
-                           intron="#666666",
-                           intergenic="#DDDDDD",
-                           utr5="#0072B2",
-                           utr3="#56B4E9",
-                           CDS="#0033BF",
-                           otherExon="#009E73"),
+           labelColors = c(promoter="#E1F114",
+                           geneBody="#9EFF00",
+                           geneDownstream="#57CB1B",
+                           distalIntergenic="#066A4B",
+                           exon="#6600FF",
+                           intron="#8F00FF",
+                           intergenic="#DA00FF",
+                           utr5="#00FFDB",
+                           utr3="#00DFFF",
+                           CDS="#00A0FF",
+                           otherExon="#006FFF"),
            plot = TRUE,
            keepExonsInGenesOnly = TRUE,
            promoterLevel){
@@ -201,7 +201,7 @@ genomicElementDistribution <-
     for(i in names(labs)){
       anno[[i]] <- switch (i,
         "promoterLevel" = {
-          suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+          suppressMessages(g <- transcripts(TxDb))
           pro <- mapply(FUN=function(upstream, downstream){
             promoters(g, upstream = upstream, downstream = downstream)
           }, promoterLevel$upstream, 
@@ -220,7 +220,7 @@ genomicElementDistribution <-
           current_anno
         },
         "geneLevel" = {
-          suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+          suppressMessages(g <- transcripts(TxDb))
           pro <- promoters(g, 
                            upstream = promoterRegion["upstream"],
                            downstream = promoterRegion["downstream"])
@@ -253,7 +253,7 @@ genomicElementDistribution <-
           exon <- exons(TxDb)
           intron <- unlist(intronsByTranscript(TxDb))
           if(keepExonsInGenesOnly){
-            suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+            suppressMessages(g <- transcripts(TxDb))
             ole <- findOverlaps(exon, g, type = "within")
             oli <- findOverlaps(intron, g, type = "within")
             ole <- !seq_along(exon) %in% queryHits(ole)
@@ -292,7 +292,7 @@ genomicElementDistribution <-
           CDS <- cds(TxDb)
           exon <- exons(TxDb)
           if(keepExonsInGenesOnly){
-            suppressMessages(g <- genes(TxDb, single.strand.genes.only=TRUE))
+            suppressMessages(g <- transcripts(TxDb))
             ole <- findOverlaps(exon, g, type = "within")
             olc <- findOverlaps(CDS, g, type = "within")
             ol5 <- findOverlaps(utr5, g, type = "within")

@@ -2,60 +2,122 @@
 % Please edit documentation in R/summarizePatternInPeaks.R
 \name{summarizePatternInPeaks}
 \alias{summarizePatternInPeaks}
-\title{Output a summary of the occurrence of each pattern in the sequences.}
+\title{Output a summary of the occurrence and enrichment of each pattern in the 
+sequences.}
 \usage{
 summarizePatternInPeaks(
   patternFilePath,
   format = "fasta",
-  skip = 0L,
   BSgenomeName,
   peaks,
-  outfile,
-  append = FALSE
+  revcomp = TRUE,
+  method = c("binom.test", "permutation.test"),
+  expectFrequencyMethod = c("Markov", "Naive"),
+  MarkovOrder = 3L,
+  bgdForPerm = c("shuffle", "chromosome"),
+  chromosome = c("asPeak", "random"),
+  nperm = 1000,
+  alpha = 0.05,
+  ...
 )
 }
 \arguments{
-\item{patternFilePath}{A character vector containing the path to the file to
-read the patterns from.}
+\item{patternFilePath}{Character value. The path to the file that contains 
+the pattern.}
 
-\item{format}{Either "fasta" (the default) or "fastq"}
+\item{format}{Character value. The format of file containing the 
+oligonucleotide pattern, either "fasta" (default) or "fastq".}
 
-\item{skip}{Single non-negative integer. The number of records of the
-pattern file to skip before beginning to read in records.}
+\item{BSgenomeName}{Character value. BSgenome object. Please refer to 
+available.genomes in BSgenome package for details.}
 
-\item{BSgenomeName}{BSgenome object. Please refer to available.genomes in
-BSgenome package for details}
+\item{peaks}{Character value. \link[GenomicRanges:GRanges-class]{GRanges} 
+containing the peaks.}
 
-\item{peaks}{\link[GenomicRanges:GRanges-class]{GRanges} containing the
-peaks}
+\item{revcomp}{Boolean value, if TURE, also search the reverse compliment of 
+pattern. Default is TRUE.}
 
-\item{outfile}{A character vector containing the path to the file to write
-the summary output.}
+\item{method}{Character value. Method for pattern enrichment test, 
+'binom.test' (default) or 'permutation.test'.}
 
-\item{append}{TRUE or FALSE, default FALSE}
+\item{expectFrequencyMethod}{Character value. Method for calculating the 
+expected probability of pattern occurrence, 'Markov' (default) or 'Naive'.}
+
+\item{MarkovOrder}{Integer value. The order of Markov chain. Default is 3.}
+
+\item{bgdForPerm}{Character value. The method for obtaining the background 
+sequence. 'chromosome' (default) selects background chromosome 
+from chromosomes, refer to 'chromosome' parameter; 'shuffle' will obtain the
+backgroud sequence by shufflubg any k-mers in peak sequences, refer to '...'.}
+
+\item{chromosome}{Character value. Relevant if "bgdForPerm='chromosome'".
+'asPeak' means to use the same chromosomes in peaks; 'random' means to use 
+all chromosomes randomly. Default is 'asPeak'.}
+
+\item{nperm}{Integer value. The number of permutation test, default is 1000.}
+
+\item{alpha}{Numeric value. The significant level for permutation test, 
+default is 0.05.}
+
+\item{...}{Aditional parameter passed to function \\link[universalmotif]
+{shuffle_sequences}}
 }
 \value{
-A data frame with 3 columns as n.peaksWithPattern (number of peaks
-with the pattern), n.totalPeaks (total number of peaks in the input) and
-Pattern (the corresponding pattern). The summary will consider both strand
-(including reverse complement).
+A list including two data frames named 'motif_enrichment' and 
+'motif_occurrence'. The 'motif_enrichment' has four columns: 
+\itemize{
+ \item{"patternNum"}: {number of matched pattern}
+ \item{"totalNumPatternWithSameLen"}:  {total number of pattern with the 
+ same length}
+ \item{"expectedRate"}:  {expected rate of pattern for 'binom.test' method}
+ \item{"patternRate"}:  {real rate of pattern for 'permutation.test' method}
+ \item{"pValueBinomTest"}:  {p value of bimom test for 'binom.test' method}
+ \item{"cutOffPermutationTest"}:  {cut off of permutation test for 
+ 'permutation.test' method}
+}
+
+The 'motif_occurrence' has 14 columns:
+
+\itemize{
+ \item{"motifChr"}: {Chromosome of motif}
+ \item{"motifStartInChr"}:  {motif start position in chromosome}
+ \item{"motifEndInChr"}:  {motif end position in chromosome}
+ \item{"motifName"}:  {motif name}
+ \item{"motifPattern"}:  {motif pattern}
+ \item{"motifStartInPeak"}:  {motif start position in peak}
+ \item{"motifEndInPeak"}: {motif end position in peak}
+ \item{"motifFound"}:  {specific motif Found in peak}
+ \item{"motifFoundStrand"}:  {strand of specific motif Found in peak, "-" 
+ means reverse complement of motif found in peaks}
+ \item{"peakChr"}:  {Chromosome of peak}
+ \item{"peakStart"}:  {peak start position}
+ \item{"peakEnd"}:  {peak end position}
+ \item{"peakWidth"}:  {peak width}
+ \item{"peakStrand"}:  {peak strand}
+}
 }
 \description{
-Output a summary of the occurrence of each pattern in the sequences.
+Output a summary of the occurrence and enrichment of each pattern in the 
+sequences.
+}
+\details{
+Please see \link[universalmotif]{shuffle_sequences} for the more 
+information bout 'shuffle' method.
 }
 \examples{
-
-    peaks = GRanges(seqnames=c("NC_008253", "NC_010468"), 
-                    IRanges(start=c(100, 500), end=c(300, 600), 
-                               names=c("peak1", "peak2")))
-    filepath =system.file("extdata", "examplePattern.fa", 
-                          package="ChIPpeakAnno")
-    library(BSgenome.Ecoli.NCBI.20080805)
-    summarizePatternInPeaks(patternFilePath=filepath, format="fasta", 
-                            skip=0L, BSgenomeName=Ecoli, peaks=peaks)
+                            
+library(BSgenome.Hsapiens.UCSC.hg19)
+filepath <- system.file("extdata", "examplePattern.fa", 
+                        package = "ChIPpeakAnno")
+peaks <- GRanges(seqnames = c("chr17", "chr3", "chr12", "chr8"),
+                 IRanges(start = c(41275784, 10076141, 4654135, 31024288),
+                         end = c(41276382, 10076732, 4654728, 31024996),
+                         names = paste0("peak", 1:4)))
+result <- summarizePatternInPeaks(patternFilePath = filepath, peaks = peaks,
+                                  BSgenomeName = Hsapiens)
 
 }
 \author{
-Lihua Julie Zhu
+Lihua Julie Zhu, Junhui Li, Kai Hu
 }
 \keyword{misc}

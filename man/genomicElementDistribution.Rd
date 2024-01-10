@@ -16,12 +16,12 @@ genomicElementDistribution(
     geneBody = "Gene body", distalIntergenic = "Distal Intergenic"), ExonIntron = c(exon
     = "Exon", intron = "Intron", intergenic = "Intergenic"), Exons = c(utr5 = "5' UTR",
     utr3 = "3' UTR", CDS = "CDS", otherExon = "Other exon"), group = c(geneLevel =
-    "Gene Level", promoterLevel = "Promoter Level", Exons = "Exon level", ExonIntron =
-    "Exon/Intron/Intergenic")),
-  labelColors = c(promoter = "#D55E00", geneDownstream = "#E69F00", geneBody = "#51C6E6",
-    distalIntergenic = "#AAAAAA", exon = "#009DDA", intron = "#666666", intergenic =
-    "#DDDDDD", utr5 = "#0072B2", utr3 = "#56B4E9", CDS = "#0033BF", otherExon =
-    "#009E73"),
+    "Transcript Level", promoterLevel = "Promoter Level", Exons = "Exon level",
+    ExonIntron = "Exon/Intron/Intergenic")),
+  labelColors = c(promoter = "#E1F114", geneBody = "#9EFF00", geneDownstream = "#57CB1B",
+    distalIntergenic = "#066A4B", exon = "#6600FF", intron = "#8F00FF", intergenic =
+    "#DA00FF", utr5 = "#00FFDB", utr3 = "#00DFFF", CDS = "#00A0FF", otherExon =
+    "#006FFF"),
   plot = TRUE,
   keepExonsInGenesOnly = TRUE,
   promoterLevel
