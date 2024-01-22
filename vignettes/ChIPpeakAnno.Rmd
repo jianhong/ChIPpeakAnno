@@ -16,7 +16,6 @@ author:
 output:
   BiocStyle::html_document:
     toc_float: true
-    pandoc_args: "--citeproc"
   BiocStyle::pdf_document: default
 package: ChIPpeakAnno
 link-citations: yes
@@ -35,6 +34,14 @@ knitr::opts_chunk$set(message = FALSE,
           					  fig.width = 6, 
           					  fig.height = 6,
           					  fig.align = "center")
+# Handle the biofilecache error
+library(BiocFileCache)
+bfc <- BiocFileCache()
+res <- bfcquery(bfc, 
+                "annotationhub.index.rds", 
+                field = "rname", 
+                exact = TRUE) 
+bfcremove(bfc, rids = res$rid)
 ```
 
 # Introduction

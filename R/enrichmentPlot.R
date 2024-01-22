@@ -16,7 +16,7 @@
 #' @return an object of ggplot
 #' @importFrom ggplot2 ggplot aes geom_bar geom_point scale_x_discrete scale_y_continuous geom_text
 #' xlab ylab theme_classic theme facet_grid expansion element_text
-#' @importFrom stats as.formula
+#' @importFrom stats as.formula reorder
 #' @importFrom scales label_wrap
 #' @export
 #' @examples 
