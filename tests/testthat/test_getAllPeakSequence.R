@@ -4,6 +4,7 @@ test_that("getAllPeakSequence works not correct", {
                      IRanges(start=c(10,300,60348387, 60348490),
                              end=c(50,330,60348389, 60348498), 
                              names=c("p1","p2","p0", "p3")))
+    seqlevelsStyle(peaks) <- "UCSC"
     suppressWarnings(seq <- 
                          getAllPeakSequence(peaks, 
                                             upstream = 20, 

@@ -59,6 +59,9 @@
 #'   library(EnsDb.Hsapiens.v75)
 #'   annoData <- toGRanges(EnsDb.Hsapiens.v75, feature="gene")
 #'   data("myPeakList")
+#'   seqlevelsStyle(myPeakList) <- "Ensembl"
+#'   seqlevelsStyle(annoData) <- "Ensembl"
+#'   seqlevelsStyle(DNAinteractiveData) <- "Ensembl"
 #'   findEnhancers(myPeakList[500:1000], annoData, DNAinteractiveData)
 #'   
 findEnhancers <- function(peaks, annoData, DNAinteractiveData, 

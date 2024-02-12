@@ -62,8 +62,8 @@ annoData[1:2]
 ```
 ## Step 3: Annotate the peaks with `annotatePeakInBatch`
 ```{r annotate}
-## keep the seqnames in the same style
-seqlevelsStyle(peaks) <- seqlevelsStyle(annoData)
+## keep the seqnames in the same style if needed
+seqlevelsStyle(peaks) <- seqlevelsStyle(annoData) <- "Ensembl"
 ## do annotation by nearest TSS
 anno <- annotatePeakInBatch(peaks, AnnotationData=annoData)
 anno[1:2]
