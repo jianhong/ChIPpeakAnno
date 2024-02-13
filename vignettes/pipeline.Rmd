@@ -151,7 +151,7 @@ to annotate the peaks to the promoter regions of Hg19 genes.
 Promoters can be specified with bindingRegion. For the following example, promoter region is defined as upstream 2000 and downstream 500 from TSS (bindingRegion=c(-2000, 500)).
 
 ```{r workflow3}
-seqlevelsStyle(overlaps) <- seqlevelsStyle(annoData) <- "Ensembl"
+seqlevelsStyle(overlaps) <- seqlevelsStyle(annoData)
 overlaps.anno <- annotatePeakInBatch(overlaps, 
                                      AnnotationData=annoData, 
                                      output="nearestBiDirectionalPromoters",
@@ -262,7 +262,7 @@ DNA5C <- system.file("extdata",
                      "wgEncodeUmassDekker5CGm12878PkV2.bed.gz",
                      package="ChIPpeakAnno")
 DNAinteractiveData <- toGRanges(gzfile(DNA5C))
-seqlevelsStyle(overlaps) <- seqlevelsStyle(annoData) <- seqlevelsStyle(DNAinteractiveData) <- "Ensembl"
+seqlevelsStyle(overlaps) <- seqlevelsStyle(annoData) <- seqlevelsStyle(DNAinteractiveData)
 findEnhancers(overlaps, annoData, DNAinteractiveData)
 ```
 
