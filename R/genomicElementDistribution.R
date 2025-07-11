@@ -216,7 +216,7 @@ genomicElementDistribution <-
             mcols(ca) <- DataFrame(type=rep(names(pro)[j], length(ca)))
             current_anno <- c(current_anno, ca)
           }
-          seqlevelsStyle(current_anno) <- seql[1]
+          current_anno <- formatSeqnames(current_anno, peaks)
           current_anno
         },
         "geneLevel" = {
@@ -246,7 +246,7 @@ genomicElementDistribution <-
             mcols(ca) <- DataFrame(type=rep(j, length(ca)))
             current_anno <- c(current_anno, ca)
           }
-          seqlevelsStyle(current_anno) <- seql[1]
+          current_anno <- formatSeqnames(current_anno, peaks)
           current_anno
         },
         "ExonIntron" = {
@@ -283,7 +283,7 @@ genomicElementDistribution <-
             mcols(ca) <- DataFrame(type=rep(j, length(ca)))
             current_anno <- c(current_anno, ca)
           }
-          seqlevelsStyle(current_anno) <- seql[1]
+          current_anno <- formatSeqnames(current_anno, peaks)
           current_anno
         },
         "Exons" = {
@@ -331,7 +331,7 @@ genomicElementDistribution <-
             mcols(ca) <- DataFrame(type=rep(j, length(ca)))
             current_anno <- c(current_anno, ca)
           }
-          seqlevelsStyle(current_anno) <- seql[1]
+          current_anno <- formatSeqnames(current_anno, peaks)
           current_anno
         }
       )
@@ -361,13 +361,18 @@ genomicElementDistribution <-
         ol <- as.data.frame(ol)
         ol <- ol[order(ol$queryHits, ol$subjectHits), ]
         ol <- ol[!duplicated((ol$queryHits)), ]
-        y$anno <- rep("undefined", length(y))
+        mcols(y)[, 'anno'] <- rep("undefined", length(y))
         y$anno[ol$queryHits] <- .ele$type[ol$subjectHits]
         y$anno
       })
       
       pct <- do.call(cbind, pct)
-      mcols(.peaks) <- cbind(mcols(.peaks), pct)
+      if( ncol(mcols(.peaks)) ){
+        mcols(.peaks) <- cbind(mcols(.peaks), pct)
+      }else{
+        mcols(.peaks) <- pct
+      }
+      
       .peaks
     })
     if(isGRanges){
