@@ -289,7 +289,13 @@ locations leveraging IRanges and biomaRt package
   #ENSEMBL ENTREZID SYMBOL
   # ENSG00000001461    57185 NIPAL3
   require(TxDb.Hsapiens.UCSC.hg19.knownGene)
-  txdb.ann <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  txdb.ann.current <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+  # note: the annotation of STPG1 shifted from old version
+  # here we set the old one for the test
+  txdb.ann <- GRanges('chr1', IRanges(start=c(24683489, 24742245),
+                      end=c(24741587, 24799473)), 
+                      strand=c('-', '+'), gene_id=c('90529', '57185'))
+  names(txdb.ann) <- txdb.ann$gene_id
   STPG1 <- select(org.Hs.eg.db, key="STPG1", keytype="SYMBOL",
                   columns=c( "SYMBOL", "ENSEMBL", "ENTREZID"))[1,3]
   NIPAL3 <- select(org.Hs.eg.db, key="NIPAL3", keytype="SYMBOL",
@@ -306,13 +312,14 @@ locations leveraging IRanges and biomaRt package
   ap <- annotatePeakInBatch(peak, Annotation=txdb.ann,
                             PeakLocForDistance = "endMinusStart")
   expect_equal(ap$feature, NIPAL3)
-  txdb.ann[NIPAL3]
+  txdb.ann.current[NIPAL3]
   txdb.ann[txdb.ann$gene_id == NIPAL3]
   #  GRanges object with 1 range and 1 metadata column:
   #    seqnames            ranges strand |     gene_id
   #  <Rle>         <IRanges>  <Rle> | <character>
   #   57185     chr1 24742245-24799473      + |       57185
   #-------
+  txdb.ann.current[STPG1]
   txdb.ann[txdb.ann$gene_id == STPG1]
   #   GRanges object with 1 range and 1 metadata column:
   #     seqnames            ranges strand |     gene_id

@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.43.2
+-------------------------
+
+    o Fix an issue for the corrdinates changes of GRCh37 annotation.
+    
 CHANGES IN VERSION 3.43.1
 -------------------------
 
