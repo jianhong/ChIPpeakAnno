@@ -41,7 +41,7 @@ Plot the GO/KEGG/reactome enrichment results
 \examples{
 data(enrichedGO)
 enrichmentPlot(enrichedGO)
-if (interactive()||Sys.getenv("USER")=="jianhongou") {
+if (interactive()||Sys.getenv("USER")=="jou") {
      
      library(org.Hs.eg.db)
      library(GO.db)

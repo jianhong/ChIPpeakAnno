@@ -25,7 +25,7 @@
 #' @importFrom GenomeInfoDb seqinfo seqnames
 #' @examples
 #' 
-#' if(Sys.getenv("USER")=="jianhongou"){
+#' if(Sys.getenv("USER")=="jou"){
 #' path <- system.file("extdata", package="ChIPpeakAnno")
 #' library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 #' library(rtracklayer)

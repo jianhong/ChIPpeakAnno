@@ -58,7 +58,7 @@ The reads will be extended to estimated fragement length.
 }
 \examples{
 
- if(interactive() || Sys.getenv("USER")=="jianhongou"){
+ if(interactive() || Sys.getenv("USER")=="jou"){
     path <- system.file("extdata", package="MMDiffBamSubset")
     if(file.exists(path)){
         WT.AB2 <- file.path(path, "reads", "WT_2.bam")

@@ -78,7 +78,7 @@ and exon is specified before intron, then only exon will
 be incremented for the same example.
 }
 \examples{
-if (interactive() || Sys.getenv("USER")=="jianhongou"){
+if (interactive() || Sys.getenv("USER")=="jou"){
   data(myPeakList)
   if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
   seqinfo(myPeakList) <- 

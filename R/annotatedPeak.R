@@ -32,7 +32,7 @@
 #' 
 #' data(annotatedPeak)
 #' head(annotatedPeak, 4)  # show first 4 ranges
-#' if (interactive() || Sys.getenv("USER")=="jianhongou") {
+#' if (interactive() || Sys.getenv("USER")=="jou") {
 #' y = annotatedPeak$distancetoFeature[!is.na(annotatedPeak$distancetoFeature)]
 #' hist(as.numeric(as.character(y)), 
 #'      xlab="Distance To Nearest TSS", main="", breaks=1000, 

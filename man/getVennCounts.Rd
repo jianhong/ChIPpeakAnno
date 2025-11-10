@@ -44,7 +44,7 @@ internal function for makeVennDigram
 }
 \examples{
 
-if(interactive() || Sys.getenv("USER")=="jianhongou"){
+if(interactive() || Sys.getenv("USER")=="jou"){
 peaks1 = GRanges(seqnames=c("1", "2", "3"), 
                  IRanges(start = c(967654, 2010897, 2496704), 
                             end = c(967754, 2010997, 2496804), 

@@ -45,7 +45,7 @@
 #' @importFrom KEGGREST keggGet keggLink
 #' @examples
 #'
-#' if (interactive()||Sys.getenv("USER")=="jianhongou") {
+#' if (interactive()||Sys.getenv("USER")=="jou") {
 #' data(annotatedPeak)
 #' library(org.Hs.eg.db)
 #' library(reactome.db)

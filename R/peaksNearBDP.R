@@ -55,8 +55,9 @@
 #' @examples
 #' 
 #' 
-#' if (interactive() || Sys.getenv("USER")=="jianhongou")
+#' if (interactive() || Sys.getenv("USER")=="jou")
 #' {
+#'     library(GenomeInfoDb)
 #'     data(myPeakList)
 #'     data(TSS.human.NCBI36)
 #'     seqlevelsStyle(TSS.human.NCBI36) <- seqlevelsStyle(myPeakList)

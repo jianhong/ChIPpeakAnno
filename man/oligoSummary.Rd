@@ -43,7 +43,7 @@ length by Markove chain.
 }
 \examples{
 
-    if(interactive() || Sys.getenv("USER")=="jianhongou"){
+    if(interactive() || Sys.getenv("USER")=="jou"){
         data(annotatedPeak)
         library(BSgenome.Hsapiens.UCSC.hg19)
         library(seqinr)

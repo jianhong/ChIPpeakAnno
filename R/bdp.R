@@ -17,7 +17,7 @@
 #' @importFrom S4Vectors elementNROWS
 #' @examples
 #' 
-#'   if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'   if(interactive() || Sys.getenv("USER")=="jou"){
 #'     library(ensembldb)
 #'     library(EnsDb.Hsapiens.v75)
 #'     data("myPeakList")

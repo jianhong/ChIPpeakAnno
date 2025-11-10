@@ -80,7 +80,7 @@ oligoFrequency <- function(sequence, MarkovOrder=3L){
 #' @importFrom stats hclust kmeans as.dendrogram nobs
 #' @examples
 #' 
-#'     if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     if(interactive() || Sys.getenv("USER")=="jou"){
 #'         data(annotatedPeak)
 #'         library(BSgenome.Hsapiens.UCSC.hg19)
 #'         library(seqinr)

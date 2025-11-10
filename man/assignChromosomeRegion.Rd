@@ -98,7 +98,7 @@ Summarize peak distribution over exon, intron, enhancer, proximal promoter,
 }
 \examples{
 
-if (interactive() || Sys.getenv("USER")=="jianhongou"){
+if (interactive() || Sys.getenv("USER")=="jou"){
     ##Display the list of genomes available at UCSC:
     #library(rtracklayer)
     #ucscGenomes()[, "db"]

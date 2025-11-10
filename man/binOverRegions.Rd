@@ -46,7 +46,7 @@ calculate the coverage of 5'UTR, CDS and 3'UTR per transcript per bin.
 }
 \examples{
 
-if(Sys.getenv("USER")=="jianhongou"){
+if(Sys.getenv("USER")=="jou"){
 path <- system.file("extdata", package="ChIPpeakAnno")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(rtracklayer)

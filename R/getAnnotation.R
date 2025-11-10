@@ -32,7 +32,7 @@
 #' @importFrom biomaRt getBM
 #' @examples
 #' 
-#' if (interactive() || Sys.getenv("USER")=="jianhongou" )
+#' if (interactive() || Sys.getenv("USER")=="jou" )
 #' {
 #'   library(biomaRt)
 #'   mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
@@ -42,7 +42,7 @@
 #' ##########################################################
 #' #  Below are 3 options to fetch the annotation file.     #
 #' ##########################################################
-#' if (interactive() || Sys.getenv("USER")=="jianhongou" ){
+#' if (interactive() || Sys.getenv("USER")=="jou" ){
 #' ## Option1: with the AnnotationHub package
 #' library(AnnotationHub)
 #' ah <- AnnotationHub()

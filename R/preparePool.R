@@ -20,7 +20,7 @@
 #' @importFrom S4Vectors queryHits subjectHits
 #' @examples
 #' 
-#'     if(interactive() || Sys.getenv("USER")=="jianhongou"){
+#'     if(interactive() || Sys.getenv("USER")=="jou"){
 #'         path <- system.file("extdata", package="ChIPpeakAnno")
 #'         peaksA <- toGRanges(file.path(path, "peaks.narrowPeak"), 
 #'                             format="narrowPeak")

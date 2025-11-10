@@ -23,7 +23,7 @@ estimate the library size of bam files
 }
 \examples{
 
-    if(interactive() || Sys.getenv("USER")=="jianhongou"){
+    if(interactive() || Sys.getenv("USER")=="jou"){
         path <- system.file("extdata", "reads", package="MMDiffBamSubset")
         if(file.exists(path)){
             WT.AB2 <- file.path(path, "WT_2.bam")

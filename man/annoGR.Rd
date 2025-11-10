@@ -86,7 +86,7 @@ seqnames, source, strand)}
 
 \examples{
 
-    if(interactive() || Sys.getenv("USER")=="jianhongou"){
+    if(interactive() || Sys.getenv("USER")=="jou"){
         library(EnsDb.Hsapiens.v79)
         anno <- annoGR(EnsDb.Hsapiens.v79)
     }

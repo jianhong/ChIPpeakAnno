@@ -86,10 +86,10 @@
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels
 #' @importFrom BiocGenerics start end width strand
 #' @importFrom GenomicFeatures exons intronsByTranscript fiveUTRsByTranscript 
-#' threeUTRsByTranscript transcripts microRNAs tRNAs
+#' threeUTRsByTranscript transcripts tRNAs
 #' @examples
 #' 
-#' if (interactive() || Sys.getenv("USER")=="jianhongou"){
+#' if (interactive() || Sys.getenv("USER")=="jou"){
 #'     ##Display the list of genomes available at UCSC:
 #'     #library(rtracklayer)
 #'     #ucscGenomes()[, "db"]
@@ -163,14 +163,14 @@ assignChromosomeRegion <-
                 promoters <- GenomicRanges::trim(promoters)
                 immediateDownstream <- GenomicRanges::trim(immediateDownstream)
             })
-            microRNAs <- tryCatch(microRNAs(TxDb), 
-                                  error=function(e) return(NULL))
+            # microRNAs <- tryCatch(microRNAs(TxDb), 
+            #                       error=function(e) return(NULL))
             tRNAs <- tryCatch(tRNAs(TxDb), error=function(e) return(NULL))
             options(warn = 0)
             annotation <- list(exons, introns, fiveUTRs, threeUTRs, 
                                promoters, immediateDownstream)
-            if(!is.null(microRNAs)) 
-                annotation <- c(annotation, "microRNAs"=microRNAs)
+            # if(!is.null(microRNAs)) 
+            #     annotation <- c(annotation, "microRNAs"=microRNAs)
             if(!is.null(tRNAs)) 
                 annotation <- c(annotation, "tRNAs"=tRNAs)
             annotation <- 
@@ -244,6 +244,7 @@ assignChromosomeRegion <-
                 newAnno.disjoin <- rep(newAnno.disjoin, lengths(newAnno.disjoin$revmap))
                 newAnno.disjoin$source <- newAnno[revmap]$source
               }
+              newAnno.disjoin$revmap <- NULL
               ol.anno <- findOverlaps(peaks.RD, newAnno.disjoin, ignore.strand=ignore.strand)
               queryHits <- peaks.RD[queryHits(ol.anno)]
               subjectHits <- newAnno.disjoin[subjectHits(ol.anno)]

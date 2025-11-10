@@ -88,7 +88,7 @@ dataset such as MACS output file to GRanges
 
   macs <- system.file("extdata", "MACS_peaks.xls", package="ChIPpeakAnno")
   macsOutput <- toGRanges(macs, format="MACS")
-  if(interactive() || Sys.getenv("USER")=="jianhongou"){
+  if(interactive() || Sys.getenv("USER")=="jou"){
     ## MACS connection
     macs <- readLines(macs)
     macs <- textConnection(macs)

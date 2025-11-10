@@ -21,7 +21,7 @@
 #' threeUTRsByTranscript genes cds promoters
 #' @return list of data for plot.
 #' @examples 
-#' if (interactive() || Sys.getenv("USER")=="jianhongou"){
+#' if (interactive() || Sys.getenv("USER")=="jou"){
 #'   data(myPeakList)
 #'   if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){
 #'   seqinfo(myPeakList) <- 
