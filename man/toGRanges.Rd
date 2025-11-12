@@ -23,8 +23,8 @@ toGRanges(data, ...)
 
 \S4method{toGRanges}{TxDb}(
   data,
-  feature = c("gene", "transcript", "exon", "CDS", "fiveUTR", "threeUTR", "microRNA",
-    "tRNAs", "geneModel"),
+  feature = c("gene", "transcript", "exon", "CDS", "fiveUTR", "threeUTR", "tRNAs",
+    "geneModel"),
   OrganismDb,
   ...
 )

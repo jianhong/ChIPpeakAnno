@@ -20,8 +20,8 @@
 
 \S4method{annoGR}{TxDb}(
   ranges,
-  feature = c("gene", "transcript", "exon", "CDS", "fiveUTR", "threeUTR", "microRNA",
-    "tRNAs", "geneModel"),
+  feature = c("gene", "transcript", "exon", "CDS", "fiveUTR", "threeUTR", "tRNAs",
+    "geneModel"),
   date,
   source,
   mdata,

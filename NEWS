@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.45.1
 -------------------------
 
+    o Remove microRNAs from annoGR
+    
+CHANGES IN VERSION 3.45.1
+-------------------------
+
     o Remove microRNAs from assignChromosomeRegion.
     
 CHANGES IN VERSION 3.43.2

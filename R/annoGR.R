@@ -207,7 +207,7 @@ setMethod("annoGR", "GRanges",
 setMethod("annoGR", "TxDb", 
           function(ranges, feature=c("gene", "transcript", "exon",
                                      "CDS", "fiveUTR", "threeUTR",
-                                     "microRNA", "tRNAs", "geneModel"),
+                                     "tRNAs", "geneModel"),
                    date, source, mdata, OrganismDb){
               feature <- match.arg(feature)
               if(missing(mdata)) {

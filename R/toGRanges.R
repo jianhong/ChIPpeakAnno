@@ -314,7 +314,7 @@ setMethod("toGRanges", "connection",
 setMethod("toGRanges", "TxDb",
           function(data, feature=c("gene", "transcript", "exon",
                                    "CDS", "fiveUTR", "threeUTR",
-                                   "microRNA", "tRNAs", "geneModel"),
+                                   "tRNAs", "geneModel"),
                    OrganismDb, ...){
               feature <- match.arg(feature)
               if(!missing(OrganismDb)) {

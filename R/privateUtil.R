@@ -433,7 +433,7 @@ findOverlaps1 <- function(query, subject, maxgap=-1L,
 #' transcript, CDS, fiveUTR, threeUTR, microRNA, and tRNA
 #' @param OrganismDb org db object
 #' @importFrom GenomicFeatures exonsBy cdsBy fiveUTRsByTranscript 
-#' threeUTRsByTranscript genes exons transcripts cds microRNAs tRNAs
+#' threeUTRsByTranscript genes exons transcripts cds tRNAs
 #' @importFrom AnnotationDbi select
 TxDb2GR <- function(ranges, feature, OrganismDb){
     switch(feature,
@@ -588,14 +588,6 @@ TxDb2GR <- function(ranges, feature, OrganismDb){
                                           unique=TRUE)
                }
                u
-           },
-           microRNA={
-               m <- microRNAs(ranges)
-               if(length(m)){
-                   names(m) <- m$mirna_id
-                   m$mirna_id <- NULL
-               }
-               m
            },
            tRNA=tRNAs(ranges)
     )
