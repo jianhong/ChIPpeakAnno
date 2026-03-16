@@ -59,7 +59,7 @@
 #' @author Jianhong Ou, Lihua Julie Zhu
 #' @seealso \link[biomaRt:getBM]{getBM}, AnnotationDb
 #' @export
-#' @importFrom AnnotationDbi mget
+#' @importFrom AnnotationDbi mget keytypes select
 #' @importFrom biomaRt getBM
 #' @importFrom utils installed.packages
 #' @examples
@@ -114,6 +114,56 @@ addGeneIDs<-function(annotatedPeak, orgAnn, IDs2Add=c("symbol"),
         
     }
     if(!missing(orgAnn)){
+      if(is(orgAnn, 'EnsDb')){
+        keytype <- switch(feature_id_type,
+                          ensembl_gene_id       = "GENEID",
+                          ensembl_transcript_id = "TXID",
+                          ensembl_exon_id  = "EXONID",
+                          gene_id = "GENEID",
+                          tx_id = "TXID",
+                          exon_id = "EXONID",
+                          "UNKNOWN"
+        )
+        if(keytype=="UNKNOWN"){
+          if(feature_id_type %in% keytypes(orgAnn)){
+            keytype <- feature_id_type
+          }else{
+            stop("Currently only the following type of feature_id_type are supported: 
+               ensembl_gene_id, ensembl_transcript_id, ensembl_exon_id,
+               gene_id, tx_id, exon_id,
+               and keytypes(orgAnn)!",
+                 call.=FALSE)
+          }
+        }
+        m_ent <- ensembldb::select(orgAnn, keys=feature_ids,
+                        columns = IDs2Add, keytype = keytype)
+        colnames(m_ent) <- c(feature_id_type, IDs2Add)
+      }else{
+        if(is(orgAnn, 'TxDb')){
+          keytype <- switch(feature_id_type,
+                            ensembl_gene_id       = "GENEID",
+                            ensembl_transcript_id = "TXNAME",
+                            ensembl_exon_id  = "EXONNAME",
+                            gene_id = "GENEID",
+                            tx_id = "TXID",
+                            exon_id = "EXONID",
+                            "UNKNOWN"
+          )
+          if(keytype=="UNKNOWN"){
+            if(feature_id_type %in% keytypes(orgAnn)){
+              keytype <- feature_id_type
+            }else{
+              stop("Currently only the following type of feature_id_type are supported: 
+               ensembl_gene_id, ensembl_transcript_id, ensembl_exon_id,
+               gene_id, tx_id, exon_id,
+               and keytypes(orgAnn)!",
+                   call.=FALSE)
+            }
+          }
+          m_ent <- AnnotationDbi::select(orgAnn, keys=feature_ids,
+                        columns = IDs2Add, keytype = keytype)
+          colnames(m_ent) <- c(feature_id_type, IDs2Add)
+        }else{
         if(is(orgAnn, "OrgDb")){
             orgAnn <- deparse(substitute(orgAnn))
         }
@@ -236,22 +286,37 @@ entrez_id, gene_alias, ensembl_gene_id, refseq_id and gene_symbol!",
             if(!silence) message("done\n")
         }
         m_ent<-m_ent[, c(feature_id_type,IDs2Add), drop=FALSE]
+        }
+      }
 }else{
     if(missing(mart) || !is(mart, "Mart")){
         stop('No valid mart object is passed in!',call.=FALSE)
     }
     IDs2Add<-unique(IDs2Add)
     IDs2Add<-IDs2Add[IDs2Add!=feature_id_type]
+    if(all(grepl('\\.\\d+$', feature_ids)) && feature_id_type %in% c(
+      'ensembl_gene_id', 'ensemble_exon_id', 'ensembl_transcript_id'
+    )){
+      feature_ids_new <- sub('\\.\\d+$', '', feature_ids)
+      has_version_num <- TRUE
+    }else{
+      feature_ids_new <- feature_ids
+      has_version_num <- FALSE
+    }
     tryCatch(m_ent<-
                  getBM(attributes=c(feature_id_type,IDs2Add),
                        filters = feature_id_type, 
-                       values = feature_ids, mart=mart),
+                       values = feature_ids_new,
+                       mart=mart),
              error = function(e){
         stop(paste("Get error when calling getBM:", e, sep="\n"),
              call.=FALSE)
     })
     if(any(colnames(m_ent)!=c(feature_id_type, IDs2Add))) 
         colnames(m_ent) <- c(feature_id_type, IDs2Add)
+    if(has_version_num){
+      m_ent[, feature_id_type] <- feature_ids[match(m_ent[, feature_id_type], feature_ids_new)]
+    }
 }
 if(!silence) message("prepare output ... ")
 #dealing with multiple entrez_id for single feature_id

@@ -111,18 +111,14 @@ head(macs_peak_ensembl, n = 2)
 For more regarding the metadata columns, please refer to the Section \@ref(findnearest). Of note, the metadata does not come with "gene symbol" column. We can add it using the `addGeneIDs` function as below.
 
 ## Add gene symbols
-To add _gene symbols_, we can leverage either the organism annotation package, namely `r Biocpkg("org.Hs.eg.db")`, or the `r Biocpkg("bioRmart")` package. The latter offers the most current information but may have a slower performance as it requires querying the [BioMart](https://useast.ensembl.org/info/data/biomart/index.html) databases in real time. Once the required package is loaded, you can use the `addGeneIDs` function to add _gene symbols_. The following example utilizes the `r Biocpkg("bioRmart")` method.
+To add _gene symbols_, we can leverage either the organism annotation package, namely `r Biocpkg("org.Hs.eg.db")`, or the `r Biocpkg("bioRmart")` package. The latter offers the most current information but may have a slower performance as it requires querying the [BioMart](https://useast.ensembl.org/info/data/biomart/index.html) databases in real time. Once the required package is loaded, you can use the `addGeneIDs` function to add _gene symbols_. The following example utilizes the `r Biocpkg("EnsDb")` method.
 
 ```{r}
-library(biomaRt)
-mart <- useMart(biomart = "ENSEMBL_MART_ENSEMBL",
-                dataset = "hsapiens_gene_ensembl")
-
 # Use Ensembl annotation package:
 macs_peak_ensembl <- addGeneIDs(annotatedPeak = macs_peak_ensembl, 
-                                mart = mart,
+                                orgAnn = EnsDb.Hsapiens.v86,
                                 feature_id_type = "ensembl_transcript_id",
-                                IDs2Add = "hgnc_symbol")
+                                IDs2Add = "SYMBOL")
 head(macs_peak_ensembl, n = 2)
 ```
 
@@ -737,15 +733,11 @@ For this example, we annotate the `macs_peak_gr2` (obtained in Section \@ref(rea
 ```{r}
 txdb.hg38.transcript <- transcripts(TxDb.Hsapiens.UCSC.hg38.knownGene)
 head(txdb.hg38.transcript, n = 4)
-head(names(txdb.hg38.transcript), n = 4)
 ```
 
 It appears that the `txdb.hg38.transcript` contains a metadata column called _tx_name_, which holds the Ensembl transcript IDs. However, the `annotatePeakInBatch` function requires this information to be stored as the names of the `txdb.hg38.trancsript` object (`names(txdb.hg38.transcript)`). This is necessary to generate annotated peaks that are compatible with the `addGeneIDs` function. To achieve this, we need to extract the transcript IDs and assign them as names. Below is how.
 ```{r}
-tr_id <- txdb.hg38.transcript$tx_name
-tr_id <- sub("\\..*$", "", tr_id) # get rid of the trailing version number
-names(txdb.hg38.transcript) <- tr_id
-head(txdb.hg38.transcript, n = 4)
+names(txdb.hg38.transcript) <- txdb.hg38.transcript$tx_name
 ```
 
 Now, we can annotate `macs_peak_gr2` with `annotatePeakInBatch`.
@@ -757,15 +749,28 @@ head(res, n = 2)
 
 As anticipated, the resulting `feature` column contains Ensembl transcript IDs. Next, we utilize the `mart` option to add gene symbols.
 ```{r}
-library(biomaRt)
+tryCatch({
+  # we will first try biomaRt
+  library(biomaRt)
 
-mart <- useMart(biomart = "ENSEMBL_MART_ENSEMBL",
-                dataset = "hsapiens_gene_ensembl")
-res <- addGeneIDs(res, 
-                  mart = mart,
-                  feature_id_type = "ensembl_transcript_id",
-                  IDs2Add = "hgnc_symbol")
-head(res, n = 2)
+  mart <- useMart(biomart = "ensembl",
+                  dataset = "hsapiens_gene_ensembl")
+  res <- addGeneIDs(res, 
+                    mart = mart,
+                    feature_id_type = "ensembl_transcript_id",
+                    IDs2Add = "hgnc_symbol")
+  head(res, n = 2)
+}, error=function(e){
+  message(e)
+  library(org.Hs.eg.db)
+  res <- addGeneIDs(res, 
+                    orgAnn = TxDb.Hsapiens.UCSC.hg38.knownGene,
+                    feature_id_type = "ensembl_transcript_id",
+                    IDs2Add = "GENEID")
+  res$symbol[!is.na(res$GENEID)] <- 
+    xget(res$GENEID[!is.na(res$GENEID)], org.Hs.egSYMBOL, output = 'first')
+  tail(res, n = 2)
+})
 ```
 
 Use `listMarts` to show available `biomart` and use `listDatasets` to show available `dataset`. Be aware that, unlike using `OrgDb` option, we must supply `hgnc_symbol` instead of `symbol` for the `IDs2Add` argument.
