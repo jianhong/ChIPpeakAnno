@@ -106,6 +106,11 @@ genomicElementDistribution <-
     }else{
       isGRanges <- FALSE
     }
+    null <- lapply(peaks, function(.ele){
+      if(any(duplicated(.ele))){
+        warning('The input peaks is not unique!')
+      }
+    })
     stopifnot("TxDb must be an object of TxDb"=is(TxDb, "TxDb"))
     stopifnot("nuleotideLevel is not logical"=is.logical(nucleotideLevel))
     stopifnot("promoterRegion should contain element upstream and downstream"=
@@ -227,8 +232,8 @@ genomicElementDistribution <-
           dws <- downstreams(g,
                              upstream = geneDownstream["upstream"],
                              downstream = geneDownstream["downstream"])
-          pro <- GenomicRanges::trim(pro)
-          dws <- GenomicRanges::trim(dws)
+          pro <- GenomicRanges::trim(unique(pro))
+          dws <- GenomicRanges::trim(unique(dws))
           intergenic <- gaps(reduce(c(pro, g, dws), ignore.strand=FALSE))
           intergenic <- intergenic[!strand(intergenic) %in% "*"]
           current_anno <- GRanges()
