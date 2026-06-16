@@ -146,7 +146,7 @@ featureAlignedExtendSignal <- function(bamfiles, index=bamfiles,
     if(galInput){
       bams.gr <- mapply(function(ga, .fLen){
         if(is(ga, "GAlignmentPairs")){
-          granges(.ele)
+          granges(ga)
         }else{
           qname <- mcols(ga)$qname
           if(pe=="auto"){
