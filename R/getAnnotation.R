@@ -35,8 +35,14 @@
 #' if (interactive() || Sys.getenv("USER")=="jou" )
 #' {
 #'   library(biomaRt)
-#'   mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-#'   Annotation <- getAnnotation(mart, featureType="TSS")
+#'   tryCatch({
+#'      mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+#'      Annotation <- getAnnotation(mart, featureType="TSS")
+#'    }, httr2_error=function(.e){
+#'        message('httr error. ', .e)
+#'    }, error=function(.e){
+#'        message(.e)
+#'    })
 #' }
 #' 
 #' ##########################################################

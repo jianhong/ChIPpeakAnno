@@ -1,7 +1,12 @@
+CHANGES IN VERSION 3.47.3
+-------------------------
+
+    o Update the vignettes to stop trying biomaRt since it is not stable.
+    
 CHANGES IN VERSION 3.47.2
 -------------------------
 
-    o Add warning message when the input is not unique for genomicElementDistribution.
+    o Fix a bug in featureAlignedExtendSignal when input is GAlignmentPairs.
     
 CHANGES IN VERSION 3.47.1
 -------------------------
