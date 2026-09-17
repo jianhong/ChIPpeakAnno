@@ -6,8 +6,7 @@
 #' 
 #' @name permPool-class
 #' @rdname permPool
-#' @aliases permPool permPool-class permPool-method $,permPool-method
-#' $<-,permPool-method
+#' @aliases permPool permPool-class permPool-method $,permPool-method $<-,permPool-method
 #' @docType class
 #' @section Objects from the Class: Objects can be created by calls of the form
 #' \code{new("permPool", grs="GRangesList", N="integer")}.

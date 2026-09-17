@@ -26,7 +26,7 @@
 #' @keywords misc
 #' @export
 #' @importFrom BiocGenerics start end width strand
-#' @importFrom GenomeInfoDb seqlengths seqlevels seqnames `seqlengths<-`
+#' @importFrom GenomeInfoDb seqlengths seqlevels seqnames "seqlengths<-"
 #' @importFrom Biostrings getSeq
 #' @examples
 #' 
@@ -36,7 +36,8 @@
 #'                          names=c("peak1", "peak2")))
 #' library(BSgenome.Ecoli.NCBI.20080805)
 #' seq <- getAllPeakSequence(peaks, upstream=20, downstream=20, genome=Ecoli)
-#' write2FASTA(seq, file="test.fa")
+#' output <- tempfile(fileext = '.fa')
+#' write2FASTA(seq, file=output)
 #' 
 getAllPeakSequence <- function(myPeakList, 
                                upstream=200L, downstream=upstream, 

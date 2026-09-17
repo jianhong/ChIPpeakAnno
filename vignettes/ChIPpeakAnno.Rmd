@@ -2,7 +2,7 @@
 title: "ChIPpeakAnno: annotate, visualize, and compare peak data"
 author:
 - name: Jianhong Ou
-  affiliation: Duke Univeristy, Durham, USA
+  affiliation: Morgridge Institute for Research, Wisconsin, USA
 - name: Kai Hu
   affiliation: UMass Chan Medical School, Worcester, USA
 - name: Haibo Liu

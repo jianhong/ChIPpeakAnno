@@ -14,6 +14,8 @@
 \alias{annoGR,EnsDb-method}
 \title{Class \code{annoGR}}
 \usage{
+\S4method{coerce}{annoGR,GRanges}(from, to = "GRanges", strict = TRUE)
+
 \S4method{info}{annoGR}(object)
 
 \S4method{annoGR}{GRanges}(ranges, feature = "group", date, ...)
@@ -37,6 +39,11 @@
 )
 }
 \arguments{
+\item{from, to}{The classes between which the coerce methods def and replace
+perform coercion.}
+
+\item{strict}{Logical. Not relevant.}
+
 \item{object}{annoGR object.}
 
 \item{ranges}{an object of \link[GenomicRanges:GRanges-class]{GRanges},

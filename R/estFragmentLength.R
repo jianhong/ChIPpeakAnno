@@ -16,8 +16,7 @@
 #' @author Jianhong Ou
 #' @keywords misc
 #' @export
-#' @importFrom Rsamtools testPairedEndBam scanBam ScanBamParam scanBamFlag
-#' scanBamHeader countBam 
+#' @importFrom Rsamtools testPairedEndBam scanBam ScanBamParam scanBamFlag scanBamHeader countBam 
 #' @importFrom GenomicAlignments readGAlignments
 #' @importFrom stats loess.smooth ts
 #' @examples

@@ -32,11 +32,8 @@
 #' @param plot logic. Plot the pie chart for the genomic elements or not.
 #' @param keepExonsInGenesOnly logic. Keep the exons within annotated gene only.
 #' @export
-#' @importFrom ggplot2 ggplot geom_rect xlim coord_polar aes_string geom_bar
-#' coord_flip scale_fill_manual theme_void theme_bw facet_wrap geom_col 
-#' geom_text guide_legend
-#' @importFrom GenomicFeatures intronsByTranscript exons fiveUTRsByTranscript 
-#' threeUTRsByTranscript genes
+#' @importFrom ggplot2 ggplot geom_rect xlim coord_polar aes_string geom_bar coord_flip scale_fill_manual theme_void theme_bw facet_wrap geom_col geom_text guide_legend
+#' @importFrom GenomicFeatures intronsByTranscript exons fiveUTRsByTranscript threeUTRsByTranscript genes
 #' @importFrom stats as.formula
 #' @return Invisible list of data for plot.
 #' @examples 

@@ -87,18 +87,21 @@
 #' 
 #' patternFilePath1 =system.file("extdata", "motifIRF4.fa", package="ChIPpeakAnno")
 #' patternFilePath2 =system.file("extdata", "motifAP1.fa", package="ChIPpeakAnno")
+#' 
+#' outfile <- tempfile(fileext = '.xls', pattern = 'testPaired.')
 #' pairedMotifs <- findMotifsInPromoterSeqs(patternFilePath1 = patternFilePath1,
 #'    patternFilePath2 = patternFilePath2,
 #'    findPairedMotif = TRUE,
 #'    name.motif1 = "IRF4", name.motif2 = "AP1",
 #'    BSgenomeName = BSgenome.Hsapiens.UCSC.hg38,
 #'    geneIDs = 7486, txdb = TxDb.Hsapiens.UCSC.hg38.knownGene,
-#'    outfile = "testPaired.xls")
+#'    outfile = outfile)
 #' 
+#' outfile <- tempfile(fileext = '.xls', pattern = 'testUnPaired.')
 #' unPairedMotifs <- findMotifsInPromoterSeqs(patternFilePath1 = patternFilePath1,
 #'     BSgenomeName = BSgenome.Hsapiens.UCSC.hg38,
 #'    geneIDs = 7486, txdb = TxDb.Hsapiens.UCSC.hg38.knownGene,
-#'    outfile = "testUnPaired.xls")
+#'    outfile = outfile)
 #' 
 findMotifsInPromoterSeqs <-
   function(patternFilePath1,
@@ -241,11 +244,15 @@ findMotifsInPromoterSeqs <-
       
       m2 <- cbind(names(x2.gr), as.data.frame(x2.gr))
       colnames(m2)[1] <- "feature"
-      m2 <- m2[, c(1:2, 7:8, 11)]
+      #m2 <- m2[, c(1:2, 7:8, 11)] #not work any more
+      m2 <- m2[, c('feature', 'seqnames', 
+                   'motifName', 'motifPattern',
+                   'motifFound')]
       colnames(m2)[3:5] <- paste(name.motif2, colnames(m2)[3:5])
       
       #m2$seqnames <- paste("chr", m2$seqnames, sep = "" )
-      
+      # remove the names column
+      temp$names <- NULL
       res <- merge(m2, temp, by = c("feature", "seqnames"))
       colnames(res)[6:14] <- paste(name.motif1, colnames(res)[6:14])
       # colnames(res):

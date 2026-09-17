@@ -47,7 +47,8 @@ peaks <- GRanges(seqnames=c("NC_008253", "NC_010468"),
                          names=c("peak1", "peak2")))
 library(BSgenome.Ecoli.NCBI.20080805)
 seq <- getAllPeakSequence(peaks, upstream=20, downstream=20, genome=Ecoli)
-write2FASTA(seq, file="test.fa")
+output <- tempfile(fileext = '.fa')
+write2FASTA(seq, file=output)
 
 }
 \references{

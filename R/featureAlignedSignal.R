@@ -21,7 +21,7 @@
 #' @keywords misc
 #' @export
 #' @import GenomicRanges
-#' @importFrom BiocGenerics width start end strand `%in%`
+#' @importFrom BiocGenerics width start end strand "%in%"
 #' @importFrom S4Vectors runLength runValue Rle
 #' @importFrom GenomeInfoDb seqnames seqlengths 
 #' @examples

@@ -43,28 +43,42 @@ for mapping because the coordinates may differ for different genome releases.
 if (interactive() || Sys.getenv("USER")=="jou" )
 {
   library(biomaRt)
-  mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
-  Annotation <- getAnnotation(mart, featureType="TSS")
+  tryCatch({
+     mart <- useMart(biomart="ensembl", dataset="hsapiens_gene_ensembl")
+     Annotation <- getAnnotation(mart, featureType="TSS")
+   }, httr2_error=function(.e){
+       message('httr error. ', .e)
+   }, error=function(.e){
+       message(.e)
+   })
 }
 
 ##########################################################
 #  Below are 3 options to fetch the annotation file.     #
 ##########################################################
+
 if (interactive() || Sys.getenv("USER")=="jou" ){
 ## Option1: with the AnnotationHub package
-library(AnnotationHub)
-ah <- AnnotationHub()
-EnsDb.Mmusculus <- query(ah, pattern = c("Mus musculus", "EnsDb"))
-EnsDb.Mmusculus.v101 <- EnsDb.Mmusculus[[length(EnsDb.Mmusculus)]]
-class(EnsDb.Mmusculus.v101)
+  library(AnnotationHub)
+  ah <- AnnotationHub()
+  EnsDb.Mmusculus <- query(ah, pattern = c("Mus musculus", "EnsDb"))
+  EnsDb.Mmusculus.v101 <- EnsDb.Mmusculus[[length(EnsDb.Mmusculus)]]
+  class(EnsDb.Mmusculus.v101)
 
 ## Option2: with the getAnnotation() function
-library(ChIPpeakAnno)
-library(biomaRt)
-listMarts()
-mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL", 
-                dataset="mmusculus_gene_ensembl")
-Annotation <- getAnnotation(mart)
+  library(ChIPpeakAnno)
+  library(biomaRt)
+  listMarts()
+  tryCatch({
+    mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL", 
+                 dataset="mmusculus_gene_ensembl")
+    Annotation <- getAnnotation(mart)
+  }, httr2_error=function(.e){
+       message('httr error. ', .e)
+  }, error=function(.e){
+       message(.e)
+ })
+  
 # Note that getAnnotation() queries biomart, which is always up-to-date.
 
 ## Option3: build your own EnsDb package

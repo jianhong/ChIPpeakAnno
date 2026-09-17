@@ -151,7 +151,10 @@ setGeneric("info", function(object) standardGeneric("info"))
 #' @import GenomicRanges
 #' @rdname annoGR
 #' @aliases coerce,GRanges,annoGR-method
-#' coerce,annoGR,GRanges-method
+#' @aliases coerce,annoGR,GRanges-method
+#' @param from,to The classes between which the coerce methods def and replace
+#'  perform coercion.
+#' @param strict Logical. Not relevant.
 #' @exportMethod coerce
 setAs(from="annoGR", to="GRanges", function(from){
     do.call(GRanges, args=append(list(seqnames=seqnames(from), 

@@ -38,8 +38,7 @@
 #' @import GenomicRanges
 #' @importFrom BiocGenerics start end width strand
 #' @importFrom S4Vectors mcols
-#' @importFrom grid grid.newpage viewport legendGrob gpar gList gEdit rasterGrob
-#' gTree rasterGrob grid.pretty yaxisGrob grid.draw xaxisGrob
+#' @importFrom grid grid.newpage viewport legendGrob gpar gList gEdit rasterGrob gTree rasterGrob grid.pretty yaxisGrob grid.draw xaxisGrob
 #' @importFrom grDevices colorRampPalette col2rgb rgb
 #' @examples
 #' 

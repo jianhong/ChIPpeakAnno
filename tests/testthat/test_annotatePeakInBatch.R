@@ -6,7 +6,8 @@ test_that("annotatePeakInBatch works not correct", {
         s <- s[!is.na(s$feature)]
         if(length(s$feature)>0){
             s <- as.data.frame(s)
-            step <- step[rownames(s), ]
+            k <- if('names' %in% colnames(s)) s$names else rownames(s)
+            step <- step[k, ]
             step <- as.data.frame(step)
             for(i in c("peak", "feature", "start_position", 
                        "end_position", "distancetoFeature", 

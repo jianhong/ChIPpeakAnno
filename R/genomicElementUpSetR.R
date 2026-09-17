@@ -17,8 +17,7 @@
 #' c(upstream point, downstream point, promoter (-1) or downstream (1),
 #'  remove gene body or not (1: remove, 0: keep)).
 #' @export
-#' @importFrom GenomicFeatures intronsByTranscript exons fiveUTRsByTranscript 
-#' threeUTRsByTranscript genes cds promoters
+#' @importFrom GenomicFeatures intronsByTranscript exons fiveUTRsByTranscript threeUTRsByTranscript genes cds promoters
 #' @return list of data for plot.
 #' @examples 
 #' if (interactive() || Sys.getenv("USER")=="jou"){

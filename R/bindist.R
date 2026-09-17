@@ -7,8 +7,11 @@
 #' 
 #' @name bindist-class
 #' @rdname bindist
-#' @aliases bindist bindist-class bindist-method $,bindist-method
-#' $<-,bindist-method
+#' @aliases bindist
+#' @aliases bindist-class
+#' @aliases bindist-method
+#' @aliases $,bindist-method
+#' @aliases $<-,bindist-method
 #' @docType class
 #' @section Objects from the Class: Objects can be created by calls of the form
 #' \code{new("bindist", counts="integer", mids="integer",

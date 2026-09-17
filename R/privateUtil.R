@@ -14,7 +14,7 @@ formatStrand <- function(strand){
   strand
 }
 ###clear seqnames, the format should be chr+NUM
-#' @importFrom GenomeInfoDb `seqlevels<-` `seqlevelsStyle` `seqlevelsStyle<-`
+#' @importFrom GenomeInfoDb "seqlevels<-" seqlevelsStyle "seqlevelsStyle<-"
 formatSeqnames <- function(from, to) {
   forceFormatSeqnames <- function(from, to){
     message("\n Try to keep the seqname style consistent.")
@@ -65,12 +65,11 @@ formatSeqnames <- function(from, to) {
   seql <- seqlevelsStyle(to)
   seqf <- seqlevelsStyle(from)
   if(!seql[1] %in% seqf){
-    tried <- try({
-      seqlevelsStyle(from) <- seql[1]
-    })
-    if(inherits(tried, "try-error")){
+    tryCatch({
+      suppressWarnings(seqlevelsStyle(from) <- seql[1])
+    }, error=function(e){
       from <- forceFormatSeqnames(from, to)
-    }
+    })
   }
   
   seql <- seqlevelsStyle(to)
@@ -432,8 +431,7 @@ findOverlaps1 <- function(query, subject, maxgap=-1L,
 #' @param feature feature type, could be geneModel, gene, exon, 
 #' transcript, CDS, fiveUTR, threeUTR, microRNA, and tRNA
 #' @param OrganismDb org db object
-#' @importFrom GenomicFeatures exonsBy cdsBy fiveUTRsByTranscript 
-#' threeUTRsByTranscript genes exons transcripts cds tRNAs
+#' @importFrom GenomicFeatures exonsBy cdsBy fiveUTRsByTranscript threeUTRsByTranscript genes exons transcripts cds tRNAs
 #' @importFrom AnnotationDbi select
 TxDb2GR <- function(ranges, feature, OrganismDb){
     switch(feature,
@@ -600,7 +598,7 @@ TxDb2GR <- function(ranges, feature, OrganismDb){
 #' @param feature feature type, could be disjointExons, gene, exon and 
 #' transcript
 #' @importFrom GenomicFeatures exonicParts
-#' @importFrom GenomeInfoDb `seqlevelsStyle<-`
+#' @importFrom GenomeInfoDb "seqlevelsStyle<-"
 EnsDb2GR <- function(ranges, feature){
     gr <- 
         switch(feature,

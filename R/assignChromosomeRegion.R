@@ -85,8 +85,7 @@
 #' @import GenomicRanges
 #' @importFrom GenomeInfoDb keepSeqlevels seqlevels
 #' @importFrom BiocGenerics start end width strand
-#' @importFrom GenomicFeatures exons intronsByTranscript fiveUTRsByTranscript 
-#' threeUTRsByTranscript transcripts tRNAs
+#' @importFrom GenomicFeatures exons intronsByTranscript fiveUTRsByTranscript threeUTRsByTranscript transcripts tRNAs
 #' @examples
 #' 
 #' if (interactive() || Sys.getenv("USER")=="jou"){

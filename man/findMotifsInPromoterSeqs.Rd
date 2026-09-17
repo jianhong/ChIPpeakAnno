@@ -134,18 +134,21 @@ library("TxDb.Hsapiens.UCSC.hg38.knownGene")
 
 patternFilePath1 =system.file("extdata", "motifIRF4.fa", package="ChIPpeakAnno")
 patternFilePath2 =system.file("extdata", "motifAP1.fa", package="ChIPpeakAnno")
+
+outfile <- tempfile(fileext = '.xls', pattern = 'testPaired.')
 pairedMotifs <- findMotifsInPromoterSeqs(patternFilePath1 = patternFilePath1,
    patternFilePath2 = patternFilePath2,
    findPairedMotif = TRUE,
    name.motif1 = "IRF4", name.motif2 = "AP1",
    BSgenomeName = BSgenome.Hsapiens.UCSC.hg38,
    geneIDs = 7486, txdb = TxDb.Hsapiens.UCSC.hg38.knownGene,
-   outfile = "testPaired.xls")
+   outfile = outfile)
 
+outfile <- tempfile(fileext = '.xls', pattern = 'testUnPaired.')
 unPairedMotifs <- findMotifsInPromoterSeqs(patternFilePath1 = patternFilePath1,
     BSgenomeName = BSgenome.Hsapiens.UCSC.hg38,
    geneIDs = 7486, txdb = TxDb.Hsapiens.UCSC.hg38.knownGene,
-   outfile = "testUnPaired.xls")
+   outfile = outfile)
 
 }
 \author{

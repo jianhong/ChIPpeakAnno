@@ -1,3 +1,8 @@
+CHANGES IN VERSION 3.47.4
+-------------------------
+
+    o Fix the bug for as.data.frame(GRangesObj).
+    
 CHANGES IN VERSION 3.47.3
 -------------------------
 
